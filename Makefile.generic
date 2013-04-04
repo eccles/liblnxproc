@@ -1,0 +1,32 @@
+
+.SUFFIXES: .c .o .so
+
+CC=gcc
+CCFLAGS=-fpic -I. -Wall
+SOFLAGS=-shared
+OBJS=$(SRCS:.c=.o)
+#TGT1=$(patsubst %,$(BIN)/%,$(SRCS))
+#TGT2=$(patsubst %,$(BIN)/%,$(OBJS))
+#TARGETS=$(TGT1) $(TGT2)
+
+%.o: %.c $(HDRS)
+	$(CC) $(CCFLAGS) -c $< -o $@
+
+all: $(LIB)
+	for d in $(DIRS); do (cd $$d; $(MAKE) ); done
+
+$(LIB): $(OBJS)
+	$(CC) $(SOFLAGS) -o $@ $^
+
+check: $(SRCS)
+	for d in $(DIRS); do (cd $$d; $(MAKE) check ); done
+	$(RELDIR)/check.sh $(SRCS)
+
+clean:
+	for d in $(DIRS); do (cd $$d; $(MAKE) clean ); done
+	rm -f $(OBJS)
+
+distclean:
+	for d in $(DIRS); do (cd $$d; $(MAKE) distclean ); done
+	rm -rf $(BIN)
+

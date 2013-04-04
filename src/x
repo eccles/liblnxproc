@@ -1,0 +1,1 @@
+static size_t array_type_field_size[2] = { sizeof(char *), sizeof(struct array_t *), };
