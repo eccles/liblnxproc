@@ -1,0 +1,13 @@
+
+C coding style
+--------------
+
+is modified K&R. the indent options are:
+
+    -kr -l80 -nce -nut
+
+    -kr - Kernighan and ritchie style
+    -l80 - 80 columns
+    -nce - don't cudddle elses
+    -nut - use spaces instead of tabs
+

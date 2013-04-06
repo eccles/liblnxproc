@@ -18,9 +18,9 @@ all: $(LIB)
 $(LIB): $(OBJS)
 	$(CC) $(SOFLAGS) -o $@ $^
 
-check: $(SRCS)
+check: $(HDRS) $(SRCS)
 	for d in $(DIRS); do (cd $$d; $(MAKE) check ); done
-	$(RELDIR)/check.sh $(SRCS)
+	$(RELDIR)/check.sh $(HDRS) $(SRCS)
 
 clean:
 	for d in $(DIRS); do (cd $$d; $(MAKE) clean ); done

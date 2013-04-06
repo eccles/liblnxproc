@@ -1,3 +1,11 @@
+# work files
+x
+y
+z
+
+# backup files
+*~
+
 # Object files
 *.o
 
@@ -15,3 +23,7 @@
 *.exe
 *.out
 *.app
+
+# core dumps
+vgcore*
+core*

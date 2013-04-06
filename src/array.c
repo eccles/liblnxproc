@@ -1,25 +1,25 @@
 /*
-This file is part of liblnxproc.
-
-    liblnxproc is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    liblnxproc is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with liblnxproc.  If not, see <http://www.gnu.org/licenses/>.
-
-    Copyright 2013 Paul Hewlett, phewlett76@gmail.com
-
-*/
+ * This file is part of liblnxproc.
+ *
+ *  liblnxproc is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  liblnxproc is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with liblnxproc.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  Copyright 2013 Paul Hewlett, phewlett76@gmail.com
+ *
+ */
 
 /* This file is a re-implementation of the 'list' type from Python
-*/
+ */
 
 #include "array.h"
 
@@ -27,212 +27,328 @@ This file is part of liblnxproc.
 #include <stdlib.h>
 #include <string.h>
 
-//struct array_t {
-//    size_t length;
-//    size_t size;
-//    void *data[];
-//};
+struct lnxproc_array_t {
+    size_t length;
+    size_t size;
+    int recursive;
+    void *data;
+};
 
-static size_t array_type_field_size[2] = { sizeof(char *), sizeof(struct array_t *), };
+static char *errstr[] = {
+    "No error",
+    "Fail to malloc array header",
+    "Fail to malloc array data",
+    "Array arg is null",
+    "Fail to realloc array data",
+    "Index out of range",
+};
 
-struct array_t *array_new(size_t size, enum array_type_t type) {
-    struct array_t *array = NULL;
-    void *p = malloc( sizeof(struct array_t));
-    if( p ) {
-        array = p;
-        array->length = 0;
-        array->size = size;
-        array->fsize = array_type_field_size[type];
-        array->type = type;
-        /* We have to malloc this separately as other objects may hold 
-           references to 'array' and we do not want 'array' to change on a 
-           realloc */
-        array->data = malloc( size * array->fsize);
-        if( !array->data ) {
+void lnxproc_array_error_print_callback(const char *func,
+                                        enum lnxproc_array_error_t err)
+{
+    if (err > 0) {
+        printf("Error: %s -> %s\n", func, errstr[err]);
+    }
+}
+
+void (*lnxproc_array_error_callback) (const char *func,
+                                      enum lnxproc_array_error_t err) = NULL;
+
+static void array_set_error(const char *func, enum lnxproc_array_error_t err)
+{
+    if (lnxproc_array_error_callback) {
+        lnxproc_array_error_callback(func, err);
+    }
+}
+
+static void *array_malloc(size_t size)
+{
+    size_t n = size * sizeof(void *);
+    void *p = malloc(n);
+    if (p) {
+        memset(p, 0, n);
+    }
+    return p;
+}
+
+static void *array_realloc(void *old, size_t osize, size_t size)
+{
+    size_t nsize = osize + size;
+    size_t n = nsize * sizeof(void *);
+    void *p = realloc(old, n);
+    if (p) {
+        void *prev = p + (osize * sizeof(void *));
+        n = size * sizeof(void *);
+        memset(prev, 0, n);
+    }
+    return p;
+}
+
+struct lnxproc_array_t *lnxproc_array_new(size_t size, int recursive)
+{
+
+    struct lnxproc_array_t *array = NULL;
+    void *p = malloc(sizeof(struct lnxproc_array_t));
+    if (!p) {
+        array_set_error(__func__, LNXPROC_ARRAY_ERROR_MALLOC_HEADER);
+        return p;
+    }
+    array = p;
+    array->length = 0;
+    array->size = size;
+    array->recursive = recursive;
+
+    /* We have to malloc this separately as other objects may hold 
+     * references to 'array' and we do not want 'array' to change on a 
+     * realloc 
+     */
+    if (size > 0) {
+        array->data = array_malloc(size);
+        if (!array->data) {
             free(array);
             array = NULL;
+            array_set_error(__func__, LNXPROC_ARRAY_ERROR_MALLOC_DATA);
         }
     }
-    return array;   
-}
-
-
-struct array_t *array_resize(struct array_t *array, size_t size) {
-    if( array ) {
-        void *p = realloc(array->data, array->size + (size * array->fsize));
-        if ( p ) {
-            array->data = p;
-            array->size += size;
-        }
-    }
-    return array;   
-}
-
-void *array_get(struct array_t *array, size_t idx) {
-    void *val = NULL;
-    if( array && ( idx < array->length ) ) {
-        switch ( array->type ) {
-            case LNXPROC_ARRAY_TYPE_CHARPTR:
-                val = ((char **)array->data)[idx];
-                break;
-            case LNXPROC_ARRAY_TYPE_STRUCTPTR:
-                val = ((struct array_t **)array->data)[idx];
-                break;
-        }
-    }
-    return val;
-}
-
-struct array_t *array_set(struct array_t *array, size_t idx, void *val) {
-    if( array ) {
-        if( idx < array->length ) {
-            switch ( array->type ) {
-                case LNXPROC_ARRAY_TYPE_CHARPTR:
-                    ((char **)array->data)[idx] = val;
-                    break;
-                case LNXPROC_ARRAY_TYPE_STRUCTPTR:
-                    ((struct array_t **)array->data)[idx] = val;
-                    break;
-            }
-        }
-        else if( idx == array->length ) {
-            if( idx > array->size ) {
-                array = array_resize(array,1);
-            }
-            switch ( array->type ) {
-                case LNXPROC_ARRAY_TYPE_CHARPTR:
-                    ((char **)array->data)[idx] = val;
-                    break;
-                case LNXPROC_ARRAY_TYPE_STRUCTPTR:
-                    ((struct array_t **)array->data)[idx] = val;
-                    break;
-            }
-            array->length++;
-        }
+    else {
+        array->data = NULL;
     }
     return array;
 }
 
-int array_iterate(struct array_t *array, 
-                  void *data,
-                  int start,
-                  int end,
-                  int (*func)(struct array_t *array,
-                              void *data, 
-                              int idx, 
-                              void *val)) {
-    if( array ) {
-        int i;
-        if ( start < 0 ) start = 0;
-        else if ( start > array->length ) start = array->length;
-        if ( end < 0 ) end = array->length;
-        else if ( end > array->length ) end = array->length;
-        for( i = start; i < end; i++ ) {
-            func(array,data,i,array->data + (i * array->fsize));
-        }
-        return 0;
+struct lnxproc_array_t *lnxproc_array_free(struct lnxproc_array_t *array)
+{
+    if (!array) {
+        array_set_error(__func__, LNXPROC_ARRAY_ERROR_NULL);
+        return array;
     }
-    return 1;
+    if (array->data) {
+        if (array->recursive) {
+            int i;
+            for (i = 0; i < array->size; i++) {
+                void *a;
+                memcpy(&a, array->data + (i * sizeof(void *)), sizeof(void *));
+                if (a) {
+                    a = lnxproc_array_free(a);
+                }
+            }
+        }
+        free(array->data);
+        array->data = NULL;
+    }
+    free(array);
+    array = NULL;
+    return array;
 }
 
-static int array_destroy_internal(struct array_t *array,
-                              void *data, 
-                              int idx, 
-                              void *val) {
-    if( array ) {
-        void *p = array_get(array, idx);
-        if ( array->type == LNXPROC_ARRAY_TYPE_STRUCTPTR ) {
-            array_iterate(p,NULL,-1,-1,array_destroy_internal);
-        }
-        return 0;
+int lnxproc_array_resize(struct lnxproc_array_t *array, size_t size)
+{
+    if (!array) {
+        array_set_error(__func__, LNXPROC_ARRAY_ERROR_NULL);
+        return 1;
     }
-    return 1;
-}
-struct array_t *array_destroy(struct array_t *array) {
-    if( array ) {
-        if ( array->type == LNXPROC_ARRAY_TYPE_STRUCTPTR ) {
-            array_iterate(array,NULL,-1,-1,array_destroy_internal);
-        }
-        if ( array->data ) {
-            free(array->data);
-            array->data = NULL;
-        }
-        free(array);
+    size_t osize = array->size;
+    void *p = array_realloc(array->data, osize, size);
+    if (!p) {
+        array_set_error(__func__, LNXPROC_ARRAY_ERROR_REALLOC_DATA);
+        return 1;
     }
-    return NULL;
+    array->data = p;
+    array->size += size;
+    return 0;
 }
 
-int array_clear(struct array_t *array) {
-    if( array ) {
-        if ( array->type == LNXPROC_ARRAY_TYPE_STRUCTPTR ) {
-        }
-        array->length = 0;
-        return 0;
+void *lnxproc_array_addr(struct lnxproc_array_t *array, size_t idx)
+{
+    void *val = NULL;
+    if (!array) {
+        array_set_error(__func__, LNXPROC_ARRAY_ERROR_NULL);
+        return val;
     }
-    return 1;
+    if (idx >= array->size) {
+        array_set_error(__func__, LNXPROC_ARRAY_ERROR_INDEX_OUT_OF_RANGE);
+        return val;
+    }
+    val = array->data + (idx * sizeof(void *));
+    return val;
+}
+
+void *lnxproc_array_get(struct lnxproc_array_t *array, size_t idx)
+{
+    void *val = NULL;
+    if (!array) {
+        array_set_error(__func__, LNXPROC_ARRAY_ERROR_NULL);
+        return val;
+    }
+    if (idx >= array->size) {
+        array_set_error(__func__, LNXPROC_ARRAY_ERROR_INDEX_OUT_OF_RANGE);
+        return val;
+    }
+    memcpy(&val, array->data + (idx * sizeof(void *)), sizeof(void *));
+    return val;
+}
+
+size_t lnxproc_array_size(struct lnxproc_array_t * array)
+{
+    size_t size = -1;
+    if (!array) {
+        array_set_error(__func__, LNXPROC_ARRAY_ERROR_NULL);
+        return size;
+    }
+    size = array->size;
+    return size;
+}
+
+int lnxproc_array_set(struct lnxproc_array_t *array, size_t idx, void *val)
+{
+    if (!array) {
+        array_set_error(__func__, LNXPROC_ARRAY_ERROR_NULL);
+        return 1;
+    }
+    if (idx < array->length) {
+        memcpy(array->data + (idx * sizeof(void *)), &val, sizeof(void *));
+    }
+    else if (idx == array->length) {
+        if (idx == array->size) {
+            int err = lnxproc_array_resize(array, 1);
+            if (err) {
+                array_set_error(__func__, err);
+                return err;
+            }
+        }
+        memcpy(array->data + (idx * sizeof(void *)), &val, sizeof(void *));
+        array->length++;
+    }
+    else {
+        array_set_error(__func__, LNXPROC_ARRAY_ERROR_INDEX_OUT_OF_RANGE);
+        return 1;
+    }
+    return 0;
+}
+
+int lnxproc_array_set_last(struct lnxproc_array_t *array, size_t idx, void *val)
+{
+    int ret = lnxproc_array_set(array, idx, val);
+    if (ret == 0) {
+        array->length = idx + 1;
+    }
+    return ret;
+}
+
+int lnxproc_array_append(struct lnxproc_array_t *array, void *val)
+{
+    return lnxproc_array_set(array, array->length, val);
+}
+
+int lnxproc_array_set_length(struct lnxproc_array_t *array, size_t idx)
+{
+    if (!array) {
+        array_set_error(__func__, LNXPROC_ARRAY_ERROR_NULL);
+        return 1;
+    }
+    if (idx >= array->size) {
+        array_set_error(__func__, LNXPROC_ARRAY_ERROR_INDEX_OUT_OF_RANGE);
+        return 1;
+    }
+    array->length = idx + 1;
+    return 0;
+}
+
+int lnxproc_array_iterate(struct lnxproc_array_t *array,
+                          void *data,
+                          int start, int end, LNXPROC_ARRAY_ITERATE_FUNC func)
+{
+    if (!array) {
+        array_set_error(__func__, LNXPROC_ARRAY_ERROR_NULL);
+        return 1;
+    }
+    int i;
+    if (start < 0) {
+        start = 0;
+    }
+    else if (start > array->length) {
+        start = array->length;
+    }
+    if (end < 0) {
+        end = array->length;
+    }
+    else if (end > array->size) {
+        end = array->size;
+    }
+    for (i = start; i < end; i++) {
+        func(array, data, i);
+    }
+    return 0;
 }
 
 struct array_print_var_t {
     int depth;
 };
 
-static int array_print_depth( struct array_print_var_t *printvar ) {
+static int array_print_depth(struct array_print_var_t *printvar)
+{
     int depth = 0;
-    if( printvar ) depth = printvar->depth;
+    if (printvar)
+        depth = printvar->depth;
     return depth;
 }
-static void array_print_indent( int depth ) {
+
+static void array_print_indent(int depth)
+{
     int i;
-    for (i = 0; i < depth; i++ ) {
+    for (i = 0; i < depth; i++) {
         printf("    ");
     }
 }
-static int array_print_internal(struct array_t *array,
-                              void *data, 
-                              int idx, 
-                              void *val) {
-    if( array ) {
-        void *p = array_get(array, idx);
-        int depth = 0;
-        switch ( array->type ) {
-            case LNXPROC_ARRAY_TYPE_CHARPTR:
-                depth = array_print_depth( data);
-                array_print_indent( depth);
-                printf( "--> Value %d:%s\n", idx, (char *)p );
-                break;
-            case LNXPROC_ARRAY_TYPE_STRUCTPTR:
-                depth = array_print_depth( data);
-                array_print_indent( depth);
-                struct array_print_var_t printvar = {
-                    .depth = depth + 1,
-                };
-                printf( "--> Value %d:%p\n", idx, p );
-                array_print(p,&printvar);
-                break;
-        }
-        return 0;
+
+static int array_print_internal(struct lnxproc_array_t *array,
+                                void *data, int idx)
+{
+    if (!array) {
+        array_set_error(__func__, LNXPROC_ARRAY_ERROR_NULL);
+        return 1;
     }
-    return 1;
+    void *a = lnxproc_array_addr(array, idx);
+    void *p = lnxproc_array_get(array, idx);
+    int depth = array_print_depth(data);
+    array_print_indent(depth);
+    if (array->recursive) {
+        struct array_print_var_t printvar = {
+            .depth = depth + 1,
+        };
+        printf("--> %d:Addr %p Value %p\n", idx, a, p);
+        if (p)
+            lnxproc_array_print(p, &printvar);
+    }
+    else {
+        printf("--> %d:Addr %p Value %p '%s'\n", idx, a, p, (char *) p);
+    }
+    return 0;
 }
 
-int array_print(struct array_t *array, void *data) {
+int lnxproc_array_print(struct lnxproc_array_t *array, void *data)
+{
     int depth = array_print_depth(data);
-    array_print_indent( depth);
-    printf( "Array at %p\n", array);
-    if( array ) {
-        array_print_indent( depth);
-        printf( "Array size %zd\n", array->size );
-        array_print_indent( depth);
-        printf( "Array length %zd\n", array->length );
-        array_print_indent( depth);
-        printf( "Array type %d\n", array->type );
-        array_print_indent( depth);
-        printf( "Array fsize %zd\n", array->fsize );
-        array_print_indent( depth);
-        printf( "Array data at %p\n", array->data );
-        array_print_indent( depth);
-        array_iterate(array,data,-1,-1,array_print_internal);
-        return 0;
+    array_print_indent(depth);
+    printf("Array at %p\n", array);
+    if (!array) {
+        array_set_error(__func__, LNXPROC_ARRAY_ERROR_NULL);
+        return 1;
     }
-    return 1;
+    array_print_indent(depth);
+    printf("Array size %zd\n", array->size);
+    array_print_indent(depth);
+    printf("Array length %zd\n", array->length);
+    array_print_indent(depth);
+    printf("Array recursive %d\n", array->recursive);
+    array_print_indent(depth);
+    printf("Array data at %p\n", array->data);
+    //array_iterate(array,data,-1,array->size,array_print_internal);
+    lnxproc_array_iterate(array, data, -1, -1, array_print_internal);
+    printf("\n");
+    return 0;
 }
+
+/* 
+ * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab 
+ */

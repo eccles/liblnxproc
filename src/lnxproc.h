@@ -30,8 +30,9 @@ extern "C" {
 #include "proc_cgroups.h"
 
 #ifdef __cplusplus
-} // extern "C"
+}                               // extern "C"
 #endif
-
-#endif // LIBLNXPROC_H
-
+#endif                          // LIBLNXPROC_H
+/* 
+ * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab 
+ */
