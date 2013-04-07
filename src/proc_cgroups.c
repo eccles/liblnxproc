@@ -30,14 +30,16 @@ typical contents of /proc/cgroups file::
 
 */
 
-#include "array.h"
-#include "proc_cgroups.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-static int proccgroups_func(struct lnxproc_base_t *base, int i, int j,
+#include "error.h"
+#include "base.h"
+#include "array.h"
+#include "proc_cgroups.h"
+
+static int proccgroups_func(LNXPROC_BASE_T *base, int i, int j,
                             char *val)
 {
 
@@ -46,7 +48,7 @@ static int proccgroups_func(struct lnxproc_base_t *base, int i, int j,
     void *map = lnxproc_base_map(base);
     /* map should only be null when both i && j are 0 */
     if (!map) {
-        map = lnxproc_array_new(2, 1);
+        map = lnxproc_array_new(2, 1, lnxproc_error_print_callback);
         if (!map) {
             printf("Map allocation failure\n");
             return 1;
@@ -57,7 +59,7 @@ static int proccgroups_func(struct lnxproc_base_t *base, int i, int j,
     void *f = lnxproc_array_get(map, i);
     /* f should only be null when j is 0 */
     if (!f) {
-        f = lnxproc_array_new(2, 0);
+        f = lnxproc_array_new(2, 0, lnxproc_error_print_callback);
         if (!f) {
             printf("Field allocation failure\n");
             return 1;
@@ -73,10 +75,10 @@ static int proccgroups_func(struct lnxproc_base_t *base, int i, int j,
     return 0;
 }
 
-int lines_split(struct lnxproc_base_t *base,
+int lines_split(LNXPROC_BASE_T *base,
                 char *line_limit,
                 char *field_limit,
-                int (*func) (struct lnxproc_base_t *, int, int, char *))
+                int (*func) (LNXPROC_BASE_T *, int, int, char *))
 {
 
     int n = lnxproc_base_nbytes(base);
@@ -120,18 +122,18 @@ int lines_split(struct lnxproc_base_t *base,
     return 0;
 }
 
-static int proccgroups_normalize(struct lnxproc_base_t *base)
+static int proccgroups_normalize(LNXPROC_BASE_T *base)
 {
     lines_split(base, "\n", "\t", proccgroups_func);
     return 0;
 }
 
-struct lnxproc_base_t *proccgroups_init(void)
+LNXPROC_BASE_T *proccgroups_init(void)
 {
     return lnxproc_base_init("/proc/cgroups",
                              NULL,
                              proccgroups_normalize,
-                             NULL, 256, &proccgroups_data);
+                             NULL, NULL, 256, &proccgroups_data);
 }
 
 /* 

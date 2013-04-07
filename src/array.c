@@ -21,45 +21,21 @@
 /* This file is a re-implementation of the 'list' type from Python
  */
 
-#include "array.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "error.h"
+#include "array.h"
+
 struct lnxproc_array_t {
+    LNXPROC_ERROR_CALLBACK callback;
     size_t length;
     size_t size;
     int recursive;
     void *data;
 };
-
-static char *errstr[] = {
-    "No error",
-    "Fail to malloc array header",
-    "Fail to malloc array data",
-    "Array arg is null",
-    "Fail to realloc array data",
-    "Index out of range",
-};
-
-void lnxproc_array_error_print_callback(const char *func,
-                                        enum lnxproc_array_error_t err)
-{
-    if (err > 0) {
-        printf("Error: %s -> %s\n", func, errstr[err]);
-    }
-}
-
-void (*lnxproc_array_error_callback) (const char *func,
-                                      enum lnxproc_array_error_t err) = NULL;
-
-static void array_set_error(const char *func, enum lnxproc_array_error_t err)
-{
-    if (lnxproc_array_error_callback) {
-        lnxproc_array_error_callback(func, err);
-    }
-}
 
 static void *array_malloc(size_t size)
 {
@@ -84,19 +60,20 @@ static void *array_realloc(void *old, size_t osize, size_t size)
     return p;
 }
 
-struct lnxproc_array_t *lnxproc_array_new(size_t size, int recursive)
+LNXPROC_ARRAY_T *lnxproc_array_new(size_t size, int recursive, LNXPROC_ERROR_CALLBACK callback)
 {
 
-    struct lnxproc_array_t *array = NULL;
-    void *p = malloc(sizeof(struct lnxproc_array_t));
+    LNXPROC_ARRAY_T *array = NULL;
+    void *p = malloc(sizeof(LNXPROC_ARRAY_T));
     if (!p) {
-        array_set_error(__func__, LNXPROC_ARRAY_ERROR_MALLOC_HEADER);
+        lnxproc_set_error(callback,__func__, LNXPROC_ERROR_ARRAY_MALLOC_HEADER);
         return p;
     }
     array = p;
     array->length = 0;
     array->size = size;
     array->recursive = recursive;
+    array->callback = callback;
 
     /* We have to malloc this separately as other objects may hold 
      * references to 'array' and we do not want 'array' to change on a 
@@ -107,7 +84,7 @@ struct lnxproc_array_t *lnxproc_array_new(size_t size, int recursive)
         if (!array->data) {
             free(array);
             array = NULL;
-            array_set_error(__func__, LNXPROC_ARRAY_ERROR_MALLOC_DATA);
+            lnxproc_set_error(callback,__func__, LNXPROC_ERROR_ARRAY_MALLOC_DATA);
         }
     }
     else {
@@ -116,12 +93,9 @@ struct lnxproc_array_t *lnxproc_array_new(size_t size, int recursive)
     return array;
 }
 
-struct lnxproc_array_t *lnxproc_array_free(struct lnxproc_array_t *array)
+LNXPROC_ARRAY_T *lnxproc_array_free(LNXPROC_ARRAY_T *array)
 {
-    if (!array) {
-        array_set_error(__func__, LNXPROC_ARRAY_ERROR_NULL);
-        return array;
-    }
+    if (array) {
     if (array->data) {
         if (array->recursive) {
             int i;
@@ -138,72 +112,68 @@ struct lnxproc_array_t *lnxproc_array_free(struct lnxproc_array_t *array)
     }
     free(array);
     array = NULL;
+    }
     return array;
 }
 
-int lnxproc_array_resize(struct lnxproc_array_t *array, size_t size)
+int lnxproc_array_resize(LNXPROC_ARRAY_T *array, size_t size)
 {
     if (!array) {
-        array_set_error(__func__, LNXPROC_ARRAY_ERROR_NULL);
-        return 1;
+        return LNXPROC_ERROR_ARRAY_NULL;
     }
     size_t osize = array->size;
     void *p = array_realloc(array->data, osize, size);
     if (!p) {
-        array_set_error(__func__, LNXPROC_ARRAY_ERROR_REALLOC_DATA);
-        return 1;
+        lnxproc_set_error(array->callback,__func__, LNXPROC_ERROR_ARRAY_REALLOC_DATA);
+        return LNXPROC_ERROR_ARRAY_REALLOC_DATA;
     }
     array->data = p;
     array->size += size;
-    return 0;
+    return LNXPROC_OK;
 }
 
-void *lnxproc_array_addr(struct lnxproc_array_t *array, size_t idx)
+void *lnxproc_array_addr(LNXPROC_ARRAY_T *array, size_t idx)
 {
     void *val = NULL;
     if (!array) {
-        array_set_error(__func__, LNXPROC_ARRAY_ERROR_NULL);
         return val;
     }
     if (idx >= array->size) {
-        array_set_error(__func__, LNXPROC_ARRAY_ERROR_INDEX_OUT_OF_RANGE);
+        lnxproc_set_error(array->callback,__func__, LNXPROC_ERROR_ARRAY_INDEX_OUT_OF_RANGE);
         return val;
     }
     val = array->data + (idx * sizeof(void *));
     return val;
 }
 
-void *lnxproc_array_get(struct lnxproc_array_t *array, size_t idx)
+void *lnxproc_array_get(LNXPROC_ARRAY_T *array, size_t idx)
 {
     void *val = NULL;
     if (!array) {
-        array_set_error(__func__, LNXPROC_ARRAY_ERROR_NULL);
         return val;
     }
     if (idx >= array->size) {
-        array_set_error(__func__, LNXPROC_ARRAY_ERROR_INDEX_OUT_OF_RANGE);
+        lnxproc_set_error(array->callback,__func__, LNXPROC_ERROR_ARRAY_INDEX_OUT_OF_RANGE);
         return val;
     }
     memcpy(&val, array->data + (idx * sizeof(void *)), sizeof(void *));
     return val;
 }
 
-size_t lnxproc_array_size(struct lnxproc_array_t * array)
+size_t lnxproc_array_size(LNXPROC_ARRAY_T * array)
 {
     size_t size = -1;
     if (!array) {
-        array_set_error(__func__, LNXPROC_ARRAY_ERROR_NULL);
         return size;
     }
     size = array->size;
     return size;
 }
 
-int lnxproc_array_set(struct lnxproc_array_t *array, size_t idx, void *val)
+int lnxproc_array_set(LNXPROC_ARRAY_T *array, size_t idx, void *val)
 {
     if (!array) {
-        array_set_error(__func__, LNXPROC_ARRAY_ERROR_NULL);
-        return 1;
+        return LNXPROC_ERROR_ARRAY_NULL;
     }
     if (idx < array->length) {
         memcpy(array->data + (idx * sizeof(void *)), &val, sizeof(void *));
@@ -212,7 +182,7 @@ int lnxproc_array_set(struct lnxproc_array_t *array, size_t idx, void *val)
         if (idx == array->size) {
             int err = lnxproc_array_resize(array, 1);
             if (err) {
-                array_set_error(__func__, err);
+                lnxproc_set_error(array->callback,__func__, err);
                 return err;
             }
         }
@@ -220,47 +190,45 @@ int lnxproc_array_set(struct lnxproc_array_t *array, size_t idx, void *val)
         array->length++;
     }
     else {
-        array_set_error(__func__, LNXPROC_ARRAY_ERROR_INDEX_OUT_OF_RANGE);
-        return 1;
+        lnxproc_set_error(array->callback,__func__, LNXPROC_ERROR_ARRAY_INDEX_OUT_OF_RANGE);
+        return LNXPROC_ERROR_ARRAY_INDEX_OUT_OF_RANGE;
     }
-    return 0;
+    return LNXPROC_OK;
 }
 
-int lnxproc_array_set_last(struct lnxproc_array_t *array, size_t idx, void *val)
+int lnxproc_array_set_last(LNXPROC_ARRAY_T *array, size_t idx, void *val)
 {
     int ret = lnxproc_array_set(array, idx, val);
-    if (ret == 0) {
+    if (ret == LNXPROC_OK) {
         array->length = idx + 1;
     }
     return ret;
 }
 
-int lnxproc_array_append(struct lnxproc_array_t *array, void *val)
+int lnxproc_array_append(LNXPROC_ARRAY_T *array, void *val)
 {
     return lnxproc_array_set(array, array->length, val);
 }
 
-int lnxproc_array_set_length(struct lnxproc_array_t *array, size_t idx)
+int lnxproc_array_set_length(LNXPROC_ARRAY_T *array, size_t idx)
 {
     if (!array) {
-        array_set_error(__func__, LNXPROC_ARRAY_ERROR_NULL);
-        return 1;
+        return LNXPROC_ERROR_ARRAY_NULL;
     }
     if (idx >= array->size) {
-        array_set_error(__func__, LNXPROC_ARRAY_ERROR_INDEX_OUT_OF_RANGE);
-        return 1;
+        lnxproc_set_error(array->callback,__func__, LNXPROC_ERROR_ARRAY_INDEX_OUT_OF_RANGE);
+        return LNXPROC_ERROR_ARRAY_INDEX_OUT_OF_RANGE;
     }
     array->length = idx + 1;
-    return 0;
+    return LNXPROC_OK;
 }
 
-int lnxproc_array_iterate(struct lnxproc_array_t *array,
+int lnxproc_array_iterate(LNXPROC_ARRAY_T *array,
                           void *data,
                           int start, int end, LNXPROC_ARRAY_ITERATE_FUNC func)
 {
     if (!array) {
-        array_set_error(__func__, LNXPROC_ARRAY_ERROR_NULL);
-        return 1;
+        return LNXPROC_ERROR_ARRAY_NULL;
     }
     int i;
     if (start < 0) {
@@ -278,7 +246,7 @@ int lnxproc_array_iterate(struct lnxproc_array_t *array,
     for (i = start; i < end; i++) {
         func(array, data, i);
     }
-    return 0;
+    return LNXPROC_OK;
 }
 
 struct array_print_var_t {
@@ -301,12 +269,11 @@ static void array_print_indent(int depth)
     }
 }
 
-static int array_print_internal(struct lnxproc_array_t *array,
+static int array_print_internal(LNXPROC_ARRAY_T *array,
                                 void *data, int idx)
 {
     if (!array) {
-        array_set_error(__func__, LNXPROC_ARRAY_ERROR_NULL);
-        return 1;
+        return LNXPROC_ERROR_ARRAY_NULL;
     }
     void *a = lnxproc_array_addr(array, idx);
     void *p = lnxproc_array_get(array, idx);
@@ -323,17 +290,16 @@ static int array_print_internal(struct lnxproc_array_t *array,
     else {
         printf("--> %d:Addr %p Value %p '%s'\n", idx, a, p, (char *) p);
     }
-    return 0;
+    return LNXPROC_OK;
 }
 
-int lnxproc_array_print(struct lnxproc_array_t *array, void *data)
+int lnxproc_array_print(LNXPROC_ARRAY_T *array, void *data)
 {
     int depth = array_print_depth(data);
     array_print_indent(depth);
     printf("Array at %p\n", array);
     if (!array) {
-        array_set_error(__func__, LNXPROC_ARRAY_ERROR_NULL);
-        return 1;
+        return LNXPROC_ERROR_ARRAY_NULL;
     }
     array_print_indent(depth);
     printf("Array size %zd\n", array->size);
@@ -346,7 +312,7 @@ int lnxproc_array_print(struct lnxproc_array_t *array, void *data)
     //array_iterate(array,data,-1,array->size,array_print_internal);
     lnxproc_array_iterate(array, data, -1, -1, array_print_internal);
     printf("\n");
-    return 0;
+    return LNXPROC_OK;
 }
 
 /* 

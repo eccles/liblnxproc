@@ -18,8 +18,6 @@
  *
  */
 
-#include "array.h"
-#include "base.h"
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -27,92 +25,72 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#include "error.h"
+#include "array.h"
+#include "base.h"
 
 struct lnxproc_base_t {
     LNXPROC_BASE_METHOD rawread;
     LNXPROC_BASE_METHOD normalize;
     LNXPROC_BASE_METHOD read;
+    LNXPROC_ERROR_CALLBACK callback;
     const char *filename;
     char *lines;
     size_t buflen;
     int nbytes;
-    char *map;
+    LNXPROC_ARRAY_T *map;
     void *data;
 };
 
-static char *errstr[] = {
-    "No error",
-    "Base arg is null",
-    "System error",
-    "Fail to malloc base",
-    "Fail to malloc buffer",
-};
-
-void lnxproc_base_error_print_callback(const char *func,
-                                       enum lnxproc_base_error_t err)
+const char *lnxproc_base_filename(LNXPROC_BASE_T *base)
 {
-    if (err > 0) {
-        printf("Error: %s -> %s\n", func, errstr[err]);
+    const char *filename = NULL;
+    if (base) {
+        filename = base->filename;
     }
+    return filename;
 }
 
-void (*lnxproc_base_error_callback) (const char *func,
-                                     enum lnxproc_base_error_t err) = NULL;
-
-static void base_set_error(const char *func, enum lnxproc_base_error_t err)
+char *lnxproc_base_lines(LNXPROC_BASE_T *base)
 {
-    if (lnxproc_base_error_callback) {
-        lnxproc_base_error_callback(func, err);
+    char *lines = NULL;
+    if (base) {
+        lines = base->lines;
     }
+    return lines;
 }
 
-const char *lnxproc_base_filename(struct lnxproc_base_t *base)
+int lnxproc_base_nbytes(LNXPROC_BASE_T *base)
 {
-    if (!base) {
-        base_set_error(__func__, LNXPROC_BASE_ERROR_NULL);
-        return NULL;
+    int nbytes = 0;
+    if (base) {
+        nbytes = base->nbytes;
+        return nbytes;
     }
-    return base->filename;
+    return -1;
 }
 
-char *lnxproc_base_lines(struct lnxproc_base_t *base)
+LNXPROC_ARRAY_T *lnxproc_base_map(LNXPROC_BASE_T *base)
 {
-    if (!base) {
-        base_set_error(__func__, LNXPROC_BASE_ERROR_NULL);
-        return NULL;
+    LNXPROC_ARRAY_T *map = NULL;
+    if (base) {
+        map = base->map;
     }
-    return base->lines;
+    return map;
 }
 
-int lnxproc_base_nbytes(struct lnxproc_base_t *base)
+int lnxproc_base_map_set(LNXPROC_BASE_T *base, LNXPROC_ARRAY_T *map)
 {
-    if (!base) {
-        base_set_error(__func__, LNXPROC_BASE_ERROR_NULL);
-        return -1;
+    if (base) {
+        base->map = map;
+        return LNXPROC_OK;
     }
-    return base->nbytes;
+    return LNXPROC_ERROR_BASE_NULL;
 }
 
-void *lnxproc_base_map(struct lnxproc_base_t *base)
-{
-    if (!base) {
-        base_set_error(__func__, LNXPROC_BASE_ERROR_NULL);
-        return NULL;
-    }
-    return base->map;
-}
-
-int lnxproc_base_map_set(struct lnxproc_base_t *base, void *map)
-{
-    if (!base) {
-        base_set_error(__func__, LNXPROC_BASE_ERROR_NULL);
-        return 1;
-    }
-    base->map = map;
-    return 0;
-}
-
-int lnxproc_base_rawread(struct lnxproc_base_t *base)
+int lnxproc_base_rawread(LNXPROC_BASE_T *base)
 {
 
     if (base->rawread) {
@@ -121,13 +99,13 @@ int lnxproc_base_rawread(struct lnxproc_base_t *base)
     else {
         int fd = open(base->filename, O_RDONLY);
         if (fd < 0) {
-            base_set_error(__func__, LNXPROC_BASE_ERROR_SYSTEM);
+            lnxproc_system_error(base->callback,__func__, errno);
             return -errno;
         }
 
         base->nbytes = read(fd, base->lines, base->buflen);
         if (base->nbytes < 0) {
-            base_set_error(__func__, LNXPROC_BASE_ERROR_SYSTEM);
+            lnxproc_system_error(base->callback,__func__, errno);
             return -errno;
         }
         base->lines[base->nbytes] = '\n';
@@ -137,19 +115,19 @@ int lnxproc_base_rawread(struct lnxproc_base_t *base)
          */
         close(fd);
     }
-    return 0;
+    return LNXPROC_OK;
 
 }
 
-int lnxproc_base_normalize(struct lnxproc_base_t *base)
+int lnxproc_base_normalize(LNXPROC_BASE_T *base)
 {
     if (base->normalize) {
         return base->normalize(base);
     }
-    return 0;
+    return LNXPROC_OK;
 }
 
-int lnxproc_base_read(struct lnxproc_base_t *base)
+int lnxproc_base_read(LNXPROC_BASE_T *base)
 {
     if (base->read) {
         return base->read(base);
@@ -168,24 +146,25 @@ int lnxproc_base_read(struct lnxproc_base_t *base)
         }
     }
 
-    return 0;
+    return LNXPROC_OK;
 }
 
-struct lnxproc_base_t *lnxproc_base_init(const char *filename,
+LNXPROC_BASE_T *lnxproc_base_init(const char *filename,
                                          LNXPROC_BASE_METHOD rawread,
                                          LNXPROC_BASE_METHOD normalize,
                                          LNXPROC_BASE_METHOD read,
+                                         LNXPROC_ERROR_CALLBACK callback,
                                          size_t buflen, void *data)
 {
 
-    struct lnxproc_base_t *base = malloc(sizeof(struct lnxproc_base_t));
+    LNXPROC_BASE_T *base = malloc(sizeof(LNXPROC_BASE_T));
     if (!base) {
-        base_set_error(__func__, LNXPROC_BASE_ERROR_MALLOC_BASE);
+        lnxproc_set_error(callback,__func__, LNXPROC_ERROR_BASE_MALLOC_BASE);
         return base;
     }
     base->lines = calloc(1, buflen + 1);
     if (!base->lines) {
-        base_set_error(__func__, LNXPROC_BASE_ERROR_MALLOC_BUFFER);
+        lnxproc_set_error(callback,__func__, LNXPROC_ERROR_BASE_MALLOC_BUFFER);
         free(base);
         return NULL;
     }
@@ -193,6 +172,7 @@ struct lnxproc_base_t *lnxproc_base_init(const char *filename,
     base->rawread = rawread;
     base->normalize = normalize;
     base->read = read;
+    base->callback = callback;
     base->filename = filename;
     base->buflen = buflen;
     base->nbytes = 0;
@@ -201,11 +181,11 @@ struct lnxproc_base_t *lnxproc_base_init(const char *filename,
     return base;
 }
 
-struct lnxproc_base_t *lnxproc_base_free(struct lnxproc_base_t *base)
+LNXPROC_BASE_T *lnxproc_base_free(LNXPROC_BASE_T *base)
 {
     if (base) {
         if (base->map) {
-            base->map = (void *) lnxproc_array_free((struct lnxproc_array_t *)
+            base->map = (void *) lnxproc_array_free((LNXPROC_ARRAY_T *)
                                                     base->map);
         }
         if (base->lines) {

@@ -28,44 +28,42 @@ static int myarray_print(struct lnxproc_array_t *array,
     printf("Array %p : Index %d\n",array,idx);
     return 0;
 }
-static void execute_base(struct base_t *base) {
+static void execute_base(LNXPROC_BASE_T *base) {
     if( base ) {
-        int state = base_read(base);
+        int state = lnxproc_base_read(base);
         if ( state < 0 ) {
             char errbuf[128];
             strerror_r(state, errbuf, sizeof(errbuf));
             printf("Failure reading proccgroups %s : %s\n", 
-                                            base_filename(base),
+                                            lnxproc_base_filename(base),
                                             errbuf);
         }
         else {
-            printf("Proccgroups: %s\n", base_filename(base));
-            printf("Proccgroups: %d bytes\n", base_nbytes(base));
+            printf("Proccgroups: %s\n", lnxproc_base_filename(base));
+            printf("Proccgroups: %d bytes\n", lnxproc_base_nbytes(base));
             printf("Proccgroups: %1$d %2$*1$s\n", 
-                                         base_nbytes(base), 
-                                         base_lines(base));
+                                         lnxproc_base_nbytes(base), 
+                                         lnxproc_base_lines(base));
         }
     }
 }
 
 int main(int argc, char *argv[]) {
 
-    lnxproc_array_error_callback = lnxproc_array_error_print_callback;
-
     printf("Allocate array for structs\n");
-    struct lnxproc_array_t *array = lnxproc_array_new(2,1);
+    struct lnxproc_array_t *array = lnxproc_array_new(2,1,lnxproc_error_print_callback);
     lnxproc_array_print(array,NULL);
 
     printf("Allocate array 1 for strings\n");
-    struct lnxproc_array_t *carray1 = lnxproc_array_new(2,0);
+    struct lnxproc_array_t *carray1 = lnxproc_array_new(2,0,lnxproc_error_print_callback);
     lnxproc_array_print(carray1,NULL);
 
     printf("Allocate array 2 for strings\n");
-    struct lnxproc_array_t *carray2 = lnxproc_array_new(2,0);
+    struct lnxproc_array_t *carray2 = lnxproc_array_new(2,0,lnxproc_error_print_callback);
     lnxproc_array_print(carray2,NULL);
 
     printf("Allocate array 3 for strings\n");
-    struct lnxproc_array_t *carray3 = lnxproc_array_new(2,0);
+    struct lnxproc_array_t *carray3 = lnxproc_array_new(2,0,lnxproc_error_print_callback);
     lnxproc_array_print(carray3,NULL);
 
     if ( array && carray1 && carray2 && carray3 ) {
@@ -169,11 +167,11 @@ int main(int argc, char *argv[]) {
         array = lnxproc_array_free(array);
     }
 
-    struct base_t *proccgroups = proccgroups_init();
+    LNXPROC_BASE_T *proccgroups = proccgroups_init();
     if ( proccgroups ) {
         execute_base(proccgroups);
         execute_base(proccgroups);
-        proccgroups = base_free(proccgroups);
+        proccgroups = lnxproc_base_free(proccgroups);
     } 
 
     return 0;

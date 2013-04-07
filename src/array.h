@@ -29,51 +29,40 @@ extern "C" {
 #endif
 
 #include <stddef.h>
+#include "error.h"
 
     struct lnxproc_array_t;
-
-    typedef int (*LNXPROC_ARRAY_ITERATE_FUNC) (struct lnxproc_array_t * array,
-                                               void *data, int idx);
-
-    enum lnxproc_array_error_t {
-        LNXPROC_ARRAY_OK = 0,
-        LNXPROC_ARRAY_ERROR_MALLOC_HEADER,
-        LNXPROC_ARRAY_ERROR_MALLOC_DATA,
-        LNXPROC_ARRAY_ERROR_NULL,
-        LNXPROC_ARRAY_ERROR_REALLOC_DATA,
-        LNXPROC_ARRAY_ERROR_INDEX_OUT_OF_RANGE,
-    };
-
-    void lnxproc_array_error_print_callback(const char *func,
-                                            enum lnxproc_array_error_t err);
-    void (*lnxproc_array_error_callback) (const char *func,
-                                          enum lnxproc_array_error_t err);
+    typedef struct lnxproc_array_t LNXPROC_ARRAY_T;
 
 #ifndef WARN_UNUSED
 #define WARN_UNUSED __attribute__((warn_unused_result))
 #endif
 
-    struct lnxproc_array_t *lnxproc_array_new(size_t size,
-                                              int recursive) WARN_UNUSED;
-    struct lnxproc_array_t *lnxproc_array_free(struct lnxproc_array_t *array)
+    LNXPROC_ARRAY_T *lnxproc_array_new(size_t size,
+                                              int recursive,
+LNXPROC_ERROR_CALLBACK callback) WARN_UNUSED;
+    LNXPROC_ARRAY_T *lnxproc_array_free(LNXPROC_ARRAY_T *array)
      WARN_UNUSED;
-    int lnxproc_array_resize(struct lnxproc_array_t *array, size_t size);
-    int lnxproc_array_set(struct lnxproc_array_t *array, size_t idx, void *val);
-    int lnxproc_array_set_last(struct lnxproc_array_t *array, size_t idx,
+    int lnxproc_array_resize(LNXPROC_ARRAY_T *array, size_t size);
+    int lnxproc_array_set(LNXPROC_ARRAY_T *array, size_t idx, void *val);
+    int lnxproc_array_set_last(LNXPROC_ARRAY_T *array, size_t idx,
                                void *val);
-    int lnxproc_array_append(struct lnxproc_array_t *array, void *val);
+    int lnxproc_array_append(LNXPROC_ARRAY_T *array, void *val);
 
-    int lnxproc_array_set_length(struct lnxproc_array_t *array, size_t idx);
-    void *lnxproc_array_addr(struct lnxproc_array_t *array, size_t idx);
-    void *lnxproc_array_get(struct lnxproc_array_t *array, size_t idx);
-    size_t lnxproc_array_size(struct lnxproc_array_t *array);
+    int lnxproc_array_set_length(LNXPROC_ARRAY_T *array, size_t idx);
+    void *lnxproc_array_addr(LNXPROC_ARRAY_T *array, size_t idx);
+    void *lnxproc_array_get(LNXPROC_ARRAY_T *array, size_t idx);
+    size_t lnxproc_array_size(LNXPROC_ARRAY_T *array);
 
-    int lnxproc_array_iterate(struct lnxproc_array_t *array,
+    typedef int (*LNXPROC_ARRAY_ITERATE_FUNC) (LNXPROC_ARRAY_T * array,
+                                               void *data, int idx);
+
+    int lnxproc_array_iterate(LNXPROC_ARRAY_T *array,
                               void *data,
                               int start,
                               int end, LNXPROC_ARRAY_ITERATE_FUNC func);
 
-    int lnxproc_array_print(struct lnxproc_array_t *array, void *data);
+    int lnxproc_array_print(LNXPROC_ARRAY_T *array, void *data);
 
 #ifdef __cplusplus
 }                               // extern "C"

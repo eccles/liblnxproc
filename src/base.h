@@ -26,43 +26,34 @@ extern "C" {
 #endif
 
 #include <stddef.h>
+#include "error.h"
+#include "array.h"
 
     struct lnxproc_base_t;
+    typedef struct lnxproc_base_t LNXPROC_BASE_T;
 
-    enum lnxproc_base_error_t {
-        LNXPROC_BASE_OK = 0,
-        LNXPROC_BASE_ERROR_NULL,
-        LNXPROC_BASE_ERROR_SYSTEM,
-        LNXPROC_BASE_ERROR_MALLOC_BASE,
-        LNXPROC_BASE_ERROR_MALLOC_BUFFER,
-    };
+    typedef int (*LNXPROC_BASE_METHOD) (LNXPROC_BASE_T * base);
 
-    void lnxproc_base_error_print_callback(const char *func,
-                                           enum lnxproc_base_error_t err);
-    void (*lnxproc_base_error_callback) (const char *func,
-                                         enum lnxproc_base_error_t err);
-
-    typedef int (*LNXPROC_BASE_METHOD) (struct lnxproc_base_t * base);
-
-    const char *lnxproc_base_filename(struct lnxproc_base_t *base);
-    char *lnxproc_base_lines(struct lnxproc_base_t *base);
-    void *lnxproc_base_map(struct lnxproc_base_t *base);
-    int lnxproc_base_map_set(struct lnxproc_base_t *base, void *map);
-    int lnxproc_base_nbytes(struct lnxproc_base_t *base);
-    int lnxproc_base_rawread(struct lnxproc_base_t *base);
-    int lnxproc_base_read(struct lnxproc_base_t *base);
-    int lnxproc_base_normalize(struct lnxproc_base_t *base);
-    struct lnxproc_base_t *lnxproc_base_init(const char *filename,
+    const char *lnxproc_base_filename(LNXPROC_BASE_T *base);
+    char *lnxproc_base_lines(LNXPROC_BASE_T *base);
+    LNXPROC_ARRAY_T *lnxproc_base_map(LNXPROC_BASE_T *base);
+    int lnxproc_base_map_set(LNXPROC_BASE_T *base, LNXPROC_ARRAY_T *map);
+    int lnxproc_base_nbytes(LNXPROC_BASE_T *base);
+    int lnxproc_base_rawread(LNXPROC_BASE_T *base);
+    int lnxproc_base_read(LNXPROC_BASE_T *base);
+    int lnxproc_base_normalize(LNXPROC_BASE_T *base);
+    LNXPROC_BASE_T *lnxproc_base_init(const char *filename,
                                              LNXPROC_BASE_METHOD rawread,
                                              LNXPROC_BASE_METHOD normalize,
                                              LNXPROC_BASE_METHOD read,
+                                             LNXPROC_ERROR_CALLBACK callback,
                                              size_t buflen, void *data);
 
 #ifndef WARN_UNUSED
 #define WARN_UNUSED __attribute__((warn_unused_result))
 #endif
 
-    struct lnxproc_base_t *lnxproc_base_free(struct lnxproc_base_t *base)
+    LNXPROC_BASE_T *lnxproc_base_free(LNXPROC_BASE_T *base)
      WARN_UNUSED;
 
 #ifdef __cplusplus
@@ -72,6 +63,3 @@ extern "C" {
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab 
  */
-#ifndef WARN_UNUSED
-#define WARN_UNUSED __attribute__((warn_unused_result))
-#endif
