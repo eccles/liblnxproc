@@ -58,6 +58,14 @@ void lnxproc_debug( const char *filename,
 }
 #endif
 
+char * lnxproc_strerror(LNXPROC_ERROR_T err, char *buf, size_t buflen){
+    if( err < 0 ) {
+        strerror_r(-((int) err), buf, buflen);
+        return buf;
+    }
+    return errstr[err];
+}
+
 void lnxproc_set_error(LNXPROC_ERROR_CALLBACK callback,
                        const char *filename,
                        int lineno, const char *funcname, LNXPROC_ERROR_T err)

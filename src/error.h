@@ -47,6 +47,8 @@ extern "C" {
                                             const char *funcname,
                                             LNXPROC_ERROR_T err);
 
+    char * lnxproc_strerror(LNXPROC_ERROR_T err, char *buf, size_t buflen);
+
     void lnxproc_error_print_callback(const char *filename,
                                       int lineno,
                                       const char *funcname,
