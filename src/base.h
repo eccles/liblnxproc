@@ -34,26 +34,26 @@ extern "C" {
 
     typedef int (*LNXPROC_BASE_METHOD) (LNXPROC_BASE_T * base);
 
-    const char *lnxproc_base_filename(LNXPROC_BASE_T *base);
-    char *lnxproc_base_lines(LNXPROC_BASE_T *base);
-    LNXPROC_ARRAY_T *lnxproc_base_map(LNXPROC_BASE_T *base);
-    int lnxproc_base_map_set(LNXPROC_BASE_T *base, LNXPROC_ARRAY_T *map);
-    int lnxproc_base_nbytes(LNXPROC_BASE_T *base);
-    int lnxproc_base_rawread(LNXPROC_BASE_T *base);
-    int lnxproc_base_read(LNXPROC_BASE_T *base);
-    int lnxproc_base_normalize(LNXPROC_BASE_T *base);
+    const char *lnxproc_base_filename(LNXPROC_BASE_T * base);
+    char *lnxproc_base_lines(LNXPROC_BASE_T * base);
+    LNXPROC_ARRAY_T *lnxproc_base_map(LNXPROC_BASE_T * base);
+    int lnxproc_base_map_set(LNXPROC_BASE_T * base, LNXPROC_ARRAY_T * map);
+    int lnxproc_base_nbytes(LNXPROC_BASE_T * base);
+    int lnxproc_base_rawread(LNXPROC_BASE_T * base);
+    int lnxproc_base_read(LNXPROC_BASE_T * base);
+    int lnxproc_base_normalize(LNXPROC_BASE_T * base);
     LNXPROC_BASE_T *lnxproc_base_init(const char *filename,
-                                             LNXPROC_BASE_METHOD rawread,
-                                             LNXPROC_BASE_METHOD normalize,
-                                             LNXPROC_BASE_METHOD read,
-                                             LNXPROC_ERROR_CALLBACK callback,
-                                             size_t buflen, void *data);
+                                      LNXPROC_BASE_METHOD rawread,
+                                      LNXPROC_BASE_METHOD normalize,
+                                      LNXPROC_BASE_METHOD read,
+                                      LNXPROC_ERROR_CALLBACK callback,
+                                      size_t buflen, void *data);
 
 #ifndef WARN_UNUSED
 #define WARN_UNUSED __attribute__((warn_unused_result))
 #endif
 
-    LNXPROC_BASE_T *lnxproc_base_free(LNXPROC_BASE_T *base)
+    LNXPROC_BASE_T *lnxproc_base_free(LNXPROC_BASE_T * base)
      WARN_UNUSED;
 
 #ifdef __cplusplus

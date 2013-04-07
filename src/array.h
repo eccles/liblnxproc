@@ -39,30 +39,30 @@ extern "C" {
 #endif
 
     LNXPROC_ARRAY_T *lnxproc_array_new(size_t size,
-                                              int recursive,
-LNXPROC_ERROR_CALLBACK callback) WARN_UNUSED;
-    LNXPROC_ARRAY_T *lnxproc_array_free(LNXPROC_ARRAY_T *array)
+                                       int recursive,
+                                       LNXPROC_ERROR_CALLBACK callback)
+        WARN_UNUSED;
+    LNXPROC_ARRAY_T *lnxproc_array_free(LNXPROC_ARRAY_T * array)
      WARN_UNUSED;
-    int lnxproc_array_resize(LNXPROC_ARRAY_T *array, size_t size);
-    int lnxproc_array_set(LNXPROC_ARRAY_T *array, size_t idx, void *val);
-    int lnxproc_array_set_last(LNXPROC_ARRAY_T *array, size_t idx,
-                               void *val);
-    int lnxproc_array_append(LNXPROC_ARRAY_T *array, void *val);
+    int lnxproc_array_resize(LNXPROC_ARRAY_T * array, size_t size);
+    int lnxproc_array_set(LNXPROC_ARRAY_T * array, size_t idx, void *val);
+    int lnxproc_array_set_last(LNXPROC_ARRAY_T * array, size_t idx, void *val);
+    int lnxproc_array_append(LNXPROC_ARRAY_T * array, void *val);
 
-    int lnxproc_array_set_length(LNXPROC_ARRAY_T *array, size_t idx);
-    void *lnxproc_array_addr(LNXPROC_ARRAY_T *array, size_t idx);
-    void *lnxproc_array_get(LNXPROC_ARRAY_T *array, size_t idx);
-    size_t lnxproc_array_size(LNXPROC_ARRAY_T *array);
+    int lnxproc_array_set_length(LNXPROC_ARRAY_T * array, size_t idx);
+    void *lnxproc_array_addr(LNXPROC_ARRAY_T * array, size_t idx);
+    void *lnxproc_array_get(LNXPROC_ARRAY_T * array, size_t idx);
+    size_t lnxproc_array_size(LNXPROC_ARRAY_T * array);
 
     typedef int (*LNXPROC_ARRAY_ITERATE_FUNC) (LNXPROC_ARRAY_T * array,
                                                void *data, int idx);
 
-    int lnxproc_array_iterate(LNXPROC_ARRAY_T *array,
+    int lnxproc_array_iterate(LNXPROC_ARRAY_T * array,
                               void *data,
                               int start,
                               int end, LNXPROC_ARRAY_ITERATE_FUNC func);
 
-    int lnxproc_array_print(LNXPROC_ARRAY_T *array, void *data);
+    int lnxproc_array_print(LNXPROC_ARRAY_T * array, void *data);
 
 #ifdef __cplusplus
 }                               // extern "C"

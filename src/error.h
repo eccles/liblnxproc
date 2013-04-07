@@ -42,18 +42,16 @@ extern "C" {
 
     typedef enum lnxproc_error_t LNXPROC_ERROR_T;
 
-    typedef void (*LNXPROC_ERROR_CALLBACK)(const char *funcname,
-                                           LNXPROC_ERROR_T err);
+    typedef void (*LNXPROC_ERROR_CALLBACK) (const char *funcname,
+                                            LNXPROC_ERROR_T err);
 
     void lnxproc_error_print_callback(const char *funcname,
                                       LNXPROC_ERROR_T err);
 
     void lnxproc_set_error(LNXPROC_ERROR_CALLBACK callback,
-                           const char *funcname,
-                           LNXPROC_ERROR_T err);
+                           const char *funcname, LNXPROC_ERROR_T err);
     void lnxproc_system_error(LNXPROC_ERROR_CALLBACK callback,
-                              const char *funcname,
-                              int err);
+                              const char *funcname, int err);
 
 
 #ifdef __cplusplus

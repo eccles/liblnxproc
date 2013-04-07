@@ -39,8 +39,7 @@ typical contents of /proc/cgroups file::
 #include "array.h"
 #include "proc_cgroups.h"
 
-static int proccgroups_func(LNXPROC_BASE_T *base, int i, int j,
-                            char *val)
+static int proccgroups_func(LNXPROC_BASE_T * base, int i, int j, char *val)
 {
 
     printf(" proccgroups_func:%d,%d: %p '%s'\n", i, j, val, val);
@@ -75,7 +74,7 @@ static int proccgroups_func(LNXPROC_BASE_T *base, int i, int j,
     return 0;
 }
 
-int lines_split(LNXPROC_BASE_T *base,
+int lines_split(LNXPROC_BASE_T * base,
                 char *line_limit,
                 char *field_limit,
                 int (*func) (LNXPROC_BASE_T *, int, int, char *))
@@ -122,7 +121,7 @@ int lines_split(LNXPROC_BASE_T *base,
     return 0;
 }
 
-static int proccgroups_normalize(LNXPROC_BASE_T *base)
+static int proccgroups_normalize(LNXPROC_BASE_T * base)
 {
     lines_split(base, "\n", "\t", proccgroups_func);
     return 0;

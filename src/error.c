@@ -43,16 +43,14 @@ static char *errstr[] = {
 };
 
 void lnxproc_set_error(LNXPROC_ERROR_CALLBACK callback,
-                       const char *funcname, 
-                       LNXPROC_ERROR_T err)
+                       const char *funcname, LNXPROC_ERROR_T err)
 {
     if (callback) {
         callback(funcname, err);
     }
 }
 
-void lnxproc_error_print_callback(const char *funcname,
-                                  LNXPROC_ERROR_T err)
+void lnxproc_error_print_callback(const char *funcname, LNXPROC_ERROR_T err)
 {
     if (err > 0) {
         printf("Error: %s -> %s\n", funcname, errstr[err]);
@@ -65,8 +63,7 @@ void lnxproc_error_print_callback(const char *funcname,
 }
 
 void lnxproc_system_error(LNXPROC_ERROR_CALLBACK callback,
-                          const char *funcname,
-                          int err)
+                          const char *funcname, int err)
 {
     if (callback) {
         callback(funcname, -err);
@@ -76,4 +73,3 @@ void lnxproc_system_error(LNXPROC_ERROR_CALLBACK callback,
 /* 
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab 
  */
-
