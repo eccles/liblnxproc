@@ -37,6 +37,8 @@ extern "C" {
     const char *lnxproc_base_filename(LNXPROC_BASE_T * base);
     char *lnxproc_base_lines(LNXPROC_BASE_T * base);
     LNXPROC_ARRAY_T *lnxproc_base_map(LNXPROC_BASE_T * base);
+    LNXPROC_ERROR_CALLBACK lnxproc_base_callback(LNXPROC_BASE_T * base);
+    int lnxproc_base_map_set(LNXPROC_BASE_T * base, LNXPROC_ARRAY_T * map);
     int lnxproc_base_map_set(LNXPROC_BASE_T * base, LNXPROC_ARRAY_T * map);
     int lnxproc_base_nbytes(LNXPROC_BASE_T * base);
     int lnxproc_base_rawread(LNXPROC_BASE_T * base);
@@ -55,6 +57,8 @@ extern "C" {
 
     LNXPROC_BASE_T *lnxproc_base_free(LNXPROC_BASE_T * base)
      WARN_UNUSED;
+
+    int lnxproc_base_map_print(LNXPROC_BASE_T * base, void *data);
 
 #ifdef __cplusplus
 }                               // extern "C"

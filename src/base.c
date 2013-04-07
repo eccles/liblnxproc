@@ -81,6 +81,23 @@ LNXPROC_ARRAY_T *lnxproc_base_map(LNXPROC_BASE_T * base)
     return map;
 }
 
+int lnxproc_base_map_print(LNXPROC_BASE_T * base, void *data)
+{
+    if (base) {
+        return lnxproc_array_print(base->map, data);
+    }
+    return LNXPROC_ERROR_BASE_NULL;
+}
+
+LNXPROC_ERROR_CALLBACK lnxproc_base_callback(LNXPROC_BASE_T * base)
+{
+    LNXPROC_ERROR_CALLBACK callback = NULL;
+    if (base) {
+        callback = base->callback;
+    }
+    return callback;
+}
+
 int lnxproc_base_map_set(LNXPROC_BASE_T * base, LNXPROC_ARRAY_T * map)
 {
     if (base) {
@@ -99,13 +116,13 @@ int lnxproc_base_rawread(LNXPROC_BASE_T * base)
     else {
         int fd = open(base->filename, O_RDONLY);
         if (fd < 0) {
-            lnxproc_system_error(base->callback, __func__, errno);
+            LNXPROC_SYSTEM_ERROR(base->callback, errno);
             return -errno;
         }
 
         base->nbytes = read(fd, base->lines, base->buflen);
         if (base->nbytes < 0) {
-            lnxproc_system_error(base->callback, __func__, errno);
+            LNXPROC_SYSTEM_ERROR(base->callback, errno);
             return -errno;
         }
         base->lines[base->nbytes] = '\n';
@@ -159,12 +176,12 @@ LNXPROC_BASE_T *lnxproc_base_init(const char *filename,
 
     LNXPROC_BASE_T *base = malloc(sizeof(LNXPROC_BASE_T));
     if (!base) {
-        lnxproc_set_error(callback, __func__, LNXPROC_ERROR_BASE_MALLOC_BASE);
+        LNXPROC_SET_ERROR(callback, LNXPROC_ERROR_BASE_MALLOC_BASE);
         return base;
     }
     base->lines = calloc(1, buflen + 1);
     if (!base->lines) {
-        lnxproc_set_error(callback, __func__, LNXPROC_ERROR_BASE_MALLOC_BUFFER);
+        LNXPROC_SET_ERROR(callback, LNXPROC_ERROR_BASE_MALLOC_BUFFER);
         free(base);
         return NULL;
     }

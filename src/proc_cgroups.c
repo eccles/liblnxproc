@@ -39,15 +39,32 @@ typical contents of /proc/cgroups file::
 #include "array.h"
 #include "proc_cgroups.h"
 
-static int proccgroups_func(LNXPROC_BASE_T * base, int i, int j, char *val)
+static LNXPROC_ARRAY_T *proccgroups_add_array(LNXPROC_BASE_T * base,
+                                              LNXPROC_ARRAY_T * wmap,
+                                              int idx, int recursive)
+{
+    LNXPROC_ARRAY_T *f = lnxproc_array_get(wmap, idx);
+    if (!f) {
+        f = lnxproc_array_new(2, recursive, lnxproc_base_callback(base));
+        if (!f) {
+            printf("Field allocation failure\n");
+            return NULL;
+        }
+        lnxproc_array_set_last(wmap, idx, f);
+    }
+    return f;
+}
+
+static int proccgroups_func(LNXPROC_BASE_T * base, int idx[], size_t idxlen,
+                            char *val)
 {
 
-    printf(" proccgroups_func:%d,%d: %p '%s'\n", i, j, val, val);
 
-    void *map = lnxproc_base_map(base);
-    /* map should only be null when both i && j are 0 */
+    int map_recursive = idxlen > 1 ? 1 : 0;
+
+    LNXPROC_ARRAY_T *map = lnxproc_base_map(base);
     if (!map) {
-        map = lnxproc_array_new(2, 1, lnxproc_error_print_callback);
+        map = lnxproc_array_new(2, map_recursive, lnxproc_base_callback(base));
         if (!map) {
             printf("Map allocation failure\n");
             return 1;
@@ -55,62 +72,71 @@ static int proccgroups_func(LNXPROC_BASE_T * base, int i, int j, char *val)
         lnxproc_base_map_set(base, map);
     }
 
-    void *f = lnxproc_array_get(map, i);
-    /* f should only be null when j is 0 */
-    if (!f) {
-        f = lnxproc_array_new(2, 0, lnxproc_error_print_callback);
-        if (!f) {
+    printf("%s[%d]: map %p recursive %d\n", __func__, __LINE__, map,
+           map_recursive);
+
+    if (!map_recursive) {
+        lnxproc_array_set_last(map, idx[0], val);
+//        lnxproc_array_print(map, NULL);
+        return 0;
+    }
+
+    LNXPROC_ARRAY_T *wmap = map;
+    int i;
+    for (i = 0; i < idxlen - 2; i++) {
+        wmap = proccgroups_add_array(base, wmap, idx[i], 1);
+        if (!wmap) {
             printf("Field allocation failure\n");
             return 1;
         }
-        lnxproc_array_set(map, i, f);
     }
-    else {
-        lnxproc_array_set_length(map, i);
-    }
-    lnxproc_array_set_last(f, j, val);
-    lnxproc_array_print(map, NULL);
+
+    wmap = proccgroups_add_array(base, wmap, idx[i], 0);
+    i++;
+    lnxproc_array_set_last(wmap, idx[i], val);
+
+//    lnxproc_array_print(map, NULL);
 
     return 0;
 }
 
 int lines_split(LNXPROC_BASE_T * base,
-                char *line_limit,
-                char *field_limit,
-                int (*func) (LNXPROC_BASE_T *, int, int, char *))
+                char *limit[],
+                size_t limitlen,
+                int (*func) (LNXPROC_BASE_T *, int *, size_t, char *))
 {
 
     int n = lnxproc_base_nbytes(base);
     if (n > 0) {
-        int i = 0;
-        int j = 0;
+        int idx[limitlen];
+        memset(idx, 0, limitlen * sizeof(int));
 
         char *c = lnxproc_base_lines(base);
         char *d = c + n;
 
         char *saveptr = c;
         while (c < d) {
-            if (strchr(line_limit, *c)) {
+            if (strchr(limit[0], *c)) {
                 *c = '\0';
-                printf
-                    ("lines_split:1:Line %d Field %d String %s\n",
-                     i, j, saveptr);
+//                printf
+//                    ("lines_split:1:Line %d Field %d String %s\n",
+//                     idx[0], idx[1], saveptr);
 
-                func(base, i, j, saveptr);
-                while ((++c < d) && strchr(line_limit, *c));
+                func(base, idx, limitlen, saveptr);
+                while ((++c < d) && strchr(limit[0], *c));
                 saveptr = c;
-                i++;
-                j = 0;
+                idx[0]++;
+                idx[1] = 0;
             }
-            else if (strchr(field_limit, *c)) {
+            else if (strchr(limit[1], *c)) {
                 *c = '\0';
-                printf
-                    ("lines_split:2:Line %d Field %d String %s\n",
-                     i, j, saveptr);
-                func(base, i, j, saveptr);
-                while ((++c < d) && strchr(field_limit, *c));
+                //               printf
+                //                   ("lines_split:2:Line %d Field %d String %s\n",
+                //                    idx[0], idx[1], saveptr);
+                func(base, idx, limitlen, saveptr);
+                while ((++c < d) && strchr(limit[1], *c));
                 saveptr = c;
-                j++;
+                idx[1]++;
             }
             else {
                 c++;
@@ -123,7 +149,9 @@ int lines_split(LNXPROC_BASE_T * base,
 
 static int proccgroups_normalize(LNXPROC_BASE_T * base)
 {
-    lines_split(base, "\n", "\t", proccgroups_func);
+    char *limit[] = { "\n", "\t" };
+    lines_split(base, limit, 2, proccgroups_func);
+    lnxproc_base_map_print(base, NULL);
     return 0;
 }
 
@@ -132,7 +160,9 @@ LNXPROC_BASE_T *proccgroups_init(void)
     return lnxproc_base_init("/proc/cgroups",
                              NULL,
                              proccgroups_normalize,
-                             NULL, NULL, 256, &proccgroups_data);
+                             NULL,
+                             lnxproc_error_print_callback,
+                             256, &proccgroups_data);
 }
 
 /* 

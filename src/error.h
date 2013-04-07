@@ -26,6 +26,7 @@ extern "C" {
 #endif
 
 #include <stddef.h>
+#define DEBUG 1
 
     enum lnxproc_error_t {
         LNXPROC_OK = 0,
@@ -39,21 +40,40 @@ extern "C" {
         LNXPROC_ERROR_BASE_MALLOC_BASE,
         LNXPROC_ERROR_BASE_MALLOC_BUFFER,
     };
-
     typedef enum lnxproc_error_t LNXPROC_ERROR_T;
 
-    typedef void (*LNXPROC_ERROR_CALLBACK) (const char *funcname,
+    typedef void (*LNXPROC_ERROR_CALLBACK) (const char *filename,
+                                            int lineno,
+                                            const char *funcname,
                                             LNXPROC_ERROR_T err);
 
-    void lnxproc_error_print_callback(const char *funcname,
+    void lnxproc_error_print_callback(const char *filename,
+                                      int lineno,
+                                      const char *funcname,
                                       LNXPROC_ERROR_T err);
 
     void lnxproc_set_error(LNXPROC_ERROR_CALLBACK callback,
+                           const char *filename,
+                           int lineno,
                            const char *funcname, LNXPROC_ERROR_T err);
     void lnxproc_system_error(LNXPROC_ERROR_CALLBACK callback,
-                              const char *funcname, int err);
+                              const char *filename,
+                              int lineno, const char *funcname, int err);
 
+#define LNXPROC_SET_ERROR(c,e) lnxproc_set_error(c,__FILE__,__LINE__,__func__,e)
 
+#define LNXPROC_SYSTEM_ERROR(c,e) \
+                            lnxproc_system_error(c,__FILE__,__LINE__,__func__,e)
+
+#ifdef DEBUG
+    void lnxproc_debug( const char *filename,
+                           int lineno,
+                           const char *funcname, char *fmt, ...);
+
+#define LNXPROC_DEBUG(fmt, args...) lnxproc_debug(__FILE__,__LINE__,__func__, fmt, ##args)
+#endif
+
+#define eprintf(format, args...) fprintf (stderr, format , ##args)
 #ifdef __cplusplus
 }                               // extern "C"
 #endif

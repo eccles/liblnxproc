@@ -41,7 +41,7 @@ extern "C" {
     LNXPROC_ARRAY_T *lnxproc_array_new(size_t size,
                                        int recursive,
                                        LNXPROC_ERROR_CALLBACK callback)
-        WARN_UNUSED;
+     WARN_UNUSED;
     LNXPROC_ARRAY_T *lnxproc_array_free(LNXPROC_ARRAY_T * array)
      WARN_UNUSED;
     int lnxproc_array_resize(LNXPROC_ARRAY_T * array, size_t size);
@@ -53,6 +53,7 @@ extern "C" {
     void *lnxproc_array_addr(LNXPROC_ARRAY_T * array, size_t idx);
     void *lnxproc_array_get(LNXPROC_ARRAY_T * array, size_t idx);
     size_t lnxproc_array_size(LNXPROC_ARRAY_T * array);
+    LNXPROC_ERROR_CALLBACK lnxproc_array_callback(LNXPROC_ARRAY_T * array);
 
     typedef int (*LNXPROC_ARRAY_ITERATE_FUNC) (LNXPROC_ARRAY_T * array,
                                                void *data, int idx);

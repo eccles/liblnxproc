@@ -29,6 +29,10 @@
 
 #include "error.h"
 
+#ifdef DEBUG
+#include <stdarg.h>
+#endif
+
 static char *errstr[] = {
     "No error",
     "System error",
@@ -42,31 +46,49 @@ static char *errstr[] = {
     "Fail to malloc base buffer",
 };
 
+#ifdef DEBUG
+void lnxproc_debug( const char *filename,
+                       int lineno, const char *funcname, char *fmt, ...)
+{
+    va_list args;
+    va_start( args, fmt );
+   printf("Debug: %s[%d] %s -> ", filename, lineno, funcname);
+   vprintf(fmt, args);
+    va_end (args);
+}
+#endif
+
 void lnxproc_set_error(LNXPROC_ERROR_CALLBACK callback,
-                       const char *funcname, LNXPROC_ERROR_T err)
+                       const char *filename,
+                       int lineno, const char *funcname, LNXPROC_ERROR_T err)
 {
     if (callback) {
-        callback(funcname, err);
+        callback(filename, lineno, funcname, err);
     }
 }
 
-void lnxproc_error_print_callback(const char *funcname, LNXPROC_ERROR_T err)
+void lnxproc_error_print_callback(const char *filename,
+                                  int lineno,
+                                  const char *funcname, LNXPROC_ERROR_T err)
 {
     if (err > 0) {
-        printf("Error: %s -> %s\n", funcname, errstr[err]);
+        printf("Error: %s[%d] %s -> %s\n", filename, lineno, funcname,
+               errstr[err]);
     }
     else if (err < 0) {
         char buf[128];
         strerror_r(-((int) err), buf, sizeof buf);
-        printf("System Error: %s -> %s\n", funcname, buf);
+        printf("System Error: %s[%d] %s -> %s\n", filename, lineno, funcname,
+               buf);
     }
 }
 
 void lnxproc_system_error(LNXPROC_ERROR_CALLBACK callback,
-                          const char *funcname, int err)
+                          const char *filename,
+                          int lineno, const char *funcname, int err)
 {
     if (callback) {
-        callback(funcname, -err);
+        callback(filename, lineno, funcname, -err);
     }
 }
 
