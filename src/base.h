@@ -34,12 +34,25 @@ extern "C" {
 
     typedef int (*LNXPROC_BASE_METHOD) (LNXPROC_BASE_T *base);
 
+    struct lnxproc_base_map_limits_t {
+        char *chars;
+        int len;
+    };
+    typedef struct lnxproc_base_map_limits_t LNXPROC_BASE_MAP_LIMITS_T;
+
+    char *lnxproc_base_map_chr(LNXPROC_BASE_MAP_LIMITS_T * pat, char c);
+
+    LNXPROC_BASE_MAP_LIMITS_T *lnxproc_base_map_limits(LNXPROC_BASE_T *base);
+    int lnxproc_base_map_dim(LNXPROC_BASE_T *base);
+    char *lnxproc_base_print_map_limit(LNXPROC_BASE_MAP_LIMITS_T * maplimit,
+                                       char *buf, size_t buflen);
+
+    LNXPROC_ARRAY_T *lnxproc_base_map(LNXPROC_BASE_T *base);
+    int lnxproc_base_map_set(LNXPROC_BASE_T *base, LNXPROC_ARRAY_T *map);
+
     const char *lnxproc_base_filename(LNXPROC_BASE_T *base);
     char *lnxproc_base_lines(LNXPROC_BASE_T *base);
-    LNXPROC_ARRAY_T *lnxproc_base_map(LNXPROC_BASE_T *base);
     LNXPROC_ERROR_CALLBACK lnxproc_base_callback(LNXPROC_BASE_T *base);
-    int lnxproc_base_map_set(LNXPROC_BASE_T *base, LNXPROC_ARRAY_T *map);
-    int lnxproc_base_map_set(LNXPROC_BASE_T *base, LNXPROC_ARRAY_T *map);
     int lnxproc_base_nbytes(LNXPROC_BASE_T *base);
     int lnxproc_base_rawread(LNXPROC_BASE_T *base);
     int lnxproc_base_read(LNXPROC_BASE_T *base);
@@ -49,7 +62,9 @@ extern "C" {
                                       LNXPROC_BASE_METHOD normalize,
                                       LNXPROC_BASE_METHOD read,
                                       LNXPROC_ERROR_CALLBACK callback,
-                                      size_t buflen, void *data);
+                                      size_t buflen,
+                                      LNXPROC_BASE_MAP_LIMITS_T maplimits[],
+                                      size_t mapdim, void *data);
 
 #ifndef WARN_UNUSED
 #define WARN_UNUSED __attribute__((warn_unused_result))
@@ -57,6 +72,7 @@ extern "C" {
 
     LNXPROC_BASE_T *lnxproc_base_free(LNXPROC_BASE_T *base) WARN_UNUSED;
 
+    int lnxproc_base_print(LNXPROC_BASE_T *base, void *data);
     int lnxproc_base_map_print(LNXPROC_BASE_T *base, void *data);
 
 #ifdef __cplusplus

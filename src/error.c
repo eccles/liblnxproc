@@ -44,6 +44,8 @@ static char *errstr[] = {
     "Base arg is null",
     "Fail to malloc base",
     "Fail to malloc base buffer",
+    "Fail to malloc base maplimits",
+    "Base maplimits is null",
 };
 
 #ifdef DEBUG

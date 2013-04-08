@@ -41,6 +41,8 @@ struct lnxproc_base_t {
     size_t buflen;
     int nbytes;
     LNXPROC_ARRAY_T *map;
+    LNXPROC_BASE_MAP_LIMITS_T *maplimits;
+    size_t mapdim;
     void *data;
 };
 
@@ -88,6 +90,38 @@ lnxproc_base_nbytes(LNXPROC_BASE_T *base)
     return -1;
 }
 
+int
+lnxproc_base_map_dim(LNXPROC_BASE_T *base)
+{
+    LNXPROC_DEBUG("Base %p\n", base);
+    int mapdim = 0;
+
+    if (base) {
+        mapdim = base->mapdim;
+        LNXPROC_DEBUG("mapdim %d\n", mapdim);
+        return mapdim;
+    }
+
+    LNXPROC_DEBUG("WARNING: Base is null\n");
+    return -1;
+}
+
+LNXPROC_BASE_MAP_LIMITS_T *
+lnxproc_base_map_limits(LNXPROC_BASE_T *base)
+{
+    LNXPROC_DEBUG("Base %p\n", base);
+    LNXPROC_BASE_MAP_LIMITS_T *maplimits = NULL;
+
+    if (base) {
+        maplimits = base->maplimits;
+        LNXPROC_DEBUG("maplimits %p\n", maplimits);
+        return maplimits;
+    }
+
+    LNXPROC_DEBUG("WARNING: Base is null\n");
+    return maplimits;
+}
+
 LNXPROC_ARRAY_T *
 lnxproc_base_map(LNXPROC_BASE_T *base)
 {
@@ -100,6 +134,109 @@ lnxproc_base_map(LNXPROC_BASE_T *base)
 
     LNXPROC_DEBUG("map %p\n", map);
     return map;
+}
+
+char *
+lnxproc_base_map_chr(LNXPROC_BASE_MAP_LIMITS_T * pat, char c)
+{
+    char *ret = NULL;
+
+//    ret = strchr(pat->chars, c);
+    int i;
+
+    for (i = 0; i < pat->len; i++) {
+        if (c == pat->chars[i]) {
+            return pat->chars + i;
+        }
+    }
+    return ret;
+}
+
+char *
+lnxproc_base_print_map_limit(LNXPROC_BASE_MAP_LIMITS_T * maplimit, char *buf,
+                             size_t buflen)
+{
+    buf[0] = '\0';
+    if (!maplimit) {
+        return buf;
+    }
+
+    const char *s = maplimit->chars;
+    int n = maplimit->len;
+
+    char *cstr[] = {
+        "NUL '\\0'", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK",
+        "BEL '\\a'", "BS '\\b'", "HT '\\t'", "LF '\\n'", "VT '\\v'", "FF '\\f'",
+        "CR '\\r'",
+        "SO", "SI", "DLE", "DC1", "DC2", "DC3", "DC4", "NAK", "SYN", "ETB",
+        "CAN", "EM", "SUB", "ESC", "FS", "GS", "RS", "US", "SPACE",
+    };
+
+    int i;
+    char c;
+    int m = 0;
+    char *b = buf;
+
+    for (i = 0; i < n; i++) {
+        c = s[i];
+        if (c < 33) {
+            m = snprintf(b, buflen, "%s ", cstr[(int) c]);
+            b += m;
+            buflen -= m;
+        }
+        else if (c == 127) {
+            m = snprintf(b, buflen, "DEL ");
+            b += m;
+            buflen -= m;
+        }
+        else if (c > 127) {
+            m = snprintf(b, buflen, "%d ", c);
+            b += m;
+            buflen -= m;
+        }
+        else {
+            m = snprintf(b, buflen, "%c ", c);
+            b += m;
+            buflen -= m;
+        }
+    }
+
+    return buf;
+}
+
+int
+lnxproc_base_print(LNXPROC_BASE_T *base, void *data)
+{
+    LNXPROC_DEBUG("Base %p Data %p\n", base);
+
+    if (base) {
+        printf("Rawread %p\n", base->rawread);
+        printf("Normalize %p\n", base->normalize);
+        printf("Read %p\n", base->read);
+        printf("Callback %p\n", base->callback);
+        printf("Filename %s\n", base->filename);
+        printf("Lines %p\n", base->lines);
+        printf("Buflen %zd\n", base->buflen);
+        printf("Nbytes %d\n", base->nbytes);
+        printf("Map %p\n", base->map);
+        printf("Map dimension %zd\n", base->mapdim);
+        printf("Map limits %p\n", base->maplimits);
+        int i;
+
+        for (i = 0; i < base->mapdim; i++) {
+            char buf[64];
+            char *p =
+                lnxproc_base_print_map_limit(base->maplimits + i, buf,
+                                             sizeof buf);
+
+            printf("Map limit %d :%s:\n", i, p);
+        }
+        printf("Data %p\n", base->data);
+        return lnxproc_array_print(base->map, data);
+    }
+
+    LNXPROC_DEBUG("WARNING: Base is null\n");
+    return LNXPROC_ERROR_BASE_NULL;
 }
 
 int
@@ -149,6 +286,11 @@ lnxproc_base_rawread(LNXPROC_BASE_T *base)
 {
     LNXPROC_DEBUG("Base %p\n", base);
 
+    if (!base) {
+        LNXPROC_SET_ERROR(base->callback, LNXPROC_ERROR_BASE_NULL);
+        return LNXPROC_ERROR_BASE_NULL;
+    }
+
     if (base->rawread) {
         LNXPROC_DEBUG("Execute specified rawread method %p\n", base->rawread);
         return base->rawread(base);
@@ -195,6 +337,11 @@ lnxproc_base_normalize(LNXPROC_BASE_T *base)
 {
     LNXPROC_DEBUG("Base %p\n", base);
 
+    if (!base) {
+        LNXPROC_SET_ERROR(base->callback, LNXPROC_ERROR_BASE_NULL);
+        return LNXPROC_ERROR_BASE_NULL;
+    }
+
     if (base->normalize) {
         LNXPROC_DEBUG("Execute specified normalize method %p\n",
                       base->normalize);
@@ -208,6 +355,11 @@ int
 lnxproc_base_read(LNXPROC_BASE_T *base)
 {
     LNXPROC_DEBUG("Base %p\n", base);
+
+    if (!base) {
+        LNXPROC_SET_ERROR(base->callback, LNXPROC_ERROR_BASE_NULL);
+        return LNXPROC_ERROR_BASE_NULL;
+    }
 
     if (base->read) {
         LNXPROC_DEBUG("Execute specified read method %p\n", base->read);
@@ -244,7 +396,10 @@ lnxproc_base_init(const char *filename,
                   LNXPROC_BASE_METHOD rawread,
                   LNXPROC_BASE_METHOD normalize,
                   LNXPROC_BASE_METHOD read,
-                  LNXPROC_ERROR_CALLBACK callback, size_t buflen, void *data)
+                  LNXPROC_ERROR_CALLBACK callback,
+                  size_t buflen,
+                  LNXPROC_BASE_MAP_LIMITS_T maplimits[], size_t mapdim,
+                  void *data)
 {
     LNXPROC_DEBUG("filename %1$p '%1$s'\n", filename);
     LNXPROC_DEBUG("rawread %p, normalize %p, read %p, callback %p\n", rawread,
@@ -255,28 +410,52 @@ lnxproc_base_init(const char *filename,
 
     if (!base) {
         LNXPROC_SET_ERROR(callback, LNXPROC_ERROR_BASE_MALLOC_BASE);
-#ifdef DEBUG
-        char buf[128];
-        char *c =
-            lnxproc_strerror(LNXPROC_ERROR_BASE_MALLOC_BASE, buf, sizeof buf);
-        LNXPROC_DEBUG("Malloc %s\n", c);
-#endif
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_BASE, "Malloc base\n");
         return base;
     }
 
+    LNXPROC_DEBUG("Calloc lines buffer\n");
     base->lines = calloc(1, buflen + 1);
 
     if (!base->lines) {
         LNXPROC_SET_ERROR(callback, LNXPROC_ERROR_BASE_MALLOC_BUFFER);
-#ifdef DEBUG
-        char buf[128];
-        char *c = lnxproc_strerror(LNXPROC_ERROR_BASE_MALLOC_BUFFER, buf,
-                                   sizeof buf);
-
-        LNXPROC_DEBUG("Malloc %s\n", c);
-#endif
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_BASE, "Malloc buffer\n");
         free(base);
         return NULL;
+    }
+
+    if (mapdim > 0) {
+        LNXPROC_DEBUG("Malloc maplimits %zd\n", mapdim);
+        base->maplimits = malloc(mapdim * sizeof(LNXPROC_BASE_MAP_LIMITS_T));
+        if (!base->maplimits) {
+            LNXPROC_SET_ERROR(callback, LNXPROC_ERROR_BASE_MALLOC_MAPLIMITS);
+            LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_MAPLIMITS,
+                                "Malloc maplimits\n");
+            free(base->lines);
+            free(base);
+            return NULL;
+        }
+        LNXPROC_DEBUG("Malloc maplimits %p\n", base->maplimits);
+        int i;
+
+        for (i = 0; i < mapdim; i++) {
+            char buf[64];
+
+            char *p =
+                lnxproc_base_print_map_limit(maplimits + i, buf, sizeof buf);
+            base->maplimits[i].chars = strdup(maplimits[i].chars);
+            base->maplimits[i].len = maplimits[i].len;
+
+            p = lnxproc_base_print_map_limit(base->maplimits + i, buf,
+                                             sizeof buf);
+
+            LNXPROC_DEBUG("Malloc maplimit %zd :%s:\n", i, p);
+        }
+        base->mapdim = mapdim;
+    }
+    else {
+        base->maplimits = NULL;
+        base->mapdim = 0;
     }
 
     base->lines[buflen] = '\n';
@@ -309,6 +488,20 @@ lnxproc_base_free(LNXPROC_BASE_T *base)
             LNXPROC_DEBUG("Free Base buffer\n");
             free(base->lines);
             base->lines = NULL;
+        }
+        if (base->maplimits) {
+            LNXPROC_DEBUG("Free Maplimits buffer %zd\n", base->mapdim);
+            int i;
+
+            for (i = 0; i < base->mapdim; i++) {
+                LNXPROC_DEBUG("Free Maplimit buffer %d\n", i);
+                free(base->maplimits[i].chars);
+                base->maplimits[i].chars = NULL;
+            }
+            LNXPROC_DEBUG("Free Maplimits buffer %p\n", base->maplimits);
+            free(base->maplimits);
+            base->maplimits = NULL;
+            base->mapdim = 0;
         }
 
         LNXPROC_DEBUG("Free Base\n");

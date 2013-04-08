@@ -40,7 +40,7 @@ typical contents of /proc/cgroups file::
 #include "proc_cgroups.h"
 
 static LNXPROC_ARRAY_T *
-proccgroups_add_array(LNXPROC_BASE_T *base,
+lines_split_add_array(LNXPROC_BASE_T *base,
                       LNXPROC_ARRAY_T *wmap, int idx, int recursive)
 {
     LNXPROC_ARRAY_T *f = lnxproc_array_get(wmap, idx);
@@ -60,7 +60,7 @@ proccgroups_add_array(LNXPROC_BASE_T *base,
 }
 
 static int
-proccgroups_func(LNXPROC_BASE_T *base, int idx[], size_t idxlen, char *val)
+lines_split_func(LNXPROC_BASE_T *base, int idx[], size_t idxlen, char *val)
 {
 
     int map_recursive = idxlen > 1 ? 1 : 0;
@@ -83,7 +83,6 @@ proccgroups_func(LNXPROC_BASE_T *base, int idx[], size_t idxlen, char *val)
 
     if (!map_recursive) {
         lnxproc_array_set_last(map, idx[0], val);
-//        lnxproc_array_print(map, NULL);
         return 0;
     }
 
@@ -91,7 +90,7 @@ proccgroups_func(LNXPROC_BASE_T *base, int idx[], size_t idxlen, char *val)
     int i;
 
     for (i = 0; i < idxlen - 2; i++) {
-        wmap = proccgroups_add_array(base, wmap, idx[i], 1);
+        wmap = lines_split_add_array(base, wmap, idx[i], 1);
 
         if (!wmap) {
             printf("Field allocation failure\n");
@@ -99,21 +98,16 @@ proccgroups_func(LNXPROC_BASE_T *base, int idx[], size_t idxlen, char *val)
         }
     }
 
-    wmap = proccgroups_add_array(base, wmap, idx[i], 0);
+    wmap = lines_split_add_array(base, wmap, idx[i], 0);
     i++;
     lnxproc_array_set_last(wmap, idx[i], val);
-
-//    lnxproc_array_print(map, NULL);
 
     return 0;
 }
 
 int
-lines_split(LNXPROC_BASE_T *base,
-            char *limit[],
-            size_t limitlen,
-            int (*func) (LNXPROC_BASE_T *, int *, size_t, char *)
-    )
+lines_split(LNXPROC_BASE_T *base, LNXPROC_BASE_MAP_LIMITS_T limit[],
+            size_t limitlen)
 {
 
     int n = lnxproc_base_nbytes(base);
@@ -129,17 +123,12 @@ lines_split(LNXPROC_BASE_T *base,
         char *saveptr = c;
 
         while (c < d) {
-            if (strchr(limit[0], *c)) {
+            if (lnxproc_base_map_chr(limit + 0, *c)) {
                 *c = '\0';
-//                printf
-//                    ("lines_split:1:Line %d Field %d String %s\n",
-//                     idx[0], idx[1], saveptr);
 
-                func(base, idx, limitlen, saveptr);
+                lines_split_func(base, idx, limitlen, saveptr);
 
-                while ((++c < d) && strchr(limit[0], *c)) {
-                    ;
-                }
+                while ((++c < d) && lnxproc_base_map_chr(limit + 0, *c));
 
                 saveptr = c;
                 idx[0]++;
@@ -147,16 +136,12 @@ lines_split(LNXPROC_BASE_T *base,
 
             }
 
-            else if (strchr(limit[1], *c)) {
+            else if (lnxproc_base_map_chr(limit + 1, *c)) {
                 *c = '\0';
-                //               printf
-                //                   ("lines_split:2:Line %d Field %d String %s\n",
-                //                    idx[0], idx[1], saveptr);
-                func(base, idx, limitlen, saveptr);
 
-                while ((++c < d) && strchr(limit[1], *c)) {
-                    ;
-                }
+                lines_split_func(base, idx, limitlen, saveptr);
+
+                while ((++c < d) && lnxproc_base_map_chr(limit + 1, *c));
 
                 saveptr = c;
                 idx[1]++;
@@ -175,21 +160,23 @@ lines_split(LNXPROC_BASE_T *base,
 static int
 proccgroups_normalize(LNXPROC_BASE_T *base)
 {
-    char *limit[] = { "\n", "\t" };
-    lines_split(base, limit, 2, proccgroups_func);
-    lnxproc_base_map_print(base, NULL);
+    lines_split(base, lnxproc_base_map_limits(base),
+                lnxproc_base_map_dim(base));
+    lnxproc_base_print(base, NULL);
     return 0;
 }
 
 LNXPROC_BASE_T *
 proccgroups_init(void)
 {
+
+    LNXPROC_BASE_MAP_LIMITS_T maplimits[] = { {"\n", 1}, {"\t", 1} };
     return lnxproc_base_init("/proc/cgroups",
                              NULL,
                              proccgroups_normalize,
                              NULL,
                              lnxproc_error_print_callback,
-                             256, &proccgroups_data);
+                             256, maplimits, 2, &proccgroups_data);
 }
 
 /*
