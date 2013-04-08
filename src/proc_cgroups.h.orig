@@ -19,13 +19,13 @@
  */
 
 #ifndef LIBLNXPROC_PROC_CGROUPS_H
-#define LIBLNXPROC_PROC_CGROUPS_H 1
-#ifdef __cplusplus
+#    define LIBLNXPROC_PROC_CGROUPS_H 1
+#    ifdef __cplusplus
 extern "C" {
-#endif
+#    endif
 
-#include "base.h"
-#include "proc_cgroups.h"
+#    include "base.h"
+#    include "proc_cgroups.h"
 
     struct procgroups_sub_t {
         int hierarchy;
@@ -45,11 +45,11 @@ extern "C" {
     } proccgroups_data;
 
     LNXPROC_BASE_T *proccgroups_init(void
-        );
+                                    );
 
-#ifdef __cplusplus
+#    ifdef __cplusplus
 }                               // extern "C"
-#endif
+#    endif
 #endif                          // LIBLNXPROC_PROC_CGROUPS_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab

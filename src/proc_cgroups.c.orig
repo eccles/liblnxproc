@@ -113,7 +113,7 @@ lines_split(LNXPROC_BASE_T *base,
             char *limit[],
             size_t limitlen,
             int (*func) (LNXPROC_BASE_T *, int *, size_t, char *)
-    )
+           )
 {
 
     int n = lnxproc_base_nbytes(base);

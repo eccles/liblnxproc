@@ -19,15 +19,15 @@
  */
 
 #ifndef LIBLNXPROC_ERROR_H
-#define LIBLNXPROC_ERROR_H 1
+#    define LIBLNXPROC_ERROR_H 1
 
-#ifdef __cplusplus
+#    ifdef __cplusplus
 extern "C" {
-#endif
+#    endif
 
-#include <errno.h>
-#include <stddef.h>
-#define DEBUG 1
+#    include <errno.h>
+#    include <stddef.h>
+#    define DEBUG 1
 
     enum lnxproc_error_t {
         LNXPROC_OK = 0,
@@ -63,20 +63,20 @@ extern "C" {
                               const char *filename,
                               int lineno, const char *funcname, int err);
 
-#define LNXPROC_SET_ERROR(c,e) lnxproc_set_error(c,__FILE__,__LINE__,__func__,e)
+#    define LNXPROC_SET_ERROR(c,e) lnxproc_set_error(c,__FILE__,__LINE__,__func__,e)
 
-#define LNXPROC_SYSTEM_ERROR(c,e) \
+#    define LNXPROC_SYSTEM_ERROR(c,e) \
                             lnxproc_system_error(c,__FILE__,__LINE__,__func__,e)
 
-#ifdef DEBUG
+#    ifdef DEBUG
     void lnxproc_debug(const char *filename,
                        int lineno, const char *funcname, char *fmt, ...
-        );
+                      );
 
-#define LNXPROC_DEBUG(fmt, args...) \
+#        define LNXPROC_DEBUG(fmt, args...) \
                           lnxproc_debug(__FILE__,__LINE__,__func__, fmt, ##args)
 
-#define LNXPROC_ERROR_DEBUG(s, fmt, args...) {\
+#        define LNXPROC_ERROR_DEBUG(s, fmt, args...) {\
     char buf[32];\
     char *c = lnxproc_strerror(s,buf,sizeof buf);\
     char buf1[64];\
@@ -86,13 +86,13 @@ extern "C" {
     lnxproc_debug(__FILE__,__LINE__,__func__, "%s: %s\n", buf1, buf2);\
 }
 
-#else
-#define LNXPROC_DEBUG(fmt, args...)
-#define LNXPROC_ERROR_DEBUG(s, fmt, args...)
-#endif
+#    else
+#        define LNXPROC_DEBUG(fmt, args...)
+#        define LNXPROC_ERROR_DEBUG(s, fmt, args...)
+#    endif
 
-#define eprintf(format, args...) fprintf (stderr, format , ##args)
-#ifdef __cplusplus
+#    define eprintf(format, args...) fprintf (stderr, format , ##args)
+#    ifdef __cplusplus
 }                               // extern "C"
-#endif
+#    endif
 #endif                          // LIBLNXPROC_ERROR_H

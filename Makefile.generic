@@ -24,7 +24,7 @@ check: $(HDRS) $(SRCS)
 
 clean:
 	for d in $(DIRS); do (cd $$d; $(MAKE) clean ); done
-	rm -f $(OBJS) *~ x y z
+	rm -f $(OBJS) *~ *.orig x y z
 
 distclean:
 	for d in $(DIRS); do (cd $$d; $(MAKE) distclean ); done

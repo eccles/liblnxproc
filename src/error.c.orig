@@ -30,7 +30,7 @@
 #include "error.h"
 
 #ifdef DEBUG
-#include <stdarg.h>
+#    include <stdarg.h>
 #endif
 
 static char *errstr[] = {
@@ -49,7 +49,7 @@ static char *errstr[] = {
 #ifdef DEBUG
 void
 lnxproc_debug(const char *filename, int lineno, const char *funcname, char *fmt, ...
-    )
+             )
 {
     va_list args;
 

@@ -19,15 +19,15 @@
  */
 
 #ifndef LIBLNXPROC_BASE_H
-#define LIBLNXPROC_BASE_H 1
+#    define LIBLNXPROC_BASE_H 1
 
-#ifdef __cplusplus
+#    ifdef __cplusplus
 extern "C" {
-#endif
+#    endif
 
-#include <stddef.h>
-#include "error.h"
-#include "array.h"
+#    include <stddef.h>
+#    include "error.h"
+#    include "array.h"
 
     struct lnxproc_base_t;
     typedef struct lnxproc_base_t LNXPROC_BASE_T;
@@ -51,17 +51,17 @@ extern "C" {
                                       LNXPROC_ERROR_CALLBACK callback,
                                       size_t buflen, void *data);
 
-#ifndef WARN_UNUSED
-#define WARN_UNUSED __attribute__((warn_unused_result))
-#endif
+#    ifndef WARN_UNUSED
+#        define WARN_UNUSED __attribute__((warn_unused_result))
+#    endif
 
     LNXPROC_BASE_T *lnxproc_base_free(LNXPROC_BASE_T *base) WARN_UNUSED;
 
     int lnxproc_base_map_print(LNXPROC_BASE_T *base, void *data);
 
-#ifdef __cplusplus
+#    ifdef __cplusplus
 }                               // extern "C"
-#endif
+#    endif
 #endif                          // LIBLNXPROC_BASE_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab

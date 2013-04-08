@@ -33,6 +33,6 @@ extern "C" {
 }                               // extern "C"
 #endif
 #endif                          // LIBLNXPROC_H
-/* 
- * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab 
+/*
+ * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
  */

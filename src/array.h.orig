@@ -22,26 +22,26 @@
  */
 
 #ifndef LIBLNXPROC_ARRAY_H
-#define LIBLNXPROC_ARRAY_H 1
+#    define LIBLNXPROC_ARRAY_H 1
 
-#ifdef __cplusplus
+#    ifdef __cplusplus
 extern "C" {
-#endif
+#    endif
 
-#include <stddef.h>
-#include "error.h"
+#    include <stddef.h>
+#    include "error.h"
 
     struct lnxproc_array_t;
     typedef struct lnxproc_array_t LNXPROC_ARRAY_T;
 
-#ifndef WARN_UNUSED
-#define WARN_UNUSED __attribute__((warn_unused_result))
-#endif
+#    ifndef WARN_UNUSED
+#        define WARN_UNUSED __attribute__((warn_unused_result))
+#    endif
 
     LNXPROC_ARRAY_T *lnxproc_array_new(size_t size,
                                        int recursive,
                                        LNXPROC_ERROR_CALLBACK callback)
-     WARN_UNUSED;
+    WARN_UNUSED;
 
     LNXPROC_ARRAY_T *lnxproc_array_free(LNXPROC_ARRAY_T *array) WARN_UNUSED;
     int lnxproc_array_resize(LNXPROC_ARRAY_T *array, size_t size);
@@ -56,7 +56,7 @@ extern "C" {
     LNXPROC_ERROR_CALLBACK lnxproc_array_callback(LNXPROC_ARRAY_T *array);
 
     typedef int (*LNXPROC_ARRAY_ITERATE_FUNC) (LNXPROC_ARRAY_T *array,
-                                               void *data, int idx);
+            void *data, int idx);
 
     int lnxproc_array_iterate(LNXPROC_ARRAY_T *array,
                               void *data,
@@ -65,9 +65,9 @@ extern "C" {
 
     int lnxproc_array_print(LNXPROC_ARRAY_T *array, void *data);
 
-#ifdef __cplusplus
+#    ifdef __cplusplus
 }                               // extern "C"
-#endif
+#    endif
 #endif                          // LIBLNXPROC_ARRAY_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
