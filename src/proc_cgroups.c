@@ -35,6 +35,7 @@ typical contents of /proc/cgroups file::
 #include <string.h>
 
 #include "error.h"
+#include "map_limits.h"
 #include "base.h"
 #include "array.h"
 #include "proc_cgroups.h"
@@ -106,8 +107,7 @@ lines_split_func(LNXPROC_BASE_T *base, int idx[], size_t idxlen, char *val)
 }
 
 int
-lines_split(LNXPROC_BASE_T *base, LNXPROC_BASE_MAP_LIMITS_T limit[],
-            size_t limitlen)
+lines_split(LNXPROC_BASE_T *base, LNXPROC_MAP_LIMITS_T limit[], size_t limitlen)
 {
 
     int n = lnxproc_base_nbytes(base);
@@ -123,12 +123,12 @@ lines_split(LNXPROC_BASE_T *base, LNXPROC_BASE_MAP_LIMITS_T limit[],
         char *saveptr = c;
 
         while (c < d) {
-            if (lnxproc_base_map_chr(limit + 0, *c)) {
+            if (lnxproc_map_chr(limit + 0, *c)) {
                 *c = '\0';
 
                 lines_split_func(base, idx, limitlen, saveptr);
 
-                while ((++c < d) && lnxproc_base_map_chr(limit + 0, *c));
+                while ((++c < d) && lnxproc_map_chr(limit + 0, *c));
 
                 saveptr = c;
                 idx[0]++;
@@ -136,12 +136,12 @@ lines_split(LNXPROC_BASE_T *base, LNXPROC_BASE_MAP_LIMITS_T limit[],
 
             }
 
-            else if (lnxproc_base_map_chr(limit + 1, *c)) {
+            else if (lnxproc_map_chr(limit + 1, *c)) {
                 *c = '\0';
 
                 lines_split_func(base, idx, limitlen, saveptr);
 
-                while ((++c < d) && lnxproc_base_map_chr(limit + 1, *c));
+                while ((++c < d) && lnxproc_map_chr(limit + 1, *c));
 
                 saveptr = c;
                 idx[1]++;
@@ -170,7 +170,7 @@ LNXPROC_BASE_T *
 proccgroups_init(void)
 {
 
-    LNXPROC_BASE_MAP_LIMITS_T maplimits[] = { {"\n", 1}, {"\t", 1} };
+    LNXPROC_MAP_LIMITS_T maplimits[] = { {"\n", 1}, {"\t", 1} };
     return lnxproc_base_init("/proc/cgroups",
                              NULL,
                              proccgroups_normalize,

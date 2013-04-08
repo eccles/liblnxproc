@@ -41,7 +41,7 @@ struct lnxproc_base_t {
     size_t buflen;
     int nbytes;
     LNXPROC_ARRAY_T *map;
-    LNXPROC_BASE_MAP_LIMITS_T *maplimits;
+    LNXPROC_MAP_LIMITS_T *maplimits;
     size_t mapdim;
     void *data;
 };
@@ -106,11 +106,11 @@ lnxproc_base_map_dim(LNXPROC_BASE_T *base)
     return -1;
 }
 
-LNXPROC_BASE_MAP_LIMITS_T *
+LNXPROC_MAP_LIMITS_T *
 lnxproc_base_map_limits(LNXPROC_BASE_T *base)
 {
     LNXPROC_DEBUG("Base %p\n", base);
-    LNXPROC_BASE_MAP_LIMITS_T *maplimits = NULL;
+    LNXPROC_MAP_LIMITS_T *maplimits = NULL;
 
     if (base) {
         maplimits = base->maplimits;
@@ -136,74 +136,6 @@ lnxproc_base_map(LNXPROC_BASE_T *base)
     return map;
 }
 
-char *
-lnxproc_base_map_chr(LNXPROC_BASE_MAP_LIMITS_T * pat, char c)
-{
-    char *ret = NULL;
-
-//    ret = strchr(pat->chars, c);
-    int i;
-
-    for (i = 0; i < pat->len; i++) {
-        if (c == pat->chars[i]) {
-            return pat->chars + i;
-        }
-    }
-    return ret;
-}
-
-char *
-lnxproc_base_print_map_limit(LNXPROC_BASE_MAP_LIMITS_T * maplimit, char *buf,
-                             size_t buflen)
-{
-    buf[0] = '\0';
-    if (!maplimit) {
-        return buf;
-    }
-
-    const char *s = maplimit->chars;
-    int n = maplimit->len;
-
-    char *cstr[] = {
-        "NUL '\\0'", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK",
-        "BEL '\\a'", "BS '\\b'", "HT '\\t'", "LF '\\n'", "VT '\\v'", "FF '\\f'",
-        "CR '\\r'",
-        "SO", "SI", "DLE", "DC1", "DC2", "DC3", "DC4", "NAK", "SYN", "ETB",
-        "CAN", "EM", "SUB", "ESC", "FS", "GS", "RS", "US", "SPACE",
-    };
-
-    int i;
-    char c;
-    int m = 0;
-    char *b = buf;
-
-    for (i = 0; i < n; i++) {
-        c = s[i];
-        if (c < 33) {
-            m = snprintf(b, buflen, "%s ", cstr[(int) c]);
-            b += m;
-            buflen -= m;
-        }
-        else if (c == 127) {
-            m = snprintf(b, buflen, "DEL ");
-            b += m;
-            buflen -= m;
-        }
-        else if (c > 127) {
-            m = snprintf(b, buflen, "%d ", c);
-            b += m;
-            buflen -= m;
-        }
-        else {
-            m = snprintf(b, buflen, "%c ", c);
-            b += m;
-            buflen -= m;
-        }
-    }
-
-    return buf;
-}
-
 int
 lnxproc_base_print(LNXPROC_BASE_T *base, void *data)
 {
@@ -225,9 +157,8 @@ lnxproc_base_print(LNXPROC_BASE_T *base, void *data)
 
         for (i = 0; i < base->mapdim; i++) {
             char buf[64];
-            char *p =
-                lnxproc_base_print_map_limit(base->maplimits + i, buf,
-                                             sizeof buf);
+            char *p = lnxproc_print_map_limit(base->maplimits + i, buf,
+                                              sizeof buf);
 
             printf("Map limit %d :%s:\n", i, p);
         }
@@ -398,8 +329,7 @@ lnxproc_base_init(const char *filename,
                   LNXPROC_BASE_METHOD read,
                   LNXPROC_ERROR_CALLBACK callback,
                   size_t buflen,
-                  LNXPROC_BASE_MAP_LIMITS_T maplimits[], size_t mapdim,
-                  void *data)
+                  LNXPROC_MAP_LIMITS_T maplimits[], size_t mapdim, void *data)
 {
     LNXPROC_DEBUG("filename %1$p '%1$s'\n", filename);
     LNXPROC_DEBUG("rawread %p, normalize %p, read %p, callback %p\n", rawread,
@@ -426,7 +356,7 @@ lnxproc_base_init(const char *filename,
 
     if (mapdim > 0) {
         LNXPROC_DEBUG("Malloc maplimits %zd\n", mapdim);
-        base->maplimits = malloc(mapdim * sizeof(LNXPROC_BASE_MAP_LIMITS_T));
+        base->maplimits = malloc(mapdim * sizeof(LNXPROC_MAP_LIMITS_T));
         if (!base->maplimits) {
             LNXPROC_SET_ERROR(callback, LNXPROC_ERROR_BASE_MALLOC_MAPLIMITS);
             LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_MAPLIMITS,
@@ -441,13 +371,12 @@ lnxproc_base_init(const char *filename,
         for (i = 0; i < mapdim; i++) {
             char buf[64];
 
-            char *p =
-                lnxproc_base_print_map_limit(maplimits + i, buf, sizeof buf);
+            char *p = lnxproc_print_map_limit(maplimits + i, buf, sizeof buf);
+
             base->maplimits[i].chars = strdup(maplimits[i].chars);
             base->maplimits[i].len = maplimits[i].len;
 
-            p = lnxproc_base_print_map_limit(base->maplimits + i, buf,
-                                             sizeof buf);
+            p = lnxproc_print_map_limit(base->maplimits + i, buf, sizeof buf);
 
             LNXPROC_DEBUG("Malloc maplimit %zd :%s:\n", i, p);
         }

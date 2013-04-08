@@ -27,6 +27,7 @@ extern "C" {
 
 #include <stddef.h>
 #include "error.h"
+#include "map_limits.h"
 #include "array.h"
 
     struct lnxproc_base_t;
@@ -34,18 +35,8 @@ extern "C" {
 
     typedef int (*LNXPROC_BASE_METHOD) (LNXPROC_BASE_T *base);
 
-    struct lnxproc_base_map_limits_t {
-        char *chars;
-        int len;
-    };
-    typedef struct lnxproc_base_map_limits_t LNXPROC_BASE_MAP_LIMITS_T;
-
-    char *lnxproc_base_map_chr(LNXPROC_BASE_MAP_LIMITS_T * pat, char c);
-
-    LNXPROC_BASE_MAP_LIMITS_T *lnxproc_base_map_limits(LNXPROC_BASE_T *base);
+    LNXPROC_MAP_LIMITS_T *lnxproc_base_map_limits(LNXPROC_BASE_T *base);
     int lnxproc_base_map_dim(LNXPROC_BASE_T *base);
-    char *lnxproc_base_print_map_limit(LNXPROC_BASE_MAP_LIMITS_T * maplimit,
-                                       char *buf, size_t buflen);
 
     LNXPROC_ARRAY_T *lnxproc_base_map(LNXPROC_BASE_T *base);
     int lnxproc_base_map_set(LNXPROC_BASE_T *base, LNXPROC_ARRAY_T *map);
@@ -63,7 +54,7 @@ extern "C" {
                                       LNXPROC_BASE_METHOD read,
                                       LNXPROC_ERROR_CALLBACK callback,
                                       size_t buflen,
-                                      LNXPROC_BASE_MAP_LIMITS_T maplimits[],
+                                      LNXPROC_MAP_LIMITS_T maplimits[],
                                       size_t mapdim, void *data);
 
 #ifndef WARN_UNUSED
