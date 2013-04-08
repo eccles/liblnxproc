@@ -46,33 +46,33 @@ struct lnxproc_base_t {
 
 const char *lnxproc_base_filename(LNXPROC_BASE_T * base)
 {
-    LNXPROC_DEBUG("Base %p\n",base);
+    LNXPROC_DEBUG("Base %p\n", base);
     const char *filename = NULL;
     if (base) {
         filename = base->filename;
     }
-    LNXPROC_DEBUG("filename %1$p '%1$s'\n",filename);
+    LNXPROC_DEBUG("filename %1$p '%1$s'\n", filename);
     return filename;
 }
 
 char *lnxproc_base_lines(LNXPROC_BASE_T * base)
 {
-    LNXPROC_DEBUG("Base %p\n",base);
+    LNXPROC_DEBUG("Base %p\n", base);
     char *lines = NULL;
     if (base) {
         lines = base->lines;
     }
-    LNXPROC_DEBUG("lines %1$p '%1$s'\n",lines);
+    LNXPROC_DEBUG("lines %1$p '%1$s'\n", lines);
     return lines;
 }
 
 int lnxproc_base_nbytes(LNXPROC_BASE_T * base)
 {
-    LNXPROC_DEBUG("Base %p\n",base);
+    LNXPROC_DEBUG("Base %p\n", base);
     int nbytes = 0;
     if (base) {
         nbytes = base->nbytes;
-        LNXPROC_DEBUG("nbytes %d\n",nbytes);
+        LNXPROC_DEBUG("nbytes %d\n", nbytes);
         return nbytes;
     }
     LNXPROC_DEBUG("WARNING: Base is null\n");
@@ -81,18 +81,18 @@ int lnxproc_base_nbytes(LNXPROC_BASE_T * base)
 
 LNXPROC_ARRAY_T *lnxproc_base_map(LNXPROC_BASE_T * base)
 {
-    LNXPROC_DEBUG("Base %p\n",base);
+    LNXPROC_DEBUG("Base %p\n", base);
     LNXPROC_ARRAY_T *map = NULL;
     if (base) {
         map = base->map;
     }
-    LNXPROC_DEBUG("map %p\n",map);
+    LNXPROC_DEBUG("map %p\n", map);
     return map;
 }
 
 int lnxproc_base_map_print(LNXPROC_BASE_T * base, void *data)
 {
-    LNXPROC_DEBUG("Base %p\n",base);
+    LNXPROC_DEBUG("Base %p Data %p\n", base);
     if (base) {
         return lnxproc_array_print(base->map, data);
     }
@@ -102,21 +102,21 @@ int lnxproc_base_map_print(LNXPROC_BASE_T * base, void *data)
 
 LNXPROC_ERROR_CALLBACK lnxproc_base_callback(LNXPROC_BASE_T * base)
 {
-    LNXPROC_DEBUG("Base %p\n",base);
+    LNXPROC_DEBUG("Base %p\n", base);
     LNXPROC_ERROR_CALLBACK callback = NULL;
     if (base) {
         callback = base->callback;
     }
-    LNXPROC_DEBUG("callback %p\n",callback);
+    LNXPROC_DEBUG("callback %p\n", callback);
     return callback;
 }
 
 int lnxproc_base_map_set(LNXPROC_BASE_T * base, LNXPROC_ARRAY_T * map)
 {
-    LNXPROC_DEBUG("Base %p\n",base);
+    LNXPROC_DEBUG("Base %p Map %p\n", base);
     if (base) {
         base->map = map;
-        LNXPROC_DEBUG("set map %p\n",map);
+        LNXPROC_DEBUG("set map %p\n", map);
         return LNXPROC_OK;
     }
     LNXPROC_DEBUG("WARNING: Base is null\n");
@@ -125,45 +125,49 @@ int lnxproc_base_map_set(LNXPROC_BASE_T * base, LNXPROC_ARRAY_T * map)
 
 int lnxproc_base_rawread(LNXPROC_BASE_T * base)
 {
-    LNXPROC_DEBUG("Base %p\n",base);
+    LNXPROC_DEBUG("Base %p\n", base);
 
     if (base->rawread) {
-        LNXPROC_DEBUG("Execute specified rawread method %p\n",base->rawread);
+        LNXPROC_DEBUG("Execute specified rawread method %p\n", base->rawread);
         return base->rawread(base);
     }
     else {
         LNXPROC_DEBUG("Execute default rawread method\n");
-        LNXPROC_DEBUG("Open %s\n",base->filename);
+        LNXPROC_DEBUG("Open %s\n", base->filename);
         int fd = open(base->filename, O_RDONLY);
         if (fd < 0) {
             LNXPROC_SYSTEM_ERROR(base->callback, errno);
+            LNXPROC_ERROR_DEBUG(-errno, "Open %s\n", base->filename);
             return -errno;
         }
 
-        LNXPROC_DEBUG("Read %s\n",base->filename);
+        LNXPROC_DEBUG("Read %s\n", base->filename);
         base->nbytes = read(fd, base->lines, base->buflen);
         if (base->nbytes < 0) {
             LNXPROC_SYSTEM_ERROR(base->callback, errno);
+            LNXPROC_ERROR_DEBUG(-errno, "Open %s\n", base->filename);
             return -errno;
         }
-        LNXPROC_DEBUG("Nbytes %d read\n",base->nbytes);
+        LNXPROC_DEBUG("Nbytes %d read\n", base->nbytes);
         base->lines[base->nbytes] = '\n';
 
         /* we do not have to check return status of close as we are only
          * reading the file 
          */
-        LNXPROC_DEBUG("Close %s\n",base->filename);
+        LNXPROC_DEBUG("Close %s\n", base->filename);
         close(fd);
     }
+    LNXPROC_DEBUG("Successful\n");
     return LNXPROC_OK;
 
 }
 
 int lnxproc_base_normalize(LNXPROC_BASE_T * base)
 {
-    LNXPROC_DEBUG("Base %p\n",base);
+    LNXPROC_DEBUG("Base %p\n", base);
     if (base->normalize) {
-        LNXPROC_DEBUG("Execute specified normalize method %p\n",base->normalize);
+        LNXPROC_DEBUG("Execute specified normalize method %p\n",
+                      base->normalize);
         return base->normalize(base);
     }
     return LNXPROC_OK;
@@ -171,31 +175,24 @@ int lnxproc_base_normalize(LNXPROC_BASE_T * base)
 
 int lnxproc_base_read(LNXPROC_BASE_T * base)
 {
-    LNXPROC_DEBUG("Base %p\n",base);
+    LNXPROC_DEBUG("Base %p\n", base);
     if (base->read) {
-        LNXPROC_DEBUG("Execute specified read method %p\n",base->read);
+        LNXPROC_DEBUG("Execute specified read method %p\n", base->read);
         return base->read(base);
     }
     else {
         LNXPROC_DEBUG("Execute default read method\n");
         int state = lnxproc_base_rawread(base);
         if (state) {
-#ifdef DEBUG
-            char buf[128];
-            char *c = lnxproc_strerror(state,buf,sizeof buf);
-            LNXPROC_DEBUG("Rawread error %d %s\n",state,c);
-#endif
+            LNXPROC_ERROR_DEBUG(state, "Rawread\n");
             return state;
         }
 
         if (base->normalize) {
+            LNXPROC_DEBUG("Execute default normalize method\n");
             state = base->normalize(base);
             if (state) {
-#ifdef DEBUG
-            char buf[128];
-            char *c = lnxproc_strerror(state,buf,sizeof buf);
-            LNXPROC_DEBUG("Normalize error %d %s\n",state,c);
-#endif
+                LNXPROC_ERROR_DEBUG(state, "Normalize\n");
                 return state;
             }
         }
@@ -212,15 +209,19 @@ LNXPROC_BASE_T *lnxproc_base_init(const char *filename,
                                   LNXPROC_ERROR_CALLBACK callback,
                                   size_t buflen, void *data)
 {
-    LNXPROC_DEBUG("filename %1$p '%1$s'\n",filename);
+    LNXPROC_DEBUG("filename %1$p '%1$s'\n", filename);
+    LNXPROC_DEBUG("rawread %p, normalize %p, read %p, callback %p\n", rawread,
+                  normalize, read, callback);
+    LNXPROC_DEBUG("buflen %zd Data %p\n", buflen, data);
 
     LNXPROC_BASE_T *base = malloc(sizeof(LNXPROC_BASE_T));
     if (!base) {
         LNXPROC_SET_ERROR(callback, LNXPROC_ERROR_BASE_MALLOC_BASE);
 #ifdef DEBUG
         char buf[128];
-        char *c = lnxproc_strerror(LNXPROC_ERROR_BASE_MALLOC_BASE,buf,sizeof buf);
-        LNXPROC_DEBUG("Malloc %s\n",c);
+        char *c =
+            lnxproc_strerror(LNXPROC_ERROR_BASE_MALLOC_BASE, buf, sizeof buf);
+        LNXPROC_DEBUG("Malloc %s\n", c);
 #endif
         return base;
     }
@@ -229,8 +230,9 @@ LNXPROC_BASE_T *lnxproc_base_init(const char *filename,
         LNXPROC_SET_ERROR(callback, LNXPROC_ERROR_BASE_MALLOC_BUFFER);
 #ifdef DEBUG
         char buf[128];
-        char *c = lnxproc_strerror(LNXPROC_ERROR_BASE_MALLOC_BUFFER,buf,sizeof buf);
-        LNXPROC_DEBUG("Malloc %s\n",c);
+        char *c =
+            lnxproc_strerror(LNXPROC_ERROR_BASE_MALLOC_BUFFER, buf, sizeof buf);
+        LNXPROC_DEBUG("Malloc %s\n", c);
 #endif
         free(base);
         return NULL;
@@ -251,7 +253,7 @@ LNXPROC_BASE_T *lnxproc_base_init(const char *filename,
 
 LNXPROC_BASE_T *lnxproc_base_free(LNXPROC_BASE_T * base)
 {
-    LNXPROC_DEBUG("Base %p\n",base);
+    LNXPROC_DEBUG("Base %p\n", base);
     if (base) {
         if (base->map) {
             LNXPROC_DEBUG("Free Base map\n");

@@ -47,19 +47,20 @@ static char *errstr[] = {
 };
 
 #ifdef DEBUG
-void lnxproc_debug( const char *filename,
-                       int lineno, const char *funcname, char *fmt, ...)
+void lnxproc_debug(const char *filename,
+                   int lineno, const char *funcname, char *fmt, ...)
 {
     va_list args;
-    va_start( args, fmt );
-   printf("Debug: %s[%d] %s -> ", filename, lineno, funcname);
-   vprintf(fmt, args);
-    va_end (args);
+    va_start(args, fmt);
+    printf("Debug: %s[%d] %s -> ", filename, lineno, funcname);
+    vprintf(fmt, args);
+    va_end(args);
 }
 #endif
 
-char * lnxproc_strerror(LNXPROC_ERROR_T err, char *buf, size_t buflen){
-    if( err < 0 ) {
+char *lnxproc_strerror(LNXPROC_ERROR_T err, char *buf, size_t buflen)
+{
+    if (err < 0) {
         strerror_r(-((int) err), buf, buflen);
         return buf;
     }

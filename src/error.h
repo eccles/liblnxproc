@@ -25,6 +25,7 @@
 extern "C" {
 #endif
 
+#include <errno.h>
 #include <stddef.h>
 #define DEBUG 1
 
@@ -47,7 +48,7 @@ extern "C" {
                                             const char *funcname,
                                             LNXPROC_ERROR_T err);
 
-    char * lnxproc_strerror(LNXPROC_ERROR_T err, char *buf, size_t buflen);
+    char *lnxproc_strerror(LNXPROC_ERROR_T err, char *buf, size_t buflen);
 
     void lnxproc_error_print_callback(const char *filename,
                                       int lineno,
@@ -68,11 +69,25 @@ extern "C" {
                             lnxproc_system_error(c,__FILE__,__LINE__,__func__,e)
 
 #ifdef DEBUG
-    void lnxproc_debug( const char *filename,
-                           int lineno,
-                           const char *funcname, char *fmt, ...);
+    void lnxproc_debug(const char *filename,
+                       int lineno, const char *funcname, char *fmt, ...);
 
-#define LNXPROC_DEBUG(fmt, args...) lnxproc_debug(__FILE__,__LINE__,__func__, fmt, ##args)
+#define LNXPROC_DEBUG(fmt, args...) \
+                          lnxproc_debug(__FILE__,__LINE__,__func__, fmt, ##args)
+
+#define LNXPROC_ERROR_DEBUG(s, fmt, args...) {\
+    char buf[32];\
+    char *c = lnxproc_strerror(s,buf,sizeof buf);\
+    char buf1[64];\
+    snprintf(buf1,sizeof buf1,"Error : %d %s",s,c);\
+    char buf2[64];\
+    snprintf(buf2,sizeof buf2,fmt, ##args);\
+    lnxproc_debug(__FILE__,__LINE__,__func__, "%s: %s\n", buf1, buf2);\
+}
+
+#else
+#define LNXPROC_DEBUG(fmt, args...)
+#define LNXPROC_ERROR_DEBUG(s, fmt, args...)
 #endif
 
 #define eprintf(format, args...) fprintf (stderr, format , ##args)
