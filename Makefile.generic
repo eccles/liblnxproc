@@ -2,7 +2,8 @@
 .SUFFIXES: .c .o .so
 
 CC=gcc
-CCFLAGS=-fpic -I. -Wall
+CCFLAGS=-DDEBUG=1 -fpic -I. -Wall
+#CCFLAGS=-fpic -I. -Wall
 SOFLAGS=-shared
 OBJS=$(SRCS:.c=.o)
 #TGT1=$(patsubst %,$(BIN)/%,$(SRCS))

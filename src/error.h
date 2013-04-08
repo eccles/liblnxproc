@@ -27,7 +27,6 @@ extern "C" {
 
 #include <errno.h>
 #include <stddef.h>
-#define DEBUG 1
 
     enum lnxproc_error_t {
         LNXPROC_OK = 0,
