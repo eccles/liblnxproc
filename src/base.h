@@ -37,6 +37,7 @@ extern "C" {
 
     LNXPROC_MAP_LIMITS_T *lnxproc_base_map_limits(LNXPROC_BASE_T *base);
     int lnxproc_base_map_dim(LNXPROC_BASE_T *base);
+    int *lnxproc_base_array_dims(LNXPROC_BASE_T *base);
 
     LNXPROC_ARRAY_T *lnxproc_base_map(LNXPROC_BASE_T *base);
     int lnxproc_base_map_set(LNXPROC_BASE_T *base, LNXPROC_ARRAY_T *map);
@@ -44,16 +45,20 @@ extern "C" {
     const char *lnxproc_base_filename(LNXPROC_BASE_T *base);
     char *lnxproc_base_lines(LNXPROC_BASE_T *base);
     LNXPROC_ERROR_CALLBACK lnxproc_base_callback(LNXPROC_BASE_T *base);
-    int lnxproc_base_nbytes(LNXPROC_BASE_T *base);
+
     int lnxproc_base_rawread(LNXPROC_BASE_T *base);
     int lnxproc_base_read(LNXPROC_BASE_T *base);
     int lnxproc_base_normalize(LNXPROC_BASE_T *base);
+
+    int lnxproc_base_nbytes(LNXPROC_BASE_T *base);
+
     LNXPROC_BASE_T *lnxproc_base_init(const char *filename,
                                       LNXPROC_BASE_METHOD rawread,
                                       LNXPROC_BASE_METHOD normalize,
                                       LNXPROC_BASE_METHOD read,
                                       LNXPROC_ERROR_CALLBACK callback,
                                       size_t buflen,
+                                      int *array_dims,
                                       LNXPROC_MAP_LIMITS_T maplimits[],
                                       size_t mapdim, void *data);
 

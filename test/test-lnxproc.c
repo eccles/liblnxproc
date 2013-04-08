@@ -50,7 +50,7 @@ static void execute_base(LNXPROC_BASE_T *base) {
 
 int main(int argc, char *argv[]) {
 
-#ifdef UNUSED
+//#ifdef UNUSED
     printf("Allocate array for structs\n");
     struct lnxproc_array_t *array = lnxproc_array_new(2,1,lnxproc_error_print_callback);
     lnxproc_array_print(array,NULL);
@@ -167,7 +167,7 @@ int main(int argc, char *argv[]) {
 
         array = lnxproc_array_free(array);
     }
-#endif
+//#endif
 
 //#ifdef UNUSED
     LNXPROC_BASE_T *proccgroups = proccgroups_init();

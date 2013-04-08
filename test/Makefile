@@ -15,5 +15,5 @@ check: $(SRCS)
 	$(RELDIR)/check.sh $(SRCS)
 
 clean:
-	rm -f $(TSKS)
+	rm -f $(TSKS) *~ *.orig core* vgcore* x y z
 
