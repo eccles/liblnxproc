@@ -28,13 +28,13 @@ This file is part of liblnxproc.
 #include "array.h"
 
 static LNXPROC_ARRAY_T *
-map_split_add_array(LNXPROC_BASE_T *base,
+map_split_add_array(LNXPROC_ERROR_CALLBACK callback,
                     LNXPROC_ARRAY_T *wmap, int arraydim, int idx, int recursive)
 {
     LNXPROC_ARRAY_T *f = lnxproc_array_get(wmap, idx);
 
     if (!f) {
-        f = lnxproc_array_new(arraydim, recursive, lnxproc_base_callback(base));
+        f = lnxproc_array_new(arraydim, recursive, callback);
 
         if (!f) {
             return NULL;
@@ -47,25 +47,11 @@ map_split_add_array(LNXPROC_BASE_T *base,
 }
 
 static int
-map_split_func(LNXPROC_BASE_T *base, int *arraydims, int *idx, size_t idxlen,
-               char *val)
+map_split_func(LNXPROC_ARRAY_T *map, LNXPROC_ERROR_CALLBACK callback,
+               int *arraydims, int *idx, size_t idxlen, char *val)
 {
 
     int map_recursive = idxlen > 1 ? 1 : 0;
-
-    LNXPROC_ARRAY_T *map = lnxproc_base_map(base);
-
-    if (!map) {
-        map =
-            lnxproc_array_new(arraydims[0], map_recursive,
-                              lnxproc_base_callback(base));
-
-        if (!map) {
-            return 1;
-        }
-
-        lnxproc_base_map_set(base, map);
-    }
 
     if (!map_recursive) {
         lnxproc_array_set_last(map, idx[0], val);
@@ -76,14 +62,14 @@ map_split_func(LNXPROC_BASE_T *base, int *arraydims, int *idx, size_t idxlen,
     int i;
 
     for (i = 0; i < idxlen - 2; i++) {
-        wmap = map_split_add_array(base, wmap, arraydims[i + 1], idx[i], 1);
+        wmap = map_split_add_array(callback, wmap, arraydims[i + 1], idx[i], 1);
 
         if (!wmap) {
             return 1;
         }
     }
 
-    wmap = map_split_add_array(base, wmap, arraydims[i + 1], idx[i], 0);
+    wmap = map_split_add_array(callback, wmap, arraydims[i + 1], idx[i], 0);
     i++;
     lnxproc_array_set_last(wmap, idx[i], val);
 
@@ -94,6 +80,22 @@ int
 lnxproc_map_split(LNXPROC_BASE_T *base,
                   int *arraydims, LNXPROC_MAP_LIMITS_T limit[], size_t limitlen)
 {
+
+    int map_recursive = limitlen > 1 ? 1 : 0;
+
+    LNXPROC_ERROR_CALLBACK callback = lnxproc_base_callback(base);
+
+    LNXPROC_ARRAY_T *map = lnxproc_base_map(base);
+
+    if (!map) {
+        map = lnxproc_array_new(arraydims[0], map_recursive, callback);
+
+        if (!map) {
+            return 1;
+        }
+
+        lnxproc_base_map_set(base, map);
+    }
 
     int n = lnxproc_base_nbytes(base);
 
@@ -108,32 +110,30 @@ lnxproc_map_split(LNXPROC_BASE_T *base,
         char *saveptr = c;
 
         while (c < d) {
-            if (lnxproc_map_chr(limit + 0, *c)) {
-                *c = '\0';
+            int i;
+            int increment = 1;
 
-                map_split_func(base, arraydims, idx, limitlen, saveptr);
+            for (i = 0; i < limitlen; i++) {
+                if (lnxproc_map_chr(limit + i, *c)) {
+                    *c = '\0';
 
-                while ((++c < d) && lnxproc_map_chr(limit + 0, *c));
+                    map_split_func(map, callback, arraydims, idx, limitlen,
+                                   saveptr);
 
-                saveptr = c;
-                idx[0]++;
-                idx[1] = 0;
+                    while ((++c < d) && lnxproc_map_chr(limit + i, *c));
 
+                    saveptr = c;
+                    idx[i]++;
+                    int j = i + 1;
+
+                    if (limitlen > j) {
+                        memset(idx + j, 0, (limitlen - j) * sizeof(int));
+                    }
+                    increment = 0;
+
+                }
             }
-
-            else if (lnxproc_map_chr(limit + 1, *c)) {
-                *c = '\0';
-
-                map_split_func(base, arraydims, idx, limitlen, saveptr);
-
-                while ((++c < d) && lnxproc_map_chr(limit + 1, *c));
-
-                saveptr = c;
-                idx[1]++;
-
-            }
-
-            else {
+            if (increment) {
                 c++;
             }
         }

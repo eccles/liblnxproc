@@ -33,7 +33,7 @@
 
 struct lnxproc_base_t {
     LNXPROC_BASE_METHOD rawread;
-    LNXPROC_BASE_METHOD normalize;
+    LNXPROC_NORMALIZE_METHOD normalize;
     LNXPROC_BASE_METHOD read;
     LNXPROC_ERROR_CALLBACK callback;
     const char *filename;
@@ -299,7 +299,8 @@ lnxproc_base_normalize(LNXPROC_BASE_T *base)
     if (base->normalize) {
         LNXPROC_DEBUG("Execute specified normalize method %p\n",
                       base->normalize);
-        return base->normalize(base);
+        return base->normalize(base, base->arraydims, base->maplimits,
+                               base->mapdim);
     }
 
     return LNXPROC_OK;
@@ -332,7 +333,9 @@ lnxproc_base_read(LNXPROC_BASE_T *base)
 
         if (base->normalize) {
             LNXPROC_DEBUG("Execute default normalize method\n");
-            state = base->normalize(base);
+            state =
+                base->normalize(base, base->arraydims, base->maplimits,
+                                base->mapdim);
 
             if (state) {
                 LNXPROC_ERROR_DEBUG(state, "Normalize\n");
@@ -348,7 +351,7 @@ lnxproc_base_read(LNXPROC_BASE_T *base)
 LNXPROC_BASE_T *
 lnxproc_base_init(const char *filename,
                   LNXPROC_BASE_METHOD rawread,
-                  LNXPROC_BASE_METHOD normalize,
+                  LNXPROC_NORMALIZE_METHOD normalize,
                   LNXPROC_BASE_METHOD read,
                   LNXPROC_ERROR_CALLBACK callback,
                   size_t buflen,
