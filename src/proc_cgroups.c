@@ -38,12 +38,13 @@ typical contents of /proc/cgroups file::
 #include "proc_cgroups.h"
 
 static int
-proccgroups_normalize(LNXPROC_BASE_T *base,
-                      int *arraydims,
-                      LNXPROC_MAP_LIMITS_T * maplimits, int mapdim)
+proccgroups_normalize(LNXPROC_ARRAY_T *map,
+                      LNXPROC_ERROR_CALLBACK callback,
+                      LNXPROC_MAP_LIMITS_T * maplimits, int mapdim,
+                      char *lines, int nbytes)
 {
-    lnxproc_map_split(base, arraydims, maplimits, mapdim);
-    lnxproc_base_print(base, NULL);
+    lnxproc_map_split(map, callback, maplimits, mapdim, lines, nbytes);
+    lnxproc_array_print(map, NULL);
     return 0;
 }
 
@@ -52,11 +53,10 @@ proccgroups_init(void)
 {
 
     LNXPROC_MAP_LIMITS_T maplimits[] = {
-        {"\n", 1},              /* row delimiters */
-        {"\t", 1}               /* column delimiters */
+        {9, "\n", 1},           /* row delimiters */
+        {4, "\t", 1}            /* column delimiters */
     };
 
-    int arraydims[] = { 9, 4 }; /* expected dimensions of matrix */
     int dim = 2;
 
     return lnxproc_base_init("/proc/cgroups",
@@ -64,7 +64,7 @@ proccgroups_init(void)
                              proccgroups_normalize,
                              NULL,
                              lnxproc_error_print_callback,
-                             256, arraydims, maplimits, dim, &proccgroups_data);
+                             256, maplimits, dim, &proccgroups_data);
 }
 
 /*

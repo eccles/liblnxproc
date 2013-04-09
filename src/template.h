@@ -18,35 +18,29 @@
  *
  */
 
-#ifndef LIBLNXPROC_MAP_H
-#define LIBLNXPROC_MAP_H 1
+#ifndef LIBLNXPROC_BASE_H
+#define LIBLNXPROC_BASE_H 1
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+//#include <stddef.h>
 #include "error.h"
-#include "array.h"
-#include "map_limits.h"
-#include "base.h"
 
-#ifndef WARN_UNUSED
-#define WARN_UNUSED __attribute__((warn_unused_result))
-#endif
+    struct lnxproc_db_t;
+    typedef struct lnxproc_db_t LNXPROC_DB_T;
 
-    LNXPROC_ARRAY_T *lnxproc_map_create(LNXPROC_ERROR_CALLBACK callback,
-                                        LNXPROC_MAP_LIMITS_T maplimits[],
-                                        size_t mapdim, int depth) WARN_UNUSED;
-
-    int lnxproc_map_split(LNXPROC_ARRAY_T *map,
-                          LNXPROC_ERROR_CALLBACK callback,
-                          LNXPROC_MAP_LIMITS_T maplimits[], size_t mapdim,
-                          char *lines, size_t nbytes);
+    const char *lnxproc_db_filename(LNXPROC_DB_T * db);
+    int lnxproc_db_print(LNXPROC_DB_T * base);
+    LNXPROC_DB_T *lnxproc_db_init(const char *filename,
+                                  LNXPROC_ERROR_CALLBACK callback);
+    LNXPROC_DB_T *lnxproc_db_free(LNXPROC_DB_T * db);
 
 #ifdef __cplusplus
 }                               // extern "C"
 #endif
-#endif                          // LIBLNXPROC_MAP_H
+#endif                          // LIBLNXPROC_DB_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
  */

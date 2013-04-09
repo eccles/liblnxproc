@@ -2,8 +2,10 @@
 .SUFFIXES: .c .o .so
 
 CC=gcc
-CCFLAGS=-DDEBUG=1 -fpic -I. -Wall
-#CCFLAGS=-fpic -I. -Wall
+CCFLAGS1=-DDEBUG=1 -g -I../src -Wall
+CCFLAGS2=$(CCFLAGS1) -fpic
+#CCFLAGS=-g -fpic -I. -Wall
+LDFLAGS=-L. -llnxproc
 SOFLAGS=-shared
 OBJS=$(SRCS:.c=.o)
 #TGT1=$(patsubst %,$(BIN)/%,$(SRCS))
@@ -11,21 +13,24 @@ OBJS=$(SRCS:.c=.o)
 #TARGETS=$(TGT1) $(TGT2)
 
 %.o: %.c $(HDRS)
-	$(CC) $(CCFLAGS) -c $< -o $@
+	$(CC) $(CCFLAGS2) -c $< -o $@
 
-all: $(LIB)
+all: $(LIB) $(BIN)
 	for d in $(DIRS); do (cd $$d; $(MAKE) ); done
 
 $(LIB): $(OBJS)
 	$(CC) $(SOFLAGS) -o $@ $^
 
+$(BIN): $(BIN).c
+	$(CC) $(CCFLAGS1) -o $@ $^ $(LDFLAGS)
+
 check: $(HDRS) $(SRCS)
 	for d in $(DIRS); do (cd $$d; $(MAKE) check ); done
-	$(RELDIR)/check.sh $(HDRS) $(SRCS)
+	$(RELDIR)/check.sh $(BIN).c $(HDRS) $(SRCS)
 
 clean:
 	for d in $(DIRS); do (cd $$d; $(MAKE) clean ); done
-	rm -f $(OBJS) *~ *.orig x y z
+	rm -f $(BIN) *.o *.so *~ *.orig core* vgcore* x y z
 
 distclean:
 	for d in $(DIRS); do (cd $$d; $(MAKE) distclean ); done

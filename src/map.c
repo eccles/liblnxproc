@@ -24,116 +24,134 @@ This file is part of liblnxproc.
 
 #include "error.h"
 #include "map_limits.h"
-#include "base.h"
 #include "array.h"
 
-static LNXPROC_ARRAY_T *
-map_split_add_array(LNXPROC_ERROR_CALLBACK callback,
-                    LNXPROC_ARRAY_T *wmap, int arraydim, int idx, int recursive)
+LNXPROC_ARRAY_T *
+lnxproc_map_create(LNXPROC_ERROR_CALLBACK callback,
+                   LNXPROC_MAP_LIMITS_T maplimits[], size_t mapdim, int depth)
 {
-    LNXPROC_ARRAY_T *f = lnxproc_array_get(wmap, idx);
+    LNXPROC_DEBUG("callback %p\n", callback);
+    LNXPROC_DEBUG("maplimits %p\n", maplimits);
+    LNXPROC_DEBUG("mapdim %d\n", mapdim);
+    LNXPROC_DEBUG("depth %d\n", depth);
 
-    if (!f) {
-        f = lnxproc_array_new(arraydim, recursive, callback);
+    lnxproc_map_limits_print(maplimits, mapdim);
 
-        if (!f) {
-            return NULL;
+    LNXPROC_MAP_LIMITS_T *maplimit = maplimits + depth;
+
+    LNXPROC_DEBUG("maplimit %p\n", maplimit);
+#ifdef DEBUG
+    char buf[64];
+
+    LNXPROC_DEBUG("maplimit %s\n",
+                  lnxproc_map_limit_print(maplimit, buf, sizeof buf));
+#endif
+
+    int recursive = depth < mapdim - 1 ? 1 : 0;
+
+    LNXPROC_DEBUG("recursive %d\n", recursive);
+
+    LNXPROC_ARRAY_T *wmap =
+        lnxproc_array_new(maplimit->expected, recursive, callback);
+
+    int i;
+
+    if (recursive) {
+        depth++;
+        for (i = 0; i < maplimit->expected; i++) {
+            LNXPROC_ARRAY_T *f =
+                lnxproc_map_create(callback, maplimits, mapdim, depth);
+            lnxproc_array_set_last(wmap, i, f);
         }
-
-        lnxproc_array_set_last(wmap, idx, f);
     }
+    return wmap;
 
-    return f;
 }
 
 static int
-map_split_func(LNXPROC_ARRAY_T *map, LNXPROC_ERROR_CALLBACK callback,
-               int *arraydims, int *idx, size_t idxlen, char *val)
+map_split_func(LNXPROC_ERROR_CALLBACK callback,
+               LNXPROC_ARRAY_T *map,
+               LNXPROC_MAP_LIMITS_T maplimits[], size_t mapdim,
+               int idx[], int depth, char *saveptr)
 {
 
-    int map_recursive = idxlen > 1 ? 1 : 0;
+    void *savedarray[mapdim];
 
-    if (!map_recursive) {
-        lnxproc_array_set_last(map, idx[0], val);
-        return 0;
-    }
-
-    LNXPROC_ARRAY_T *wmap = map;
+    savedarray[0] = map;
     int i;
 
-    for (i = 0; i < idxlen - 2; i++) {
-        wmap = map_split_add_array(callback, wmap, arraydims[i + 1], idx[i], 1);
+    for (i = 1; i < mapdim; i++) {
+        LNXPROC_ARRAY_T *f = lnxproc_array_get(savedarray[i - 1], idx[i - 1]);
 
-        if (!wmap) {
-            return 1;
+        if (!f) {
+            LNXPROC_MAP_LIMITS_T *maplimit = maplimits + i;
+            int recursive = i < mapdim - 1 ? 1 : 0;
+
+            f = lnxproc_array_new(maplimit->expected, recursive, callback);
+            /* TODO = trap null return valie */
+            if (recursive)
+                lnxproc_array_set_last(savedarray[i - 1], idx[i - 1], f);
         }
+        savedarray[i] = f;
     }
-
-    wmap = map_split_add_array(callback, wmap, arraydims[i + 1], idx[i], 0);
-    i++;
-    lnxproc_array_set_last(wmap, idx[i], val);
+    lnxproc_array_set_last(savedarray[i - 1], idx[i - 1], saveptr);
 
     return LNXPROC_OK;
 }
 
 int
-lnxproc_map_split(LNXPROC_BASE_T *base,
-                  int *arraydims, LNXPROC_MAP_LIMITS_T limit[], size_t limitlen)
+lnxproc_map_split(LNXPROC_ARRAY_T *map,
+                  LNXPROC_ERROR_CALLBACK callback,
+                  LNXPROC_MAP_LIMITS_T maplimits[], size_t mapdim,
+                  char *lines, int nbytes)
 {
 
-    int map_recursive = limitlen > 1 ? 1 : 0;
-
-    LNXPROC_ERROR_CALLBACK callback = lnxproc_base_callback(base);
-
-    LNXPROC_ARRAY_T *map = lnxproc_base_map(base);
-
-    if (!map) {
-        map = lnxproc_array_new(arraydims[0], map_recursive, callback);
-
-        if (!map) {
-            return 1;
-        }
-
-        lnxproc_base_map_set(base, map);
-    }
-
-    int n = lnxproc_base_nbytes(base);
-
-    if (n > 0) {
-        int idx[limitlen];
-
-        memset(idx, 0, limitlen * sizeof(int));
-
-        char *c = lnxproc_base_lines(base);
-        char *d = c + n;
+    if (nbytes > 0) {
+        char *c = lines;
+        char *d = c + nbytes;
 
         char *saveptr = c;
 
-        while (c < d) {
-            int i;
-            int increment = 1;
+        if (mapdim > 0) {
+            int idx[mapdim];
 
-            for (i = 0; i < limitlen; i++) {
-                if (lnxproc_map_chr(limit + i, *c)) {
-                    *c = '\0';
+            memset(idx, 0, mapdim * sizeof(int));
 
-                    map_split_func(map, callback, arraydims, idx, limitlen,
-                                   saveptr);
+            while (c < d) {
+                int i;
+                int increment = 1;
 
-                    while ((++c < d) && lnxproc_map_chr(limit + i, *c));
+                for (i = 0; i < mapdim; i++) {
+                    if (lnxproc_map_chr(maplimits + i, *c)) {
+                        *c = '\0';
 
-                    saveptr = c;
-                    idx[i]++;
-                    int j = i + 1;
+                        map_split_func(callback, map, maplimits, mapdim,
+                                       idx, i, saveptr);
 
-                    if (limitlen > j) {
-                        memset(idx + j, 0, (limitlen - j) * sizeof(int));
+                        while ((++c < d) && lnxproc_map_chr(maplimits + i, *c));
+
+                        saveptr = c;
+                        idx[i]++;
+                        int j = i + 1;
+
+                        if (mapdim > j) {
+                            memset(idx + j, 0, (mapdim - j) * sizeof(int));
+                        }
+
+                        increment = 0;
                     }
-                    increment = 0;
-
+                }
+                if (increment) {
+                    c++;
                 }
             }
-            if (increment) {
+        }
+        else {
+            while (c < d) {
+                if (strchr("\n", *c)) {
+                    *c = '\0';
+                    break;
+                }
                 c++;
             }
         }

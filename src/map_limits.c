@@ -27,32 +27,58 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "error.h"
 #include "map_limits.h"
 
 char *
-lnxproc_map_chr(LNXPROC_MAP_LIMITS_T * pat, char c)
+lnxproc_map_chr(LNXPROC_MAP_LIMITS_T * maplimit, char c)
 {
     char *ret = NULL;
 
-//    ret = strchr(pat->chars, c);
+//    ret = strchr(maplimit->chars, c);
     int i;
 
-    for (i = 0; i < pat->len; i++) {
-        if (c == pat->chars[i]) {
-            return pat->chars + i;
+    for (i = 0; i < maplimit->len; i++) {
+        if (c == maplimit->chars[i]) {
+            return maplimit->chars + i;
         }
     }
     return ret;
 }
 
+int
+lnxproc_map_limits_print(LNXPROC_MAP_LIMITS_T maplimits[], int mapdim)
+{
+    if (!maplimits) {
+        return 1;
+    }
+
+    int i;
+
+    for (i = 0; i < mapdim; i++) {
+        char buf[64];
+        char *p = lnxproc_map_limit_print(maplimits + i, buf, sizeof buf);
+
+        printf("Maplimit %d :%s:\n", i, p);
+    }
+    return LNXPROC_OK;
+}
+
 char *
-lnxproc_print_map_limit(LNXPROC_MAP_LIMITS_T * maplimit, char *buf,
+lnxproc_map_limit_print(LNXPROC_MAP_LIMITS_T * maplimit, char *buf,
                         size_t buflen)
 {
     buf[0] = '\0';
     if (!maplimit) {
         return buf;
     }
+
+    int m = 0;
+    char *b = buf;
+
+    m = snprintf(b, buflen, "E%zd ", maplimit->expected);
+    b += m;
+    buflen -= m;
 
     const char *s = maplimit->chars;
     int n = maplimit->len;
@@ -67,8 +93,6 @@ lnxproc_print_map_limit(LNXPROC_MAP_LIMITS_T * maplimit, char *buf,
 
     int i;
     char c;
-    int m = 0;
-    char *b = buf;
 
     for (i = 0; i < n; i++) {
         c = s[i];
@@ -95,6 +119,76 @@ lnxproc_print_map_limit(LNXPROC_MAP_LIMITS_T * maplimit, char *buf,
     }
 
     return buf;
+}
+
+LNXPROC_MAP_LIMITS_T *
+lnxproc_map_limits_dup(LNXPROC_ERROR_CALLBACK callback,
+                       LNXPROC_MAP_LIMITS_T maplimits[], size_t mapdim)
+{
+    LNXPROC_MAP_LIMITS_T *newmaplimits = NULL;
+
+    if (mapdim > 0 && maplimits) {
+        LNXPROC_DEBUG("Malloc maplimits %zd\n", mapdim);
+        newmaplimits = malloc(mapdim * sizeof(LNXPROC_MAP_LIMITS_T));
+        if (!newmaplimits) {
+            LNXPROC_SET_ERROR(callback, LNXPROC_ERROR_MALLOC_MAPLIMITS);
+            LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC_MAPLIMITS,
+                                "Malloc maplimits\n");
+            return newmaplimits;
+        }
+        LNXPROC_DEBUG("Malloc maplimits %p\n", newmaplimits);
+        int i;
+
+        for (i = 0; i < mapdim; i++) {
+
+#ifdef DEBUG
+            char buf[64];
+            char *p = lnxproc_map_limit_print(maplimits + i, buf, sizeof buf);
+
+            LNXPROC_DEBUG("Malloc old maplimit %zd :%s:\n", i, p);
+#endif
+            newmaplimits[i].chars = strdup(maplimits[i].chars);
+            if (!newmaplimits[i].chars) {
+                LNXPROC_SET_ERROR(callback,
+                                  LNXPROC_ERROR_MALLOC_MAPLIMITS_ENTRY);
+                LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC_MAPLIMITS_ENTRY,
+                                    "Malloc maplimits entry\n");
+                int j;
+
+                for (j = i - 1; j >= 0; j--) {
+                    free(newmaplimits[j].chars);
+                }
+                return NULL;
+            }
+            newmaplimits[i].expected = maplimits[i].expected;
+            newmaplimits[i].len = maplimits[i].len;
+
+#ifdef DEBUG
+            p = lnxproc_map_limit_print(newmaplimits + i, buf, sizeof buf);
+            LNXPROC_DEBUG("Malloc new maplimit %zd :%s:\n", i, p);
+#endif
+
+        }
+    }
+    return newmaplimits;
+}
+
+LNXPROC_MAP_LIMITS_T *
+lnxproc_map_limits_free(LNXPROC_MAP_LIMITS_T maplimits[], size_t mapdim)
+{
+    if (mapdim > 0 && maplimits) {
+        LNXPROC_DEBUG("Free Maplimits buffer %zd\n", mapdim);
+        int i;
+
+        for (i = 0; i < mapdim; i++) {
+            LNXPROC_DEBUG("Free Maplimit buffer %d\n", i);
+            free(maplimits[i].chars);
+            maplimits[i].chars = NULL;
+        }
+        LNXPROC_DEBUG("Free Maplimits buffer %p\n", maplimits);
+        free(maplimits);
+    }
+    return NULL;
 }
 
 /*

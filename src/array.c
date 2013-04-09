@@ -483,8 +483,8 @@ lnxproc_array_print(LNXPROC_ARRAY_T *array, void *data)
     printf("Array recursive %d\n", array->recursive);
     array_print_indent(depth);
     printf("Array data at %p\n", array->data);
-    //array_iterate(array,data,-1,array->size,array_print_internal);
-    lnxproc_array_iterate(array, data, -1, -1, array_print_internal);
+    lnxproc_array_iterate(array, data, -1, array->size, array_print_internal);
+//    lnxproc_array_iterate(array, data, -1, -1, array_print_internal);
     printf("\n");
     return LNXPROC_OK;
 }

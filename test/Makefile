@@ -3,7 +3,7 @@ SRCS=test-lnxproc.c
 TSKS=test-lnxproc
 
 CC=gcc
-CCFLAGS=-DDEBUG=1 -I../src -Wall
+CCFLAGS=-DDEBUG=1 -g -I../src -Wall
 LDFLAGS=-L../src -llnxproc
 
 all: $(TSKS)

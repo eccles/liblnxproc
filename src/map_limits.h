@@ -25,16 +25,33 @@
 extern "C" {
 #endif
 
+#include "error.h"
+
     struct lnxproc_map_limits_t {
+        size_t expected;
         char *chars;
         int len;
     };
     typedef struct lnxproc_map_limits_t LNXPROC_MAP_LIMITS_T;
 
-    char *lnxproc_map_chr(LNXPROC_MAP_LIMITS_T * pat, char c);
+    char *lnxproc_map_chr(LNXPROC_MAP_LIMITS_T * maplimit, char c);
 
-    char *lnxproc_print_map_limit(LNXPROC_MAP_LIMITS_T * maplimit,
-                                  char *buf, size_t buflen);
+    char *lnxproc_map_limit_print(LNXPROC_MAP_LIMITS_T * maplimit, char *buf,
+                                  size_t buflen);
+    int lnxproc_map_limits_print(LNXPROC_MAP_LIMITS_T maplimits[], int mapdim);
+
+#ifndef WARN_UNUSED
+#define WARN_UNUSED __attribute__((warn_unused_result))
+#endif
+
+    LNXPROC_MAP_LIMITS_T *lnxproc_map_limits_dup(LNXPROC_ERROR_CALLBACK
+                                                 callback,
+                                                 LNXPROC_MAP_LIMITS_T
+                                                 maplimits[],
+                                                 size_t mapdim) WARN_UNUSED;
+    LNXPROC_MAP_LIMITS_T *lnxproc_map_limits_free(LNXPROC_MAP_LIMITS_T
+                                                  maplimits[],
+                                                  size_t mapdim) WARN_UNUSED;
 
 #ifdef __cplusplus
 }                               // extern "C"

@@ -34,14 +34,14 @@ extern "C" {
     typedef struct lnxproc_base_t LNXPROC_BASE_T;
 
     typedef int (*LNXPROC_BASE_METHOD) (LNXPROC_BASE_T *base);
-    typedef int (*LNXPROC_NORMALIZE_METHOD) (LNXPROC_BASE_T *base,
-                                             int *arraydims,
+    typedef int (*LNXPROC_NORMALIZE_METHOD) (LNXPROC_ARRAY_T *map,
+                                             LNXPROC_ERROR_CALLBACK callback,
                                              LNXPROC_MAP_LIMITS_T * maplimits,
-                                             int mapdim);
+                                             int mapdim,
+                                             char *lines, int nbytes);
 
     LNXPROC_MAP_LIMITS_T *lnxproc_base_map_limits(LNXPROC_BASE_T *base);
     int lnxproc_base_map_dim(LNXPROC_BASE_T *base);
-    int *lnxproc_base_array_dims(LNXPROC_BASE_T *base);
 
     LNXPROC_ARRAY_T *lnxproc_base_map(LNXPROC_BASE_T *base);
     int lnxproc_base_map_set(LNXPROC_BASE_T *base, LNXPROC_ARRAY_T *map);
@@ -62,7 +62,6 @@ extern "C" {
                                       LNXPROC_BASE_METHOD read,
                                       LNXPROC_ERROR_CALLBACK callback,
                                       size_t buflen,
-                                      int *array_dims,
                                       LNXPROC_MAP_LIMITS_T maplimits[],
                                       size_t mapdim, void *data);
 

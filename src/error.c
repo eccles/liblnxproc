@@ -46,14 +46,15 @@ static char *errstr[] = {
     "Fail to malloc base buffer",
     "Fail to malloc base maplimits",
     "Base maplimits is null",
-    "Fail to malloc base array dims",
     "Fail to malloc base maplimits entry",
+    "Fail to malloc db",
+    "Db arg is null",
 };
 
 #ifdef DEBUG
 void
-lnxproc_debug(const char *filename, int lineno, const char *funcname, char *fmt, ...
-    )
+lnxproc_debug(const char *filename, int lineno, const char *funcname, char *fmt,
+              ...)
 {
     va_list args;
 
