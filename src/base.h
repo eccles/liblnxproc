@@ -54,8 +54,8 @@ extern "C" {
                                       LNXPROC_BASE_METHOD read,
                                       LNXPROC_ERROR_CALLBACK callback,
                                       size_t buflen,
-                                      LNXPROC_LIMITS_T maplimits[],
-                                      size_t mapdim, void *data);
+                                      LNXPROC_LIMITS_T limits[],
+                                      size_t dim, void *data);
 
 #ifndef WARN_UNUSED
 #define WARN_UNUSED __attribute__((warn_unused_result))

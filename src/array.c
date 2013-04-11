@@ -156,7 +156,7 @@ lnxproc_array_callback(LNXPROC_ARRAY_T *array)
 }
 
 int
-lnxproc_set(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim, char *val)
+lnxproc_array_set(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim, char *val)
 {
 
     array->saved[0] = array->data;
@@ -189,7 +189,8 @@ lnxproc_set(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim, char *val)
 }
 
 int
-lnxproc_set_last(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim, char *val)
+lnxproc_array_set_last(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim,
+                       char *val)
 {
 
     array->saved[0] = array->data;

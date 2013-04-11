@@ -48,7 +48,7 @@ test_error(void)
 static void
 test_limits(void)
 {
-    printf("\nMaplimits 1\n");
+    printf("\nLimits 1\n");
     LNXPROC_LIMITS_T mylimits1[] = {
         {3, "\n", 1},
     };
@@ -76,7 +76,7 @@ test_limits(void)
 
     limits1 = lnxproc_limits_free(limits1, dim1);
 
-    printf("\nMaplimits 2\n");
+    printf("\nLimits 2\n");
     LNXPROC_LIMITS_T mylimits2[] = {
         {3, "\n", 1}
         ,
@@ -105,7 +105,7 @@ test_limits(void)
 
     limits2 = lnxproc_limits_free(limits2, dim2);
 
-    printf("\nMaplimits 3\n");
+    printf("\nLimits 3\n");
     LNXPROC_LIMITS_T mylimits3[] = {
         {3, "\n", 1}
         ,
@@ -138,10 +138,6 @@ test_limits(void)
 
 }
 
-/*
-    char *lnxproc_chr(LNXPROC_LIMITS_T * maplimit, char c);
-
- */
 #endif
 
 /*----------------------------------------------------------------------------*/

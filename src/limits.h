@@ -38,7 +38,7 @@ extern "C" {
 
     char *lnxproc_limit_print(LNXPROC_LIMITS_T * limit, char *buf,
                               size_t buflen);
-    int lnxproc_limits_print(LNXPROC_LIMITS_T limits[], int mapdim);
+    int lnxproc_limits_print(LNXPROC_LIMITS_T limits[], int dim);
 
 #ifndef WARN_UNUSED
 #define WARN_UNUSED __attribute__((warn_unused_result))
@@ -49,7 +49,7 @@ extern "C" {
                                          LNXPROC_LIMITS_T
                                          limits[], size_t dim) WARN_UNUSED;
     LNXPROC_LIMITS_T *lnxproc_limits_free(LNXPROC_LIMITS_T
-                                          maplimits[], size_t dim) WARN_UNUSED;
+                                          limits[], size_t dim) WARN_UNUSED;
 
 #ifdef __cplusplus
 }                               // extern "C"
