@@ -77,49 +77,8 @@ lnxproc_base_nbytes(LNXPROC_BASE_T *base)
     return -1;
 }
 
-int
-lnxproc_base_dim(LNXPROC_BASE_T *base)
-{
-    LNXPROC_DEBUG("Base %p\n", base);
-    int dim = 0;
-
-    if (!base) {
-        LNXPROC_SET_ERROR(base->callback, LNXPROC_ERROR_BASE_NULL);
-        return dim;
-    }
-
-    if (!base->array) {
-        LNXPROC_SET_ERROR(base->callback, LNXPROC_ERROR_ARRAY_NULL);
-        return -1;
-    }
-
-    dim = base->array->dim;
-    LNXPROC_DEBUG("Dimension %d\n", dim);
-    return dim;
-}
-
-LNXPROC_LIMITS_T *
-lnxproc_base_limits(LNXPROC_BASE_T *base)
-{
-    LNXPROC_DEBUG("Base %p\n", base);
-    LNXPROC_LIMITS_T *limits = NULL;
-
-    if (!base) {
-        LNXPROC_SET_ERROR(base->callback, LNXPROC_ERROR_BASE_NULL);
-        return limits;
-    }
-
-    if (!base->array) {
-        LNXPROC_SET_ERROR(base->callback, LNXPROC_ERROR_ARRAY_NULL);
-        return limits;
-    }
-    limits = base->array->limits;
-    LNXPROC_DEBUG("Limits %p\n", limits);
-    return limits;
-}
-
 LNXPROC_ARRAY_T *
-lnxproc_base_map(LNXPROC_BASE_T *base)
+lnxproc_base_array(LNXPROC_BASE_T *base)
 {
     LNXPROC_DEBUG("Base %p\n", base);
     LNXPROC_ARRAY_T *array = NULL;
@@ -150,17 +109,6 @@ lnxproc_base_print(LNXPROC_BASE_T *base, int allocated, void *data)
         return lnxproc_array_print(base->array, allocated, data);
     }
 
-    LNXPROC_DEBUG("WARNING: Base is null\n");
-    return LNXPROC_ERROR_BASE_NULL;
-}
-
-int
-lnxproc_base_map_print(LNXPROC_BASE_T *base, void *data)
-{
-    LNXPROC_DEBUG("Base %p Data %p\n", base);
-    if (base) {
-        return lnxproc_array_print(base->array, 0, data);
-    }
     LNXPROC_DEBUG("WARNING: Base is null\n");
     return LNXPROC_ERROR_BASE_NULL;
 }

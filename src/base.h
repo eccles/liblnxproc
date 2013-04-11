@@ -36,10 +36,7 @@ extern "C" {
     typedef int (*LNXPROC_BASE_METHOD) (LNXPROC_BASE_T *base);
     typedef int (*LNXPROC_NORMALIZE_METHOD) (LNXPROC_BASE_T *base);
 
-    LNXPROC_LIMITS_T *lnxproc_base_map_limits(LNXPROC_BASE_T *base);
-    int lnxproc_base_map_dim(LNXPROC_BASE_T *base);
-
-    LNXPROC_ARRAY_T *lnxproc_base_map(LNXPROC_BASE_T *base);
+    LNXPROC_ARRAY_T *lnxproc_base_array(LNXPROC_BASE_T *base);
 
     const char *lnxproc_base_filename(LNXPROC_BASE_T *base);
     char *lnxproc_base_lines(LNXPROC_BASE_T *base);
@@ -67,7 +64,6 @@ extern "C" {
     LNXPROC_BASE_T *lnxproc_base_free(LNXPROC_BASE_T *base) WARN_UNUSED;
 
     int lnxproc_base_print(LNXPROC_BASE_T *base, int allocated, void *data);
-    int lnxproc_base_map_print(LNXPROC_BASE_T *base, void *data);
 
 #ifdef __cplusplus
 }                               // extern "C"

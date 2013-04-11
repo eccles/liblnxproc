@@ -24,7 +24,7 @@ This file is part of liblnxproc.
 
 //#define TEST_ERROR 1
 //#define TEST_VECTOR 1
-#define TEST_LIMITS 1
+//#define TEST_LIMITS 1
 #define TEST_ARRAY 1
 //#define TEST_PROCCGROUPS 1
 
