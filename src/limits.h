@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef LIBLNXPROC_MAP_LIMITS_H
-#define LIBLNXPROC_MAP_LIMITS_H 1
+#ifndef LIBLNXPROC_LIMITS_H
+#define LIBLNXPROC_LIMITS_H 1
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,36 +27,36 @@ extern "C" {
 
 #include "error.h"
 
-    struct lnxproc_map_limits_t {
+    struct lnxproc_limits_t {
         size_t expected;
         char *chars;
         int len;
     };
-    typedef struct lnxproc_map_limits_t LNXPROC_MAP_LIMITS_T;
+    typedef struct lnxproc_limits_t LNXPROC_LIMITS_T;
 
-    char *lnxproc_map_chr(LNXPROC_MAP_LIMITS_T * maplimit, char c);
+    char *lnxproc_chr(LNXPROC_LIMITS_T * limit, char c);
 
-    char *lnxproc_map_limit_print(LNXPROC_MAP_LIMITS_T * maplimit, char *buf,
+    char *lnxproc_limit_print(LNXPROC_LIMITS_T * limit, char *buf,
                                   size_t buflen);
-    int lnxproc_map_limits_print(LNXPROC_MAP_LIMITS_T maplimits[], int mapdim);
+    int lnxproc_limits_print(LNXPROC_LIMITS_T limits[], int mapdim);
 
 #ifndef WARN_UNUSED
 #define WARN_UNUSED __attribute__((warn_unused_result))
 #endif
 
-    LNXPROC_MAP_LIMITS_T *lnxproc_map_limits_dup(LNXPROC_ERROR_CALLBACK
+    LNXPROC_LIMITS_T *lnxproc_limits_dup(LNXPROC_ERROR_CALLBACK
                                                  callback,
-                                                 LNXPROC_MAP_LIMITS_T
-                                                 maplimits[],
-                                                 size_t mapdim) WARN_UNUSED;
-    LNXPROC_MAP_LIMITS_T *lnxproc_map_limits_free(LNXPROC_MAP_LIMITS_T
+                                                 LNXPROC_LIMITS_T
+                                                 limits[],
+                                                 size_t dim) WARN_UNUSED;
+    LNXPROC_LIMITS_T *lnxproc_limits_free(LNXPROC_LIMITS_T
                                                   maplimits[],
-                                                  size_t mapdim) WARN_UNUSED;
+                                                  size_t dim) WARN_UNUSED;
 
 #ifdef __cplusplus
 }                               // extern "C"
 #endif
-#endif                          // LIBLNXPROC_MAP_LIMITS_H
+#endif                          // LIBLNXPROC_LIMITS_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
  */

@@ -28,25 +28,10 @@
 #include <string.h>
 
 #include "error.h"
-#include "array.h"
-#include "map_limits.h"
-#include "map.h"
-#include "base.h"
-
-struct lnxproc_base_t {
-    LNXPROC_BASE_METHOD rawread;
-    LNXPROC_NORMALIZE_METHOD normalize;
-    LNXPROC_BASE_METHOD read;
-    LNXPROC_ERROR_CALLBACK callback;
-    const char *filename;
-    char *lines;
-    size_t buflen;
-    int nbytes;
-    void *map;
-    LNXPROC_MAP_LIMITS_T *maplimits;
-    size_t mapdim;
-    void *data;
-};
+#include "vector_private.h"
+#include "array_private.h"
+#include "limits.h"
+#include "base_private.h"
 
 const char *
 lnxproc_base_filename(LNXPROC_BASE_T *base)
@@ -93,53 +78,63 @@ lnxproc_base_nbytes(LNXPROC_BASE_T *base)
 }
 
 int
-lnxproc_base_map_dim(LNXPROC_BASE_T *base)
+lnxproc_base_dim(LNXPROC_BASE_T *base)
 {
     LNXPROC_DEBUG("Base %p\n", base);
-    int mapdim = 0;
+    int dim = 0;
 
-    if (base) {
-        mapdim = base->mapdim;
-        LNXPROC_DEBUG("mapdim %d\n", mapdim);
-        return mapdim;
+    if (!base) {
+        LNXPROC_SET_ERROR(base->callback, LNXPROC_ERROR_BASE_NULL);
+        return dim;
     }
 
-    LNXPROC_DEBUG("WARNING: Base is null\n");
-    return -1;
+    if (!base->array) {
+        LNXPROC_SET_ERROR(base->callback, LNXPROC_ERROR_ARRAY_NULL);
+        return -1;
+    }
+
+    dim = base->array->dim;
+    LNXPROC_DEBUG("Dimension %d\n", dim);
+    return dim;
 }
 
-LNXPROC_MAP_LIMITS_T *
-lnxproc_base_map_limits(LNXPROC_BASE_T *base)
+LNXPROC_LIMITS_T *
+lnxproc_base_limits(LNXPROC_BASE_T *base)
 {
     LNXPROC_DEBUG("Base %p\n", base);
-    LNXPROC_MAP_LIMITS_T *maplimits = NULL;
+    LNXPROC_LIMITS_T *limits = NULL;
 
-    if (base) {
-        maplimits = base->maplimits;
-        LNXPROC_DEBUG("maplimits %p\n", maplimits);
-        return maplimits;
+    if (!base) {
+        LNXPROC_SET_ERROR(base->callback, LNXPROC_ERROR_BASE_NULL);
+        return limits;
     }
 
-    LNXPROC_DEBUG("WARNING: Base is null\n");
-    return maplimits;
+    if (!base->array) {
+        LNXPROC_SET_ERROR(base->callback, LNXPROC_ERROR_ARRAY_NULL);
+        return limits;
+    }
+    limits = base->array->limits;
+    LNXPROC_DEBUG("Limits %p\n", limits);
+    return limits;
 }
 
 LNXPROC_ARRAY_T *
 lnxproc_base_map(LNXPROC_BASE_T *base)
 {
     LNXPROC_DEBUG("Base %p\n", base);
-    LNXPROC_ARRAY_T *map = NULL;
+    LNXPROC_ARRAY_T *array = NULL;
 
-    if (base) {
-        map = base->map;
+    if (!base) {
+        LNXPROC_SET_ERROR(base->callback, LNXPROC_ERROR_BASE_NULL);
+        return array;
     }
-
-    LNXPROC_DEBUG("map %p\n", map);
-    return map;
+    array = base->array;
+    LNXPROC_DEBUG("Array %p\n", array);
+    return array;
 }
 
 int
-lnxproc_base_print(LNXPROC_BASE_T *base, void *data)
+lnxproc_base_print(LNXPROC_BASE_T *base, int allocated, void *data)
 {
     LNXPROC_DEBUG("Base %p Data %p\n", base, data);
 
@@ -152,21 +147,7 @@ lnxproc_base_print(LNXPROC_BASE_T *base, void *data)
         printf("Lines %p\n", base->lines);
         printf("Buflen %zd\n", base->buflen);
         printf("Nbytes %d\n", base->nbytes);
-        printf("Map %p\n", base->map);
-        printf("Map dimension %zd\n", base->mapdim);
-        printf("Map limits %p\n", base->maplimits);
-        int i;
-
-        for (i = 0; i < base->mapdim; i++) {
-            char buf[64];
-            char *p = lnxproc_map_limit_print(base->maplimits + i, buf,
-                                              sizeof buf);
-
-            printf("Map limit %d :%s:\n", i, p);
-        }
-
-        printf("Data %p\n", base->data);
-        return lnxproc_array_print(base->map, data);
+        return lnxproc_array_print(base->array, allocated, data);
     }
 
     LNXPROC_DEBUG("WARNING: Base is null\n");
@@ -177,11 +158,9 @@ int
 lnxproc_base_map_print(LNXPROC_BASE_T *base, void *data)
 {
     LNXPROC_DEBUG("Base %p Data %p\n", base);
-
     if (base) {
-        return lnxproc_array_print(base->map, data);
+        return lnxproc_array_print(base->array, 0, data);
     }
-
     LNXPROC_DEBUG("WARNING: Base is null\n");
     return LNXPROC_ERROR_BASE_NULL;
 }
@@ -198,21 +177,6 @@ lnxproc_base_callback(LNXPROC_BASE_T *base)
 
     LNXPROC_DEBUG("callback %p\n", callback);
     return callback;
-}
-
-int
-lnxproc_base_map_set(LNXPROC_BASE_T *base, LNXPROC_ARRAY_T *map)
-{
-    LNXPROC_DEBUG("Base %p Map %p\n", base);
-
-    if (base) {
-        base->map = map;
-        LNXPROC_DEBUG("set map %p\n", map);
-        return LNXPROC_OK;
-    }
-
-    LNXPROC_DEBUG("WARNING: Base is null\n");
-    return LNXPROC_ERROR_BASE_NULL;
 }
 
 int
@@ -279,8 +243,7 @@ lnxproc_base_normalize(LNXPROC_BASE_T *base)
     if (base->normalize) {
         LNXPROC_DEBUG("Execute specified normalize method %p\n",
                       base->normalize);
-        return base->normalize(base->map, base->callback, base->maplimits,
-                               base->mapdim, base->lines, base->nbytes);
+        return base->normalize(base);
     }
 
     return LNXPROC_OK;
@@ -310,13 +273,9 @@ lnxproc_base_read(LNXPROC_BASE_T *base)
             LNXPROC_ERROR_DEBUG(state, "Rawread\n");
             return state;
         }
-
         if (base->normalize) {
             LNXPROC_DEBUG("Execute default normalize method\n");
-            state =
-                base->normalize(base->map, base->callback, base->maplimits,
-                                base->mapdim, base->lines, base->nbytes);
-
+            state = base->normalize(base);
             if (state) {
                 LNXPROC_ERROR_DEBUG(state, "Normalize\n");
                 return state;
@@ -335,13 +294,13 @@ lnxproc_base_init(const char *filename,
                   LNXPROC_BASE_METHOD read,
                   LNXPROC_ERROR_CALLBACK callback,
                   size_t buflen,
-                  LNXPROC_MAP_LIMITS_T maplimits[], size_t mapdim, void *data)
+                  LNXPROC_LIMITS_T limits[], size_t dim, void *data)
 {
     LNXPROC_DEBUG("filename %1$p '%1$s'\n", filename);
     LNXPROC_DEBUG("rawread %p, normalize %p, read %p, callback %p\n", rawread,
                   normalize, read, callback);
     LNXPROC_DEBUG("buflen %zd Data %p\n", buflen, data);
-    LNXPROC_DEBUG("maplimits %p mapdim %d\n", maplimits, mapdim);
+    LNXPROC_DEBUG("limits %p dim %d\n", limits, dim);
 
     LNXPROC_BASE_T *base = calloc(1, sizeof(LNXPROC_BASE_T));
 
@@ -361,25 +320,6 @@ lnxproc_base_init(const char *filename,
     }
     base->lines[buflen] = '\n';
 
-    if (mapdim > 0) {
-        base->maplimits = lnxproc_map_limits_dup(callback, maplimits, mapdim);
-        if (!base->maplimits) {
-            return lnxproc_base_free(base);
-        }
-        base->mapdim = mapdim;
-
-        base->map = lnxproc_map_create(callback, maplimits, mapdim, 0);
-
-        if (!base->map) {
-            return lnxproc_base_free(base);
-        }
-    }
-    else {
-        base->maplimits = NULL;
-        base->mapdim = 0;
-        base->map = base->lines;
-    }
-
     base->rawread = rawread;
     base->normalize = normalize;
     base->read = read;
@@ -388,7 +328,7 @@ lnxproc_base_init(const char *filename,
     base->buflen = buflen;
     base->nbytes = 0;
     base->data = data;
-    lnxproc_base_print(base, NULL);
+    lnxproc_base_print(base, 1, NULL);
     LNXPROC_DEBUG("Successful\n");
     return base;
 }
@@ -399,21 +339,15 @@ lnxproc_base_free(LNXPROC_BASE_T *base)
     LNXPROC_DEBUG("Base %p\n", base);
 
     if (base) {
-        if (base->map && base->mapdim > 0) {
-            LNXPROC_DEBUG("Free Base map\n");
-            base->map = (void *) lnxproc_array_free((LNXPROC_ARRAY_T *)
-                                                    base->map);
+        if (base->array) {
+            LNXPROC_DEBUG("Free Array \n");
+            base->array = (void *) lnxproc_array_free(base->array);
         }
-
         if (base->lines) {
             LNXPROC_DEBUG("Free Base buffer\n");
             free(base->lines);
             base->lines = NULL;
         }
-
-        base->maplimits =
-            lnxproc_map_limits_free(base->maplimits, base->mapdim);
-        base->mapdim = 0;
 
         LNXPROC_DEBUG("Free Base\n");
         free(base);

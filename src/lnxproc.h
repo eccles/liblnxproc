@@ -25,8 +25,13 @@ This file is part of liblnxproc.
 extern "C" {
 #endif
 
+#include "error.h"
+#include "vector.h"
 #include "array.h"
 #include "base.h"
+#include "base.h"
+#include "limits.h"
+//#include "map.h"
 #include "proc_cgroups.h"
 
 #ifdef __cplusplus

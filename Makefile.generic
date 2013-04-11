@@ -21,7 +21,7 @@ all: $(LIB) $(BIN)
 $(LIB): $(OBJS)
 	$(CC) $(SOFLAGS) -o $@ $^
 
-$(BIN): $(BIN).c
+$(BIN): $(BIN).c $(LIB)
 	$(CC) $(CCFLAGS1) -o $@ $^ $(LDFLAGS)
 
 check: $(HDRS) $(SRCS)

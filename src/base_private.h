@@ -18,29 +18,36 @@
  *
  */
 
-#ifndef LIBLNXPROC_TEMPLATE_H
-#define LIBLNXPROC_TEMPLATE_H 1
+#ifndef LIBLNXPROC_BASE_PRIVATE_H
+#define LIBLNXPROC_BASE_PRIVATE_H 1
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-//#include <stddef.h>
+#include <stddef.h>
+
 #include "error.h"
+#include "array_private.h"
+#include "base.h"
 
-    struct lnxproc_template_t;
-    typedef struct lnxproc_template_t LNXPROC_TEMPLATE_T;
-
-    const char *lnxproc_template_filename(LNXPROC_TEMPLATE_T * temp);
-    int lnxproc_template_print(LNXPROC_TEMPLATE_T * temp);
-    LNXPROC_TEMPLATE_T *lnxproc_template_init(const char *filename,
-                                  LNXPROC_ERROR_CALLBACK callback);
-    LNXPROC_TEMPLATE_T *lnxproc_template_free(LNXPROC_TEMPLATE_T * temp);
+    struct lnxproc_base_t {
+        LNXPROC_BASE_METHOD rawread;
+        LNXPROC_NORMALIZE_METHOD normalize;
+        LNXPROC_BASE_METHOD read;
+        LNXPROC_ERROR_CALLBACK callback;
+        const char *filename;
+        char *lines;
+        size_t buflen;
+        int nbytes;
+        LNXPROC_ARRAY_T *array;
+        void *data;
+    };
 
 #ifdef __cplusplus
 }                               // extern "C"
 #endif
-#endif                          // LIBLNXPROC_TEMPLATE_H
+#endif                          // LIBLNXPROC_BASE_PRIVATE_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
  */

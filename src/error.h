@@ -36,15 +36,28 @@ extern "C" {
         LNXPROC_ERROR_ARRAY_NULL,
         LNXPROC_ERROR_ARRAY_REALLOC_DATA,
         LNXPROC_ERROR_ARRAY_INDEX_OUT_OF_RANGE,
+        LNXPROC_ERROR_ARRAY_DATA_NULL,
         LNXPROC_ERROR_BASE_NULL,
         LNXPROC_ERROR_BASE_MALLOC_BASE,
         LNXPROC_ERROR_BASE_MALLOC_BUFFER,
-        LNXPROC_ERROR_MALLOC_MAPLIMITS,
-        LNXPROC_ERROR_MAPLIMITS_NULL,
-        LNXPROC_ERROR_MALLOC_MAPLIMITS_ENTRY,
+        LNXPROC_ERROR_MALLOC_LIMITS,
+        LNXPROC_ERROR_LIMITS_NULL,
+        LNXPROC_ERROR_MALLOC_LIMITS_ENTRY,
         LNXPROC_ERROR_DB_MALLOC,
         LNXPROC_ERROR_DB_NULL,
+        LNXPROC_ERROR_TEMPLATE_MALLOC,
+        LNXPROC_ERROR_TEMPLATE_NULL,
+        LNXPROC_ERROR_TIMESTAMP_MALLOC,
+        LNXPROC_ERROR_TIMESTAMP_NULL,
+        LNXPROC_ERROR_VECTOR_MALLOC_HEADER,
+        LNXPROC_ERROR_VECTOR_MALLOC_DATA,
+        LNXPROC_ERROR_VECTOR_NULL,
+        LNXPROC_ERROR_VECTOR_REALLOC_DATA,
+        LNXPROC_ERROR_VECTOR_INDEX_OUT_OF_RANGE,
+        LNXPROC_ERROR_MISMATCHED_STRINGS,
+        LNXPROC_ERROR_SIZE
     };
+
     typedef enum lnxproc_error_t LNXPROC_ERROR_T;
 
     typedef void (*LNXPROC_ERROR_CALLBACK) (const char *filename,
@@ -52,7 +65,7 @@ extern "C" {
                                             const char *funcname,
                                             LNXPROC_ERROR_T err);
 
-    char *lnxproc_strerror(LNXPROC_ERROR_T err, char *buf, size_t buflen);
+    const char *lnxproc_strerror(LNXPROC_ERROR_T err, char *buf, size_t buflen);
 
     void lnxproc_error_print_callback(const char *filename,
                                       int lineno,
@@ -63,16 +76,17 @@ extern "C" {
                            const char *filename,
                            int lineno,
                            const char *funcname, LNXPROC_ERROR_T err);
-    void lnxproc_system_error(LNXPROC_ERROR_CALLBACK callback,
-                              const char *filename,
-                              int lineno, const char *funcname, int err);
 
 #define LNXPROC_SET_ERROR(c,e) lnxproc_set_error(c,__FILE__,__LINE__,__func__,e)
 
 #define LNXPROC_SYSTEM_ERROR(c,e) \
-                            lnxproc_system_error(c,__FILE__,__LINE__,__func__,e)
+                            lnxproc_set_error(c,__FILE__,__LINE__,__func__,-e)
 
 #ifdef DEBUG
+    int lnxproc_error_check(void);
+
+#define LNXPROC_ERROR_CHECK() lnxproc_error_check()
+
     void lnxproc_debug(const char *filename,
                        int lineno, const char *funcname, char *fmt, ...
         );
@@ -82,7 +96,7 @@ extern "C" {
 
 #define LNXPROC_ERROR_DEBUG(s, fmt, args...) {\
     char buf[32];\
-    char *c = lnxproc_strerror(s,buf,sizeof buf);\
+    const char *c = lnxproc_strerror(s,buf,sizeof buf);\
     char buf1[64];\
     snprintf(buf1,sizeof buf1,"Error : %d %s",s,c);\
     char buf2[64];\
@@ -91,12 +105,15 @@ extern "C" {
 }
 
 #else
+#define LNXPROC_ERROR_CHECK()
 #define LNXPROC_DEBUG(fmt, args...)
 #define LNXPROC_ERROR_DEBUG(s, fmt, args...)
 #endif
 
-#define eprintf(format, args...) fprintf (stderr, format , ##args)
 #ifdef __cplusplus
 }                               // extern "C"
 #endif
 #endif                          // LIBLNXPROC_ERROR_H
+/*
+ * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
+ */

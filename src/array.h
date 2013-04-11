@@ -30,6 +30,8 @@ extern "C" {
 
 #include <stddef.h>
 #include "error.h"
+#include "vector.h"
+#include "limits.h"
 
     struct lnxproc_array_t;
     typedef struct lnxproc_array_t LNXPROC_ARRAY_T;
@@ -38,32 +40,29 @@ extern "C" {
 #define WARN_UNUSED __attribute__((warn_unused_result))
 #endif
 
-    LNXPROC_ARRAY_T *lnxproc_array_new(size_t size,
-                                       int recursive,
+    LNXPROC_VECTOR_T *lnxproc_array_create(LNXPROC_ERROR_CALLBACK callback,
+                                           LNXPROC_LIMITS_T limits[],
+                                           size_t dim, int depth);
+
+    LNXPROC_ARRAY_T *lnxproc_array_new(LNXPROC_LIMITS_T limits[],
+                                       size_t dim,
                                        LNXPROC_ERROR_CALLBACK callback)
      WARN_UNUSED;
 
     LNXPROC_ARRAY_T *lnxproc_array_free(LNXPROC_ARRAY_T *array) WARN_UNUSED;
-    int lnxproc_array_resize(LNXPROC_ARRAY_T *array, size_t size);
-    int lnxproc_array_set(LNXPROC_ARRAY_T *array, size_t idx, void *val);
-    int lnxproc_array_set_last(LNXPROC_ARRAY_T *array, size_t idx, void *val);
-    int lnxproc_array_append(LNXPROC_ARRAY_T *array, void *val);
 
-    int lnxproc_array_set_length(LNXPROC_ARRAY_T *array, size_t idx);
-    void *lnxproc_array_addr(LNXPROC_ARRAY_T *array, size_t idx);
-    void *lnxproc_array_get(LNXPROC_ARRAY_T *array, size_t idx);
-    size_t lnxproc_array_size(LNXPROC_ARRAY_T *array);
+    int lnxproc_array_set(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim,
+                          char *val);
+    int lnxproc_array_set_last(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim,
+                               char *val);
+    char *lnxproc_array_get(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim);
+
     LNXPROC_ERROR_CALLBACK lnxproc_array_callback(LNXPROC_ARRAY_T *array);
 
-    typedef int (*LNXPROC_ARRAY_ITERATE_FUNC) (LNXPROC_ARRAY_T *array,
-                                               void *data, int idx);
-
     int lnxproc_array_iterate(LNXPROC_ARRAY_T *array,
-                              void *data,
-                              int start,
-                              int end, LNXPROC_ARRAY_ITERATE_FUNC func);
+                              void *data, LNXPROC_VECTOR_ITERATE_FUNC func);
 
-    int lnxproc_array_print(LNXPROC_ARRAY_T *array, void *data);
+    int lnxproc_array_print(LNXPROC_ARRAY_T *array, int allocated, void *data);
 
 #ifdef __cplusplus
 }                               // extern "C"

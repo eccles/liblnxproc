@@ -26,21 +26,21 @@ extern "C" {
 #endif
 
 #include "error.h"
-#include "array.h"
-#include "map_limits.h"
+#include "vector.h"
+#include "limits.h"
 #include "base.h"
 
 #ifndef WARN_UNUSED
 #define WARN_UNUSED __attribute__((warn_unused_result))
 #endif
 
-    LNXPROC_ARRAY_T *lnxproc_map_create(LNXPROC_ERROR_CALLBACK callback,
-                                        LNXPROC_MAP_LIMITS_T maplimits[],
-                                        size_t mapdim, int depth) WARN_UNUSED;
+    LNXPROC_VECTOR_T *lnxproc_create(LNXPROC_ERROR_CALLBACK callback,
+                                         LNXPROC_LIMITS_T limits[],
+                                         size_t dim, int depth) WARN_UNUSED;
 
-    int lnxproc_map_split(LNXPROC_ARRAY_T *map,
+    int lnxproc_split(LNXPROC_VECTOR_T * map,
                           LNXPROC_ERROR_CALLBACK callback,
-                          LNXPROC_MAP_LIMITS_T maplimits[], size_t mapdim,
+                          LNXPROC_LIMITS_T limits[], size_t dim,
                           char *lines, size_t nbytes);
 
 #ifdef __cplusplus

@@ -31,20 +31,21 @@ typical contents of /proc/cgroups file::
 */
 
 #include "error.h"
-#include "map_limits.h"
-#include "base.h"
-#include "array.h"
+#include "limits.h"
+#include "vector_private.h"
+#include "array_private.h"
+#include "base_private.h"
 #include "map.h"
 #include "proc_cgroups.h"
 
 static int
-proccgroups_normalize(LNXPROC_ARRAY_T *map,
-                      LNXPROC_ERROR_CALLBACK callback,
-                      LNXPROC_MAP_LIMITS_T * maplimits, int mapdim,
-                      char *lines, int nbytes)
+proccgroups_normalize(LNXPROC_BASE_T *base)
 {
-    lnxproc_map_split(map, callback, maplimits, mapdim, lines, nbytes);
-    lnxproc_array_print(map, NULL);
+    lnxproc_split(base->array->data,
+                      base->callback,
+                      base->array->limits,
+                      base->array->dim, base->lines, base->nbytes);
+    lnxproc_base_print(base, 1, NULL);
     return 0;
 }
 
@@ -52,19 +53,19 @@ LNXPROC_BASE_T *
 proccgroups_init(void)
 {
 
-    LNXPROC_MAP_LIMITS_T maplimits[] = {
+    LNXPROC_LIMITS_T limits[] = {
         {9, "\n", 1},           /* row delimiters */
         {4, "\t", 1}            /* column delimiters */
     };
 
-    int dim = 2;
+    size_t dim = sizeof(limits) / sizeof(limits[0]);
 
     return lnxproc_base_init("/proc/cgroups",
                              NULL,
                              proccgroups_normalize,
                              NULL,
                              lnxproc_error_print_callback,
-                             256, maplimits, dim, &proccgroups_data);
+                             256, limits, dim, &proccgroups_data);
 }
 
 /*

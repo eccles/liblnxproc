@@ -18,29 +18,31 @@
  *
  */
 
-#ifndef LIBLNXPROC_TEMPLATE_H
-#define LIBLNXPROC_TEMPLATE_H 1
+/* This file is a re-implementation of the 'list' type from Python
+ */
+
+#ifndef LIBLNXPROC_VECTOR_PRIVATE_H
+#define LIBLNXPROC_VECTOR_PRIVATE_H 1
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-//#include <stddef.h>
 #include "error.h"
+#include "vector.h"
 
-    struct lnxproc_template_t;
-    typedef struct lnxproc_template_t LNXPROC_TEMPLATE_T;
-
-    const char *lnxproc_template_filename(LNXPROC_TEMPLATE_T * temp);
-    int lnxproc_template_print(LNXPROC_TEMPLATE_T * temp);
-    LNXPROC_TEMPLATE_T *lnxproc_template_init(const char *filename,
-                                  LNXPROC_ERROR_CALLBACK callback);
-    LNXPROC_TEMPLATE_T *lnxproc_template_free(LNXPROC_TEMPLATE_T * temp);
+    struct lnxproc_vector_t {
+        LNXPROC_ERROR_CALLBACK callback;
+        size_t length;
+        size_t size;
+        int recursive;
+        void *data;
+    };
 
 #ifdef __cplusplus
 }                               // extern "C"
 #endif
-#endif                          // LIBLNXPROC_TEMPLATE_H
+#endif                          // LIBLNXPROC_VECTOR_PRIVATE_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
  */

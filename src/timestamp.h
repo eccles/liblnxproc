@@ -18,29 +18,30 @@
  *
  */
 
-#ifndef LIBLNXPROC_TEMPLATE_H
-#define LIBLNXPROC_TEMPLATE_H 1
+#ifndef LIBLNXPROC_TIMESTAMP_H
+#define LIBLNXPROC_TIMESTAMP_H 1
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-//#include <stddef.h>
+#include <sys/time.h>
 #include "error.h"
 
-    struct lnxproc_template_t;
-    typedef struct lnxproc_template_t LNXPROC_TEMPLATE_T;
+    struct lnxproc_timestamp_t;
+    typedef struct lnxproc_timestamp_t LNXPROC_TIMESTAMP_T;
 
-    const char *lnxproc_template_filename(LNXPROC_TEMPLATE_T * temp);
-    int lnxproc_template_print(LNXPROC_TEMPLATE_T * temp);
-    LNXPROC_TEMPLATE_T *lnxproc_template_init(const char *filename,
-                                  LNXPROC_ERROR_CALLBACK callback);
-    LNXPROC_TEMPLATE_T *lnxproc_template_free(LNXPROC_TEMPLATE_T * temp);
+    struct timeval *lnxproc_timestamp_timeval(LNXPROC_TIMESTAMP_T * timestamp);
+    int lnxproc_timestamp_print(LNXPROC_TIMESTAMP_T * timestamp);
+    LNXPROC_TIMESTAMP_T *lnxproc_timestamp_init(LNXPROC_ERROR_CALLBACK
+                                                callback);
+    LNXPROC_TIMESTAMP_T *lnxproc_timestamp_free(LNXPROC_TIMESTAMP_T *
+                                                timestamp);
 
 #ifdef __cplusplus
 }                               // extern "C"
 #endif
-#endif                          // LIBLNXPROC_TEMPLATE_H
+#endif                          // LIBLNXPROC_TIMESTAMP_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
  */

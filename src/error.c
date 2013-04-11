@@ -33,7 +33,7 @@
 #include <stdarg.h>
 #endif
 
-static char *errstr[] = {
+static const char *errstr[] = {
     "No error",
     "System error",
     "Fail to malloc array header",
@@ -41,15 +41,30 @@ static char *errstr[] = {
     "Array arg is null",
     "Fail to realloc array data",
     "Array index out of range",
+    "Array data is null",
     "Base arg is null",
     "Fail to malloc base",
     "Fail to malloc base buffer",
-    "Fail to malloc base maplimits",
-    "Base maplimits is null",
-    "Fail to malloc base maplimits entry",
+    "Fail to malloc base limits",
+    "Base limits is null",
+    "Fail to malloc base limits entry",
     "Fail to malloc db",
     "Db arg is null",
+    "Fail to malloc template",
+    "Template arg is null",
+    "Fail to malloc timestamp",
+    "Timestamp arg is null",
+    "Fail to malloc vector header",
+    "Fail to malloc vector data",
+    "Vector arg is null",
+    "Fail to realloc vector data",
+    "Vector index out of range",
+    "Error enum and string have mismatched sizes",
 };
+
+#define ERRSTR_SIZE sizeof(errstr)/sizeof(errstr[0])
+
+static const char unknown_error[] = "Unknown error";
 
 #ifdef DEBUG
 void
@@ -64,13 +79,15 @@ lnxproc_debug(const char *filename, int lineno, const char *funcname, char *fmt,
     va_end(args);
 }
 #endif
-
-char *
+const char *
 lnxproc_strerror(LNXPROC_ERROR_T err, char *buf, size_t buflen)
 {
     if (err < 0) {
         strerror_r(-((int) err), buf, buflen);
         return buf;
+    }
+    if (err >= ERRSTR_SIZE) {
+        return unknown_error;
     }
 
     return errstr[err];
@@ -91,7 +108,12 @@ lnxproc_error_print_callback(const char *filename,
                              int lineno,
                              const char *funcname, LNXPROC_ERROR_T err)
 {
-    if (err > 0) {
+    if (err >= ERRSTR_SIZE) {
+        printf("Error: %s[%d] %s -> %s = %d\n", filename, lineno, funcname,
+               unknown_error, err);
+    }
+
+    else if (err > 0) {
         printf("Error: %s[%d] %s -> %s\n", filename, lineno, funcname,
                errstr[err]);
 
@@ -106,15 +128,20 @@ lnxproc_error_print_callback(const char *filename,
     }
 }
 
-void
-lnxproc_system_error(LNXPROC_ERROR_CALLBACK callback,
-                     const char *filename,
-                     int lineno, const char *funcname, int err)
+#ifdef DEBUG
+int
+lnxproc_error_check(void)
 {
-    if (callback) {
-        callback(filename, lineno, funcname, -err);
+    if (LNXPROC_ERROR_SIZE != ERRSTR_SIZE) {
+        int err = LNXPROC_ERROR_MISMATCHED_STRINGS;
+
+        printf("Error: %s %d != %zd\n", errstr[err], LNXPROC_ERROR_SIZE,
+               ERRSTR_SIZE);
+        return err;
     }
+    return LNXPROC_OK;
 }
+#endif
 
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab

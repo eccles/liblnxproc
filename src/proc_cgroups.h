@@ -44,8 +44,7 @@ extern "C" {
         struct procgroups_sub_t perf_event;
     } proccgroups_data;
 
-    LNXPROC_BASE_T *proccgroups_init(void
-        );
+    LNXPROC_BASE_T *proccgroups_init(void);
 
 #ifdef __cplusplus
 }                               // extern "C"

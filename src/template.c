@@ -21,21 +21,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "error.h"
-#include "db.h"
+#include "template.h"
 
-struct lnxproc_db_t {
+struct lnxproc_template_t {
     const char *filename;
     LNXPROC_ERROR_CALLBACK callback;
 };
 
 const char *
-lnxproc_db_filename(LNXPROC_DB_T * db)
+lnxproc_template_filename(LNXPROC_TEMPLATE_T * temp)
 {
-    LNXPROC_DEBUG("Base %p\n", db);
+    LNXPROC_DEBUG("Template %p\n", temp);
     const char *filename = NULL;
 
-    if (db) {
-        filename = db->filename;
+    if (temp) {
+        filename = temp->filename;
     }
 
     LNXPROC_DEBUG("filename %1$p '%1$s'\n", filename);
@@ -43,50 +43,50 @@ lnxproc_db_filename(LNXPROC_DB_T * db)
 }
 
 int
-lnxproc_db_print(LNXPROC_DB_T * db)
+lnxproc_template_print(LNXPROC_TEMPLATE_T * temp)
 {
-    LNXPROC_DEBUG("Db %p\n", db);
+    LNXPROC_DEBUG("Template %p\n", temp);
 
-    if (db) {
-        printf("Filename %s\n", db->filename);
+    if (temp) {
+        printf("Filename %s\n", temp->filename);
     }
 
-    LNXPROC_DEBUG("WARNING: Db is null\n");
-    return LNXPROC_ERROR_DB_NULL;
+    LNXPROC_DEBUG("WARNING: Template is null\n");
+    return LNXPROC_ERROR_TEMPLATE_NULL;
 }
 
-LNXPROC_DB_T *
-lnxproc_db_init(const char *filename, LNXPROC_ERROR_CALLBACK callback)
+LNXPROC_TEMPLATE_T *
+lnxproc_template_init(const char *filename, LNXPROC_ERROR_CALLBACK callback)
 {
     LNXPROC_DEBUG("filename %1$p '%1$s'\n", filename);
     LNXPROC_DEBUG("callback %p\n", callback);
 
-    LNXPROC_DB_T *db = malloc(sizeof(LNXPROC_DB_T));
+    LNXPROC_TEMPLATE_T *temp = malloc(sizeof(LNXPROC_TEMPLATE_T));
 
-    if (!db) {
-        LNXPROC_SET_ERROR(callback, LNXPROC_ERROR_DB_MALLOC);
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_DB_MALLOC, "Malloc db\n");
-        return db;
+    if (!temp) {
+        LNXPROC_SET_ERROR(callback, LNXPROC_ERROR_TEMPLATE_MALLOC);
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_TEMPLATE_MALLOC, "Malloc temp\n");
+        return temp;
     }
 
-    db->filename = filename;
-    db->callback = callback;
+    temp->filename = filename;
+    temp->callback = callback;
     LNXPROC_DEBUG("Successful\n");
-    return db;
+    return temp;
 }
 
-LNXPROC_DB_T *
-lnxproc_db_free(LNXPROC_DB_T * db)
+LNXPROC_TEMPLATE_T *
+lnxproc_template_free(LNXPROC_TEMPLATE_T * temp)
 {
-    LNXPROC_DEBUG("Db %p\n", db);
+    LNXPROC_DEBUG("Template %p\n", temp);
 
-    if (db) {
-        LNXPROC_DEBUG("Free Db\n");
-        free(db);
-        db = NULL;
+    if (temp) {
+        LNXPROC_DEBUG("Free Template\n");
+        free(temp);
+        temp = NULL;
     }
 
-    return db;
+    return temp;
 }
 
 /*
