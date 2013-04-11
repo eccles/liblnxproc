@@ -2,12 +2,15 @@
 .SUFFIXES: .c .o .so
 
 CC=gcc
-CCFLAGS1=-DDEBUG=1 -g -I../src -Wall
+CCFLAGSD=-DDEBUG=1 -g
+CCFLAGS1=-I../src -Wall
 CCFLAGS2=$(CCFLAGS1) -fpic
 #CCFLAGS=-g -fpic -I. -Wall
-LDFLAGS=-L. -llnxproc
+LDFLAGS1=-L. -llnxproc
+LDFLAGS2=-L. -llnxproc-dbg
 SOFLAGS=-shared
 OBJS=$(SRCS:.c=.o)
+OBJSDBG=$(SRCS:.c=-dbg.o)
 #TGT1=$(patsubst %,$(BIN)/%,$(SRCS))
 #TGT2=$(patsubst %,$(BIN)/%,$(OBJS))
 #TARGETS=$(TGT1) $(TGT2)
@@ -15,14 +18,23 @@ OBJS=$(SRCS:.c=.o)
 %.o: %.c $(HDRS)
 	$(CC) $(CCFLAGS2) -c $< -o $@
 
-all: $(LIB) $(BIN)
+%-dbg.o: %.c $(HDRS)
+	$(CC) $(CCFLAGSD) $(CCFLAGS2) -c $< -o $@
+
+all: $(BIN) $(BIN)-dbg
 	for d in $(DIRS); do (cd $$d; $(MAKE) ); done
 
-$(LIB): $(OBJS)
+$(LIB).so: $(OBJS)
 	$(CC) $(SOFLAGS) -o $@ $^
 
-$(BIN): $(BIN).c $(LIB)
-	$(CC) $(CCFLAGS1) -o $@ $^ $(LDFLAGS)
+$(LIB)-dbg.so: $(OBJSDBG)
+	$(CC) $(SOFLAGS) -o $@ $^
+
+$(BIN): $(BIN).c $(LIB).so
+	$(CC) $(CCFLAGS1) -o $@ $^ $(LDFLAGS1)
+
+$(BIN)-dbg: $(BIN).c $(LIB)-dbg.so
+	$(CC) $(CCFLAGSD) $(CCFLAGS1) -o $@ $^ $(LDFLAGS2)
 
 check: $(HDRS) $(SRCS)
 	for d in $(DIRS); do (cd $$d; $(MAKE) check ); done
@@ -31,8 +43,4 @@ check: $(HDRS) $(SRCS)
 clean:
 	for d in $(DIRS); do (cd $$d; $(MAKE) clean ); done
 	rm -f $(BIN) *.o *.so *~ *.orig core* vgcore* x y z
-
-distclean:
-	for d in $(DIRS); do (cd $$d; $(MAKE) distclean ); done
-	rm -rf $(BIN)
 

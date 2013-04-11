@@ -309,12 +309,12 @@ test_array(void)
     LNXPROC_ARRAY_T *array1 =
         lnxproc_array_new(limits1, dim1, lnxproc_error_print_callback);
 
-    size_t idx1[] = { 1 };
-    lnxproc_array_set(array1, idx1, 1, "array1 1");
+    size_t idx1[] = { 0 };
+    lnxproc_array_set(array1, idx1, 1, "array1 0");
     size_t idx13[] = { 3 };
     lnxproc_array_set_last(array1, idx13, 1, "array1 3");
-    size_t idx12[] = { 2 };
-    lnxproc_array_set_last(array1, idx12, 1, "array1 2");
+    size_t idx12[] = { 1 };
+    lnxproc_array_set_last(array1, idx12, 1, "array1 1");
 
     lnxproc_array_print(array1, 1, NULL);
     array1 = lnxproc_array_free(array1);
@@ -330,9 +330,9 @@ test_array(void)
         lnxproc_array_new(limits2, dim2, lnxproc_error_print_callback);
 
     size_t idx2[] = { 0, 0 };
-    lnxproc_array_set(array1, idx2, 2, "array2 0 0");
+    lnxproc_array_set(array2, idx2, 2, "array2 0 0");
     size_t idx21[] = { 1, 1 };
-    lnxproc_array_set_last(array1, idx21, 2, "array2 1 1");
+    lnxproc_array_set_last(array2, idx21, 2, "array2 1 1");
 
     lnxproc_array_print(array2, 1, NULL);
     array2 = lnxproc_array_free(array2);
@@ -349,11 +349,11 @@ test_array(void)
         lnxproc_array_new(limits3, dim3, lnxproc_error_print_callback);
 
     size_t idx3[] = { 0, 0, 0 };
-    lnxproc_array_set(array1, idx3, 3, "array3 0 0 0");
+    lnxproc_array_set(array3, idx3, 3, "array3 0 0 0");
     size_t idx31[] = { 0, 0, 1 };
-    lnxproc_array_set_last(array1, idx31, 3, "array3 0 0 1");
+    lnxproc_array_set_last(array3, idx31, 3, "array3 0 0 1");
     size_t idx32[] = { 1, 2, 3 };
-    lnxproc_array_set_last(array1, idx32, 3, "array3 1 2 3");
+    lnxproc_array_set_last(array3, idx32, 3, "array3 1 2 3");
 
     lnxproc_array_print(array3, 1, NULL);
     array3 = lnxproc_array_free(array3);
