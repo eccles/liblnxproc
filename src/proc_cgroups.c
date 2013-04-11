@@ -42,9 +42,9 @@ static int
 proccgroups_normalize(LNXPROC_BASE_T *base)
 {
     lnxproc_split(base->array->data,
-                      base->callback,
-                      base->array->limits,
-                      base->array->dim, base->lines, base->nbytes);
+                  base->callback,
+                  base->array->limits,
+                  base->array->dim, base->lines, base->nbytes);
     lnxproc_base_print(base, 1, NULL);
     return 0;
 }

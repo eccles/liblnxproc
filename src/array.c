@@ -45,8 +45,7 @@ lnxproc_array_create(LNXPROC_ERROR_CALLBACK callback,
 #ifdef DEBUG
     char buf[64];
 
-    LNXPROC_DEBUG("limit %s\n",
-                  lnxproc_limit_print(limit, buf, sizeof buf));
+    LNXPROC_DEBUG("limit %s\n", lnxproc_limit_print(limit, buf, sizeof buf));
 #endif
 
     int recursive = depth < dim - 1 ? 1 : 0;

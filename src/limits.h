@@ -37,7 +37,7 @@ extern "C" {
     char *lnxproc_chr(LNXPROC_LIMITS_T * limit, char c);
 
     char *lnxproc_limit_print(LNXPROC_LIMITS_T * limit, char *buf,
-                                  size_t buflen);
+                              size_t buflen);
     int lnxproc_limits_print(LNXPROC_LIMITS_T limits[], int mapdim);
 
 #ifndef WARN_UNUSED
@@ -45,13 +45,11 @@ extern "C" {
 #endif
 
     LNXPROC_LIMITS_T *lnxproc_limits_dup(LNXPROC_ERROR_CALLBACK
-                                                 callback,
-                                                 LNXPROC_LIMITS_T
-                                                 limits[],
-                                                 size_t dim) WARN_UNUSED;
+                                         callback,
+                                         LNXPROC_LIMITS_T
+                                         limits[], size_t dim) WARN_UNUSED;
     LNXPROC_LIMITS_T *lnxproc_limits_free(LNXPROC_LIMITS_T
-                                                  maplimits[],
-                                                  size_t dim) WARN_UNUSED;
+                                          maplimits[], size_t dim) WARN_UNUSED;
 
 #ifdef __cplusplus
 }                               // extern "C"

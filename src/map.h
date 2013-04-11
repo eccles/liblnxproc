@@ -35,13 +35,13 @@ extern "C" {
 #endif
 
     LNXPROC_VECTOR_T *lnxproc_create(LNXPROC_ERROR_CALLBACK callback,
-                                         LNXPROC_LIMITS_T limits[],
-                                         size_t dim, int depth) WARN_UNUSED;
+                                     LNXPROC_LIMITS_T limits[],
+                                     size_t dim, int depth) WARN_UNUSED;
 
     int lnxproc_split(LNXPROC_VECTOR_T * map,
-                          LNXPROC_ERROR_CALLBACK callback,
-                          LNXPROC_LIMITS_T limits[], size_t dim,
-                          char *lines, size_t nbytes);
+                      LNXPROC_ERROR_CALLBACK callback,
+                      LNXPROC_LIMITS_T limits[], size_t dim,
+                      char *lines, size_t nbytes);
 
 #ifdef __cplusplus
 }                               // extern "C"

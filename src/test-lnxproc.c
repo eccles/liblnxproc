@@ -56,9 +56,8 @@ test_limits(void)
 
     lnxproc_limits_print(mylimits1, dim1);
 
-    LNXPROC_LIMITS_T *limits1 =
-        lnxproc_limits_dup(lnxproc_error_print_callback,
-                               mylimits1, dim1);
+    LNXPROC_LIMITS_T *limits1 = lnxproc_limits_dup(lnxproc_error_print_callback,
+                                                   mylimits1, dim1);
 
     int i;
 
@@ -88,9 +87,8 @@ test_limits(void)
 
     lnxproc_limits_print(mylimits2, dim2);
 
-    LNXPROC_LIMITS_T *limits2 =
-        lnxproc_limits_dup(lnxproc_error_print_callback,
-                               mylimits2, dim2);
+    LNXPROC_LIMITS_T *limits2 = lnxproc_limits_dup(lnxproc_error_print_callback,
+                                                   mylimits2, dim2);
 
     for (i = 0; i < dim2; i++) {
         char *c = lnxproc_chr(limits2 + i, ' ');
@@ -120,9 +118,8 @@ test_limits(void)
 
     lnxproc_limits_print(mylimits3, dim3);
 
-    LNXPROC_LIMITS_T *limits3 =
-        lnxproc_limits_dup(lnxproc_error_print_callback,
-                               mylimits3, dim3);
+    LNXPROC_LIMITS_T *limits3 = lnxproc_limits_dup(lnxproc_error_print_callback,
+                                                   mylimits3, dim3);
 
     for (i = 0; i < dim3; i++) {
         char *c = lnxproc_chr(limits3 + i, ' ');

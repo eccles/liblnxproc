@@ -69,8 +69,7 @@ lnxproc_limits_print(LNXPROC_LIMITS_T limits[], int dim)
 }
 
 char *
-lnxproc_limit_print(LNXPROC_LIMITS_T * limit, char *buf,
-                        size_t buflen)
+lnxproc_limit_print(LNXPROC_LIMITS_T * limit, char *buf, size_t buflen)
 {
     buf[0] = '\0';
     if (!limit) {
@@ -80,8 +79,7 @@ lnxproc_limit_print(LNXPROC_LIMITS_T * limit, char *buf,
     int m = 0;
     char *b = buf;
 
-    m = snprintf(b, buflen, "Exp %zd: Len %d: ", limit->expected,
-                 limit->len);
+    m = snprintf(b, buflen, "Exp %zd: Len %d: ", limit->expected, limit->len);
     b += m;
     buflen -= m;
 
@@ -128,7 +126,7 @@ lnxproc_limit_print(LNXPROC_LIMITS_T * limit, char *buf,
 
 LNXPROC_LIMITS_T *
 lnxproc_limits_dup(LNXPROC_ERROR_CALLBACK callback,
-                       LNXPROC_LIMITS_T limits[], size_t dim)
+                   LNXPROC_LIMITS_T limits[], size_t dim)
 {
     LNXPROC_LIMITS_T *newlimits = NULL;
 
@@ -137,8 +135,7 @@ lnxproc_limits_dup(LNXPROC_ERROR_CALLBACK callback,
         newlimits = malloc(dim * sizeof(LNXPROC_LIMITS_T));
         if (!newlimits) {
             LNXPROC_SET_ERROR(callback, LNXPROC_ERROR_MALLOC_LIMITS);
-            LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC_LIMITS,
-                                "Malloc limits\n");
+            LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC_LIMITS, "Malloc limits\n");
             return newlimits;
         }
         LNXPROC_DEBUG("Malloc limits %p\n", newlimits);
@@ -154,8 +151,7 @@ lnxproc_limits_dup(LNXPROC_ERROR_CALLBACK callback,
 #endif
             newlimits[i].chars = malloc(limits[i].len * sizeof(char));
             if (!newlimits[i].chars) {
-                LNXPROC_SET_ERROR(callback,
-                                  LNXPROC_ERROR_MALLOC_LIMITS_ENTRY);
+                LNXPROC_SET_ERROR(callback, LNXPROC_ERROR_MALLOC_LIMITS_ENTRY);
                 LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC_LIMITS_ENTRY,
                                     "Malloc limits entry\n");
                 int j;

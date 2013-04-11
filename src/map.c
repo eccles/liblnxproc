@@ -28,7 +28,7 @@ This file is part of liblnxproc.
 
 LNXPROC_VECTOR_T *
 lnxproc_create(LNXPROC_ERROR_CALLBACK callback,
-                   LNXPROC_LIMITS_T limits[], size_t dim, int depth)
+               LNXPROC_LIMITS_T limits[], size_t dim, int depth)
 {
     LNXPROC_DEBUG("callback %p\n", callback);
     LNXPROC_DEBUG("limits %p\n", limits);
@@ -41,8 +41,7 @@ lnxproc_create(LNXPROC_ERROR_CALLBACK callback,
 #ifdef DEBUG
     char buf[64];
 
-    LNXPROC_DEBUG("limit %s\n",
-                  lnxproc_limit_print(limit, buf, sizeof buf));
+    LNXPROC_DEBUG("limit %s\n", lnxproc_limit_print(limit, buf, sizeof buf));
 #endif
 
     int recursive = depth < dim - 1 ? 1 : 0;
@@ -57,8 +56,8 @@ lnxproc_create(LNXPROC_ERROR_CALLBACK callback,
     if (recursive) {
         depth++;
         for (i = 0; i < limit->expected; i++) {
-            LNXPROC_VECTOR_T *f =
-                lnxproc_create(callback, limits, dim, depth);
+            LNXPROC_VECTOR_T *f = lnxproc_create(callback, limits, dim, depth);
+
             if (!f) {
                 return NULL;
             }
@@ -105,9 +104,8 @@ map_split_func(LNXPROC_ERROR_CALLBACK callback,
 
 int
 lnxproc_split(LNXPROC_VECTOR_T * map,
-                  LNXPROC_ERROR_CALLBACK callback,
-                  LNXPROC_LIMITS_T limits[], size_t dim,
-                  char *lines, int nbytes)
+              LNXPROC_ERROR_CALLBACK callback,
+              LNXPROC_LIMITS_T limits[], size_t dim, char *lines, int nbytes)
 {
 
     if (nbytes > 0) {
@@ -129,9 +127,8 @@ lnxproc_split(LNXPROC_VECTOR_T * map,
                     if (lnxproc_chr(limits + i, *c)) {
                         *c = '\0';
 
-                        int ret =
-                            map_split_func(callback, map, limits, dim,
-                                           idx, i, saveptr);
+                        int ret = map_split_func(callback, map, limits, dim,
+                                                 idx, i, saveptr);
 
                         if (ret) {
                             return ret;
