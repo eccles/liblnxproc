@@ -42,6 +42,7 @@ static const char *errstr[] = {
     "Fail to realloc array data",
     "Array index out of range",
     "Array data is null",
+    "Array dimension out of range",
     "Base arg is null",
     "Fail to malloc base",
     "Fail to malloc base buffer",

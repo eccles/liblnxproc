@@ -31,7 +31,7 @@
 #include "limits.h"
 
 char *
-lnxproc_chr(LNXPROC_LIMITS_T * limit, char c)
+lnxproc_limit_chr(LNXPROC_LIMITS_T * limit, char c)
 {
 
 /*

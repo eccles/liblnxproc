@@ -34,7 +34,7 @@ extern "C" {
     };
     typedef struct lnxproc_limits_t LNXPROC_LIMITS_T;
 
-    char *lnxproc_chr(LNXPROC_LIMITS_T * limit, char c);
+    char *lnxproc_limit_chr(LNXPROC_LIMITS_T * limit, char c);
 
     char *lnxproc_limit_print(LNXPROC_LIMITS_T * limit, char *buf,
                               size_t buflen);

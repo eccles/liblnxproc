@@ -30,9 +30,9 @@
 #include "limits.h"
 #include "array_private.h"
 
-LNXPROC_VECTOR_T *
-lnxproc_array_create(LNXPROC_ERROR_CALLBACK callback,
-                     LNXPROC_LIMITS_T limits[], size_t dim, int depth)
+static LNXPROC_VECTOR_T *
+array_create(LNXPROC_ERROR_CALLBACK callback,
+             LNXPROC_LIMITS_T limits[], size_t dim, int depth)
 {
     LNXPROC_DEBUG("callback %p\n", callback);
     LNXPROC_DEBUG("limits %p\n", limits);
@@ -60,8 +60,8 @@ lnxproc_array_create(LNXPROC_ERROR_CALLBACK callback,
     if (recursive) {
         depth++;
         for (i = 0; i < limit->expected; i++) {
-            LNXPROC_VECTOR_T *f = lnxproc_array_create(callback,
-                                                       limits, dim, depth);
+            LNXPROC_VECTOR_T *f = array_create(callback,
+                                               limits, dim, depth);
 
             if (!f) {
                 return NULL;
@@ -92,22 +92,39 @@ lnxproc_array_new(LNXPROC_LIMITS_T limits[], size_t dim,
     array = p;
     array->callback = callback;
 
-    array->limits = lnxproc_limits_dup(callback, limits, dim);
-    if (!array->limits) {
-        return lnxproc_array_free(array);
-    }
-    array->dim = dim;
-
-    array->saved = calloc(dim, sizeof(void *));
-    if (!array->saved) {
+    if (limits && (dim == 0)) {
+        LNXPROC_SET_ERROR(callback, LNXPROC_ERROR_ARRAY_ILLEGAL_DIMENSION);
         return lnxproc_array_free(array);
     }
 
-    array->data = lnxproc_array_create(callback, limits, dim, 0);
-    if (!array->data) {
-        return lnxproc_array_free(array);
+    if (limits) {
+        array->limits = lnxproc_limits_dup(callback, limits, dim);
+        if (!array->limits) {
+            return lnxproc_array_free(array);
+        }
+        array->dim = dim;
+    }
+    else {
+        array->limits = NULL;
+        array->dim = 0;
     }
 
+    if (dim > 0) {
+        array->saved = calloc(dim, sizeof(void *));
+        if (!array->saved) {
+            return lnxproc_array_free(array);
+        }
+
+        array->data = array_create(callback, limits, dim, 0);
+        if (!array->data) {
+            return lnxproc_array_free(array);
+        }
+    }
+    else {
+        LNXPROC_DEBUG("Scalar array\n");
+        array->saved = NULL;
+        array->data = NULL;
+    }
     LNXPROC_DEBUG("Success\n");
     return array;
 }
@@ -125,7 +142,7 @@ lnxproc_array_free(LNXPROC_ARRAY_T *array)
             free(array->saved);
             array->saved = NULL;
         }
-        if (array->data) {
+        if (array->dim > 0 && array->data) {
             array->data = lnxproc_vector_free(array->data);
         }
 
@@ -155,9 +172,47 @@ lnxproc_array_callback(LNXPROC_ARRAY_T *array)
     return callback;
 }
 
+#ifdef DEBUG
+#define DEBUG_IDX(idx,dim) {\
+    char buf[32] = "";\
+    int i;\
+    int s = sizeof buf;\
+    char *c = buf;\
+    for( i=0; i < dim; i++ ) {\
+        int n = snprintf(c, s,"%zd,",idx[i]);\
+        c += n;\
+        s -= n;\
+    }\
+    LNXPROC_DEBUG("Idx %s Dim %zd\n", buf, dim);\
+}
+#else
+#define DEBUG_IDX(idx,dim)
+#endif
+
 int
 lnxproc_array_set(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim, char *val)
 {
+#ifdef DEBUG
+    LNXPROC_DEBUG("Array %p\n", array);
+    DEBUG_IDX(idx, dim);
+    LNXPROC_DEBUG("Val %p\n", val);
+#endif
+
+    if (!array) {
+        return LNXPROC_ERROR_ARRAY_NULL;
+    }
+
+    if (dim != array->dim) {
+        LNXPROC_SET_ERROR(array->callback,
+                          LNXPROC_ERROR_ARRAY_ILLEGAL_DIMENSION);
+        return LNXPROC_ERROR_ARRAY_ILLEGAL_DIMENSION;
+    }
+
+    if (dim == 0) {
+        array->data = val;
+        LNXPROC_DEBUG("Success\n");
+        return LNXPROC_OK;
+    }
 
     array->saved[0] = array->data;
 
@@ -177,7 +232,7 @@ lnxproc_array_set(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim, char *val)
                 return 1;
             }
             if (recursive) {
-                lnxproc_vector_set_last(array->saved[j], idx[j], f);
+                lnxproc_vector_set(array->saved[j], idx[j], f);
             }
         }
         array->saved[i] = f;
@@ -192,6 +247,27 @@ int
 lnxproc_array_set_last(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim,
                        char *val)
 {
+#ifdef DEBUG
+    LNXPROC_DEBUG("Array %p\n", array);
+    DEBUG_IDX(idx, dim);
+    LNXPROC_DEBUG("Val %p\n", val);
+#endif
+
+    if (!array) {
+        return LNXPROC_ERROR_ARRAY_NULL;
+    }
+
+    if (dim != array->dim) {
+        LNXPROC_SET_ERROR(array->callback,
+                          LNXPROC_ERROR_ARRAY_ILLEGAL_DIMENSION);
+        return LNXPROC_ERROR_ARRAY_ILLEGAL_DIMENSION;
+    }
+
+    if (dim == 0) {
+        array->data = val;
+        LNXPROC_DEBUG("Success\n");
+        return LNXPROC_OK;
+    }
 
     array->saved[0] = array->data;
     lnxproc_vector_set_length(array->saved[0], idx[0]);
@@ -229,9 +305,34 @@ lnxproc_array_set_last(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim,
 char *
 lnxproc_array_get(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim)
 {
-    LNXPROC_DEBUG("Array %p Idx[0] %zd %d\n", array, idx, dim);
+#ifdef DEBUG
+    LNXPROC_DEBUG("Array %p\n", array);
+    DEBUG_IDX(idx, dim);
+#endif
+
+    if (!array) {
+        return NULL;
+    }
+
+    if (dim != array->dim) {
+        LNXPROC_SET_ERROR(array->callback,
+                          LNXPROC_ERROR_ARRAY_ILLEGAL_DIMENSION);
+        return NULL;
+    }
 
     char *val = NULL;
+
+    if (dim == 0) {
+        if (!array->data) {
+            LNXPROC_SET_ERROR(array->callback,
+                              LNXPROC_ERROR_ARRAY_INDEX_OUT_OF_RANGE);
+            return NULL;
+
+        }
+        val = array->data;
+        LNXPROC_DEBUG("Success\n");
+        return val;
+    }
 
     array->saved[0] = array->data;
 
@@ -263,16 +364,21 @@ lnxproc_array_iterate(LNXPROC_ARRAY_T *array,
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ARRAY_NULL, "\n");
         return LNXPROC_ERROR_ARRAY_NULL;
     }
+
     if (!array->data) {
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ARRAY_NULL, "\n");
         return LNXPROC_ERROR_ARRAY_NULL;
     }
-    int ret = lnxproc_vector_iterate(array->data, NULL, -1, -1, func);
 
-    if (!ret) {
-        LNXPROC_DEBUG("Success\n");
+    if (array->dim > 0) {
+        int ret = lnxproc_vector_iterate(array->data, NULL, -1, -1, func);
+
+        if (ret) {
+            return ret;
+        }
     }
-    return ret;
+    LNXPROC_DEBUG("Success\n");
+    return LNXPROC_OK;
 }
 
 int
@@ -292,7 +398,12 @@ lnxproc_array_print(LNXPROC_ARRAY_T *array, int allocated, void *data)
     printf("Array dim %zd\n", array->dim);
     lnxproc_limits_print(array->limits, array->dim);
 
-    lnxproc_vector_print(array->data, allocated, NULL);
+    if (array->dim > 0) {
+        lnxproc_vector_print(array->data, allocated, NULL);
+    }
+    else {
+        printf("Array scalar value %1$p '%1$s'\n", (char *) array->data);
+    }
     printf("\n");
     return LNXPROC_OK;
 }

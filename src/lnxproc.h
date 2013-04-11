@@ -31,7 +31,6 @@ extern "C" {
 #include "base.h"
 #include "base.h"
 #include "limits.h"
-//#include "map.h"
 #include "proc_cgroups.h"
 
 #ifdef __cplusplus

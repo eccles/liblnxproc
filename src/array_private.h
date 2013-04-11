@@ -38,7 +38,7 @@ extern "C" {
         LNXPROC_LIMITS_T *limits;
         size_t dim;
         void **saved;
-        LNXPROC_VECTOR_T *data;
+        void *data;
     };
 
 #ifdef __cplusplus

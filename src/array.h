@@ -40,10 +40,6 @@ extern "C" {
 #define WARN_UNUSED __attribute__((warn_unused_result))
 #endif
 
-    LNXPROC_VECTOR_T *lnxproc_array_create(LNXPROC_ERROR_CALLBACK callback,
-                                           LNXPROC_LIMITS_T limits[],
-                                           size_t dim, int depth);
-
     LNXPROC_ARRAY_T *lnxproc_array_new(LNXPROC_LIMITS_T limits[],
                                        size_t dim,
                                        LNXPROC_ERROR_CALLBACK callback)

@@ -28,9 +28,8 @@
 #include <string.h>
 
 #include "error.h"
-#include "vector_private.h"
-#include "array_private.h"
 #include "limits.h"
+#include "array_private.h"
 #include "base_private.h"
 
 const char *
@@ -197,6 +196,75 @@ lnxproc_base_normalize(LNXPROC_BASE_T *base)
     return LNXPROC_OK;
 }
 
+static int
+base_map(LNXPROC_BASE_T *base)
+{
+
+    LNXPROC_ARRAY_T *array = base->array;
+    LNXPROC_LIMITS_T *limits = base->array->limits;
+    int dim = base->array->dim;
+    char *lines = base->lines;
+    int nbytes = base->nbytes;
+
+    if (nbytes > 0) {
+        char *c = lines;
+        char *d = c + nbytes;
+
+        if (dim > 0) {
+            char *saveptr = c;
+
+            size_t idx[dim];
+
+            memset(idx, 0, dim * sizeof(int));
+
+            while (c < d) {
+                size_t i;
+                int increment = 1;
+
+                for (i = 0; i < dim; i++) {
+                    if (lnxproc_limit_chr(limits + i, *c)) {
+                        *c = '\0';
+
+                        int ret =
+                            lnxproc_array_set_last(array, idx, i, saveptr);
+
+                        if (ret) {
+                            return ret;
+                        }
+
+                        while ((++c < d) && lnxproc_limit_chr(limits + i, *c));
+
+                        saveptr = c;
+                        idx[i]++;
+                        int j = i + 1;
+
+                        if (dim > j) {
+                            memset(idx + j, 0, (dim - j) * sizeof(int));
+                        }
+
+                        increment = 0;
+                    }
+                }
+                if (increment) {
+                    c++;
+                }
+            }
+        }
+        else {
+            base->data = c;
+            while (c < d) {
+                if (strchr("\n", *c)) {
+                    *c = '\0';
+                    break;
+                }
+                c++;
+            }
+        }
+    }
+
+    return LNXPROC_OK;
+}
+
 int
 lnxproc_base_read(LNXPROC_BASE_T *base)
 {
@@ -221,6 +289,7 @@ lnxproc_base_read(LNXPROC_BASE_T *base)
             LNXPROC_ERROR_DEBUG(state, "Rawread\n");
             return state;
         }
+        base_map(base);
         if (base->normalize) {
             LNXPROC_DEBUG("Execute default normalize method\n");
             state = base->normalize(base);

@@ -62,14 +62,14 @@ test_limits(void)
     int i;
 
     for (i = 0; i < dim1; i++) {
-        char *c = lnxproc_chr(limits1 + i, ' ');
+        char *c = lnxproc_limits_limit_chr(limits1 + i, ' ');
 
         printf("Compare ' ' to entry %d : Result = %p\n", i, c);
-        c = lnxproc_chr(limits1 + i, '\n');
+        c = lnxproc_limits_limit_chr(limits1 + i, '\n');
         printf("Compare '\\n' to entry %d : Result = %p\n", i, c);
-        c = lnxproc_chr(limits1 + i, '\0');
+        c = lnxproc_limits_limit_chr(limits1 + i, '\0');
         printf("Compare '\\0' to entry %d : Result = %p\n", i, c);
-        c = lnxproc_chr(limits1 + i, '\t');
+        c = lnxproc_limits_limit_chr(limits1 + i, '\t');
         printf("Compare '\\t' to entry %d : Result = %p\n", i, c);
     }
     lnxproc_limits_print(limits1, dim1);
@@ -91,14 +91,14 @@ test_limits(void)
                                                    mylimits2, dim2);
 
     for (i = 0; i < dim2; i++) {
-        char *c = lnxproc_chr(limits2 + i, ' ');
+        char *c = lnxproc_limits_limit_chr(limits2 + i, ' ');
 
         printf("Compare ' ' to entry %d : Result = %p\n", i, c);
-        c = lnxproc_chr(limits2 + i, '\n');
+        c = lnxproc_limits_limit_chr(limits2 + i, '\n');
         printf("Compare '\\n' to entry %d : Result = %p\n", i, c);
-        c = lnxproc_chr(limits2 + i, '\0');
+        c = lnxproc_limits_limit_chr(limits2 + i, '\0');
         printf("Compare '\\0' to entry %d : Result = %p\n", i, c);
-        c = lnxproc_chr(limits2 + i, '\t');
+        c = lnxproc_limits_limit_chr(limits2 + i, '\t');
         printf("Compare '\\t' to entry %d : Result = %p\n", i, c);
     }
     lnxproc_limits_print(limits2, dim2);
@@ -122,14 +122,14 @@ test_limits(void)
                                                    mylimits3, dim3);
 
     for (i = 0; i < dim3; i++) {
-        char *c = lnxproc_chr(limits3 + i, ' ');
+        char *c = lnxproc_limit_chr(limits3 + i, ' ');
 
         printf("Compare ' ' to entry %d : Result = %p\n", i, c);
-        c = lnxproc_chr(limits3 + i, '\n');
+        c = lnxproc_limit_chr(limits3 + i, '\n');
         printf("Compare '\\n' to entry %d : Result = %p\n", i, c);
-        c = lnxproc_chr(limits3 + i, '\0');
+        c = lnxproc_limit_chr(limits3 + i, '\0');
         printf("Compare '\\0' to entry %d : Result = %p\n", i, c);
-        c = lnxproc_chr(limits3 + i, '\t');
+        c = lnxproc_limit_chr(limits3 + i, '\t');
         printf("Compare '\\t' to entry %d : Result = %p\n", i, c);
     }
     lnxproc_limits_print(limits3, dim3);
@@ -285,22 +285,22 @@ test_vector(void)
 
 /*----------------------------------------------------------------------------*/
 #ifdef TEST_ARRAY
-static int
-myarray_print(LNXPROC_VECTOR_T * vector, void *data, int idx)
-{
-    printf("Array %p : Index %d\n", vector, idx);
-    return 0;
-}
-
 static void
 test_array(void)
 {
-    size_t dim0 = 0;
+    printf("Array 0\n");
     LNXPROC_ARRAY_T *array0 =
-        lnxproc_array_new(NULL, dim0, lnxproc_error_print_callback);
+        lnxproc_array_new(NULL, 0, lnxproc_error_print_callback);
+
+    lnxproc_array_set(array0, NULL, 0, "array0");
+    char *val = lnxproc_array_get(array0, NULL, 0);
+
+    printf("Got value %1$p '%1$s'\n", val);
+
     lnxproc_array_print(array0, 1, NULL);
     array0 = lnxproc_array_free(array0);
 
+    printf("Array 1\n");
     LNXPROC_LIMITS_T limits1[] = {
         {3, "\n", 1},
     };
@@ -308,9 +308,18 @@ test_array(void)
 
     LNXPROC_ARRAY_T *array1 =
         lnxproc_array_new(limits1, dim1, lnxproc_error_print_callback);
+
+    size_t idx1[] = { 1 };
+    lnxproc_array_set(array1, idx1, 1, "array1 1");
+    size_t idx13[] = { 3 };
+    lnxproc_array_set_last(array1, idx13, 1, "array1 3");
+    size_t idx12[] = { 2 };
+    lnxproc_array_set_last(array1, idx12, 1, "array1 2");
+
     lnxproc_array_print(array1, 1, NULL);
     array1 = lnxproc_array_free(array1);
 
+    printf("Array 2\n");
     LNXPROC_LIMITS_T limits2[] = {
         {3, "\n", 1},
         {5, "\t", 1},
@@ -319,9 +328,16 @@ test_array(void)
 
     LNXPROC_ARRAY_T *array2 =
         lnxproc_array_new(limits2, dim2, lnxproc_error_print_callback);
+
+    size_t idx2[] = { 0, 0 };
+    lnxproc_array_set(array1, idx2, 2, "array2 0 0");
+    size_t idx21[] = { 1, 1 };
+    lnxproc_array_set_last(array1, idx21, 2, "array2 1 1");
+
     lnxproc_array_print(array2, 1, NULL);
     array2 = lnxproc_array_free(array2);
 
+    printf("Array 3\n");
     LNXPROC_LIMITS_T limits3[] = {
         {3, "\n", 1},
         {5, "\t", 1},
@@ -331,37 +347,18 @@ test_array(void)
 
     LNXPROC_ARRAY_T *array3 =
         lnxproc_array_new(limits3, dim3, lnxproc_error_print_callback);
+
+    size_t idx3[] = { 0, 0, 0 };
+    lnxproc_array_set(array1, idx3, 3, "array3 0 0 0");
+    size_t idx31[] = { 0, 0, 1 };
+    lnxproc_array_set_last(array1, idx31, 3, "array3 0 0 1");
+    size_t idx32[] = { 1, 2, 3 };
+    lnxproc_array_set_last(array1, idx32, 3, "array3 1 2 3");
+
     lnxproc_array_print(array3, 1, NULL);
     array3 = lnxproc_array_free(array3);
 }
 
-/*
-
-    LNXPROC_VECTOR_T *lnxproc_array_create(LNXPROC_ERROR_CALLBACK callback,
-                                           LNXPROC_LIMITS_T limits[],
-                                           size_t dim, int depth);
-
-    LNXPROC_ARRAY_T *lnxproc_array_new(LNXPROC_LIMITS_T limits[],
-                                       size_t dim,
-                                       LNXPROC_ERROR_CALLBACK callback)
-     WARN_UNUSED;
-
-    LNXPROC_ARRAY_T *lnxproc_array_free(LNXPROC_ARRAY_T *array) WARN_UNUSED;
-
-    int lnxproc_array_set(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim,
-                          char *val);
-    int lnxproc_array_set_last(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim,
-                               char *val);
-    char *lnxproc_array_get(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim);
-
-    LNXPROC_ERROR_CALLBACK lnxproc_array_callback(LNXPROC_ARRAY_T *array);
-
-    int lnxproc_array_iterate(LNXPROC_ARRAY_T *array,
-                              void *data, LNXPROC_VECTOR_ITERATE_FUNC func);
-
-    int lnxproc_array_print(LNXPROC_ARRAY_T *array, int allocated, void *data);
-
-*/
 #endif
 
 /*----------------------------------------------------------------------------*/
