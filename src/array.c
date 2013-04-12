@@ -237,7 +237,7 @@ lnxproc_array_set(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim, char *val)
         }
         array->saved[i] = f;
     }
-    lnxproc_vector_set(array->saved[j], idx[j], val);
+    lnxproc_vector_set(array->saved[dim-1], idx[dim-1], val);
 
     LNXPROC_DEBUG("Success\n");
     return LNXPROC_OK;
@@ -290,13 +290,11 @@ lnxproc_array_set_last(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim,
             if (recursive) {
                 lnxproc_vector_set_last(array->saved[j], idx[j], f);
             }
-            else {
-                lnxproc_vector_set_length(array->saved[j], idx[j]);
-            }
         }
+        lnxproc_vector_set_length(array->saved[j], idx[j]);
         array->saved[i] = f;
     }
-    lnxproc_vector_set_last(array->saved[j], idx[j], val);
+    lnxproc_vector_set_last(array->saved[dim-1], idx[dim-1], val);
 
     LNXPROC_DEBUG("Success\n");
     return LNXPROC_OK;
@@ -348,7 +346,7 @@ lnxproc_array_get(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim)
         }
         array->saved[i] = f;
     }
-    val = lnxproc_vector_get(array->saved[j], idx[j]);
+    val = lnxproc_vector_get(array->saved[dim-1], idx[dim-1]);
 
     LNXPROC_DEBUG("Success (val = %1$p '%1$s')\n", val);
     return val;
@@ -399,7 +397,7 @@ lnxproc_array_print(LNXPROC_ARRAY_T *array, int allocated, void *data)
     lnxproc_limits_print(array->limits, array->dim);
 
     if (array->dim > 0) {
-        lnxproc_vector_print(array->data, allocated, NULL);
+        lnxproc_vector_print(array->data, allocated, data);
     }
     else {
         printf("Array scalar value %1$p '%1$s'\n", (char *) array->data);

@@ -288,6 +288,7 @@ test_vector(void)
 static void
 test_array(void)
 {
+
     printf("Array 0\n");
     LNXPROC_ARRAY_T *array0 =
         lnxproc_array_new(NULL, 0, lnxproc_error_print_callback);
@@ -328,13 +329,17 @@ test_array(void)
 
     LNXPROC_ARRAY_T *array2 =
         lnxproc_array_new(limits2, dim2, lnxproc_error_print_callback);
+    lnxproc_array_print(array2, 1, NULL);
 
     size_t idx2[] = { 0, 0 };
     lnxproc_array_set(array2, idx2, 2, "array2 0 0");
+    lnxproc_array_print(array2, 1, NULL);
+
     size_t idx21[] = { 1, 1 };
     lnxproc_array_set_last(array2, idx21, 2, "array2 1 1");
-
     lnxproc_array_print(array2, 1, NULL);
+    lnxproc_array_print(array2, 1, NULL);
+
     array2 = lnxproc_array_free(array2);
 
     printf("Array 3\n");
@@ -357,6 +362,7 @@ test_array(void)
 
     lnxproc_array_print(array3, 1, NULL);
     array3 = lnxproc_array_free(array3);
+
 }
 
 #endif
@@ -403,7 +409,7 @@ int
 main(int argc, char *argv[])
 {
 
-#ifdef TEST_VECTOR
+#ifdef TEST_ERROR
     test_error();
 #endif
 #ifdef TEST_VECTOR
