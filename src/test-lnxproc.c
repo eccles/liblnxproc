@@ -26,7 +26,7 @@ This file is part of liblnxproc.
 //#define TEST_VECTOR 1
 //#define TEST_LIMITS 1
 #define TEST_ARRAY 1
-//#define TEST_PROCCGROUPS 1
+//#define TEST_PROC_CGROUPS 1
 
 /*----------------------------------------------------------------------------*/
 #ifdef TEST_ERROR
@@ -62,14 +62,14 @@ test_limits(void)
     int i;
 
     for (i = 0; i < dim1; i++) {
-        char *c = lnxproc_limits_limit_chr(limits1 + i, ' ');
+        char *c = lnxproc_limit_chr(limits1 + i, ' ');
 
         printf("Compare ' ' to entry %d : Result = %p\n", i, c);
-        c = lnxproc_limits_limit_chr(limits1 + i, '\n');
+        c = lnxproc_limit_chr(limits1 + i, '\n');
         printf("Compare '\\n' to entry %d : Result = %p\n", i, c);
-        c = lnxproc_limits_limit_chr(limits1 + i, '\0');
+        c = lnxproc_limit_chr(limits1 + i, '\0');
         printf("Compare '\\0' to entry %d : Result = %p\n", i, c);
-        c = lnxproc_limits_limit_chr(limits1 + i, '\t');
+        c = lnxproc_limit_chr(limits1 + i, '\t');
         printf("Compare '\\t' to entry %d : Result = %p\n", i, c);
     }
     lnxproc_limits_print(limits1, dim1);
@@ -91,14 +91,14 @@ test_limits(void)
                                                    mylimits2, dim2);
 
     for (i = 0; i < dim2; i++) {
-        char *c = lnxproc_limits_limit_chr(limits2 + i, ' ');
+        char *c = lnxproc_limit_chr(limits2 + i, ' ');
 
         printf("Compare ' ' to entry %d : Result = %p\n", i, c);
-        c = lnxproc_limits_limit_chr(limits2 + i, '\n');
+        c = lnxproc_limit_chr(limits2 + i, '\n');
         printf("Compare '\\n' to entry %d : Result = %p\n", i, c);
-        c = lnxproc_limits_limit_chr(limits2 + i, '\0');
+        c = lnxproc_limit_chr(limits2 + i, '\0');
         printf("Compare '\\0' to entry %d : Result = %p\n", i, c);
-        c = lnxproc_limits_limit_chr(limits2 + i, '\t');
+        c = lnxproc_limit_chr(limits2 + i, '\t');
         printf("Compare '\\t' to entry %d : Result = %p\n", i, c);
     }
     lnxproc_limits_print(limits2, dim2);
@@ -175,34 +175,34 @@ test_vector(void)
     if (vector && cvector1 && cvector2 && cvector3) {
 
         printf("Add string vector to struct vector at position %d\n", 0);
-        lnxproc_vector_set(vector, 0, cvector1);
+        lnxproc_vector_set_child(vector, 0, cvector1);
         lnxproc_vector_print(vector, 1, NULL);
 
         printf
             ("Add string vector to struct vector at position %d (should fail)\n",
              2);
-        lnxproc_vector_set(vector, 2, cvector2);
+        lnxproc_vector_set_child(vector, 2, cvector2);
         lnxproc_vector_print(vector, 1, NULL);
 
         printf("Add string vector to struct vector at position %d\n", 1);
-        lnxproc_vector_set(vector, 1, cvector2);
+        lnxproc_vector_set_child(vector, 1, cvector2);
         lnxproc_vector_print(vector, 1, NULL);
 
         printf
             ("Add string vector to struct vector at position %d (should resize)\n",
              2);
-        lnxproc_vector_set(vector, 2, cvector3);
+        lnxproc_vector_set_child(vector, 2, cvector3);
         lnxproc_vector_print(vector, 1, NULL);
 
         printf("Get string vector from struct vector at position %d\n", 0);
-        struct lnxproc_vector_t *myvector = lnxproc_vector_get(vector, 0);
+        LNXPROC_VECTOR_T *myvector = lnxproc_vector_child(vector, 0);
 
         lnxproc_vector_print(myvector, 1, NULL);
 
         printf
             ("Get string vector from struct vector at position %d (should fail)\n",
              3);
-        myvector = lnxproc_vector_get(vector, 3);
+        myvector = lnxproc_vector_child(vector, 3);
         lnxproc_vector_print(myvector, 1, NULL);
 
         printf("Resize struct vector - add %d elements\n", 20);
@@ -230,43 +230,43 @@ test_vector(void)
         printf("Val9 at %1$p with value %1$s\n", val9);
 
         printf("cvector1: Set idx %1$d to value %2$p '%2$s'\n", 0, val2);
-        lnxproc_vector_set(cvector1, 0, val2);
+        lnxproc_vector_set_value(cvector1, 0, val2);
         lnxproc_vector_print(vector, 1, NULL);
 
         printf("cvector1: Set idx %1$d to value %2$p '%2$s'\n", 0, val1);
-        lnxproc_vector_set(cvector1, 0, val1);
+        lnxproc_vector_set_value(cvector1, 0, val1);
         lnxproc_vector_print(vector, 1, NULL);
 
         printf("cvector1: Set idx %1$d to value %2$p '%2$s'\n", 1, val4);
-        lnxproc_vector_set(cvector1, 1, val4);
+        lnxproc_vector_set_value(cvector1, 1, val4);
         lnxproc_vector_print(vector, 1, NULL);
 
         printf("cvector1: Set idx %1$d to value %2$p '%2$s'\n", 2, val7);
-        lnxproc_vector_set(cvector1, 2, val7);
+        lnxproc_vector_set_value(cvector1, 2, val7);
         lnxproc_vector_print(vector, 1, NULL);
 
         printf("cvector2: Set idx %1$d to value %2$p '%2$s'\n", 0, val2);
-        lnxproc_vector_set(cvector2, 0, val2);
+        lnxproc_vector_set_value(cvector2, 0, val2);
         lnxproc_vector_print(vector, 1, NULL);
 
         printf("cvector2: Set idx %1$d to value %2$p '%2$s'\n", 1, val5);
-        lnxproc_vector_set(cvector2, 1, val5);
+        lnxproc_vector_set_value(cvector2, 1, val5);
         lnxproc_vector_print(vector, 1, NULL);
 
         printf("cvector2: Set idx %1$d to value %2$p '%2$s'\n", 2, val7);
-        lnxproc_vector_set(cvector2, 2, val7);
+        lnxproc_vector_set_value(cvector2, 2, val7);
         lnxproc_vector_print(vector, 1, NULL);
 
         printf("cvector3: Set idx %1$d to value %2$p '%2$s'\n", 0, val3);
-        lnxproc_vector_set(cvector3, 0, val3);
+        lnxproc_vector_set_value(cvector3, 0, val3);
         lnxproc_vector_print(vector, 1, NULL);
 
         printf("cvector3: Set idx %1$d to value %2$p '%2$s'\n", 1, val6);
-        lnxproc_vector_set(cvector3, 1, val6);
+        lnxproc_vector_set_value(cvector3, 1, val6);
         lnxproc_vector_print(vector, 1, NULL);
 
         printf("cvector3: Set idx %1$d to value %2$p '%2$s'\n", 2, val9);
-        lnxproc_vector_set(cvector3, 2, val9);
+        lnxproc_vector_set_value(cvector3, 2, val9);
         lnxproc_vector_print(vector, 1, NULL);
 
         printf("cvector2: Resize string vector - add %d elements\n", 20);
@@ -338,7 +338,6 @@ test_array(void)
     size_t idx21[] = { 1, 1 };
     lnxproc_array_set_last(array2, idx21, 2, "array2 1 1");
     lnxproc_array_print(array2, 1, NULL);
-    lnxproc_array_print(array2, 1, NULL);
 
     array2 = lnxproc_array_free(array2);
 
@@ -368,7 +367,7 @@ test_array(void)
 #endif
 
 /*----------------------------------------------------------------------------*/
-#ifdef TEST_PROCCGROUPS
+#ifdef TEST_PROC_CGROUPS
 
 static void
 execute_base(LNXPROC_BASE_T *base)
@@ -380,7 +379,7 @@ execute_base(LNXPROC_BASE_T *base)
             char errbuf[128];
 
             strerror_r(state, errbuf, sizeof(errbuf));
-            printf("Failure reading proccgroups %s : %s\n",
+            printf("Failure reading proc_cgroups %s : %s\n",
                    lnxproc_base_filename(base), errbuf);
         }
         else {
@@ -393,14 +392,14 @@ execute_base(LNXPROC_BASE_T *base)
 }
 
 static void
-test_proccgroups(void)
+test_proc_cgroups(void)
 {
-    LNXPROC_BASE_T *proccgroups = proccgroups_init();
+    LNXPROC_BASE_T *proc_cgroups = proc_cgroups_init();
 
-    if (proccgroups) {
-        execute_base(proccgroups);
-        execute_base(proccgroups);
-        proccgroups = lnxproc_base_free(proccgroups);
+    if (proc_cgroups) {
+        execute_base(proc_cgroups);
+        execute_base(proc_cgroups);
+        proc_cgroups = lnxproc_base_free(proc_cgroups);
     }
 }
 #endif
@@ -421,8 +420,8 @@ main(int argc, char *argv[])
 #ifdef TEST_ARRAY
     test_array();
 #endif
-#ifdef TEST_PROCCGROUPS
-    test_proccgroups();
+#ifdef TEST_PROC_CGROUPS
+    test_proc_cgroups();
 #endif
 
     return 0;

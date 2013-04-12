@@ -30,22 +30,18 @@ typical contents of /proc/cgroups file::
 
 */
 
-#include "error.h"
-#include "limits.h"
-#include "vector_private.h"
-#include "array_private.h"
 #include "base_private.h"
 #include "proc_cgroups.h"
 
 static int
-proccgroups_normalize(LNXPROC_BASE_T *base)
+proc_cgroups_normalize(LNXPROC_BASE_T *base)
 {
     lnxproc_base_print(base, 1, NULL);
     return 0;
 }
 
 LNXPROC_BASE_T *
-proccgroups_init(void)
+proc_cgroups_init(void)
 {
 
     LNXPROC_LIMITS_T limits[] = {
@@ -57,10 +53,10 @@ proccgroups_init(void)
 
     return lnxproc_base_init("/proc/cgroups",
                              NULL,
-                             proccgroups_normalize,
+                             proc_cgroups_normalize,
                              NULL,
                              lnxproc_error_print_callback,
-                             256, limits, dim, &proccgroups_data);
+                             256, limits, dim, &proc_cgroups_data);
 }
 
 /*

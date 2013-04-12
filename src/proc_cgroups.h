@@ -25,26 +25,25 @@ extern "C" {
 #endif
 
 #include "base.h"
-#include "proc_cgroups.h"
 
-    struct procgroups_sub_t {
+    struct proc_cgroups_sub_t {
         int hierarchy;
         int num_cgroups;
         int enabled;
     };
 
     struct {
-        struct procgroups_sub_t cpuset;
-        struct procgroups_sub_t cpu;
-        struct procgroups_sub_t cpuacct;
-        struct procgroups_sub_t memory;
-        struct procgroups_sub_t devices;
-        struct procgroups_sub_t freezer;
-        struct procgroups_sub_t blkio;
-        struct procgroups_sub_t perf_event;
-    } proccgroups_data;
+        struct proc_cgroups_sub_t cpuset;
+        struct proc_cgroups_sub_t cpu;
+        struct proc_cgroups_sub_t cpuacct;
+        struct proc_cgroups_sub_t memory;
+        struct proc_cgroups_sub_t devices;
+        struct proc_cgroups_sub_t freezer;
+        struct proc_cgroups_sub_t blkio;
+        struct proc_cgroups_sub_t perf_event;
+    } proc_cgroups_data;
 
-    LNXPROC_BASE_T *proccgroups_init(void);
+    LNXPROC_BASE_T *proc_cgroups_init(void);
 
 #ifdef __cplusplus
 }                               // extern "C"

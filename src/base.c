@@ -199,12 +199,22 @@ lnxproc_base_normalize(LNXPROC_BASE_T *base)
 static int
 base_map(LNXPROC_BASE_T *base)
 {
+    LNXPROC_DEBUG("Base %p\n", base);
 
     LNXPROC_ARRAY_T *array = base->array;
     LNXPROC_LIMITS_T *limits = base->array->limits;
     int dim = base->array->dim;
     char *lines = base->lines;
     int nbytes = base->nbytes;
+
+    LNXPROC_DEBUG("Lines %p Nbytes %d\n", base, nbytes);
+
+#ifdef DEBUG
+    char buf[128];
+
+    lnxproc_chars_print(lines, nbytes, buf, sizeof buf);
+    LNXPROC_DEBUG("Chars %s\n", buf);
+#endif
 
     if (nbytes > 0) {
         char *c = lines;
@@ -226,7 +236,7 @@ base_map(LNXPROC_BASE_T *base)
                         *c = '\0';
 
                         int ret =
-                            lnxproc_array_set_last(array, idx, i, saveptr);
+                            lnxproc_array_set_last(array, idx, dim, saveptr);
 
                         if (ret) {
                             return ret;
@@ -329,13 +339,20 @@ lnxproc_base_init(const char *filename,
 
     LNXPROC_DEBUG("Calloc lines buffer\n");
     base->lines = calloc(1, buflen + 1);
-
     if (!base->lines) {
         LNXPROC_SET_ERROR(callback, LNXPROC_ERROR_BASE_MALLOC_BUFFER);
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_BASE, "Malloc buffer\n");
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_BUFFER,
+                            "Malloc buffer\n");
         return lnxproc_base_free(base);
     }
     base->lines[buflen] = '\n';
+
+    base->array = lnxproc_array_new(limits, dim, callback);
+    if (!base->array) {
+        LNXPROC_SET_ERROR(callback, LNXPROC_ERROR_BASE_MALLOC_ARRAY);
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_ARRAY, "Malloc array\n");
+        return lnxproc_base_free(base);
+    }
 
     base->rawread = rawread;
     base->normalize = normalize;

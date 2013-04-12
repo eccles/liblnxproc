@@ -36,7 +36,8 @@ extern "C" {
         size_t length;
         size_t size;
         int recursive;
-        void *data;
+        LNXPROC_VECTOR_T **children;
+        char **values;
     };
 
 #ifdef __cplusplus

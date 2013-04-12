@@ -36,6 +36,9 @@ extern "C" {
 
     char *lnxproc_limit_chr(LNXPROC_LIMITS_T * limit, char c);
 
+    char *lnxproc_chars_print(char *chars, size_t nchars, char *buf,
+                              size_t buflen);
+
     char *lnxproc_limit_print(LNXPROC_LIMITS_T * limit, char *buf,
                               size_t buflen);
     int lnxproc_limits_print(LNXPROC_LIMITS_T limits[], int dim);

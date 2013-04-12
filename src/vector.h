@@ -46,15 +46,25 @@ extern "C" {
     LNXPROC_VECTOR_T *lnxproc_vector_free(LNXPROC_VECTOR_T *
                                           vector) WARN_UNUSED;
     int lnxproc_vector_resize(LNXPROC_VECTOR_T * vector, size_t size);
-    int lnxproc_vector_set(LNXPROC_VECTOR_T * vector, size_t idx, void *val);
-    int lnxproc_vector_set_last(LNXPROC_VECTOR_T * vector, size_t idx,
-                                void *val);
 
-    int lnxproc_vector_append(LNXPROC_VECTOR_T * vector, void *val);
+    int lnxproc_vector_set_child(LNXPROC_VECTOR_T * vector, size_t idx,
+                                 LNXPROC_VECTOR_T * child);
+    int lnxproc_vector_set_value(LNXPROC_VECTOR_T * vector, size_t idx,
+                                 char *val);
+
+    int lnxproc_vector_set_last_child(LNXPROC_VECTOR_T * vector, size_t idx,
+                                      LNXPROC_VECTOR_T * child);
+    int lnxproc_vector_set_last_value(LNXPROC_VECTOR_T * vector, size_t idx,
+                                      char *val);
+
+    int lnxproc_vector_append(LNXPROC_VECTOR_T * vector,
+                              LNXPROC_VECTOR_T * child, char *val);
 
     int lnxproc_vector_set_length(LNXPROC_VECTOR_T * vector, size_t idx);
-    void *lnxproc_vector_addr(LNXPROC_VECTOR_T * vector, size_t idx);
-    void *lnxproc_vector_get(LNXPROC_VECTOR_T * vector, size_t idx);
+    LNXPROC_VECTOR_T *lnxproc_vector_child(LNXPROC_VECTOR_T * vector,
+                                           size_t idx);
+    char *lnxproc_vector_value(LNXPROC_VECTOR_T * vector, size_t idx);
+
     size_t lnxproc_vector_size(LNXPROC_VECTOR_T * vector);
 
     LNXPROC_ERROR_CALLBACK lnxproc_vector_callback(LNXPROC_VECTOR_T * vector);

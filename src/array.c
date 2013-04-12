@@ -66,7 +66,7 @@ array_create(LNXPROC_ERROR_CALLBACK callback,
             if (!f) {
                 return NULL;
             }
-            lnxproc_vector_set_last(wvec, i, f);
+            lnxproc_vector_set_last_child(wvec, i, f);
         }
     }
     return wvec;
@@ -221,7 +221,7 @@ lnxproc_array_set(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim, char *val)
 
     for (i = 1; i < array->dim; i++) {
         j = i - 1;
-        LNXPROC_VECTOR_T *f = lnxproc_vector_get(array->saved[j], idx[j]);
+        LNXPROC_VECTOR_T *f = lnxproc_vector_child(array->saved[j], idx[j]);
 
         if (!f) {
             int recursive = i < array->dim - 1 ? 1 : 0;
@@ -232,12 +232,12 @@ lnxproc_array_set(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim, char *val)
                 return 1;
             }
             if (recursive) {
-                lnxproc_vector_set(array->saved[j], idx[j], f);
+                lnxproc_vector_set_child(array->saved[j], idx[j], f);
             }
         }
         array->saved[i] = f;
     }
-    lnxproc_vector_set(array->saved[dim-1], idx[dim-1], val);
+    lnxproc_vector_set_value(array->saved[dim - 1], idx[dim - 1], val);
 
     LNXPROC_DEBUG("Success\n");
     return LNXPROC_OK;
@@ -277,7 +277,7 @@ lnxproc_array_set_last(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim,
 
     for (i = 1; i < array->dim; i++) {
         j = i - 1;
-        LNXPROC_VECTOR_T *f = lnxproc_vector_get(array->saved[j], idx[j]);
+        LNXPROC_VECTOR_T *f = lnxproc_vector_child(array->saved[j], idx[j]);
 
         if (!f) {
             int recursive = i < array->dim - 1 ? 1 : 0;
@@ -288,13 +288,13 @@ lnxproc_array_set_last(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim,
                 return 1;
             }
             if (recursive) {
-                lnxproc_vector_set_last(array->saved[j], idx[j], f);
+                lnxproc_vector_set_last_child(array->saved[j], idx[j], f);
             }
         }
         lnxproc_vector_set_length(array->saved[j], idx[j]);
         array->saved[i] = f;
     }
-    lnxproc_vector_set_last(array->saved[dim-1], idx[dim-1], val);
+    lnxproc_vector_set_last_value(array->saved[dim - 1], idx[dim - 1], val);
 
     LNXPROC_DEBUG("Success\n");
     return LNXPROC_OK;
@@ -339,14 +339,14 @@ lnxproc_array_get(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim)
 
     for (i = 1; i < array->dim; i++) {
         j = i - 1;
-        LNXPROC_VECTOR_T *f = lnxproc_vector_get(array->saved[j], idx[j]);
+        LNXPROC_VECTOR_T *f = lnxproc_vector_child(array->saved[j], idx[j]);
 
         if (!f) {
             return NULL;
         }
         array->saved[i] = f;
     }
-    val = lnxproc_vector_get(array->saved[dim-1], idx[dim-1]);
+    val = lnxproc_vector_value(array->saved[dim - 1], idx[dim - 1]);
 
     LNXPROC_DEBUG("Success (val = %1$p '%1$s')\n", val);
     return val;
