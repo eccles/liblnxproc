@@ -644,7 +644,8 @@ lnxproc_vector_print(LNXPROC_VECTOR_T * vector, int allocated, void *data)
                                vector_print_internal);
     }
     else {
-        lnxproc_vector_iterate(vector, &printvar, -1, -1, vector_print_internal);
+        lnxproc_vector_iterate(vector, &printvar, -1, -1,
+                               vector_print_internal);
     }
     printf("\n");
     return LNXPROC_OK;

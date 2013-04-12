@@ -26,24 +26,27 @@ extern "C" {
 
 #include "base.h"
 
-    struct proc_cgroups_sub_t {
+    struct lnxproc_proc_cgroups_sub_t {
         int hierarchy;
         int num_cgroups;
         int enabled;
     };
+    typedef struct lnxproc_proc_cgroups_sub_t LNXPROC_PROC_CGROUPS_SUB_T;
 
-    struct {
-        struct proc_cgroups_sub_t cpuset;
-        struct proc_cgroups_sub_t cpu;
-        struct proc_cgroups_sub_t cpuacct;
-        struct proc_cgroups_sub_t memory;
-        struct proc_cgroups_sub_t devices;
-        struct proc_cgroups_sub_t freezer;
-        struct proc_cgroups_sub_t blkio;
-        struct proc_cgroups_sub_t perf_event;
-    } proc_cgroups_data;
+    struct lnxproc_proc_cgroups_t {
+        LNXPROC_PROC_CGROUPS_SUB_T cpuset;
+        LNXPROC_PROC_CGROUPS_SUB_T cpu;
+        LNXPROC_PROC_CGROUPS_SUB_T cpuacct;
+        LNXPROC_PROC_CGROUPS_SUB_T memory;
+        LNXPROC_PROC_CGROUPS_SUB_T devices;
+        LNXPROC_PROC_CGROUPS_SUB_T freezer;
+        LNXPROC_PROC_CGROUPS_SUB_T blkio;
+        LNXPROC_PROC_CGROUPS_SUB_T perf_event;
+    };
 
-    LNXPROC_BASE_T *proc_cgroups_init(void);
+    typedef struct lnxproc_proc_cgroups_t LNXPROC_PROC_CGROUPS_T;
+
+    LNXPROC_BASE_T *lnxproc_proc_cgroups_init(void);
 
 #ifdef __cplusplus
 }                               // extern "C"

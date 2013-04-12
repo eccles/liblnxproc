@@ -394,7 +394,7 @@ execute_base(LNXPROC_BASE_T *base)
 static void
 test_proc_cgroups(void)
 {
-    LNXPROC_BASE_T *proc_cgroups = proc_cgroups_init();
+    LNXPROC_BASE_T *proc_cgroups = lnxproc_proc_cgroups_init();
 
     if (proc_cgroups) {
         execute_base(proc_cgroups);
