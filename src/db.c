@@ -18,15 +18,14 @@
  *
  */
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "error.h"
-#include "db.h"
 
-struct lnxproc_db_t {
-    const char *filename;
-    LNXPROC_ERROR_CALLBACK callback;
-};
+#include "error.h"
+#include "db_private.h"
 
 const char *
 lnxproc_db_filename(LNXPROC_DB_T * db)
@@ -49,6 +48,63 @@ lnxproc_db_print(LNXPROC_DB_T * db)
 
     if (db) {
         printf("Filename %s\n", db->filename);
+        return LNXPROC_OK;
+    }
+
+    LNXPROC_DEBUG("WARNING: Db is null\n");
+    return LNXPROC_ERROR_DB_NULL;
+}
+
+LNXPROC_DB_DATA_T 
+lnxproc_db_fetch(LNXPROC_DB_T * db, char *key, size_t keylen)
+{
+    LNXPROC_DEBUG("Db %p\n", db);
+    LNXPROC_DB_DATA_T dbkey = {
+        .dsize = 0,
+        .dptr = NULL,
+    };
+
+    if (db) {
+        if( !db->db ) {
+            LNXPROC_SET_ERROR(db->callback, LNXPROC_ERROR_DB_NOT_OPEN);
+            LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_DB_NOT_OPEN, "Fetch db\n");
+            return dbkey;
+        }
+        dbkey.dsize = keylen;
+        dbkey.dptr = (unsigned char *)key;
+        LNXPROC_DB_DATA_T ret = tdb_fetch(db->db,dbkey);
+        if( !ret.dptr ) {
+            LNXPROC_SET_ERROR(db->callback, LNXPROC_ERROR_DB_FETCH);
+            LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_DB_FETCH, "Fetch db %s\n",
+                                   tdb_errorstr(db->db));
+        }
+        return ret;
+    }
+
+    LNXPROC_DEBUG("WARNING: Db is null\n");
+    return dbkey;
+}
+
+int 
+lnxproc_db_store(LNXPROC_DB_T * db, LNXPROC_DB_DATA_T key, LNXPROC_DB_DATA_T data)
+{
+    LNXPROC_DEBUG("Db %p\n", db);
+
+    if (db) {
+        if( !db->db ) {
+            LNXPROC_SET_ERROR(db->callback, LNXPROC_ERROR_DB_NOT_OPEN);
+            LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_DB_NOT_OPEN, "Store db\n");
+            return LNXPROC_ERROR_DB_NOT_OPEN;
+        }
+        int flag = TDB_REPLACE;
+        int ret = tdb_store(db->db, key, data, flag);
+        if( ret < 0 ) {
+            LNXPROC_SET_ERROR(db->callback, LNXPROC_ERROR_DB_STORE);
+            LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_DB_STORE, "Store db %s\n",
+                                                       tdb_errorstr(db->db));
+            return LNXPROC_ERROR_DB_STORE;
+        }
+        return LNXPROC_OK;
     }
 
     LNXPROC_DEBUG("WARNING: Db is null\n");
@@ -71,6 +127,19 @@ lnxproc_db_init(const char *filename, LNXPROC_ERROR_CALLBACK callback)
 
     db->filename = filename;
     db->callback = callback;
+
+    int hash_size = 0;
+    int tdb_flags = TDB_INTERNAL;
+    int open_flags = O_RDWR;
+    mode_t mode = 0;
+
+    db->db = tdb_open(NULL, hash_size, tdb_flags, open_flags, mode);
+    if (!db->db) {
+        LNXPROC_SET_ERROR(callback, LNXPROC_ERROR_DB_OPEN);
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_DB_OPEN, "Open db\n");
+        return lnxproc_db_free(db);
+    }
+
     LNXPROC_DEBUG("Successful\n");
     return db;
 }
@@ -81,6 +150,14 @@ lnxproc_db_free(LNXPROC_DB_T * db)
     LNXPROC_DEBUG("Db %p\n", db);
 
     if (db) {
+        if (db->db) {
+            int ret = tdb_close(db->db);
+
+            if (ret < 0) {
+                LNXPROC_SET_ERROR(db->callback, LNXPROC_ERROR_DB_CLOSE);
+                LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_DB_CLOSE, "Close db\n");
+            }
+        }
         LNXPROC_DEBUG("Free Db\n");
         free(db);
         db = NULL;

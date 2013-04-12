@@ -19,14 +19,16 @@ This file is part of liblnxproc.
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "lnxproc.h"
 
 //#define TEST_ERROR 1
+#define TEST_DB 1
 //#define TEST_VECTOR 1
 //#define TEST_LIMITS 1
 //#define TEST_ARRAY 1
-#define TEST_PROC_CGROUPS 1
+//#define TEST_PROC_CGROUPS 1
 
 /*----------------------------------------------------------------------------*/
 #ifdef TEST_ERROR
@@ -43,6 +45,39 @@ test_error(void)
 }
 #endif
 
+/*----------------------------------------------------------------------------*/
+#ifdef TEST_DB
+static void
+test_db(void)
+{
+    LNXPROC_DB_T *db = lnxproc_db_init(NULL,lnxproc_error_print_callback);
+    lnxproc_db_print(db);
+
+    LNXPROC_DB_DATA_T key = {
+        .dptr = (unsigned char *)"firstkey",
+        .dsize = sizeof "firstkey",
+    };
+    printf("Key is %zd bytes with value %s\n",key.dsize,key.dptr);
+    LNXPROC_DB_DATA_T data = {
+        .dptr = (unsigned char *)"firstdata",
+        .dsize = sizeof "firstdata",
+    };
+    printf("Data is %zd bytes with value %s\n",data.dsize,data.dptr);
+
+    lnxproc_db_store(db,key,data);
+    LNXPROC_DB_DATA_T data1 = lnxproc_db_fetch(db, (char *)key.dptr,key.dsize);
+    printf("Data is %zd bytes with value %s ",data1.dsize,data1.dptr);
+    if( data1.dptr ) {
+        printf("Success\n");
+    }
+    else {
+        printf("FAIL\n");
+    }
+
+    free(data1.dptr);
+    db = lnxproc_db_free(db);
+}
+#endif
 /*----------------------------------------------------------------------------*/
 #ifdef TEST_LIMITS
 static void
@@ -410,6 +445,9 @@ main(int argc, char *argv[])
 
 #ifdef TEST_ERROR
     test_error();
+#endif
+#ifdef TEST_DB
+    test_db();
 #endif
 #ifdef TEST_VECTOR
     test_vector();
