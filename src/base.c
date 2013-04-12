@@ -223,10 +223,16 @@ base_map(LNXPROC_BASE_T *base)
         if (dim > 0) {
             char *saveptr = c;
 
-            size_t *idx = calloc(dim,sizeof(size_t));
+/*
+ * use malloced array when testing with valgrind
+ * For some raeson valgrind reports use of an uninitialised variable if using
+ * stack allocated arrays here
+ */
 
-//            size_t idx[dim];
-//            memset(idx, 0, dim * sizeof(int));
+//            size_t *idx = calloc(dim,sizeof(size_t));
+
+            size_t idx[dim];
+            memset(idx, 0, dim * sizeof(int));
 
             while (c < d) {
                 size_t i;
@@ -240,7 +246,7 @@ base_map(LNXPROC_BASE_T *base)
                             lnxproc_array_set_last(array, idx, dim, saveptr);
 
                         if (ret) {
-                            free(idx);
+//                            free(idx);
                             return ret;
                         }
 
@@ -261,7 +267,7 @@ base_map(LNXPROC_BASE_T *base)
                     c++;
                 }
             }
-            free(idx);
+//            free(idx);
         }
         else {
             base->data = c;
