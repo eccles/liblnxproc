@@ -79,10 +79,12 @@ lnxproc_debug(const char *filename, int lineno, const char *funcname, char *fmt,
 {
     va_list args;
 
-    va_start(args, fmt);
     printf("Debug: %s[%d] %s -> ", filename, lineno, funcname);
+
+    va_start(args, fmt);
     vprintf(fmt, args);
     va_end(args);
+
 }
 #endif
 const char *

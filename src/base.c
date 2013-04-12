@@ -223,9 +223,10 @@ base_map(LNXPROC_BASE_T *base)
         if (dim > 0) {
             char *saveptr = c;
 
-            size_t idx[dim];
+            size_t *idx = calloc(dim,sizeof(size_t));
 
-            memset(idx, 0, dim * sizeof(int));
+//            size_t idx[dim];
+//            memset(idx, 0, dim * sizeof(int));
 
             while (c < d) {
                 size_t i;
@@ -239,6 +240,7 @@ base_map(LNXPROC_BASE_T *base)
                             lnxproc_array_set_last(array, idx, dim, saveptr);
 
                         if (ret) {
+                            free(idx);
                             return ret;
                         }
 
@@ -259,6 +261,7 @@ base_map(LNXPROC_BASE_T *base)
                     c++;
                 }
             }
+            free(idx);
         }
         else {
             base->data = c;

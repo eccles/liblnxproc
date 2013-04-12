@@ -6,9 +6,13 @@ then
     ./test-lnxproc
     exit 0
 fi
+VALOPTS="--leak-check=full --show-reachable=yes --read-var-info=yes --track-origins=yes"
 if [ "$1" = "leak" ]
 then
-    valgrind -v --leak-check=full --show-reachable=yes --read-var-info=yes ./test-lnxproc
+    valgrind -v ${VALOPTS} ./test-lnxproc
+elif [ "$1" = "leakdbg" ]
+then
+    valgrind -v ${VALOPTS} ./test-lnxproc-dbg
 elif [ "$1" = "ddd" ]
 then
     ddd test-lnxproc-dbg

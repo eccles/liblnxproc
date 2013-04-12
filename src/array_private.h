@@ -37,8 +37,8 @@ extern "C" {
         LNXPROC_ERROR_CALLBACK callback;
         LNXPROC_LIMITS_T *limits;
         size_t dim;
-        void **saved;
-        void *data;
+        LNXPROC_VECTOR_T **saved;
+        LNXPROC_VECTOR_T *vector;
     };
 
 #ifdef __cplusplus
