@@ -28,6 +28,7 @@ extern "C" {
 #include <stddef.h>
 
 #include "error.h"
+#include "timestamp_private.h"
 #include "array_private.h"
 #include "base.h"
 
@@ -36,6 +37,7 @@ extern "C" {
         LNXPROC_NORMALIZE_METHOD normalize;
         LNXPROC_BASE_METHOD read;
         LNXPROC_ERROR_CALLBACK callback;
+        LNXPROC_TIMESTAMP_T *timestamp;
         const char *filename;
         char *lines;
         size_t buflen;

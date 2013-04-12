@@ -22,24 +22,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "error.h"
-#include "timestamp.h"
-
-#include <sys/time.h>
+#include "timestamp_private.h"
 
 /*
+    struct lnxproc_timestamp_t;
+    typedef struct lnxproc_timestamp_t LNXPROC_TIMESTAMP_T;
+
+    struct timeval *lnxproc_timestamp_timeval(LNXPROC_TIMESTAMP_T * timestamp);
+    int lnxproc_timestamp_print(LNXPROC_TIMESTAMP_T * timestamp);
+    LNXPROC_TIMESTAMP_T *lnxproc_timestamp_init(LNXPROC_ERROR_CALLBACK
+                                                callback);
+    LNXPROC_TIMESTAMP_T *lnxproc_timestamp_free(LNXPROC_TIMESTAMP_T *
+                                                timestamp);
+
        int gettimeofday(struct timeval *tv, struct timezone *tz);
 */
-struct lnxproc_timestamp_t {
-    struct timeval val;
-    const char *filename;
-    LNXPROC_ERROR_CALLBACK callback;
-};
 
-static char *
-timestamp_timeval_print(struct timeval *val, char *buf, size_t buflen)
+char *
+lnxproc_timestamp_str(LNXPROC_TIMESTAMP_T * timestamp, char *buf, size_t buflen)
 {
-    if (buf) {
-        snprintf(buf, buflen, "%d.%06d", (int) val->tv_sec, (int) val->tv_usec);
+    if (timestamp && buf) {
+        snprintf(buf, buflen, "%d.%06d", (int) timestamp->tv.tv_sec,
+                 (int) timestamp->tv.tv_usec);
     }
     return buf;
 }
@@ -48,20 +52,41 @@ struct timeval *
 lnxproc_timestamp_timeval(LNXPROC_TIMESTAMP_T * timestamp)
 {
     LNXPROC_DEBUG("Timestamp %p\n", timestamp);
-    struct timeval *val = NULL;
+    struct timeval *tv = NULL;
 
     if (timestamp) {
-        val = &timestamp->val;
+        gettimeofday(&timestamp->tv, NULL);
+        tv = &timestamp->tv;
 #ifdef DEBUG
         char buf[64];
 
-        timestamp_timeval_print(val, buf, sizeof buf);
+        lnxproc_timestamp_str(timestamp, buf, sizeof buf);
         LNXPROC_DEBUG("timestamp %s\n", buf);
 #endif
     }
 
-    LNXPROC_DEBUG("val %p\n", val);
-    return val;
+    LNXPROC_DEBUG("val %p\n", tv);
+    return tv;
+}
+
+struct timeval *
+lnxproc_timestamp_tv(LNXPROC_TIMESTAMP_T * timestamp)
+{
+    LNXPROC_DEBUG("Timestamp %p\n", timestamp);
+    struct timeval *tv = NULL;
+
+    if (timestamp) {
+        tv = &timestamp->tv;
+#ifdef DEBUG
+        char buf[64];
+
+        lnxproc_timestamp_str(timestamp, buf, sizeof buf);
+        LNXPROC_DEBUG("timestamp %s\n", buf);
+#endif
+    }
+
+    LNXPROC_DEBUG("val %p\n", tv);
+    return tv;
 }
 
 int
@@ -72,7 +97,7 @@ lnxproc_timestamp_print(LNXPROC_TIMESTAMP_T * timestamp)
     if (timestamp) {
         char buf[64];
 
-        timestamp_timeval_print(&timestamp->val, buf, sizeof buf);
+        lnxproc_timestamp_str(timestamp, buf, sizeof buf);
         printf("Timestamp %s\n", buf);
         return LNXPROC_OK;
     }
@@ -96,6 +121,7 @@ lnxproc_timestamp_init(LNXPROC_ERROR_CALLBACK callback)
     }
 
     timestamp->callback = callback;
+    lnxproc_timestamp_timeval(timestamp);
     LNXPROC_DEBUG("Successful\n");
     return timestamp;
 }

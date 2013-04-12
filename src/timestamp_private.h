@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef LIBLNXPROC_TIMESTAMP_H
-#define LIBLNXPROC_TIMESTAMP_H 1
+#ifndef LIBLNXPROC_TIMESTAMP_PRIVATE_H
+#define LIBLNXPROC_TIMESTAMP_PRIVATE_H 1
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,24 +27,17 @@ extern "C" {
 
 #include <sys/time.h>
 #include "error.h"
+#include "timestamp.h"
 
-    struct lnxproc_timestamp_t;
-    typedef struct lnxproc_timestamp_t LNXPROC_TIMESTAMP_T;
-
-    struct timeval *lnxproc_timestamp_timeval(LNXPROC_TIMESTAMP_T * timestamp);
-    struct timeval *lnxproc_timestamp_tv(LNXPROC_TIMESTAMP_T * timestamp);
-    char *lnxproc_timestamp_str(LNXPROC_TIMESTAMP_T * timestamp, char *buf,
-                                size_t buflen);
-    int lnxproc_timestamp_print(LNXPROC_TIMESTAMP_T * timestamp);
-    LNXPROC_TIMESTAMP_T *lnxproc_timestamp_init(LNXPROC_ERROR_CALLBACK
-                                                callback);
-    LNXPROC_TIMESTAMP_T *lnxproc_timestamp_free(LNXPROC_TIMESTAMP_T *
-                                                timestamp);
+    struct lnxproc_timestamp_t {
+        struct timeval tv;
+        LNXPROC_ERROR_CALLBACK callback;
+    };
 
 #ifdef __cplusplus
 }                               // extern "C"
 #endif
-#endif                          // LIBLNXPROC_TIMESTAMP_H
+#endif                          // LIBLNXPROC_TIMESTAMP_PRIVATE_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
  */

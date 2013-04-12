@@ -29,6 +29,7 @@
 
 #include "error.h"
 #include "limits.h"
+#include "timestamp_private.h"
 #include "array_private.h"
 #include "base_private.h"
 
@@ -105,6 +106,7 @@ lnxproc_base_print(LNXPROC_BASE_T *base, int allocated, void *data)
         printf("Lines %p\n", base->lines);
         printf("Buflen %zd\n", base->buflen);
         printf("Nbytes %d\n", base->nbytes);
+        lnxproc_timestamp_print(base->timestamp);
         return lnxproc_array_print(base->array, allocated, data);
     }
 
@@ -136,10 +138,10 @@ lnxproc_base_rawread(LNXPROC_BASE_T *base)
         return LNXPROC_ERROR_BASE_NULL;
     }
 
+    lnxproc_timestamp_timeval(base->timestamp);
     if (base->rawread) {
         LNXPROC_DEBUG("Execute specified rawread method %p\n", base->rawread);
         return base->rawread(base);
-
     }
 
     else {
@@ -362,6 +364,13 @@ lnxproc_base_init(const char *filename,
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_ARRAY, "Malloc array\n");
         return lnxproc_base_free(base);
     }
+    base->timestamp = lnxproc_timestamp_init(callback);
+    if (!base->timestamp) {
+        LNXPROC_SET_ERROR(callback, LNXPROC_ERROR_BASE_MALLOC_TIMESTAMP);
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_TIMESTAMP,
+                            "Malloc timestamp\n");
+        return lnxproc_base_free(base);
+    }
 
     base->rawread = rawread;
     base->normalize = normalize;
@@ -390,6 +399,11 @@ lnxproc_base_free(LNXPROC_BASE_T *base)
             LNXPROC_DEBUG("Free Base buffer\n");
             free(base->lines);
             base->lines = NULL;
+        }
+        if (base->timestamp) {
+            LNXPROC_DEBUG("Free Timestamp\n");
+            free(base->timestamp);
+            base->timestamp = NULL;
         }
 
         LNXPROC_DEBUG("Free Base\n");

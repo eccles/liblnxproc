@@ -28,6 +28,7 @@ extern "C" {
 #include <stddef.h>
 #include "error.h"
 #include "limits.h"
+#include "timestamp.h"
 #include "array.h"
 
     struct lnxproc_base_t;
