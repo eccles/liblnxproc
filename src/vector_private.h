@@ -31,14 +31,17 @@ extern "C" {
 #include "error.h"
 #include "vector.h"
 
+    union lnxproc_vector_data_t {
+        LNXPROC_VECTOR_T *child;
+        char *value;
+    };
+
     struct lnxproc_vector_t {
         LNXPROC_ERROR_CALLBACK callback;
         size_t length;
         size_t size;
         int recursive;
-        LNXPROC_VECTOR_T *parent;
-        LNXPROC_VECTOR_T **children;
-        char **values;
+        LNXPROC_VECTOR_DATA_T *data;
     };
 
 #ifdef __cplusplus

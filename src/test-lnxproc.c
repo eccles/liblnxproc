@@ -24,10 +24,10 @@ This file is part of liblnxproc.
 #include "lnxproc.h"
 
 //#define TEST_ERROR 1
-#define TEST_DB 1
+//#define TEST_DB 1
 //#define TEST_VECTOR 1
 //#define TEST_LIMITS 1
-//#define TEST_ARRAY 1
+#define TEST_ARRAY 1
 //#define TEST_PROC_CGROUPS 1
 
 /*----------------------------------------------------------------------------*/
@@ -50,24 +50,26 @@ test_error(void)
 static void
 test_db(void)
 {
-    LNXPROC_DB_T *db = lnxproc_db_init(NULL,lnxproc_error_print_callback);
+    LNXPROC_DB_T *db = lnxproc_db_init(NULL, lnxproc_error_print_callback);
+
     lnxproc_db_print(db);
 
     LNXPROC_DB_DATA_T key = {
-        .dptr = (unsigned char *)"firstkey",
+        .dptr = (unsigned char *) "firstkey",
         .dsize = sizeof "firstkey",
     };
-    printf("Key is %zd bytes with value %s\n",key.dsize,key.dptr);
+    printf("Key is %zd bytes with value %s\n", key.dsize, key.dptr);
     LNXPROC_DB_DATA_T data = {
-        .dptr = (unsigned char *)"firstdata",
+        .dptr = (unsigned char *) "firstdata",
         .dsize = sizeof "firstdata",
     };
-    printf("Data is %zd bytes with value %s\n",data.dsize,data.dptr);
+    printf("Data is %zd bytes with value %s\n", data.dsize, data.dptr);
 
-    lnxproc_db_store(db,key,data);
-    LNXPROC_DB_DATA_T data1 = lnxproc_db_fetch(db, (char *)key.dptr,key.dsize);
-    printf("Data is %zd bytes with value %s ",data1.dsize,data1.dptr);
-    if( data1.dptr ) {
+    lnxproc_db_store(db, key, data);
+    LNXPROC_DB_DATA_T data1 =
+        lnxproc_db_fetch(db, (char *) key.dptr, key.dsize);
+    printf("Data is %zd bytes with value %s ", data1.dsize, data1.dptr);
+    if (data1.dptr) {
         printf("Success\n");
     }
     else {
@@ -178,9 +180,15 @@ test_limits(void)
 /*----------------------------------------------------------------------------*/
 #ifdef TEST_VECTOR
 static int
-myvector_print(LNXPROC_VECTOR_T * vector, void *data, int idx)
+myvector_print(LNXPROC_VECTOR_DATA_T * val, int recursive, void *data,
+               size_t idx)
 {
-    printf("Array %p : Index %d\n", vector, idx);
+    if (recursive) {
+        printf("Child %p : Index %zd\n", lnxproc_data_child(val), idx);
+    }
+    else {
+        printf("Val %p : Index %zd\n", lnxproc_data_value(val), idx);
+    }
     return 0;
 }
 
@@ -325,8 +333,11 @@ test_array(void)
 {
 
     printf("Array 0\n");
+    LNXPROC_LIMITS_T limits0[] = {
+        {3, "\n", 1},
+    };
     LNXPROC_ARRAY_T *array0 =
-        lnxproc_array_new(NULL, 0, lnxproc_error_print_callback);
+        lnxproc_array_new(limits0, 0, lnxproc_error_print_callback);
 
     lnxproc_array_set(array0, NULL, 0, "array0");
     char *val = lnxproc_array_get(array0, NULL, 0);

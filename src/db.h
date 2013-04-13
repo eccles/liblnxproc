@@ -41,9 +41,9 @@ extern "C" {
     LNXPROC_DB_T *lnxproc_db_free(LNXPROC_DB_T * db);
 
     LNXPROC_DB_DATA_T lnxproc_db_fetch(LNXPROC_DB_T * db, char *key,
-                                        size_t keylen);
+                                       size_t keylen);
     int lnxproc_db_store(LNXPROC_DB_T * db, LNXPROC_DB_DATA_T key,
-                                        LNXPROC_DB_DATA_T data);
+                         LNXPROC_DB_DATA_T data);
 
 #ifdef __cplusplus
 }                               // extern "C"

@@ -55,8 +55,12 @@ extern "C" {
 
     LNXPROC_ERROR_CALLBACK lnxproc_array_callback(LNXPROC_ARRAY_T *array);
 
+    typedef int (*LNXPROC_ARRAY_ITERATE_FUNC) (char *val,
+                                               void *data, size_t idx[],
+                                               size_t dim);
+
     int lnxproc_array_iterate(LNXPROC_ARRAY_T *array,
-                              void *data, LNXPROC_VECTOR_ITERATE_FUNC func);
+                              void *data, LNXPROC_ARRAY_ITERATE_FUNC func);
 
     int lnxproc_array_print(LNXPROC_ARRAY_T *array, int allocated, void *data);
 

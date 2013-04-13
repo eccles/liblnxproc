@@ -55,7 +55,7 @@ lnxproc_db_print(LNXPROC_DB_T * db)
     return LNXPROC_ERROR_DB_NULL;
 }
 
-LNXPROC_DB_DATA_T 
+LNXPROC_DB_DATA_T
 lnxproc_db_fetch(LNXPROC_DB_T * db, char *key, size_t keylen)
 {
     LNXPROC_DEBUG("Db %p\n", db);
@@ -65,18 +65,19 @@ lnxproc_db_fetch(LNXPROC_DB_T * db, char *key, size_t keylen)
     };
 
     if (db) {
-        if( !db->db ) {
+        if (!db->db) {
             LNXPROC_SET_ERROR(db->callback, LNXPROC_ERROR_DB_NOT_OPEN);
             LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_DB_NOT_OPEN, "Fetch db\n");
             return dbkey;
         }
         dbkey.dsize = keylen;
-        dbkey.dptr = (unsigned char *)key;
-        LNXPROC_DB_DATA_T ret = tdb_fetch(db->db,dbkey);
-        if( !ret.dptr ) {
+        dbkey.dptr = (unsigned char *) key;
+        LNXPROC_DB_DATA_T ret = tdb_fetch(db->db, dbkey);
+
+        if (!ret.dptr) {
             LNXPROC_SET_ERROR(db->callback, LNXPROC_ERROR_DB_FETCH);
             LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_DB_FETCH, "Fetch db %s\n",
-                                   tdb_errorstr(db->db));
+                                tdb_errorstr(db->db));
         }
         return ret;
     }
@@ -85,23 +86,25 @@ lnxproc_db_fetch(LNXPROC_DB_T * db, char *key, size_t keylen)
     return dbkey;
 }
 
-int 
-lnxproc_db_store(LNXPROC_DB_T * db, LNXPROC_DB_DATA_T key, LNXPROC_DB_DATA_T data)
+int
+lnxproc_db_store(LNXPROC_DB_T * db, LNXPROC_DB_DATA_T key,
+                 LNXPROC_DB_DATA_T data)
 {
     LNXPROC_DEBUG("Db %p\n", db);
 
     if (db) {
-        if( !db->db ) {
+        if (!db->db) {
             LNXPROC_SET_ERROR(db->callback, LNXPROC_ERROR_DB_NOT_OPEN);
             LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_DB_NOT_OPEN, "Store db\n");
             return LNXPROC_ERROR_DB_NOT_OPEN;
         }
         int flag = TDB_REPLACE;
         int ret = tdb_store(db->db, key, data, flag);
-        if( ret < 0 ) {
+
+        if (ret < 0) {
             LNXPROC_SET_ERROR(db->callback, LNXPROC_ERROR_DB_STORE);
             LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_DB_STORE, "Store db %s\n",
-                                                       tdb_errorstr(db->db));
+                                tdb_errorstr(db->db));
             return LNXPROC_ERROR_DB_STORE;
         }
         return LNXPROC_OK;
