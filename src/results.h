@@ -31,31 +31,36 @@ extern "C" {
 
     struct lnxproc_results_t {
         struct timeval tv;
-        const char *filename;
+//        const char *filename;
         LNXPROC_RESULTS_FILE_T *db;
     };
     typedef struct lnxproc_results_t LNXPROC_RESULTS_T;
 
-    const char *lnxproc_results_filename(LNXPROC_RESULTS_T * results);
-    struct timeval *lnxproc_results_timeval(LNXPROC_RESULTS_T * results);
-    struct timeval *lnxproc_results_tv(LNXPROC_RESULTS_T * results);
-    char *lnxproc_results_timeval_str(LNXPROC_RESULTS_T * results, char *buf,
-                                      size_t buflen);
-    int lnxproc_results_print(LNXPROC_RESULTS_T * results);
+//    LNXPROC_ERROR_T lnxproc_results_filename(LNXPROC_RESULTS_T * results, char **filename);
+    LNXPROC_ERROR_T lnxproc_results_timeval(LNXPROC_RESULTS_T * results,
+                                            struct timeval **tv);
+    LNXPROC_ERROR_T lnxproc_results_tv(LNXPROC_RESULTS_T * results,
+                                       struct timeval **tv);
+    LNXPROC_ERROR_T lnxproc_results_timeval_str(LNXPROC_RESULTS_T * results,
+                                                char *buf, size_t buflen);
+    LNXPROC_ERROR_T lnxproc_results_print(LNXPROC_RESULTS_T * results);
+
+    LNXPROC_ERROR_T lnxproc_results_new(LNXPROC_RESULTS_T ** newresults);
 
 #ifndef WARN_UNUSED
 #define WARN_UNUSED __attribute__((warn_unused_result))
 #endif
 
-    LNXPROC_RESULTS_T *lnxproc_results_new(void) WARN_UNUSED;
     LNXPROC_RESULTS_T *lnxproc_results_free(LNXPROC_RESULTS_T *
                                             results) WARN_UNUSED;
 
-    LNXPROC_RESULTS_DATA_T lnxproc_results_fetch(LNXPROC_RESULTS_T * results,
-                                                 char *key, size_t keylen);
-    int lnxproc_results_store(LNXPROC_RESULTS_T * db,
-                              LNXPROC_RESULTS_DATA_T key,
-                              LNXPROC_RESULTS_DATA_T data);
+    LNXPROC_ERROR_T lnxproc_results_fetch(LNXPROC_RESULTS_T * results,
+                                          char *key, size_t keylen,
+                                          LNXPROC_RESULTS_DATA_T * val);
+
+    LNXPROC_ERROR_T lnxproc_results_store(LNXPROC_RESULTS_T * results,
+                                          LNXPROC_RESULTS_DATA_T key,
+                                          LNXPROC_RESULTS_DATA_T data);
 
 #ifdef __cplusplus
 }                               // extern "C"

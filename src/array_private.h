@@ -28,13 +28,11 @@
 extern "C" {
 #endif
 
-#include "error.h"
 #include "vector_private.h"
 #include "limits.h"
 #include "array.h"
 
     struct lnxproc_array_t {
-        LNXPROC_ERROR_CALLBACK callback;
         LNXPROC_LIMITS_T *limits;
         size_t dim;
         LNXPROC_VECTOR_T **saved;

@@ -34,11 +34,10 @@ extern "C" {
     struct lnxproc_base_t;
     typedef struct lnxproc_base_t LNXPROC_BASE_T;
 
-    LNXPROC_ARRAY_T *lnxproc_base_array(LNXPROC_BASE_T *base);
+    LNXPROC_ERROR_T lnxproc_base_array(LNXPROC_BASE_T *base, LNXPROC_ARRAY_T **array);
 
     const char *lnxproc_base_filename(LNXPROC_BASE_T *base);
     char *lnxproc_base_lines(LNXPROC_BASE_T *base);
-    LNXPROC_ERROR_CALLBACK lnxproc_base_callback(LNXPROC_BASE_T *base);
 
     typedef LNXPROC_RESULTS_T *(*LNXPROC_BASE_METHOD) (LNXPROC_BASE_T *base);
 
@@ -52,7 +51,6 @@ extern "C" {
                                      LNXPROC_BASE_METHOD rawread,
                                      LNXPROC_BASE_METHOD normalize,
                                      LNXPROC_BASE_METHOD read,
-                                     LNXPROC_ERROR_CALLBACK callback,
                                      size_t buflen,
                                      LNXPROC_LIMITS_T limits[], size_t dim);
 

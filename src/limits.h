@@ -36,21 +36,20 @@ extern "C" {
 
     char *lnxproc_limit_chr(LNXPROC_LIMITS_T * limit, char c);
 
-    char *lnxproc_chars_print(char *chars, size_t nchars, char *buf,
-                              size_t buflen);
+    LNXPROC_ERROR_T lnxproc_chars_print(char *chars, size_t nchars, char *buf,
+                                        size_t buflen);
 
-    char *lnxproc_limit_print(LNXPROC_LIMITS_T * limit, char *buf,
-                              size_t buflen);
-    int lnxproc_limits_print(LNXPROC_LIMITS_T limits[], int dim);
+    LNXPROC_ERROR_T lnxproc_limit_print(LNXPROC_LIMITS_T * limit, char *buf,
+                                        size_t buflen);
+    LNXPROC_ERROR_T lnxproc_limits_print(LNXPROC_LIMITS_T limits[], int dim);
+
+    LNXPROC_ERROR_T lnxproc_limits_dup(LNXPROC_LIMITS_T ** newlimits,
+                                       LNXPROC_LIMITS_T limits[], size_t dim);
 
 #ifndef WARN_UNUSED
 #define WARN_UNUSED __attribute__((warn_unused_result))
 #endif
 
-    LNXPROC_LIMITS_T *lnxproc_limits_dup(LNXPROC_ERROR_CALLBACK
-                                         callback,
-                                         LNXPROC_LIMITS_T
-                                         limits[], size_t dim) WARN_UNUSED;
     LNXPROC_LIMITS_T *lnxproc_limits_free(LNXPROC_LIMITS_T
                                           limits[], size_t dim) WARN_UNUSED;
 

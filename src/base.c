@@ -77,19 +77,18 @@ lnxproc_base_nbytes(LNXPROC_BASE_T *base)
     return -1;
 }
 
-LNXPROC_ARRAY_T *
-lnxproc_base_array(LNXPROC_BASE_T *base)
+LNXPROC_ERROR_T
+lnxproc_base_array(LNXPROC_BASE_T *base, LNXPROC_ARRAY_T **array)
 {
     LNXPROC_DEBUG("Base %p\n", base);
-    LNXPROC_ARRAY_T *array = NULL;
 
     if (!base) {
-        LNXPROC_SET_ERROR(base->callback, LNXPROC_ERROR_BASE_NULL);
-        return array;
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_NULL,"\n");
+        return LNXPROC_ERROR_BASE_NULL;
     }
-    array = base->array;
-    LNXPROC_DEBUG("Array %p\n", array);
-    return array;
+    *array = base->array;
+    LNXPROC_DEBUG("Array %p\n", *array);
+    return LNXPROC_OK;
 }
 
 int
@@ -101,7 +100,6 @@ lnxproc_base_print(LNXPROC_BASE_T *base, int allocated, void *data)
         printf("Rawread %p\n", base->rawread);
         printf("Normalize %p\n", base->normalize);
         printf("Read %p\n", base->read);
-        printf("Callback %p\n", base->callback);
         printf("Filename %s\n", base->filename);
         printf("Lines %p\n", base->lines);
         printf("Buflen %zd\n", base->buflen);
@@ -114,31 +112,17 @@ lnxproc_base_print(LNXPROC_BASE_T *base, int allocated, void *data)
     return LNXPROC_ERROR_BASE_NULL;
 }
 
-LNXPROC_ERROR_CALLBACK
-lnxproc_base_callback(LNXPROC_BASE_T *base)
-{
-    LNXPROC_DEBUG("Base %p\n", base);
-    LNXPROC_ERROR_CALLBACK callback = NULL;
-
-    if (base) {
-        callback = base->callback;
-    }
-
-    LNXPROC_DEBUG("callback %p\n", callback);
-    return callback;
-}
-
 LNXPROC_RESULTS_T *
 lnxproc_base_rawread(LNXPROC_BASE_T *base)
 {
     LNXPROC_DEBUG("Base %p\n", base);
 
     if (!base) {
-        LNXPROC_SET_ERROR(base->callback, LNXPROC_ERROR_BASE_NULL);
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_NULL,"\n");
         return NULL;
     }
 
-    lnxproc_results_timeval(base->results);
+    lnxproc_results_timeval(base->results, NULL);
     if (base->rawread) {
         LNXPROC_DEBUG("Execute specified rawread method %p\n", base->rawread);
         return base->rawread(base);
@@ -150,7 +134,6 @@ lnxproc_base_rawread(LNXPROC_BASE_T *base)
         int fd = open(base->filename, O_RDONLY);
 
         if (fd < 0) {
-            LNXPROC_SYSTEM_ERROR(base->callback, errno);
             LNXPROC_ERROR_DEBUG(-errno, "Open %s\n", base->filename);
             return NULL;
         }
@@ -159,7 +142,6 @@ lnxproc_base_rawread(LNXPROC_BASE_T *base)
         base->nbytes = read(fd, base->lines, base->buflen);
 
         if (base->nbytes < 0) {
-            LNXPROC_SYSTEM_ERROR(base->callback, errno);
             LNXPROC_ERROR_DEBUG(-errno, "Open %s\n", base->filename);
             return NULL;
         }
@@ -185,7 +167,7 @@ lnxproc_base_normalize(LNXPROC_BASE_T *base)
     LNXPROC_DEBUG("Base %p\n", base);
 
     if (!base) {
-        LNXPROC_SET_ERROR(base->callback, LNXPROC_ERROR_BASE_NULL);
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_NULL,"\n");
         return NULL;
     }
 
@@ -295,7 +277,7 @@ lnxproc_base_read(LNXPROC_BASE_T *base)
     LNXPROC_DEBUG("Base %p\n", base);
 
     if (!base) {
-        LNXPROC_SET_ERROR(base->callback, LNXPROC_ERROR_BASE_NULL);
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_NULL,"\n");
         return NULL;
     }
 
@@ -327,19 +309,17 @@ lnxproc_base_new(const char *filename,
                  LNXPROC_BASE_METHOD rawread,
                  LNXPROC_BASE_METHOD normalize,
                  LNXPROC_BASE_METHOD read,
-                 LNXPROC_ERROR_CALLBACK callback,
                  size_t buflen, LNXPROC_LIMITS_T limits[], size_t dim)
 {
     LNXPROC_DEBUG("filename %1$p '%1$s'\n", filename);
-    LNXPROC_DEBUG("rawread %p, normalize %p, read %p, callback %p\n", rawread,
-                  normalize, read, callback);
+    LNXPROC_DEBUG("rawread %p, normalize %p, read %p\n", rawread,
+                  normalize, read);
     LNXPROC_DEBUG("buflen %zd\n", buflen);
     LNXPROC_DEBUG("limits %p dim %d\n", limits, dim);
 
     LNXPROC_BASE_T *base = calloc(1, sizeof(LNXPROC_BASE_T));
 
     if (!base) {
-        LNXPROC_SET_ERROR(callback, LNXPROC_ERROR_BASE_MALLOC_BASE);
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_BASE, "Malloc base\n");
         return base;
     }
@@ -347,23 +327,20 @@ lnxproc_base_new(const char *filename,
     LNXPROC_DEBUG("Calloc lines buffer\n");
     base->lines = calloc(1, buflen + 1);
     if (!base->lines) {
-        LNXPROC_SET_ERROR(callback, LNXPROC_ERROR_BASE_MALLOC_BUFFER);
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_BUFFER,
                             "Malloc buffer\n");
         return lnxproc_base_free(base);
     }
     base->lines[buflen] = '\n';
 
-    base->array = lnxproc_array_new(limits, dim, callback);
+    lnxproc_array_new(&base->array, limits, dim);
     if (!base->array) {
-        LNXPROC_SET_ERROR(callback, LNXPROC_ERROR_BASE_MALLOC_ARRAY);
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_ARRAY, "Malloc array\n");
         return lnxproc_base_free(base);
     }
 
-    base->results = lnxproc_results_new();
+    lnxproc_results_new(&base->results);
     if (!base->results) {
-        LNXPROC_SET_ERROR(callback, LNXPROC_ERROR_BASE_MALLOC_RESULTS);
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_RESULTS,
                             "Malloc results\n");
         return lnxproc_base_free(base);
@@ -373,7 +350,6 @@ lnxproc_base_new(const char *filename,
     base->rawread = rawread;
     base->normalize = normalize;
     base->read = read;
-    base->callback = callback;
     base->filename = filename;
     base->buflen = buflen;
     base->nbytes = 0;

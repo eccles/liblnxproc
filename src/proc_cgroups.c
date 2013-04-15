@@ -35,7 +35,7 @@ typical contents of /proc/cgroups file::
 #include "base_private.h"
 #include "proc_cgroups.h"
 
-static int
+static LNXPROC_ERROR_T
 proc_groups_func(char *val, void *data, size_t idx[], size_t dim)
 {
     if (idx[0] == 0) {
@@ -69,7 +69,7 @@ lnxproc_proc_cgroups_new(void)
                             NULL,
                             proc_cgroups_normalize,
                             NULL,
-                            lnxproc_error_print_callback, 256, limits, dim);
+                            256, limits, dim);
 }
 
 /*

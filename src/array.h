@@ -36,33 +36,30 @@ extern "C" {
     struct lnxproc_array_t;
     typedef struct lnxproc_array_t LNXPROC_ARRAY_T;
 
+    LNXPROC_ERROR_T lnxproc_array_new(LNXPROC_ARRAY_T **array,
+                                       LNXPROC_LIMITS_T limits[],
+                                       size_t dim);
+
 #ifndef WARN_UNUSED
 #define WARN_UNUSED __attribute__((warn_unused_result))
 #endif
 
-    LNXPROC_ARRAY_T *lnxproc_array_new(LNXPROC_LIMITS_T limits[],
-                                       size_t dim,
-                                       LNXPROC_ERROR_CALLBACK callback)
-     WARN_UNUSED;
-
     LNXPROC_ARRAY_T *lnxproc_array_free(LNXPROC_ARRAY_T *array) WARN_UNUSED;
 
-    int lnxproc_array_set(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim,
+    LNXPROC_ERROR_T lnxproc_array_set(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim,
                           char *val);
-    int lnxproc_array_set_last(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim,
+    LNXPROC_ERROR_T lnxproc_array_set_last(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim,
                                char *val);
-    char *lnxproc_array_get(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim);
+    LNXPROC_ERROR_T lnxproc_array_get(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim, char **value);
 
-    LNXPROC_ERROR_CALLBACK lnxproc_array_callback(LNXPROC_ARRAY_T *array);
-
-    typedef int (*LNXPROC_ARRAY_ITERATE_FUNC) (char *val,
+    typedef LNXPROC_ERROR_T (*LNXPROC_ARRAY_ITERATE_FUNC) (char *val,
                                                void *data, size_t idx[],
                                                size_t dim);
 
-    int lnxproc_array_iterate(LNXPROC_ARRAY_T *array,
+    LNXPROC_ERROR_T lnxproc_array_iterate(LNXPROC_ARRAY_T *array,
                               void *data, LNXPROC_ARRAY_ITERATE_FUNC func);
 
-    int lnxproc_array_print(LNXPROC_ARRAY_T *array, int allocated, void *data);
+    LNXPROC_ERROR_T lnxproc_array_print(LNXPROC_ARRAY_T *array, int allocated, void *data);
 
 #ifdef __cplusplus
 }                               // extern "C"

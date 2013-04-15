@@ -29,97 +29,128 @@
 #include "error.h"
 #include "results.h"
 
-char *
+LNXPROC_ERROR_T
 lnxproc_results_timeval_str(LNXPROC_RESULTS_T * results, char *buf,
                             size_t buflen)
 {
+    if (!results) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
+        return LNXPROC_ERROR_RESULTS_NULL;
+    }
+    if (!buf) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_BUF_NULL, "\n");
+        return LNXPROC_ERROR_RESULTS_BUF_NULL;
+    }
+    if (buflen < 1) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_BUFLEN_ZERO, "\n");
+        return LNXPROC_ERROR_RESULTS_BUFLEN_ZERO;
+    }
+
     if (results && buf) {
         snprintf(buf, buflen, "%d.%06d", (int) results->tv.tv_sec,
                  (int) results->tv.tv_usec);
     }
-    return buf;
+    return LNXPROC_OK;
 }
 
-struct timeval *
-lnxproc_results_timeval(LNXPROC_RESULTS_T * results)
+LNXPROC_ERROR_T
+lnxproc_results_timeval(LNXPROC_RESULTS_T * results, struct timeval **tv)
 {
-    LNXPROC_DEBUG("Timestamp %p\n", results);
-    struct timeval *tv = NULL;
-
-    if (results) {
-        gettimeofday(&results->tv, NULL);
-        tv = &results->tv;
-#ifdef DEBUG
-        char buf[64];
-
-        lnxproc_results_timeval_str(results, buf, sizeof buf);
-        LNXPROC_DEBUG("results %s\n", buf);
-#endif
-    }
-
-    LNXPROC_DEBUG("val %p\n", tv);
-    return tv;
-}
-
-struct timeval *
-lnxproc_results_tv(LNXPROC_RESULTS_T * results)
-{
-    LNXPROC_DEBUG("Timestamp %p\n", results);
-    struct timeval *tv = NULL;
-
-    if (results) {
-        tv = &results->tv;
-#ifdef DEBUG
-        char buf[64];
-
-        lnxproc_results_timeval_str(results, buf, sizeof buf);
-        LNXPROC_DEBUG("results %s\n", buf);
-#endif
-    }
-
-    LNXPROC_DEBUG("val %p\n", tv);
-    return tv;
-}
-
-int
-lnxproc_results_print(LNXPROC_RESULTS_T * results)
-{
-    LNXPROC_DEBUG("Timestamp %p\n", results);
-
-    if (results) {
-        char buf[64];
-
-        lnxproc_results_timeval_str(results, buf, sizeof buf);
-        printf("Timestamp %s\n", buf);
-        return LNXPROC_OK;
-    }
-
-    LNXPROC_DEBUG("WARNING: Timestamp is null\n");
-    return LNXPROC_ERROR_RESULTS_NULL;
-}
-
-LNXPROC_RESULTS_T *
-lnxproc_results_new(void)
-{
-    LNXPROC_RESULTS_T *results = calloc(1, sizeof(LNXPROC_RESULTS_T));
-
+    LNXPROC_DEBUG("Results %p\n", results);
     if (!results) {
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
-        return NULL;
+        return LNXPROC_ERROR_RESULTS_NULL;
     }
 
     gettimeofday(&results->tv, NULL);
+    if (tv) {
+        *tv = &results->tv;
+    }
+#ifdef DEBUG
+    char buf[64];
 
-    results->db = DB_OPEN();
-    if (!results->db) {
-//        LNXPROC_SET_ERROR(callback, LNXPROC_ERROR_RESULTS_DB_OPEN);
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_OPEN, "Open Db\n");
-        results = lnxproc_results_free(results);
-        return results;
+    lnxproc_results_timeval_str(results, buf, sizeof buf);
+    LNXPROC_DEBUG("Timestamp %s\n", buf);
+#endif
+
+    return LNXPROC_OK;
+}
+
+LNXPROC_ERROR_T
+lnxproc_results_tv(LNXPROC_RESULTS_T * results, struct timeval **tv)
+{
+    LNXPROC_DEBUG("Results %p\n", results);
+    if (!results) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
+        return LNXPROC_ERROR_RESULTS_NULL;
+    }
+    if (!tv) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_TV_NULL, "\n");
+        return LNXPROC_ERROR_RESULTS_TV_NULL;
+    }
+    *tv = &results->tv;
+#ifdef DEBUG
+    char buf[64];
+
+    lnxproc_results_timeval_str(results, buf, sizeof buf);
+    LNXPROC_DEBUG("Timestamp %s\n", buf);
+#endif
+
+    return LNXPROC_OK;
+}
+
+LNXPROC_ERROR_T
+lnxproc_results_print(LNXPROC_RESULTS_T * results)
+{
+    LNXPROC_DEBUG("Results %p\n", results);
+
+    if (!results) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
+        return LNXPROC_ERROR_RESULTS_NULL;
     }
 
+    char buf[64];
+
+    lnxproc_results_timeval_str(results, buf, sizeof buf);
+    printf("Results %s\n", buf);
+    return LNXPROC_OK;
+
+    LNXPROC_DEBUG("WARNING: Results is null\n");
+    return LNXPROC_ERROR_RESULTS_NULL;
+}
+
+LNXPROC_ERROR_T
+lnxproc_results_new(LNXPROC_RESULTS_T ** results)
+{
+    if (!results) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_ADDRESS_NULL, "\n");
+        return LNXPROC_ERROR_RESULTS_ADDRESS_NULL;
+    }
+    if (*results) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_ADDRESS_CONTENTS_NOT_NULL,
+                            "\n");
+        return LNXPROC_ERROR_RESULTS_ADDRESS_CONTENTS_NOT_NULL;
+    }
+
+    LNXPROC_RESULTS_T *newresults = calloc(1, sizeof(LNXPROC_RESULTS_T));
+
+    if (!newresults) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
+        return LNXPROC_ERROR_RESULTS_NULL;
+    }
+
+    gettimeofday(&newresults->tv, NULL);
+
+    newresults->db = DB_OPEN();
+    if (!newresults->db) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_OPEN, "Open Db\n");
+        newresults = lnxproc_results_free(newresults);
+        return LNXPROC_ERROR_RESULTS_DB_OPEN;
+    }
+
+    *results = newresults;
     LNXPROC_DEBUG("Successful\n");
-    return results;
+    return LNXPROC_OK;
 }
 
 LNXPROC_RESULTS_T *
@@ -135,7 +166,6 @@ lnxproc_results_free(LNXPROC_RESULTS_T * results)
             int ret = tdb_close(results->db);
 
             if (ret < 0) {
-//              LNXPROC_SET_ERROR(results->callback, LNXPROC_ERROR_RESULTS_DB_CLOSE);
                 LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_CLOSE,
                                     "Close Db\n");
             }
@@ -149,72 +179,72 @@ lnxproc_results_free(LNXPROC_RESULTS_T * results)
     return results;
 }
 
-LNXPROC_RESULTS_DATA_T
-lnxproc_results_fetch(LNXPROC_RESULTS_T * results, char *key, size_t keylen)
+LNXPROC_ERROR_T
+lnxproc_results_fetch(LNXPROC_RESULTS_T * results, char *key, size_t keylen,
+                      LNXPROC_RESULTS_DATA_T * val)
 {
-    LNXPROC_DEBUG("Db %p\n", results);
+    LNXPROC_DEBUG("Results %p\n", results);
+    if (!results) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
+        return LNXPROC_ERROR_RESULTS_NULL;
+    }
+    if (!key) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_KEY_NULL, "\n");
+        return LNXPROC_ERROR_RESULTS_KEY_NULL;
+    }
+    if (keylen < 0) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_KEYLEN_ZERO, "\n");
+        return LNXPROC_ERROR_RESULTS_KEYLEN_ZERO;
+    }
+    if (!results->db) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_NOT_OPEN,
+                            "Fetch results\n");
+        return LNXPROC_ERROR_RESULTS_DB_NOT_OPEN;
+    }
 #ifdef LNXPROC_TDB
     LNXPROC_RESULTS_DATA_T dbkey = {
-        .dsize = 0,
-        .dptr = NULL,
+        .dsize = keylen,
+        .dptr = (unsigned char *) key,
     };
-#endif
-    if (results) {
-        if (!results->db) {
-//          LNXPROC_SET_ERROR(results->callback, LNXPROC_ERROR_RESULTS_DB_NOT_OPEN);
-            LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_NOT_OPEN,
-                                "Fetch results\n");
-            return dbkey;
-        }
-#ifdef LNXPROC_TDB
-        dbkey.dsize = keylen;
-        dbkey.dptr = (unsigned char *) key;
-        LNXPROC_RESULTS_DATA_T ret = tdb_fetch(results->db, dbkey);
 
-        if (!ret.dptr) {
-//          LNXPROC_SET_ERROR(results->callback, LNXPROC_ERROR_RESULTS_DB_FETCH);
-            LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_FETCH,
-                                "Fetch results %s\n",
-                                tdb_errorstr(results->db));
-        }
-        return ret;
-#endif
+    *val = tdb_fetch(results->db, dbkey);
+    if (!val->dptr) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_FETCH,
+                            "Fetch results %s\n", tdb_errorstr(results->db));
+        return LNXPROC_ERROR_RESULTS_DB_FETCH;
     }
+#endif
 
-    LNXPROC_DEBUG("WARNING: Db is null\n");
-    return dbkey;
+    return LNXPROC_OK;
 }
 
-int
+LNXPROC_ERROR_T
 lnxproc_results_store(LNXPROC_RESULTS_T * results, LNXPROC_RESULTS_DATA_T key,
                       LNXPROC_RESULTS_DATA_T data)
 {
-    LNXPROC_DEBUG("Db %p\n", results);
-
-    if (results) {
-        if (!results->db) {
-//          LNXPROC_SET_ERROR(results->callback, LNXPROC_ERROR_RESULTS_DB_NOT_OPEN);
-            LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_NOT_OPEN,
-                                "Store results\n");
-            return LNXPROC_ERROR_RESULTS_DB_NOT_OPEN;
-        }
-#ifdef LNXPROC_TDB
-        int flag = TDB_REPLACE;
-        int ret = tdb_store(results->db, key, data, flag);
-
-        if (ret < 0) {
-//          LNXPROC_SET_ERROR(results->callback, LNXPROC_ERROR_RESULTS_DB_STORE);
-            LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_STORE,
-                                "Store results %s\n",
-                                tdb_errorstr(results->db));
-            return LNXPROC_ERROR_RESULTS_DB_STORE;
-        }
-        return LNXPROC_OK;
-#endif
+    if (!results) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
+        return LNXPROC_ERROR_RESULTS_NULL;
     }
 
-    LNXPROC_DEBUG("WARNING: Db is null\n");
-    return LNXPROC_ERROR_RESULTS_NULL;
+    LNXPROC_DEBUG("Results %p\n", results);
+
+    if (!results->db) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_NOT_OPEN,
+                            "Store results\n");
+        return LNXPROC_ERROR_RESULTS_DB_NOT_OPEN;
+    }
+#ifdef LNXPROC_TDB
+    int flag = TDB_REPLACE;
+    int ret = tdb_store(results->db, key, data, flag);
+
+    if (ret < 0) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_STORE,
+                            "Store results %s\n", tdb_errorstr(results->db));
+        return LNXPROC_ERROR_RESULTS_DB_STORE;
+    }
+#endif
+    return LNXPROC_OK;
 }
 
 /*

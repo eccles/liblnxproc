@@ -50,7 +50,9 @@ test_error(void)
 static void
 test_results(void)
 {
-    LNXPROC_RESULTS_T *results = lnxproc_results_new();
+    LNXPROC_RESULTS_T *results = NULL;
+
+    lnxproc_results_new(&results);
 
     lnxproc_results_print(results);
     results = lnxproc_results_free(results);
@@ -96,8 +98,9 @@ test_limits(void)
 
     lnxproc_limits_print(mylimits1, dim1);
 
-    LNXPROC_LIMITS_T *limits1 = lnxproc_limits_dup(lnxproc_error_print_callback,
-                                                   mylimits1, dim1);
+    LNXPROC_LIMITS_T *limits1 = NULL;
+
+    lnxproc_limits_dup(&limits1, mylimits1, dim1);
 
     int i;
 
@@ -127,8 +130,9 @@ test_limits(void)
 
     lnxproc_limits_print(mylimits2, dim2);
 
-    LNXPROC_LIMITS_T *limits2 = lnxproc_limits_dup(lnxproc_error_print_callback,
-                                                   mylimits2, dim2);
+    LNXPROC_LIMITS_T *limits2 = NULL;
+
+    lnxproc_limits_dup(&limits2, mylimits2, dim2);
 
     for (i = 0; i < dim2; i++) {
         char *c = lnxproc_limit_chr(limits2 + i, ' ');
@@ -158,8 +162,9 @@ test_limits(void)
 
     lnxproc_limits_print(mylimits3, dim3);
 
-    LNXPROC_LIMITS_T *limits3 = lnxproc_limits_dup(lnxproc_error_print_callback,
-                                                   mylimits3, dim3);
+    LNXPROC_LIMITS_T *limits3 = NULL;
+
+    lnxproc_limits_dup(&limits3, mylimits3, dim3);
 
     for (i = 0; i < dim3; i++) {
         char *c = lnxproc_limit_chr(limits3 + i, ' ');
@@ -182,15 +187,21 @@ test_limits(void)
 
 /*----------------------------------------------------------------------------*/
 #ifdef TEST_VECTOR
-static int
+static LNXPROC_ERROR_T
 myvector_print(LNXPROC_VECTOR_DATA_T * val, int recursive, void *data,
                size_t idx)
 {
     if (recursive) {
-        printf("Child %p : Index %zd\n", lnxproc_data_child(val), idx);
+        LNXPROC_VECTOR_T *child = NULL;
+
+        lnxproc_data_child(val, &child);
+        printf("Child %p : Index %zd\n", child, idx);
     }
     else {
-        printf("Val %p : Index %zd\n", lnxproc_data_value(val), idx);
+        char *value = NULL;
+
+        lnxproc_data_value(val, &value);
+        printf("Val %p : Index %zd\n", value, idx);
     }
     return 0;
 }
@@ -199,23 +210,27 @@ static void
 test_vector(void)
 {
     printf("Allocate vector for structs\n");
-    struct lnxproc_vector_t *vector =
-        lnxproc_vector_new(2, 1, lnxproc_error_print_callback);
+    LNXPROC_VECTOR_T *vector = NULL;
+
+    lnxproc_vector_new(&vector, 2, 1);
     lnxproc_vector_print(vector, 1, NULL);
 
     printf("Allocate vector 1 for strings\n");
-    struct lnxproc_vector_t *cvector1 =
-        lnxproc_vector_new(2, 0, lnxproc_error_print_callback);
+    LNXPROC_VECTOR_T *cvector1 = NULL;
+
+    lnxproc_vector_new(&cvector1, 2, 0);
     lnxproc_vector_print(cvector1, 1, NULL);
 
     printf("Allocate vector 2 for strings\n");
-    struct lnxproc_vector_t *cvector2 =
-        lnxproc_vector_new(2, 0, lnxproc_error_print_callback);
+    LNXPROC_VECTOR_T *cvector2 = NULL;
+
+    lnxproc_vector_new(&cvector2, 2, 0);
     lnxproc_vector_print(cvector2, 1, NULL);
 
     printf("Allocate vector 3 for strings\n");
-    struct lnxproc_vector_t *cvector3 =
-        lnxproc_vector_new(2, 0, lnxproc_error_print_callback);
+    LNXPROC_VECTOR_T *cvector3 = NULL;
+
+    lnxproc_vector_new(&cvector3, 2, 0);
     lnxproc_vector_print(cvector3, 1, NULL);
 
     if (vector && cvector1 && cvector2 && cvector3) {
@@ -241,14 +256,17 @@ test_vector(void)
         lnxproc_vector_print(vector, 1, NULL);
 
         printf("Get string vector from struct vector at position %d\n", 0);
-        LNXPROC_VECTOR_T *myvector = lnxproc_vector_child(vector, 0);
+        LNXPROC_VECTOR_T *myvector = NULL;
+
+        lnxproc_vector_child(vector, 0, &myvector);
 
         lnxproc_vector_print(myvector, 1, NULL);
 
         printf
             ("Get string vector from struct vector at position %d (should fail)\n",
              3);
-        myvector = lnxproc_vector_child(vector, 3);
+        myvector = NULL;
+        lnxproc_vector_child(vector, 3, &myvector);
         lnxproc_vector_print(myvector, 1, NULL);
 
         printf("Resize struct vector - add %d elements\n", 20);
@@ -339,11 +357,12 @@ test_array(void)
     LNXPROC_LIMITS_T limits0[] = {
         {3, "\n", 1},
     };
-    LNXPROC_ARRAY_T *array0 =
-        lnxproc_array_new(limits0, 0, lnxproc_error_print_callback);
+    LNXPROC_ARRAY_T *array0 = NULL;
+    lnxproc_array_new(&array0,limits0, 0);
 
     lnxproc_array_set(array0, NULL, 0, "array0");
-    char *val = lnxproc_array_get(array0, NULL, 0);
+    char *val = NULL;
+    lnxproc_array_get(array0, NULL, 0, &val);
 
     printf("Got value %1$p '%1$s'\n", val);
 
@@ -356,8 +375,8 @@ test_array(void)
     };
     size_t dim1 = sizeof(limits1) / sizeof(limits1[0]);
 
-    LNXPROC_ARRAY_T *array1 =
-        lnxproc_array_new(limits1, dim1, lnxproc_error_print_callback);
+    LNXPROC_ARRAY_T *array1 = NULL;
+    lnxproc_array_new(&array1, limits1, dim1);
 
     size_t idx1[] = { 0 };
     lnxproc_array_set(array1, idx1, 1, "array1 0");
@@ -376,8 +395,8 @@ test_array(void)
     };
     size_t dim2 = sizeof(limits2) / sizeof(limits2[0]);
 
-    LNXPROC_ARRAY_T *array2 =
-        lnxproc_array_new(limits2, dim2, lnxproc_error_print_callback);
+    LNXPROC_ARRAY_T *array2 = NULL;
+    lnxproc_array_new(&array2, limits2, dim2);
     lnxproc_array_print(array2, 1, NULL);
 
     size_t idx2[] = { 0, 0 };
@@ -398,8 +417,8 @@ test_array(void)
     };
     size_t dim3 = sizeof(limits3) / sizeof(limits3[0]);
 
-    LNXPROC_ARRAY_T *array3 =
-        lnxproc_array_new(limits3, dim3, lnxproc_error_print_callback);
+    LNXPROC_ARRAY_T *array3 = NULL;
+    lnxproc_array_new(&array3, limits3, dim3);
 
     size_t idx3[] = { 0, 0, 0 };
     lnxproc_array_set(array3, idx3, 3, "array3 0 0 0");

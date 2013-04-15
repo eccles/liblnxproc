@@ -37,7 +37,6 @@ extern "C" {
     };
 
     struct lnxproc_vector_t {
-        LNXPROC_ERROR_CALLBACK callback;
         size_t length;
         size_t size;
         int recursive;
