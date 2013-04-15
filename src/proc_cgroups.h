@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 #include "base.h"
-
+/*
     struct lnxproc_proc_cgroups_sub_t {
         int hierarchy;
         int num_cgroups;
@@ -45,8 +45,8 @@ extern "C" {
     };
 
     typedef struct lnxproc_proc_cgroups_t LNXPROC_PROC_CGROUPS_T;
-
-    LNXPROC_BASE_T *lnxproc_proc_cgroups_init(void);
+*/
+    LNXPROC_BASE_T *lnxproc_proc_cgroups_new(void);
 
 #ifdef __cplusplus
 }                               // extern "C"

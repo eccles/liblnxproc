@@ -34,78 +34,28 @@ typical contents of /proc/cgroups file::
 
 #include "base_private.h"
 #include "proc_cgroups.h"
-/*
-    struct proc_cgroups_sub_t {
-        int hierarchy;
-        int num_cgroups;
-        int enabled;
-    };
-
-    struct {
-        struct proc_cgroups_sub_t cpuset;
-        struct proc_cgroups_sub_t cpu;
-        struct proc_cgroups_sub_t cpuacct;
-        struct proc_cgroups_sub_t memory;
-        struct proc_cgroups_sub_t devices;
-        struct proc_cgroups_sub_t freezer;
-        struct proc_cgroups_sub_t blkio;
-        struct proc_cgroups_sub_t perf_event;
-    } proc_cgroups_data;
-
-*/
-
-static LNXPROC_PROC_CGROUPS_T proc_cgroups_data;
 
 static int
+proc_groups_func(char *val, void *data, size_t idx[], size_t dim)
+{
+    if (idx[0] == 0) {
+        if (idx[1] == 1) {
+        }
+    }
+
+    return LNXPROC_OK;
+}
+
+static LNXPROC_RESULTS_T *
 proc_cgroups_normalize(LNXPROC_BASE_T *base)
 {
     lnxproc_base_print(base, 1, NULL);
-
-    struct map_t {
-        size_t idx[2];
-        int *addr;
-    };
-
-    struct map_t map[] = {
-        {{0, 0}, &proc_cgroups_data.cpuset.hierarchy},
-        {{0, 1}, &proc_cgroups_data.cpuset.num_cgroups},
-        {{0, 2}, &proc_cgroups_data.cpuset.enabled},
-        {{1, 0}, &proc_cgroups_data.cpu.hierarchy},
-        {{1, 1}, &proc_cgroups_data.cpu.num_cgroups},
-        {{1, 2}, &proc_cgroups_data.cpu.enabled},
-        {{2, 0}, &proc_cgroups_data.cpuacct.hierarchy},
-        {{2, 1}, &proc_cgroups_data.cpuacct.num_cgroups},
-        {{2, 2}, &proc_cgroups_data.cpuacct.enabled},
-        {{3, 0}, &proc_cgroups_data.memory.hierarchy},
-        {{3, 1}, &proc_cgroups_data.memory.num_cgroups},
-        {{3, 2}, &proc_cgroups_data.memory.enabled},
-        {{4, 0}, &proc_cgroups_data.devices.hierarchy},
-        {{4, 1}, &proc_cgroups_data.devices.num_cgroups},
-        {{4, 2}, &proc_cgroups_data.devices.enabled},
-        {{5, 0}, &proc_cgroups_data.freezer.hierarchy},
-        {{5, 1}, &proc_cgroups_data.freezer.num_cgroups},
-        {{5, 2}, &proc_cgroups_data.freezer.enabled},
-        {{6, 0}, &proc_cgroups_data.blkio.hierarchy},
-        {{6, 1}, &proc_cgroups_data.blkio.num_cgroups},
-        {{6, 2}, &proc_cgroups_data.blkio.enabled},
-        {{7, 0}, &proc_cgroups_data.perf_event.hierarchy},
-        {{7, 1}, &proc_cgroups_data.perf_event.num_cgroups},
-        {{7, 2}, &proc_cgroups_data.perf_event.enabled},
-    };
-
-    size_t dims = sizeof(map) / sizeof(map[0]);
-
-    int i;
-
-    for (i = 0; i < dims; i++) {
-        *map[i].addr = atoi(lnxproc_array_get(base->array, map[i].idx, 2));
-    }
-
-    return 0;
+    lnxproc_array_iterate(base->array, NULL, proc_groups_func);
+    return base->results;
 }
 
 LNXPROC_BASE_T *
-lnxproc_proc_cgroups_init(void)
+lnxproc_proc_cgroups_new(void)
 {
 
     LNXPROC_LIMITS_T limits[] = {
@@ -115,12 +65,11 @@ lnxproc_proc_cgroups_init(void)
 
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
-    return lnxproc_base_init("/proc/cgroups",
-                             NULL,
-                             proc_cgroups_normalize,
-                             NULL,
-                             lnxproc_error_print_callback,
-                             256, limits, dim, &proc_cgroups_data);
+    return lnxproc_base_new("/proc/cgroups",
+                            NULL,
+                            proc_cgroups_normalize,
+                            NULL,
+                            lnxproc_error_print_callback, 256, limits, dim);
 }
 
 /*

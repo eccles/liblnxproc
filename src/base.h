@@ -28,14 +28,11 @@ extern "C" {
 #include <stddef.h>
 #include "error.h"
 #include "limits.h"
-#include "timestamp.h"
+#include "results.h"
 #include "array.h"
 
     struct lnxproc_base_t;
     typedef struct lnxproc_base_t LNXPROC_BASE_T;
-
-    typedef int (*LNXPROC_BASE_METHOD) (LNXPROC_BASE_T *base);
-    typedef int (*LNXPROC_NORMALIZE_METHOD) (LNXPROC_BASE_T *base);
 
     LNXPROC_ARRAY_T *lnxproc_base_array(LNXPROC_BASE_T *base);
 
@@ -43,20 +40,21 @@ extern "C" {
     char *lnxproc_base_lines(LNXPROC_BASE_T *base);
     LNXPROC_ERROR_CALLBACK lnxproc_base_callback(LNXPROC_BASE_T *base);
 
-    int lnxproc_base_rawread(LNXPROC_BASE_T *base);
-    int lnxproc_base_read(LNXPROC_BASE_T *base);
-    int lnxproc_base_normalize(LNXPROC_BASE_T *base);
+    typedef LNXPROC_RESULTS_T *(*LNXPROC_BASE_METHOD) (LNXPROC_BASE_T *base);
+
+    LNXPROC_RESULTS_T *lnxproc_base_rawread(LNXPROC_BASE_T *base);
+    LNXPROC_RESULTS_T *lnxproc_base_read(LNXPROC_BASE_T *base);
+    LNXPROC_RESULTS_T *lnxproc_base_normalize(LNXPROC_BASE_T *base);
 
     int lnxproc_base_nbytes(LNXPROC_BASE_T *base);
 
-    LNXPROC_BASE_T *lnxproc_base_init(const char *filename,
-                                      LNXPROC_BASE_METHOD rawread,
-                                      LNXPROC_NORMALIZE_METHOD normalize,
-                                      LNXPROC_BASE_METHOD read,
-                                      LNXPROC_ERROR_CALLBACK callback,
-                                      size_t buflen,
-                                      LNXPROC_LIMITS_T limits[],
-                                      size_t dim, void *data);
+    LNXPROC_BASE_T *lnxproc_base_new(const char *filename,
+                                     LNXPROC_BASE_METHOD rawread,
+                                     LNXPROC_BASE_METHOD normalize,
+                                     LNXPROC_BASE_METHOD read,
+                                     LNXPROC_ERROR_CALLBACK callback,
+                                     size_t buflen,
+                                     LNXPROC_LIMITS_T limits[], size_t dim);
 
 #ifndef WARN_UNUSED
 #define WARN_UNUSED __attribute__((warn_unused_result))

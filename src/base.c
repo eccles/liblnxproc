@@ -29,7 +29,7 @@
 
 #include "error.h"
 #include "limits.h"
-#include "timestamp_private.h"
+#include "results.h"
 #include "array_private.h"
 #include "base_private.h"
 
@@ -106,7 +106,7 @@ lnxproc_base_print(LNXPROC_BASE_T *base, int allocated, void *data)
         printf("Lines %p\n", base->lines);
         printf("Buflen %zd\n", base->buflen);
         printf("Nbytes %d\n", base->nbytes);
-        lnxproc_timestamp_print(base->timestamp);
+        lnxproc_results_print(base->results);
         return lnxproc_array_print(base->array, allocated, data);
     }
 
@@ -128,17 +128,17 @@ lnxproc_base_callback(LNXPROC_BASE_T *base)
     return callback;
 }
 
-int
+LNXPROC_RESULTS_T *
 lnxproc_base_rawread(LNXPROC_BASE_T *base)
 {
     LNXPROC_DEBUG("Base %p\n", base);
 
     if (!base) {
         LNXPROC_SET_ERROR(base->callback, LNXPROC_ERROR_BASE_NULL);
-        return LNXPROC_ERROR_BASE_NULL;
+        return NULL;
     }
 
-    lnxproc_timestamp_timeval(base->timestamp);
+    lnxproc_results_timeval(base->results);
     if (base->rawread) {
         LNXPROC_DEBUG("Execute specified rawread method %p\n", base->rawread);
         return base->rawread(base);
@@ -152,7 +152,7 @@ lnxproc_base_rawread(LNXPROC_BASE_T *base)
         if (fd < 0) {
             LNXPROC_SYSTEM_ERROR(base->callback, errno);
             LNXPROC_ERROR_DEBUG(-errno, "Open %s\n", base->filename);
-            return -errno;
+            return NULL;
         }
 
         LNXPROC_DEBUG("Read %s\n", base->filename);
@@ -161,7 +161,7 @@ lnxproc_base_rawread(LNXPROC_BASE_T *base)
         if (base->nbytes < 0) {
             LNXPROC_SYSTEM_ERROR(base->callback, errno);
             LNXPROC_ERROR_DEBUG(-errno, "Open %s\n", base->filename);
-            return -errno;
+            return NULL;
         }
 
         LNXPROC_DEBUG("Nbytes %d read\n", base->nbytes);
@@ -175,18 +175,18 @@ lnxproc_base_rawread(LNXPROC_BASE_T *base)
     }
 
     LNXPROC_DEBUG("Successful\n");
-    return LNXPROC_OK;
+    return base->results;
 
 }
 
-int
+LNXPROC_RESULTS_T *
 lnxproc_base_normalize(LNXPROC_BASE_T *base)
 {
     LNXPROC_DEBUG("Base %p\n", base);
 
     if (!base) {
         LNXPROC_SET_ERROR(base->callback, LNXPROC_ERROR_BASE_NULL);
-        return LNXPROC_ERROR_BASE_NULL;
+        return NULL;
     }
 
     if (base->normalize) {
@@ -271,7 +271,9 @@ base_map(LNXPROC_BASE_T *base)
             }
             free(idx);
         }
+/*
         else {
+
             base->data = c;
             while (c < d) {
                 if (strchr("\n", *c)) {
@@ -281,19 +283,20 @@ base_map(LNXPROC_BASE_T *base)
                 c++;
             }
         }
+*/
     }
 
     return LNXPROC_OK;
 }
 
-int
+LNXPROC_RESULTS_T *
 lnxproc_base_read(LNXPROC_BASE_T *base)
 {
     LNXPROC_DEBUG("Base %p\n", base);
 
     if (!base) {
         LNXPROC_SET_ERROR(base->callback, LNXPROC_ERROR_BASE_NULL);
-        return LNXPROC_ERROR_BASE_NULL;
+        return NULL;
     }
 
     if (base->read) {
@@ -304,40 +307,33 @@ lnxproc_base_read(LNXPROC_BASE_T *base)
 
     else {
         LNXPROC_DEBUG("Execute default read method\n");
-        int state = lnxproc_base_rawread(base);
+        LNXPROC_RESULTS_T *res = lnxproc_base_rawread(base);
 
-        if (state) {
-            LNXPROC_ERROR_DEBUG(state, "Rawread\n");
-            return state;
+        if (!res) {
+            return res;
         }
         base_map(base);
         if (base->normalize) {
             LNXPROC_DEBUG("Execute default normalize method\n");
-            state = base->normalize(base);
-            if (state) {
-                LNXPROC_ERROR_DEBUG(state, "Normalize\n");
-                return state;
-            }
+            return base->normalize(base);
         }
     }
 
-    LNXPROC_DEBUG("Successful\n");
-    return LNXPROC_OK;
+    return base->results;
 }
 
 LNXPROC_BASE_T *
-lnxproc_base_init(const char *filename,
-                  LNXPROC_BASE_METHOD rawread,
-                  LNXPROC_NORMALIZE_METHOD normalize,
-                  LNXPROC_BASE_METHOD read,
-                  LNXPROC_ERROR_CALLBACK callback,
-                  size_t buflen,
-                  LNXPROC_LIMITS_T limits[], size_t dim, void *data)
+lnxproc_base_new(const char *filename,
+                 LNXPROC_BASE_METHOD rawread,
+                 LNXPROC_BASE_METHOD normalize,
+                 LNXPROC_BASE_METHOD read,
+                 LNXPROC_ERROR_CALLBACK callback,
+                 size_t buflen, LNXPROC_LIMITS_T limits[], size_t dim)
 {
     LNXPROC_DEBUG("filename %1$p '%1$s'\n", filename);
     LNXPROC_DEBUG("rawread %p, normalize %p, read %p, callback %p\n", rawread,
                   normalize, read, callback);
-    LNXPROC_DEBUG("buflen %zd Data %p\n", buflen, data);
+    LNXPROC_DEBUG("buflen %zd\n", buflen);
     LNXPROC_DEBUG("limits %p dim %d\n", limits, dim);
 
     LNXPROC_BASE_T *base = calloc(1, sizeof(LNXPROC_BASE_T));
@@ -364,14 +360,16 @@ lnxproc_base_init(const char *filename,
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_ARRAY, "Malloc array\n");
         return lnxproc_base_free(base);
     }
-    base->timestamp = lnxproc_timestamp_init(callback);
-    if (!base->timestamp) {
-        LNXPROC_SET_ERROR(callback, LNXPROC_ERROR_BASE_MALLOC_TIMESTAMP);
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_TIMESTAMP,
-                            "Malloc timestamp\n");
+
+    base->results = lnxproc_results_new();
+    if (!base->results) {
+        LNXPROC_SET_ERROR(callback, LNXPROC_ERROR_BASE_MALLOC_RESULTS);
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_RESULTS,
+                            "Malloc results\n");
         return lnxproc_base_free(base);
     }
 
+    base->prev = NULL;
     base->rawread = rawread;
     base->normalize = normalize;
     base->read = read;
@@ -379,7 +377,6 @@ lnxproc_base_init(const char *filename,
     base->filename = filename;
     base->buflen = buflen;
     base->nbytes = 0;
-    base->data = data;
     lnxproc_base_print(base, 1, NULL);
     LNXPROC_DEBUG("Successful\n");
     return base;
@@ -391,6 +388,10 @@ lnxproc_base_free(LNXPROC_BASE_T *base)
     LNXPROC_DEBUG("Base %p\n", base);
 
     if (base) {
+        if (base->results) {
+            LNXPROC_DEBUG("Free results \n");
+            base->results = lnxproc_results_free(base->results);
+        }
         if (base->array) {
             LNXPROC_DEBUG("Free Array \n");
             base->array = (void *) lnxproc_array_free(base->array);
@@ -399,11 +400,6 @@ lnxproc_base_free(LNXPROC_BASE_T *base)
             LNXPROC_DEBUG("Free Base buffer\n");
             free(base->lines);
             base->lines = NULL;
-        }
-        if (base->timestamp) {
-            LNXPROC_DEBUG("Free Timestamp\n");
-            free(base->timestamp);
-            base->timestamp = NULL;
         }
 
         LNXPROC_DEBUG("Free Base\n");

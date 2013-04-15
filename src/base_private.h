@@ -28,22 +28,22 @@ extern "C" {
 #include <stddef.h>
 
 #include "error.h"
-#include "timestamp_private.h"
+#include "results.h"
 #include "array_private.h"
 #include "base.h"
 
     struct lnxproc_base_t {
         LNXPROC_BASE_METHOD rawread;
-        LNXPROC_NORMALIZE_METHOD normalize;
+        LNXPROC_BASE_METHOD normalize;
         LNXPROC_BASE_METHOD read;
         LNXPROC_ERROR_CALLBACK callback;
-        LNXPROC_TIMESTAMP_T *timestamp;
         const char *filename;
         char *lines;
         size_t buflen;
         int nbytes;
         LNXPROC_ARRAY_T *array;
-        void *data;
+        LNXPROC_RESULTS_T *results;
+        LNXPROC_RESULTS_T *prev;
     };
 
 #ifdef __cplusplus

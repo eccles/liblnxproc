@@ -27,10 +27,10 @@ extern "C" {
 
 #include "error.h"
 #include "vector.h"
-#include "array.h"
-#include "db.h"
-#include "base.h"
 #include "limits.h"
+#include "array.h"
+#include "base.h"
+#include "results.h"
 #include "proc_cgroups.h"
 
 #ifdef __cplusplus

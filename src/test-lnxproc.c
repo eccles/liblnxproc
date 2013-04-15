@@ -23,12 +23,12 @@ This file is part of liblnxproc.
 #include <string.h>
 #include "lnxproc.h"
 
-//#define TEST_ERROR 1
-//#define TEST_DB 1
-//#define TEST_VECTOR 1
-//#define TEST_LIMITS 1
+#define TEST_ERROR 1
+#define TEST_RESULTS 1
+#define TEST_VECTOR 1
+#define TEST_LIMITS 1
 #define TEST_ARRAY 1
-//#define TEST_PROC_CGROUPS 1
+#define TEST_PROC_CGROUPS 1
 
 /*----------------------------------------------------------------------------*/
 #ifdef TEST_ERROR
@@ -46,14 +46,16 @@ test_error(void)
 #endif
 
 /*----------------------------------------------------------------------------*/
-#ifdef TEST_DB
+#ifdef TEST_RESULTS
 static void
-test_db(void)
+test_results(void)
 {
-    LNXPROC_DB_T *db = lnxproc_db_init(NULL, lnxproc_error_print_callback);
+    LNXPROC_RESULTS_T *results = lnxproc_results_new();
 
-    lnxproc_db_print(db);
+    lnxproc_results_print(results);
+    results = lnxproc_results_free(results);
 
+/*
     LNXPROC_DB_DATA_T key = {
         .dptr = (unsigned char *) "firstkey",
         .dsize = sizeof "firstkey",
@@ -78,6 +80,7 @@ test_db(void)
 
     free(data1.dptr);
     db = lnxproc_db_free(db);
+*/
 }
 #endif
 /*----------------------------------------------------------------------------*/
@@ -419,14 +422,11 @@ static void
 execute_base(LNXPROC_BASE_T *base)
 {
     if (base) {
-        int state = lnxproc_base_read(base);
+        LNXPROC_RESULTS_T *res = lnxproc_base_read(base);
 
-        if (state < 0) {
-            char errbuf[128];
-
-            strerror_r(state, errbuf, sizeof(errbuf));
-            printf("Failure reading proc_cgroups %s : %s\n",
-                   lnxproc_base_filename(base), errbuf);
+        if (!res) {
+            printf("Failure reading proc_cgroups %s\n",
+                   lnxproc_base_filename(base));
         }
         else {
             printf("Proccgroups: %s\n", lnxproc_base_filename(base));
@@ -440,7 +440,7 @@ execute_base(LNXPROC_BASE_T *base)
 static void
 test_proc_cgroups(void)
 {
-    LNXPROC_BASE_T *proc_cgroups = lnxproc_proc_cgroups_init();
+    LNXPROC_BASE_T *proc_cgroups = lnxproc_proc_cgroups_new();
 
     if (proc_cgroups) {
         execute_base(proc_cgroups);
@@ -457,8 +457,8 @@ main(int argc, char *argv[])
 #ifdef TEST_ERROR
     test_error();
 #endif
-#ifdef TEST_DB
-    test_db();
+#ifdef TEST_RESULTS
+    test_results();
 #endif
 #ifdef TEST_VECTOR
     test_vector();

@@ -25,25 +25,32 @@
 extern "C" {
 #endif
 
-#include <sys/types.h>
-#include <tdb.h>
 #include "error.h"
 
-    struct lnxproc_db_t;
-    typedef struct lnxproc_db_t LNXPROC_DB_T;
+#define LNXPROC_TDB 1
 
-    typedef TDB_DATA LNXPROC_DB_DATA_T;
+#ifdef LNXPROC_TDB
 
-    const char *lnxproc_db_filename(LNXPROC_DB_T * db);
-    int lnxproc_db_print(LNXPROC_DB_T * db);
-    LNXPROC_DB_T *lnxproc_db_init(const char *filename,
-                                  LNXPROC_ERROR_CALLBACK callback);
-    LNXPROC_DB_T *lnxproc_db_free(LNXPROC_DB_T * db);
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <tdb.h>
 
-    LNXPROC_DB_DATA_T lnxproc_db_fetch(LNXPROC_DB_T * db, char *key,
-                                       size_t keylen);
-    int lnxproc_db_store(LNXPROC_DB_T * db, LNXPROC_DB_DATA_T key,
-                         LNXPROC_DB_DATA_T data);
+    typedef TDB_CONTEXT LNXPROC_RESULTS_FILE_T;
+    typedef TDB_DATA LNXPROC_RESULTS_DATA_T;
+
+#define DB_OPEN()  ({\
+    int hash_size = 0;\
+    int tdb_flags = TDB_INTERNAL;\
+    int open_flags = O_RDWR;\
+    mode_t mode = 0;\
+\
+    LNXPROC_RESULTS_FILE_T *db = tdb_open(NULL, hash_size, tdb_flags, open_flags, mode);\
+\
+    db;\
+})\
+
+#endif                          // LNXPROC_TDB
 
 #ifdef __cplusplus
 }                               // extern "C"
