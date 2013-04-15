@@ -65,11 +65,12 @@ lnxproc_proc_cgroups_new(void)
 
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
-    return lnxproc_base_new("/proc/cgroups",
-                            NULL,
-                            proc_cgroups_normalize,
-                            NULL,
-                            256, limits, dim);
+    LNXPROC_BASE_T *base = NULL;
+
+    lnxproc_base_new(&base,
+                     "/proc/cgroups",
+                     NULL, proc_cgroups_normalize, NULL, 256, limits, dim);
+    return base;
 }
 
 /*

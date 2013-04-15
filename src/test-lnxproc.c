@@ -358,10 +358,12 @@ test_array(void)
         {3, "\n", 1},
     };
     LNXPROC_ARRAY_T *array0 = NULL;
-    lnxproc_array_new(&array0,limits0, 0);
+
+    lnxproc_array_new(&array0, limits0, 0);
 
     lnxproc_array_set(array0, NULL, 0, "array0");
     char *val = NULL;
+
     lnxproc_array_get(array0, NULL, 0, &val);
 
     printf("Got value %1$p '%1$s'\n", val);
@@ -376,6 +378,7 @@ test_array(void)
     size_t dim1 = sizeof(limits1) / sizeof(limits1[0]);
 
     LNXPROC_ARRAY_T *array1 = NULL;
+
     lnxproc_array_new(&array1, limits1, dim1);
 
     size_t idx1[] = { 0 };
@@ -396,6 +399,7 @@ test_array(void)
     size_t dim2 = sizeof(limits2) / sizeof(limits2[0]);
 
     LNXPROC_ARRAY_T *array2 = NULL;
+
     lnxproc_array_new(&array2, limits2, dim2);
     lnxproc_array_print(array2, 1, NULL);
 
@@ -418,6 +422,7 @@ test_array(void)
     size_t dim3 = sizeof(limits3) / sizeof(limits3[0]);
 
     LNXPROC_ARRAY_T *array3 = NULL;
+
     lnxproc_array_new(&array3, limits3, dim3);
 
     size_t idx3[] = { 0, 0, 0 };
@@ -444,14 +449,21 @@ execute_base(LNXPROC_BASE_T *base)
         LNXPROC_RESULTS_T *res = lnxproc_base_read(base);
 
         if (!res) {
-            printf("Failure reading proc_cgroups %s\n",
-                   lnxproc_base_filename(base));
+            printf("Failure reading proc_cgroups\n");
         }
         else {
-            printf("Proccgroups: %s\n", lnxproc_base_filename(base));
-            printf("Proccgroups: %d bytes\n", lnxproc_base_nbytes(base));
-            printf("Proccgroups: %1$d %2$*1$s\n",
-                   lnxproc_base_nbytes(base), lnxproc_base_lines(base));
+            const char *filename = NULL;
+
+            lnxproc_base_filename(base, &filename);
+            printf("Proccgroups: %s\n", filename);
+            int nbytes = 0;
+
+            lnxproc_base_nbytes(base, &nbytes);
+            printf("Proccgroups: %d bytes\n", nbytes);
+            char *lines = NULL;
+
+            lnxproc_base_lines(base, &lines);
+            printf("Proccgroups: %1$d %2$*1$s\n", nbytes, lines);
         }
     }
 }

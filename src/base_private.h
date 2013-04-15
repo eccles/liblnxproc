@@ -27,7 +27,6 @@ extern "C" {
 
 #include <stddef.h>
 
-#include "error.h"
 #include "results.h"
 #include "array_private.h"
 #include "base.h"
