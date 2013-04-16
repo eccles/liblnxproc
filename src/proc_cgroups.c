@@ -38,24 +38,19 @@ typical contents of /proc/cgroups file::
 static LNXPROC_ERROR_T
 proc_groups_func(char *val, void *data, size_t idx[], size_t dim)
 {
-    if (idx[0] == 0) {
-        if (idx[1] == 1) {
-        }
-    }
-
     return LNXPROC_OK;
 }
 
-static LNXPROC_RESULTS_T *
+static LNXPROC_ERROR_T
 proc_cgroups_normalize(LNXPROC_BASE_T *base)
 {
     lnxproc_base_print(base, 1, NULL);
     lnxproc_array_iterate(base->array, NULL, proc_groups_func);
-    return base->results;
+    return 0;
 }
 
-LNXPROC_BASE_T *
-lnxproc_proc_cgroups_new(void)
+LNXPROC_ERROR_T
+lnxproc_proc_cgroups_new(LNXPROC_BASE_T **base)
 {
 
     LNXPROC_LIMITS_T limits[] = {
@@ -65,12 +60,10 @@ lnxproc_proc_cgroups_new(void)
 
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
-    LNXPROC_BASE_T *base = NULL;
-
-    lnxproc_base_new(&base,
-                     "/proc/cgroups",
-                     NULL, proc_cgroups_normalize, NULL, 256, limits, dim);
-    return base;
+    return lnxproc_base_new(base,
+                            "/proc/cgroups",
+                            NULL, proc_cgroups_normalize, NULL, 256, limits,
+                            dim);
 }
 
 /*

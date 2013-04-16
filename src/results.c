@@ -84,10 +84,12 @@ lnxproc_results_tv(LNXPROC_RESULTS_T * results, struct timeval **tv)
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_NULL;
     }
+
     if (!tv) {
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_TV_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_TV_NULL;
     }
+
     *tv = &results->tv;
 #ifdef DEBUG
     char buf[64];
@@ -115,8 +117,6 @@ lnxproc_results_print(LNXPROC_RESULTS_T * results)
     printf("Results %s\n", buf);
     return LNXPROC_OK;
 
-    LNXPROC_DEBUG("WARNING: Results is null\n");
-    return LNXPROC_ERROR_RESULTS_NULL;
 }
 
 LNXPROC_ERROR_T
@@ -126,6 +126,7 @@ lnxproc_results_new(LNXPROC_RESULTS_T ** results)
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_ADDRESS_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_ADDRESS_NULL;
     }
+
     if (*results) {
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_ADDRESS_CONTENTS_NOT_NULL,
                             "\n");
@@ -144,7 +145,7 @@ lnxproc_results_new(LNXPROC_RESULTS_T ** results)
     newresults->db = DB_OPEN();
     if (!newresults->db) {
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_OPEN, "Open Db\n");
-        newresults = lnxproc_results_free(newresults);
+        LNXPROC_RESULTS_FREE(newresults);
         return LNXPROC_ERROR_RESULTS_DB_OPEN;
     }
 
@@ -184,18 +185,27 @@ lnxproc_results_fetch(LNXPROC_RESULTS_T * results, char *key, size_t keylen,
                       LNXPROC_RESULTS_DATA_T * val)
 {
     LNXPROC_DEBUG("Results %p\n", results);
+
     if (!results) {
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_NULL;
     }
+
     if (!key) {
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_KEY_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_KEY_NULL;
     }
-    if (keylen < 0) {
+
+    if (keylen < 1) {
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_KEYLEN_ZERO, "\n");
         return LNXPROC_ERROR_RESULTS_KEYLEN_ZERO;
     }
+
+    if (!val) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_VAL_ADDRESS_NULL, "\n");
+        return LNXPROC_ERROR_RESULTS_VAL_ADDRESS_NULL;
+    }
+
     if (!results->db) {
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_NOT_OPEN,
                             "Fetch results\n");

@@ -56,6 +56,7 @@ LNXPROC_ERROR_T
 lnxproc_limits_print(LNXPROC_LIMITS_T limits[], int dim)
 {
     if (!limits) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_NULL, "\n");
         return LNXPROC_ERROR_LIMITS_NULL;
     }
 
@@ -120,7 +121,9 @@ LNXPROC_ERROR_T
 lnxproc_limit_print(LNXPROC_LIMITS_T * limit, char *buf, size_t buflen)
 {
     buf[0] = '\0';
+
     if (!limit) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_NULL, "\n");
         return LNXPROC_ERROR_LIMIT_NULL;
     }
 
@@ -139,26 +142,32 @@ lnxproc_limits_dup(LNXPROC_LIMITS_T ** newlimits,
                    LNXPROC_LIMITS_T limits[], size_t dim)
 {
     if (!newlimits) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_ADDRESS_NULL, "\n");
         return LNXPROC_ERROR_LIMITS_ADDRESS_NULL;
     }
     if (*newlimits) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_ADDRESS_CONTENTS_NOT_NULL,
+                            "\n");
         return LNXPROC_ERROR_LIMITS_ADDRESS_CONTENTS_NOT_NULL;
     }
     if (dim < 1) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_ILLEGAL_DIMENSION, "\n");
         return LNXPROC_ERROR_LIMITS_ILLEGAL_DIMENSION;
     }
     if (!limits) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_NULL, "\n");
         return LNXPROC_ERROR_LIMITS_NULL;
     }
 
     LNXPROC_DEBUG("Malloc limits %zd\n", dim);
-    LNXPROC_LIMITS_T *nlimits = malloc(dim * sizeof(LNXPROC_LIMITS_T));
+    LNXPROC_LIMITS_T *nlimits = calloc(dim, sizeof(LNXPROC_LIMITS_T));
 
     if (!nlimits) {
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_MALLOC, "Malloc limits\n");
         return LNXPROC_ERROR_LIMITS_MALLOC;
     }
-    LNXPROC_DEBUG("Malloc limits %p\n", newlimits);
+
+    LNXPROC_DEBUG("Malloc limits %p\n", nlimits);
     int i;
 
     for (i = 0; i < dim; i++) {
@@ -190,8 +199,8 @@ lnxproc_limits_dup(LNXPROC_LIMITS_T ** newlimits,
         lnxproc_limit_print(nlimits + i, buf, sizeof buf);
         LNXPROC_DEBUG("Malloc new limit %zd :%s:\n", i, buf);
 #endif
-        *newlimits = nlimits;
     }
+    *newlimits = nlimits;
     return LNXPROC_OK;
 }
 

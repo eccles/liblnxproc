@@ -34,7 +34,8 @@ extern "C" {
     struct lnxproc_base_t;
     typedef struct lnxproc_base_t LNXPROC_BASE_T;
 
-    typedef LNXPROC_RESULTS_T *(*LNXPROC_BASE_METHOD) (LNXPROC_BASE_T *base);
+    typedef LNXPROC_ERROR_T (*LNXPROC_BASE_METHOD) (LNXPROC_BASE_T *base);
+    //typedef LNXPROC_RESULTS_T *(*LNXPROC_BASE_METHOD) (LNXPROC_BASE_T *base);
 
     LNXPROC_ERROR_T lnxproc_base_new(LNXPROC_BASE_T **base,
                                      const char *filename,
@@ -61,9 +62,9 @@ extern "C" {
                                           const char **filename);
     LNXPROC_ERROR_T lnxproc_base_lines(LNXPROC_BASE_T *base, char **lines);
 
-    LNXPROC_RESULTS_T *lnxproc_base_rawread(LNXPROC_BASE_T *base);
-    LNXPROC_RESULTS_T *lnxproc_base_read(LNXPROC_BASE_T *base);
-    LNXPROC_RESULTS_T *lnxproc_base_normalize(LNXPROC_BASE_T *base);
+    LNXPROC_ERROR_T lnxproc_base_rawread(LNXPROC_BASE_T *base);
+    LNXPROC_ERROR_T lnxproc_base_read(LNXPROC_BASE_T *base);
+    LNXPROC_ERROR_T lnxproc_base_normalize(LNXPROC_BASE_T *base);
 
     LNXPROC_ERROR_T lnxproc_base_nbytes(LNXPROC_BASE_T *base, int *nbytes);
 

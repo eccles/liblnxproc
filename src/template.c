@@ -64,7 +64,6 @@ lnxproc_template_init(const char *filename, LNXPROC_ERROR_CALLBACK callback)
     LNXPROC_TEMPLATE_T *temp = malloc(sizeof(LNXPROC_TEMPLATE_T));
 
     if (!temp) {
-        LNXPROC_SET_ERROR(callback, LNXPROC_ERROR_TEMPLATE_MALLOC);
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_TEMPLATE_MALLOC, "Malloc temp\n");
         return temp;
     }

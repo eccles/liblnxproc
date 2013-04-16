@@ -35,6 +35,7 @@
 
 static const char *errstr[] = {
     "No error",
+    "Error enum and string have mismatched sizes",
     "System error",
     "Fail to malloc array header",
     "Fail to malloc array data",
@@ -44,6 +45,9 @@ static const char *errstr[] = {
     "Array vector is null",
     "Fail to malloc array vector",
     "Fail to malloc array saved",
+    "Array saved is null",
+    "Array address argument is null",
+    "Array address contents is not null",
     "Array limits is null",
     "Array dimension out of range",
     "Base arg is null",
@@ -75,16 +79,17 @@ static const char *errstr[] = {
     "Fail to malloc results",
     "Results key is null",
     "Results keylength is less than 1",
+    "Results value address is null",
     "Fail to malloc vector header",
     "Fail to malloc vector data",
 /*43*/ "Vector arg is null",
     "Fail to realloc vector data",
     "Vector index out of range",
+    "Vector data is null",
     "Vector children is null",
     "Vector values is null",
     "Vector address is null",
     "Vector address contents is not null",
-    "Error enum and string have mismatched sizes",
 };
 
 #define ERRSTR_SIZE sizeof(errstr)/sizeof(errstr[0])
@@ -121,16 +126,6 @@ lnxproc_strerror(LNXPROC_ERROR_T err, char *buf, size_t buflen)
 }
 
 void
-lnxproc_set_error(LNXPROC_ERROR_CALLBACK callback,
-                  const char *filename,
-                  int lineno, const char *funcname, LNXPROC_ERROR_T err)
-{
-    if (callback) {
-        callback(filename, lineno, funcname, err);
-    }
-}
-
-void
 lnxproc_error_print_callback(const char *filename,
                              int lineno,
                              const char *funcname, LNXPROC_ERROR_T err)
@@ -155,7 +150,6 @@ lnxproc_error_print_callback(const char *filename,
     }
 }
 
-#ifdef DEBUG
 int
 lnxproc_error_check(void)
 {
@@ -168,7 +162,6 @@ lnxproc_error_check(void)
     }
     return LNXPROC_OK;
 }
-#endif
 
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab

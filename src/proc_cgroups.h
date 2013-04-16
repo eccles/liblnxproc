@@ -24,6 +24,7 @@
 extern "C" {
 #endif
 
+#include "error.h"
 #include "base.h"
 /*
     struct lnxproc_proc_cgroups_sub_t {
@@ -46,7 +47,7 @@ extern "C" {
 
     typedef struct lnxproc_proc_cgroups_t LNXPROC_PROC_CGROUPS_T;
 */
-    LNXPROC_BASE_T *lnxproc_proc_cgroups_new(void);
+    LNXPROC_ERROR_T lnxproc_proc_cgroups_new(LNXPROC_BASE_T **base);
 
 #ifdef __cplusplus
 }                               // extern "C"
