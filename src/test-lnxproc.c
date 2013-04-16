@@ -55,7 +55,7 @@ test_results(void)
     lnxproc_results_new(&results);
 
     lnxproc_results_print(results);
-    results = lnxproc_results_free(results);
+    LNXPROC_RESULTS_FREE(results);
 
 /*
     LNXPROC_DB_DATA_T key = {
@@ -117,7 +117,7 @@ test_limits(void)
     }
     lnxproc_limits_print(limits1, dim1);
 
-    limits1 = lnxproc_limits_free(limits1, dim1);
+    LNXPROC_LIMITS_FREE(limits1, dim1);
 
     printf("\nLimits 2\n");
     LNXPROC_LIMITS_T mylimits2[] = {
@@ -147,7 +147,7 @@ test_limits(void)
     }
     lnxproc_limits_print(limits2, dim2);
 
-    limits2 = lnxproc_limits_free(limits2, dim2);
+    LNXPROC_LIMITS_FREE(limits2, dim2);
 
     printf("\nLimits 3\n");
     LNXPROC_LIMITS_T mylimits3[] = {
@@ -179,7 +179,7 @@ test_limits(void)
     }
     lnxproc_limits_print(limits3, dim3);
 
-    limits3 = lnxproc_limits_free(limits3, dim3);
+    LNXPROC_LIMITS_FREE(limits3, dim3);
 
 }
 
@@ -341,7 +341,7 @@ test_vector(void)
         lnxproc_vector_iterate(vector, NULL, 1, 3, myvector_print);
         printf("\n");
 
-        vector = lnxproc_vector_free(vector);
+        LNXPROC_VECTOR_FREE(vector);
     }
 
 }
@@ -369,7 +369,7 @@ test_array(void)
     printf("Got value %1$p '%1$s'\n", val);
 
     lnxproc_array_print(array0, 1, NULL);
-    array0 = lnxproc_array_free(array0);
+    LNXPROC_ARRAY_FREE(array0);
 
     printf("Array 1\n");
     LNXPROC_LIMITS_T limits1[] = {
@@ -389,7 +389,7 @@ test_array(void)
     lnxproc_array_set_last(array1, idx12, 1, "array1 1");
 
     lnxproc_array_print(array1, 1, NULL);
-    array1 = lnxproc_array_free(array1);
+    LNXPROC_ARRAY_FREE(array1);
 
     printf("Array 2\n");
     LNXPROC_LIMITS_T limits2[] = {
@@ -411,7 +411,7 @@ test_array(void)
     lnxproc_array_set_last(array2, idx21, 2, "array2 1 1");
     lnxproc_array_print(array2, 1, NULL);
 
-    array2 = lnxproc_array_free(array2);
+    LNXPROC_ARRAY_FREE(array2);
 
     printf("Array 3\n");
     LNXPROC_LIMITS_T limits3[] = {
@@ -433,7 +433,7 @@ test_array(void)
     lnxproc_array_set_last(array3, idx32, 3, "array3 1 2 3");
 
     lnxproc_array_print(array3, 1, NULL);
-    array3 = lnxproc_array_free(array3);
+    LNXPROC_ARRAY_FREE(array3);
 
 }
 
@@ -476,7 +476,7 @@ test_proc_cgroups(void)
     if (proc_cgroups) {
         execute_base(proc_cgroups);
         execute_base(proc_cgroups);
-        proc_cgroups = lnxproc_base_free(proc_cgroups);
+        LNXPROC_BASE_FREE(proc_cgroups);
     }
 }
 #endif

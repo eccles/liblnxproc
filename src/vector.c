@@ -136,7 +136,7 @@ lnxproc_vector_new(LNXPROC_VECTOR_T ** vector, size_t size, int recursive)
         if (!p->data) {
             LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_MALLOC_DATA,
                                 "Malloc data\n");
-            p = lnxproc_vector_free(p);
+            LNXPROC_VECTOR_FREE(p);
             return LNXPROC_ERROR_VECTOR_MALLOC_DATA;
         }
     }

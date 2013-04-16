@@ -34,20 +34,7 @@ extern "C" {
     struct lnxproc_base_t;
     typedef struct lnxproc_base_t LNXPROC_BASE_T;
 
-    LNXPROC_ERROR_T lnxproc_base_array(LNXPROC_BASE_T *base,
-                                       LNXPROC_ARRAY_T **array);
-
-    LNXPROC_ERROR_T lnxproc_base_filename(LNXPROC_BASE_T *base,
-                                          const char **filename);
-    LNXPROC_ERROR_T lnxproc_base_lines(LNXPROC_BASE_T *base, char **lines);
-
     typedef LNXPROC_RESULTS_T *(*LNXPROC_BASE_METHOD) (LNXPROC_BASE_T *base);
-
-    LNXPROC_RESULTS_T *lnxproc_base_rawread(LNXPROC_BASE_T *base);
-    LNXPROC_RESULTS_T *lnxproc_base_read(LNXPROC_BASE_T *base);
-    LNXPROC_RESULTS_T *lnxproc_base_normalize(LNXPROC_BASE_T *base);
-
-    LNXPROC_ERROR_T lnxproc_base_nbytes(LNXPROC_BASE_T *base, int *nbytes);
 
     LNXPROC_ERROR_T lnxproc_base_new(LNXPROC_BASE_T **base,
                                      const char *filename,
@@ -62,6 +49,23 @@ extern "C" {
 #endif
 
     LNXPROC_BASE_T *lnxproc_base_free(LNXPROC_BASE_T *base) WARN_UNUSED;
+
+#define LNXPROC_BASE_FREE(b) {\
+    b = lnxproc_base_free(b);\
+}
+
+    LNXPROC_ERROR_T lnxproc_base_array(LNXPROC_BASE_T *base,
+                                       LNXPROC_ARRAY_T **array);
+
+    LNXPROC_ERROR_T lnxproc_base_filename(LNXPROC_BASE_T *base,
+                                          const char **filename);
+    LNXPROC_ERROR_T lnxproc_base_lines(LNXPROC_BASE_T *base, char **lines);
+
+    LNXPROC_RESULTS_T *lnxproc_base_rawread(LNXPROC_BASE_T *base);
+    LNXPROC_RESULTS_T *lnxproc_base_read(LNXPROC_BASE_T *base);
+    LNXPROC_RESULTS_T *lnxproc_base_normalize(LNXPROC_BASE_T *base);
+
+    LNXPROC_ERROR_T lnxproc_base_nbytes(LNXPROC_BASE_T *base, int *nbytes);
 
     LNXPROC_ERROR_T lnxproc_base_print(LNXPROC_BASE_T *base, int allocated,
                                        void *data);

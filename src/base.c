@@ -327,7 +327,7 @@ lnxproc_base_new(LNXPROC_BASE_T **base,
     if (!p->lines) {
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_BUFFER,
                             "Malloc buffer\n");
-        p = lnxproc_base_free(p);
+        LNXPROC_BASE_FREE(p);
         return LNXPROC_ERROR_BASE_MALLOC_BUFFER;
     }
     p->lines[buflen] = '\n';
@@ -335,7 +335,7 @@ lnxproc_base_new(LNXPROC_BASE_T **base,
     lnxproc_array_new(&p->array, limits, dim);
     if (!p->array) {
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_ARRAY, "Malloc array\n");
-        p = lnxproc_base_free(p);
+        LNXPROC_BASE_FREE(p);
         return LNXPROC_ERROR_BASE_MALLOC_ARRAY;
     }
 
@@ -343,7 +343,7 @@ lnxproc_base_new(LNXPROC_BASE_T **base,
     if (!p->results) {
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_RESULTS,
                             "Malloc results\n");
-        p = lnxproc_base_free(p);
+        LNXPROC_BASE_FREE(p);
         return LNXPROC_ERROR_BASE_MALLOC_RESULTS;
     }
 
@@ -368,11 +368,11 @@ lnxproc_base_free(LNXPROC_BASE_T *base)
     if (base) {
         if (base->results) {
             LNXPROC_DEBUG("Free results \n");
-            base->results = lnxproc_results_free(base->results);
+            LNXPROC_RESULTS_FREE(base->results);
         }
         if (base->array) {
             LNXPROC_DEBUG("Free Array \n");
-            base->array = (void *) lnxproc_array_free(base->array);
+            LNXPROC_ARRAY_FREE(base->array);
         }
         if (base->lines) {
             LNXPROC_DEBUG("Free Base buffer\n");

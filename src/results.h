@@ -36,15 +36,6 @@ extern "C" {
     };
     typedef struct lnxproc_results_t LNXPROC_RESULTS_T;
 
-//    LNXPROC_ERROR_T lnxproc_results_filename(LNXPROC_RESULTS_T * results, char **filename);
-    LNXPROC_ERROR_T lnxproc_results_timeval(LNXPROC_RESULTS_T * results,
-                                            struct timeval **tv);
-    LNXPROC_ERROR_T lnxproc_results_tv(LNXPROC_RESULTS_T * results,
-                                       struct timeval **tv);
-    LNXPROC_ERROR_T lnxproc_results_timeval_str(LNXPROC_RESULTS_T * results,
-                                                char *buf, size_t buflen);
-    LNXPROC_ERROR_T lnxproc_results_print(LNXPROC_RESULTS_T * results);
-
     LNXPROC_ERROR_T lnxproc_results_new(LNXPROC_RESULTS_T ** newresults);
 
 #ifndef WARN_UNUSED
@@ -53,6 +44,18 @@ extern "C" {
 
     LNXPROC_RESULTS_T *lnxproc_results_free(LNXPROC_RESULTS_T *
                                             results) WARN_UNUSED;
+#define LNXPROC_RESULTS_FREE(r) {\
+    r =  lnxproc_results_free(r);\
+}
+
+//    LNXPROC_ERROR_T lnxproc_results_filename(LNXPROC_RESULTS_T * results, char **filename);
+    LNXPROC_ERROR_T lnxproc_results_timeval(LNXPROC_RESULTS_T * results,
+                                            struct timeval **tv);
+    LNXPROC_ERROR_T lnxproc_results_tv(LNXPROC_RESULTS_T * results,
+                                       struct timeval **tv);
+    LNXPROC_ERROR_T lnxproc_results_timeval_str(LNXPROC_RESULTS_T * results,
+                                                char *buf, size_t buflen);
+    LNXPROC_ERROR_T lnxproc_results_print(LNXPROC_RESULTS_T * results);
 
     LNXPROC_ERROR_T lnxproc_results_fetch(LNXPROC_RESULTS_T * results,
                                           char *key, size_t keylen,

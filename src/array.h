@@ -43,6 +43,10 @@ extern "C" {
 
     LNXPROC_ARRAY_T *lnxproc_array_free(LNXPROC_ARRAY_T *array) WARN_UNUSED;
 
+#define LNXPROC_ARRAY_FREE(a) {\
+    a = lnxproc_array_free(a);\
+}
+
     LNXPROC_ERROR_T lnxproc_array_set(LNXPROC_ARRAY_T *array, size_t idx[],
                                       size_t dim, char *val);
     LNXPROC_ERROR_T lnxproc_array_set_last(LNXPROC_ARRAY_T *array, size_t idx[],

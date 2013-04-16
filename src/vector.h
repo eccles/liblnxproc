@@ -37,11 +37,6 @@ extern "C" {
     union lnxproc_vector_data_t;
     typedef union lnxproc_vector_data_t LNXPROC_VECTOR_DATA_T;
 
-    LNXPROC_ERROR_T lnxproc_data_child(LNXPROC_VECTOR_DATA_T * val,
-                                       LNXPROC_VECTOR_T ** vector);
-    LNXPROC_ERROR_T lnxproc_data_value(LNXPROC_VECTOR_DATA_T * val,
-                                       char **value);
-
     LNXPROC_ERROR_T lnxproc_vector_new(LNXPROC_VECTOR_T ** vec,
                                        size_t size, int recursive);
 
@@ -51,6 +46,15 @@ extern "C" {
 
     LNXPROC_VECTOR_T *lnxproc_vector_free(LNXPROC_VECTOR_T *
                                           vector) WARN_UNUSED;
+
+#define LNXPROC_VECTOR_FREE(v) {\
+    v =  lnxproc_vector_free(v);\
+}
+
+    LNXPROC_ERROR_T lnxproc_data_child(LNXPROC_VECTOR_DATA_T * val,
+                                       LNXPROC_VECTOR_T ** vector);
+    LNXPROC_ERROR_T lnxproc_data_value(LNXPROC_VECTOR_DATA_T * val,
+                                       char **value);
 
     LNXPROC_ERROR_T lnxproc_vector_resize(LNXPROC_VECTOR_T * vector,
                                           size_t size);

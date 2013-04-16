@@ -87,7 +87,7 @@ lnxproc_array_new(LNXPROC_ARRAY_T **array, LNXPROC_LIMITS_T limits[],
 
     if (!limits) {
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ARRAY_LIMITS_NULL, "\n");
-        p = lnxproc_array_free(p);
+        LNXPROC_ARRAY_FREE(p);
         return LNXPROC_ERROR_ARRAY_LIMITS_NULL;
     }
 
@@ -95,7 +95,7 @@ lnxproc_array_new(LNXPROC_ARRAY_T **array, LNXPROC_LIMITS_T limits[],
         LNXPROC_ERROR_T ret = lnxproc_limits_dup(&p->limits, limits, dim);
 
         if (ret) {
-            p = lnxproc_array_free(p);
+            LNXPROC_ARRAY_FREE(p);
             return ret;
         }
         p->dim = dim;
@@ -104,7 +104,7 @@ lnxproc_array_new(LNXPROC_ARRAY_T **array, LNXPROC_LIMITS_T limits[],
         LNXPROC_ERROR_T ret = lnxproc_limits_dup(&p->limits, limits, 1);
 
         if (ret) {
-            p = lnxproc_array_free(p);
+            LNXPROC_ARRAY_FREE(p);
             return ret;
         }
         p->dim = 0;
@@ -113,13 +113,13 @@ lnxproc_array_new(LNXPROC_ARRAY_T **array, LNXPROC_LIMITS_T limits[],
     if (dim > 0) {
         p->saved = calloc(dim, sizeof(LNXPROC_VECTOR_T *));
         if (!p->saved) {
-            p = lnxproc_array_free(p);
+            LNXPROC_ARRAY_FREE(p);
             return LNXPROC_ERROR_ARRAY_SAVED_MALLOC;
         }
 
         p->vector = array_create(limits, dim, 0);
         if (!p->vector) {
-            p = lnxproc_array_free(p);
+            LNXPROC_ARRAY_FREE(p);
             return LNXPROC_ERROR_ARRAY_VECTOR_MALLOC;
         }
     }
@@ -128,7 +128,7 @@ lnxproc_array_new(LNXPROC_ARRAY_T **array, LNXPROC_LIMITS_T limits[],
         p->vector = NULL;
         lnxproc_vector_new(&p->vector, 1, 0);
         if (!p->vector) {
-            p = lnxproc_array_free(p);
+            LNXPROC_ARRAY_FREE(p);
             return LNXPROC_ERROR_ARRAY_VECTOR_MALLOC;
         }
         p->saved = NULL;
@@ -145,16 +145,14 @@ lnxproc_array_free(LNXPROC_ARRAY_T *array)
 
     if (array) {
         if (array->limits) {
-            array->limits =
-                lnxproc_limits_free(array->limits,
-                                    array->dim < 1 ? 1 : array->dim);
+            LNXPROC_LIMITS_FREE(array->limits, array->dim < 1 ? 1 : array->dim);
         }
         if (array->saved) {
             free(array->saved);
             array->saved = NULL;
         }
         if (array->vector) {
-            array->vector = lnxproc_vector_free(array->vector);
+            LNXPROC_VECTOR_FREE(array->vector);
         }
 
         LNXPROC_DEBUG("Free array %p\n", array);
