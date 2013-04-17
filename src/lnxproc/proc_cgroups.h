@@ -24,29 +24,9 @@
 extern "C" {
 #endif
 
-#include "error.h"
-#include "base.h"
-/*
-    struct lnxproc_proc_cgroups_sub_t {
-        int hierarchy;
-        int num_cgroups;
-        int enabled;
-    };
-    typedef struct lnxproc_proc_cgroups_sub_t LNXPROC_PROC_CGROUPS_SUB_T;
+#include <lnxproc/error.h>
+#include <lnxproc/base.h>
 
-    struct lnxproc_proc_cgroups_t {
-        LNXPROC_PROC_CGROUPS_SUB_T cpuset;
-        LNXPROC_PROC_CGROUPS_SUB_T cpu;
-        LNXPROC_PROC_CGROUPS_SUB_T cpuacct;
-        LNXPROC_PROC_CGROUPS_SUB_T memory;
-        LNXPROC_PROC_CGROUPS_SUB_T devices;
-        LNXPROC_PROC_CGROUPS_SUB_T freezer;
-        LNXPROC_PROC_CGROUPS_SUB_T blkio;
-        LNXPROC_PROC_CGROUPS_SUB_T perf_event;
-    };
-
-    typedef struct lnxproc_proc_cgroups_t LNXPROC_PROC_CGROUPS_T;
-*/
     LNXPROC_ERROR_T lnxproc_proc_cgroups_new(LNXPROC_BASE_T **base);
 
 #ifdef __cplusplus
