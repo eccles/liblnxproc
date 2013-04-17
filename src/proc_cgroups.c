@@ -36,7 +36,7 @@ typical contents of /proc/cgroups file::
 #include "base_private.h"
 #include <lnxproc/proc_cgroups.h>
 
-struct proc_groups_env_t {
+struct proc_cgroups_env_t {
     LNXPROC_RESULTS_T *results;
     int colslen;
     char **cols;
@@ -48,7 +48,7 @@ proc_groups_func(char *val, void *data, size_t idx[], size_t dim)
 {
     LNXPROC_DEBUG("Val %s, Data %p, idx[%d]=%d idx[%d]=%d\n", val, data, 0,
                   idx[0], 1, idx[1]);
-    struct proc_groups_env_t *env = data;
+    struct proc_cgroups_env_t *env = data;
 
     if (idx[0] == 0) {
         lnxproc_results_store(env->results, val, "/col%02d", idx[1]);
@@ -81,7 +81,7 @@ proc_cgroups_normalize(LNXPROC_BASE_T *base)
     LNXPROC_RESULTS_T *results = base->results;
     LNXPROC_ARRAY_T *array = base->array;
 
-    struct proc_groups_env_t env = {
+    struct proc_cgroups_env_t env = {
         .results = results,
         .colslen = 0,
         .cols = NULL,

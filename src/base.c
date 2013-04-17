@@ -197,14 +197,11 @@ base_map(LNXPROC_BASE_T *base)
     LNXPROC_ARRAY_T *array = base->array;
 
     LNXPROC_DEBUG("Array %p\n", array);
-    LNXPROC_LIMITS_T *limits = base->array->limits;
 
-    LNXPROC_DEBUG("Limits %p\n", limits);
-    int dim = base->array->dim;
     char *lines = base->lines;
     int nbytes = base->nbytes;
 
-    LNXPROC_DEBUG("Dim %d Lines %p Nbytes %d\n", dim, lines, nbytes);
+    LNXPROC_DEBUG("Lines %p Nbytes %d\n", lines, nbytes);
 
 #ifdef DEBUG
     char basebuf[128];
@@ -221,7 +218,13 @@ base_map(LNXPROC_BASE_T *base)
 
         LNXPROC_DEBUG("End at Chars %p\n", d);
 
-        if (dim > 0) {
+        if (array) {
+
+            LNXPROC_LIMITS_T *limits = base->array->limits;
+            int dim = base->array->dim;
+
+            LNXPROC_DEBUG("Limits %p Dim %d\n", limits, dim);
+
             char *saveptr = c;
 
             size_t idx[dim];
@@ -269,10 +272,7 @@ base_map(LNXPROC_BASE_T *base)
             }
         }
 
-/*
         else {
-
-            base->data = c;
             while (c < d) {
                 if (strchr("\n", *c)) {
                     *c = '\0';
@@ -281,7 +281,6 @@ base_map(LNXPROC_BASE_T *base)
                 c++;
             }
         }
-*/
     }
 
     return LNXPROC_OK;
@@ -363,21 +362,18 @@ lnxproc_base_new(LNXPROC_BASE_T **base,
 
     LNXPROC_ERROR_T ret;
 
-    ret = lnxproc_array_new(&p->array, limits, dim);
-    if (ret) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_ARRAY, "Malloc array\n");
-        LNXPROC_BASE_FREE(p);
-        return LNXPROC_ERROR_BASE_MALLOC_ARRAY;
+    if (limits && dim > 0) {
+        ret = lnxproc_array_new(&p->array, limits, dim);
+        if (ret) {
+            LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_ARRAY,
+                                "Malloc array\n");
+            LNXPROC_BASE_FREE(p);
+            return LNXPROC_ERROR_BASE_MALLOC_ARRAY;
+        }
     }
-
-//    ret = lnxproc_results_new(&p->results);
-//    if (ret) {
-//        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_RESULTS,
-//                            "Malloc results\n");
-//        LNXPROC_BASE_FREE(p);
-//        return LNXPROC_ERROR_BASE_MALLOC_RESULTS;
-//    }
-
+    else {
+        p->array = NULL;
+    }
     p->results = NULL;
     p->prev = NULL;
     p->rawread = rawread;

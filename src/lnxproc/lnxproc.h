@@ -32,6 +32,7 @@ extern "C" {
 #include <lnxproc/base.h>
 #include <lnxproc/results.h>
 #include <lnxproc/proc_cgroups.h>
+#include <lnxproc/proc_osrelease.h>
 
 #ifdef __cplusplus
 }                               // extern "C"

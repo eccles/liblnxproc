@@ -23,12 +23,13 @@ This file is part of liblnxproc.
 #include <string.h>
 #include <lnxproc/lnxproc.h>
 
-#define TEST_ERROR 1
-#define TEST_RESULTS 1
-#define TEST_VECTOR 1
-#define TEST_LIMITS 1
-#define TEST_ARRAY 1
-#define TEST_PROC_CGROUPS 1
+//#define TEST_ERROR 1
+//#define TEST_RESULTS 1
+//#define TEST_VECTOR 1
+//#define TEST_LIMITS 1
+//#define TEST_ARRAY 1
+//#define TEST_PROC_CGROUPS 1
+#define TEST_PROC_OSRELEASE 1
 
 /*----------------------------------------------------------------------------*/
 #ifdef TEST_ERROR
@@ -522,36 +523,8 @@ test_array(void)
 /*----------------------------------------------------------------------------*/
 #ifdef TEST_PROC_CGROUPS
 
-static void
-execute_base(LNXPROC_BASE_T *base)
-{
-    if (base) {
-        LNXPROC_RESULTS_T *res = lnxproc_base_read(base);
-
-        if (!res) {
-            printf("Failure reading proc_cgroups\n");
-        }
-        else {
-            const char *filename = NULL;
-
-            lnxproc_base_filename(base, &filename);
-            printf("Proccgroups: %s\n", filename);
-
-            int nbytes = 0;
-
-            lnxproc_base_nbytes(base, &nbytes);
-            printf("Proccgroups: %d bytes\n", nbytes);
-
-            char *lines = NULL;
-
-            lnxproc_base_lines(base, &lines);
-            printf("Proccgroups: %1$d %2$*1$s\n", nbytes, lines);
-
-            lnxproc_results_print(res);
-            LNXPROC_RESULTS_FREE(res);
-        }
-    }
-}
+#define EXECUTE_BASE
+static void execute_base(LNXPROC_BASE_T *base);
 
 static void
 test_proc_cgroups(void)
@@ -574,7 +547,66 @@ test_proc_cgroups(void)
     }
 }
 #endif
+/*----------------------------------------------------------------------------*/
+#ifdef TEST_PROC_OSRELEASE
 
+#define EXECUTE_BASE
+static void execute_base(LNXPROC_BASE_T *base);
+
+static void
+test_proc_osrelease(void)
+{
+    LNXPROC_BASE_T *proc_osrelease = NULL;
+    LNXPROC_ERROR_T ret = lnxproc_proc_osrelease_new(&proc_osrelease);
+
+    if (ret == LNXPROC_OK) {
+        printf("Execute 1\n");
+        execute_base(proc_osrelease);
+        printf("Execute 2\n");
+        execute_base(proc_osrelease);
+        printf("Execute 3\n");
+        execute_base(proc_osrelease);
+        printf("Execute 4\n");
+        execute_base(proc_osrelease);
+        printf("Execute 5\n");
+        execute_base(proc_osrelease);
+        LNXPROC_BASE_FREE(proc_osrelease);
+    }
+}
+#endif
+
+/*----------------------------------------------------------------------------*/
+#ifdef EXECUTE_BASE
+static void
+execute_base(LNXPROC_BASE_T *base)
+{
+    if (base) {
+        LNXPROC_RESULTS_T *res = lnxproc_base_read(base);
+
+        if (!res) {
+            printf("Failure reading proc_cgroups\n");
+        }
+        else {
+            const char *filename = NULL;
+
+            lnxproc_base_filename(base, &filename);
+            printf("Filename : %s\n", filename);
+
+            int nbytes = 0;
+            lnxproc_base_nbytes(base, &nbytes);
+
+            char *lines = NULL;
+            lnxproc_base_lines(base, &lines);
+            printf("Data : %1$d %2$*1$s\n", nbytes, lines);
+
+            lnxproc_results_print(res);
+            LNXPROC_RESULTS_FREE(res);
+        }
+    }
+}
+#endif
+
+/*----------------------------------------------------------------------------*/
 int
 main(int argc, char *argv[])
 {
@@ -596,6 +628,9 @@ main(int argc, char *argv[])
 #endif
 #ifdef TEST_PROC_CGROUPS
     test_proc_cgroups();
+#endif
+#ifdef TEST_PROC_OSRELEASE
+    test_proc_osrelease();
 #endif
 
     return 0;
