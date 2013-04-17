@@ -31,22 +31,72 @@ typical contents of /proc/cgroups file::
 */
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "base_private.h"
 #include "proc_cgroups.h"
 
+struct proc_groups_env_t {
+    LNXPROC_RESULTS_T *results;
+    int colslen;
+    char **cols;
+    char *key;
+};
+
 static LNXPROC_ERROR_T
 proc_groups_func(char *val, void *data, size_t idx[], size_t dim)
 {
+    struct proc_groups_env_t *env = data;
+
+    if (idx[0] == 0) {
+        lnxproc_results_store(env->results, val, "/col%02d", idx[1]);
+        void *p = realloc(env->cols, (env->colslen + 1) * sizeof(char *));
+
+        if (!p) {
+            LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_SYSTEM, "\n");
+            return LNXPROC_ERROR_SYSTEM;
+        }
+        env->cols = p;
+        env->colslen += 1;
+        env->cols[idx[1]] = strdup(val);
+    }
+    else {
+        if (idx[1] == 0) {
+            env->key = val;
+            lnxproc_results_store(env->results, val, "/key%02d", idx[1]);
+        }
+        else if (idx[1] < env->colslen) {
+            lnxproc_results_store(env->results, val, "/%s/%s", env->key,
+                                  env->cols[idx[1]]);
+        }
+    }
     return LNXPROC_OK;
 }
 
 static LNXPROC_ERROR_T
 proc_cgroups_normalize(LNXPROC_BASE_T *base)
 {
-    lnxproc_base_print(base, 1, NULL);
-    lnxproc_array_iterate(base->array, NULL, proc_groups_func);
-    return 0;
+    LNXPROC_RESULTS_T *results = base->results;
+    LNXPROC_ARRAY_T *array = base->array;
+
+    struct proc_groups_env_t env = {
+        .results = results,
+        .colslen = 0,
+        .cols = NULL,
+        .key = NULL,
+    };
+
+    lnxproc_array_iterate(array, &env, proc_groups_func);
+    if (env.cols) {
+        int i;
+
+        for (i = 0; i < env.colslen; i++) {
+            free(env.cols[i]);
+        }
+        free(env.cols);
+    }
+
+    return LNXPROC_OK;
 }
 
 LNXPROC_ERROR_T

@@ -89,28 +89,29 @@ lnxproc_chars_print(char *chars, size_t nchars, char *buf, size_t buflen)
 
     int m = 0;
     char *b = buf;
+    int len = buflen - 1;
 
-    for (i = 0; i < nchars; i++) {
+    for (i = 0; i < nchars && len > 0; i++) {
         c = chars[i];
         if (c < 33) {
-            m = snprintf(b, buflen, "%s ", cstr[(int) c]);
+            m = snprintf(b, len, "%s ", cstr[(int) c]);
             b += m;
-            buflen -= m;
+            len -= m;
         }
         else if (c == 127) {
-            m = snprintf(b, buflen, "DEL ");
+            m = snprintf(b, len, "DEL ");
             b += m;
-            buflen -= m;
+            len -= m;
         }
         else if (c > 127) {
-            m = snprintf(b, buflen, "%d ", c);
+            m = snprintf(b, len, "%d ", c);
             b += m;
-            buflen -= m;
+            len -= m;
         }
         else {
-            m = snprintf(b, buflen, "%c ", c);
+            m = snprintf(b, len, "%c ", c);
             b += m;
-            buflen -= m;
+            len -= m;
         }
     }
 
@@ -129,18 +130,22 @@ lnxproc_limit_print(LNXPROC_LIMITS_T * limit, char *buf, size_t buflen)
 
     int m = 0;
     char *b = buf;
+    int len = buflen - 1;
 
-    m = snprintf(b, buflen, "Exp %zd: Len %d: ", limit->expected, limit->len);
+    m = snprintf(b, len, "Exp %zd: Len %d: ", limit->expected, limit->len);
     b += m;
-    buflen -= m;
+    len -= m;
 
-    return lnxproc_chars_print(limit->chars, limit->len, b, buflen);
+    return lnxproc_chars_print(limit->chars, limit->len, b, len);
 }
 
 LNXPROC_ERROR_T
 lnxproc_limits_dup(LNXPROC_LIMITS_T ** newlimits,
                    LNXPROC_LIMITS_T limits[], size_t dim)
 {
+    LNXPROC_DEBUG("sizeof ptr %d\n", sizeof(void *));
+    LNXPROC_DEBUG("sizeof LNXPROC_LIMITS_T %d\n", sizeof(LNXPROC_LIMITS_T));
+
     if (!newlimits) {
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_ADDRESS_NULL, "\n");
         return LNXPROC_ERROR_LIMITS_ADDRESS_NULL;

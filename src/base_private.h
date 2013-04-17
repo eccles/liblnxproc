@@ -34,7 +34,7 @@ extern "C" {
     struct lnxproc_base_t {
         LNXPROC_BASE_METHOD rawread;
         LNXPROC_BASE_METHOD normalize;
-        LNXPROC_BASE_METHOD read;
+        LNXPROC_READ_METHOD read;
         const char *filename;
         char *lines;
         size_t buflen;

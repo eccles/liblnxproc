@@ -62,8 +62,13 @@ extern "C" {
                                           LNXPROC_RESULTS_DATA_T * val);
 
     LNXPROC_ERROR_T lnxproc_results_store(LNXPROC_RESULTS_T * results,
-                                          LNXPROC_RESULTS_DATA_T key,
-                                          LNXPROC_RESULTS_DATA_T data);
+                                          char *value, char *fmt, ...);
+
+    typedef int (*LNXPROC_RESULTS_ITERATE_FUNC) (char *key, char *value,
+                                                 void *data);
+    LNXPROC_ERROR_T lnxproc_results_iterate(LNXPROC_RESULTS_T * results,
+                                            LNXPROC_RESULTS_ITERATE_FUNC func,
+                                            void *data);
 
 #ifdef __cplusplus
 }                               // extern "C"

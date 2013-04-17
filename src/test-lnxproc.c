@@ -377,7 +377,7 @@ test_array(void)
     printf("Got value %1$p '%1$s' : %2$s\n", val,
            lnxproc_strerror(ret, buf, sizeof buf));
 
-    ret = lnxproc_array_print(array0, 1, NULL);
+    ret = lnxproc_array_print(array0, 1);
     printf("Print Array 0 : %s\n", lnxproc_strerror(ret, buf, sizeof buf));
     LNXPROC_ARRAY_FREE(array0);
 
@@ -429,7 +429,7 @@ test_array(void)
     printf("Got value %1$p '%1$s' : %2$s\n", val,
            lnxproc_strerror(ret, buf, sizeof buf));
 
-    ret = lnxproc_array_print(array1, 1, NULL);
+    ret = lnxproc_array_print(array1, 1);
     printf("Print Array 1 : %s\n", lnxproc_strerror(ret, buf, sizeof buf));
     LNXPROC_ARRAY_FREE(array1);
 
@@ -470,7 +470,7 @@ test_array(void)
     printf("Got value %1$p '%1$s' : %2$s\n", val,
            lnxproc_strerror(ret, buf, sizeof buf));
 
-    ret = lnxproc_array_print(array2, 1, NULL);
+    ret = lnxproc_array_print(array2, 1);
     printf("Print Array 2 : %s\n", lnxproc_strerror(ret, buf, sizeof buf));
 
     LNXPROC_ARRAY_FREE(array2);
@@ -511,7 +511,7 @@ test_array(void)
     printf("Put value %1$p '%1$s' : %2$s\n", in123,
            lnxproc_strerror(ret, buf, sizeof buf));
 
-    ret = lnxproc_array_print(array3, 1, NULL);
+    ret = lnxproc_array_print(array3, 1);
     printf("Print Array 3 : %s\n", lnxproc_strerror(ret, buf, sizeof buf));
     LNXPROC_ARRAY_FREE(array3);
 
@@ -526,9 +526,9 @@ static void
 execute_base(LNXPROC_BASE_T *base)
 {
     if (base) {
-        LNXPROC_ERROR_T res = lnxproc_base_read(base);
+        LNXPROC_RESULTS_T *res = lnxproc_base_read(base);
 
-        if (res) {
+        if (!res) {
             printf("Failure reading proc_cgroups\n");
         }
         else {
@@ -536,14 +536,18 @@ execute_base(LNXPROC_BASE_T *base)
 
             lnxproc_base_filename(base, &filename);
             printf("Proccgroups: %s\n", filename);
+
             int nbytes = 0;
 
             lnxproc_base_nbytes(base, &nbytes);
             printf("Proccgroups: %d bytes\n", nbytes);
+
             char *lines = NULL;
 
             lnxproc_base_lines(base, &lines);
             printf("Proccgroups: %1$d %2$*1$s\n", nbytes, lines);
+            lnxproc_results_print(res);
+            LNXPROC_RESULTS_FREE(res);
         }
     }
 }

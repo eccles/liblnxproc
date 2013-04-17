@@ -35,13 +35,13 @@ extern "C" {
     typedef struct lnxproc_base_t LNXPROC_BASE_T;
 
     typedef LNXPROC_ERROR_T (*LNXPROC_BASE_METHOD) (LNXPROC_BASE_T *base);
-    //typedef LNXPROC_RESULTS_T *(*LNXPROC_BASE_METHOD) (LNXPROC_BASE_T *base);
+    typedef LNXPROC_RESULTS_T *(*LNXPROC_READ_METHOD) (LNXPROC_BASE_T *base);
 
     LNXPROC_ERROR_T lnxproc_base_new(LNXPROC_BASE_T **base,
                                      const char *filename,
                                      LNXPROC_BASE_METHOD rawread,
                                      LNXPROC_BASE_METHOD normalize,
-                                     LNXPROC_BASE_METHOD read,
+                                     LNXPROC_READ_METHOD read,
                                      size_t buflen,
                                      LNXPROC_LIMITS_T limits[], size_t dim);
 
@@ -63,13 +63,12 @@ extern "C" {
     LNXPROC_ERROR_T lnxproc_base_lines(LNXPROC_BASE_T *base, char **lines);
 
     LNXPROC_ERROR_T lnxproc_base_rawread(LNXPROC_BASE_T *base);
-    LNXPROC_ERROR_T lnxproc_base_read(LNXPROC_BASE_T *base);
+    LNXPROC_RESULTS_T *lnxproc_base_read(LNXPROC_BASE_T *base);
     LNXPROC_ERROR_T lnxproc_base_normalize(LNXPROC_BASE_T *base);
 
     LNXPROC_ERROR_T lnxproc_base_nbytes(LNXPROC_BASE_T *base, int *nbytes);
 
-    LNXPROC_ERROR_T lnxproc_base_print(LNXPROC_BASE_T *base, int allocated,
-                                       void *data);
+    LNXPROC_ERROR_T lnxproc_base_print(LNXPROC_BASE_T *base);
 
 #ifdef __cplusplus
 }                               // extern "C"

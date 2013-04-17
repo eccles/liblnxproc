@@ -24,6 +24,8 @@
 #include <sys/time.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
+#include <string.h>
 #include <tdb.h>
 
 #include "error.h"
@@ -101,6 +103,13 @@ lnxproc_results_tv(LNXPROC_RESULTS_T * results, struct timeval **tv)
     return LNXPROC_OK;
 }
 
+static int
+internal_print_func(char *key, char *value, void *data)
+{
+    printf("Key %s = %s\n", key, value);
+    return LNXPROC_OK;
+}
+
 LNXPROC_ERROR_T
 lnxproc_results_print(LNXPROC_RESULTS_T * results)
 {
@@ -114,14 +123,17 @@ lnxproc_results_print(LNXPROC_RESULTS_T * results)
     char buf[64];
 
     lnxproc_results_timeval_str(results, buf, sizeof buf);
-    printf("Results %s\n", buf);
-    return LNXPROC_OK;
+    printf("Timestamp %s\n", buf);
+
+    return lnxproc_results_iterate(results, internal_print_func, NULL);
 
 }
 
 LNXPROC_ERROR_T
 lnxproc_results_new(LNXPROC_RESULTS_T ** results)
 {
+    LNXPROC_DEBUG("sizeof ptr %d\n", sizeof(void *));
+    LNXPROC_DEBUG("sizeof LNXPROC_RESULTS_T %d\n", sizeof(LNXPROC_RESULTS_T));
     if (!results) {
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_ADDRESS_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_ADDRESS_NULL;
@@ -229,9 +241,10 @@ lnxproc_results_fetch(LNXPROC_RESULTS_T * results, char *key, size_t keylen,
 }
 
 LNXPROC_ERROR_T
-lnxproc_results_store(LNXPROC_RESULTS_T * results, LNXPROC_RESULTS_DATA_T key,
-                      LNXPROC_RESULTS_DATA_T data)
+lnxproc_results_store(LNXPROC_RESULTS_T * results, char *value, char *fmt, ...)
 {
+    va_list ap;
+
     if (!results) {
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_NULL;
@@ -245,6 +258,20 @@ lnxproc_results_store(LNXPROC_RESULTS_T * results, LNXPROC_RESULTS_DATA_T key,
         return LNXPROC_ERROR_RESULTS_DB_NOT_OPEN;
     }
 #ifdef LNXPROC_TDB
+
+    char buf[128];
+
+    TDB_DATA key;
+
+    va_start(ap, fmt);
+    key.dsize = 1 + vsnprintf(buf, sizeof buf, fmt, ap);
+    va_end(ap);
+    key.dptr = (unsigned char *) buf;
+
+    TDB_DATA data;
+
+    data.dsize = 1 + strlen(value);
+    data.dptr = (unsigned char *) value;
     int flag = TDB_REPLACE;
     int ret = tdb_store(results->db, key, data, flag);
 
@@ -252,6 +279,102 @@ lnxproc_results_store(LNXPROC_RESULTS_T * results, LNXPROC_RESULTS_DATA_T key,
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_STORE,
                             "Store results %s\n", tdb_errorstr(results->db));
         return LNXPROC_ERROR_RESULTS_DB_STORE;
+    }
+#endif
+    return LNXPROC_OK;
+}
+
+/*
+TDB_TRAVERSE(3)            Linux Programmer's Manual           TDB_TRAVERSE(3)
+
+NAME
+       tdb_traverse - visit every element in a tdb database
+
+SYNOPSIS
+       #include <tdb.h>
+
+       int tdb_traverse(TDB_CONTEXT *tdb,
+               int (*fn)(TDB_CONTEXT *,TDB_DATA,TDB_DATA,void *),
+               void *state);
+
+DESCRIPTION
+       tdb_traverse is the only sure way to visit all the items within a given
+       database, tdb Because this  function  has  intimate  knowledge  of  the
+       internals of the database, it is able to cope with writers touching the
+       database at the same time it is trying to traverse it.
+
+       If fn is supplied it will be called with the state parameter  for  each
+       element  in  the database, as the forth argument. The First argument is
+       the database tdb the second is the key and the third is  the  data.  If
+       this  function  call  returns  anything but 0, the traversal will stop.
+       Unlike in tdb_fetch() the programmer is not required to free either the
+       pointer from either the key or data parameters that are passed into the
+       function. The fn function should have the prototype:
+          int (*tdb_traverse_func)(TDB_CONTEXT *, TDB_DATA, TDB_DATA, void *);
+
+       Calling tdb_traverse with a NULL fn parameter is the appropriate way to
+       count the number of elements in the database.
+
+RETURN VALUE
+       The return value is the number of elements traversed or -1 if there was
+       an error.
+
+AUTHORS
+       Software: Andrew Tridgell <tridge@linuxcare.com> and Luke Kenneth  Cas‐
+       son Leighton Man page: Ben Woodard <ben@valinux.com>
+
+SEE ALSO
+       gdbm(3), tdb(3)
+
+Samba                            Aug 16, 2000                  TDB_TRAVERSE(3)
+~
+*/
+//typedef int (*RESULTS_ITERATE_FUNC)(char *key,char *value,void *env);
+//static int db_traverse_func(char *key,char *value,void *env) {
+//    return LNXPROC_OK;
+//}
+#ifdef LNXPROC_TDB
+struct db_traverse_env_t {
+    LNXPROC_RESULTS_ITERATE_FUNC func;
+    void *data;
+};
+static int
+db_traverse_func(TDB_CONTEXT * tdb, TDB_DATA key, TDB_DATA value, void *state)
+{
+    struct db_traverse_env_t *env = state;
+
+    env->func((char *) key.dptr, (char *) value.dptr, env->data);
+    return 0;
+}
+#endif
+
+LNXPROC_ERROR_T
+lnxproc_results_iterate(LNXPROC_RESULTS_T * results,
+                        LNXPROC_RESULTS_ITERATE_FUNC func, void *data)
+{
+    if (!results) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
+        return LNXPROC_ERROR_RESULTS_NULL;
+    }
+
+    LNXPROC_DEBUG("Results %p\n", results);
+
+    if (!results->db) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_NOT_OPEN,
+                            "Iterate results\n");
+        return LNXPROC_ERROR_RESULTS_DB_NOT_OPEN;
+    }
+#ifdef LNXPROC_TDB
+    struct db_traverse_env_t env = {
+        .func = func,
+        .data = data,
+    };
+    int ret = tdb_traverse(results->db, db_traverse_func, &env);
+
+    if (ret < 0) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_ITERATE,
+                            "Iterate results %s\n", tdb_errorstr(results->db));
+        return LNXPROC_ERROR_RESULTS_DB_ITERATE;
     }
 #endif
     return LNXPROC_OK;

@@ -100,6 +100,8 @@ LNXPROC_ERROR_T
 lnxproc_vector_new(LNXPROC_VECTOR_T ** vector, size_t size, int recursive)
 {
 
+    LNXPROC_DEBUG("sizeof ptr %d\n", sizeof(void *));
+    LNXPROC_DEBUG("sizeof LNXPROC_VECTOR_T %d\n", sizeof(LNXPROC_VECTOR_T));
     LNXPROC_DEBUG("Size %zd Recursive %d\n", size, recursive);
 
     if (!vector) {
