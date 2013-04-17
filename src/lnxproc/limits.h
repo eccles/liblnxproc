@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-#include "error.h"
+#include <lnxproc/error.h>
 
     struct lnxproc_limits_t {
         size_t expected;

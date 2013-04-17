@@ -26,8 +26,8 @@ extern "C" {
 #endif
 
 #include <sys/time.h>
-#include "db.h"
-#include "error.h"
+#include <lnxproc/db.h>
+#include <lnxproc/error.h>
 
     struct lnxproc_results_t {
         struct timeval tv;

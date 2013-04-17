@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 #include <stddef.h>
-#include "error.h"
+#include <lnxproc/error.h>
 
     struct lnxproc_vector_t;
     typedef struct lnxproc_vector_t LNXPROC_VECTOR_T;

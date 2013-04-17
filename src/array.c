@@ -25,9 +25,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "error.h"
+#include <lnxproc/error.h>
 #include "vector_private.h"
-#include "limits.h"
+#include <lnxproc/limits.h>
 #include "array_private.h"
 
 static LNXPROC_VECTOR_T *

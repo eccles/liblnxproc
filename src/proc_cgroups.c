@@ -34,7 +34,7 @@ typical contents of /proc/cgroups file::
 #include <string.h>
 
 #include "base_private.h"
-#include "proc_cgroups.h"
+#include <lnxproc/proc_cgroups.h>
 
 struct proc_groups_env_t {
     LNXPROC_RESULTS_T *results;

@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-#include "error.h"
+#include <lnxproc/error.h>
 
 #define LNXPROC_TDB 1
 

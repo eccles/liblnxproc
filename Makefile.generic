@@ -3,7 +3,7 @@
 
 CC=gcc
 CCFLAGSD=-DDEBUG=1 -g
-CCFLAGS1=-I../src -Wall -Werror
+CCFLAGS1=-I../src -Wall
 CCFLAGS2=$(CCFLAGS1) -fpic
 #CCFLAGS=-g -fpic -I. -Wall
 LDFLAGS1=-L. -llnxproc
@@ -39,9 +39,9 @@ $(BIN)-dbg: $(BIN).c $(LIB)-dbg.so
 
 check: $(HDRS) $(SRCS)
 	for d in $(DIRS); do (cd $$d; $(MAKE) check ); done
-	$(RELDIR)/check.sh $(BIN).c $(HDRS) $(SRCS)
+	$(RELDIR)/check.sh $(HDRS) $(SRCS) $(PUBHDIR)
 
 clean:
-	for d in $(DIRS); do (cd $$d; $(MAKE) clean ); done
+	for d in $(PUBHDIR); do (cd $$d; rm -f *~ ); done
 	rm -f $(BIN) $(BIN)-dbg *.o *.so *~ *.orig core* vgcore* x y z
 

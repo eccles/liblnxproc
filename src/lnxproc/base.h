@@ -26,10 +26,10 @@ extern "C" {
 #endif
 
 #include <stddef.h>
-#include "error.h"
-#include "limits.h"
-#include "results.h"
-#include "array.h"
+#include <lnxproc/error.h>
+#include <lnxproc/limits.h>
+#include <lnxproc/results.h>
+#include <lnxproc/array.h>
 
     struct lnxproc_base_t;
     typedef struct lnxproc_base_t LNXPROC_BASE_T;

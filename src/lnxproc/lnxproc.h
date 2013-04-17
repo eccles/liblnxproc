@@ -25,13 +25,13 @@ This file is part of liblnxproc.
 extern "C" {
 #endif
 
-#include "error.h"
-#include "vector.h"
-#include "limits.h"
-#include "array.h"
-#include "base.h"
-#include "results.h"
-#include "proc_cgroups.h"
+#include <lnxproc/error.h>
+#include <lnxproc/vector.h>
+#include <lnxproc/limits.h>
+#include <lnxproc/array.h>
+#include <lnxproc/base.h>
+#include <lnxproc/results.h>
+#include <lnxproc/proc_cgroups.h>
 
 #ifdef __cplusplus
 }                               // extern "C"

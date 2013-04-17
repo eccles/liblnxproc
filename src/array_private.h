@@ -29,8 +29,8 @@ extern "C" {
 #endif
 
 #include "vector_private.h"
-#include "limits.h"
-#include "array.h"
+#include <lnxproc/limits.h>
+#include <lnxproc/array.h>
 
     struct lnxproc_array_t {
         LNXPROC_LIMITS_T *limits;

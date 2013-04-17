@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 #include <stddef.h>
-#include "limits.h"
+#include <lnxproc/limits.h>
 
     struct lnxproc_array_t;
     typedef struct lnxproc_array_t LNXPROC_ARRAY_T;

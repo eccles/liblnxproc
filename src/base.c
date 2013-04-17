@@ -27,9 +27,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "error.h"
-#include "limits.h"
-#include "results.h"
+#include <lnxproc/error.h>
+#include <lnxproc/limits.h>
+#include <lnxproc/results.h>
 #include "array_private.h"
 #include "base_private.h"
 

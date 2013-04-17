@@ -21,7 +21,7 @@ This file is part of liblnxproc.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "lnxproc.h"
+#include <lnxproc/lnxproc.h>
 
 #define TEST_ERROR 1
 #define TEST_RESULTS 1

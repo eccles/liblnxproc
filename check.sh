@@ -41,11 +41,24 @@ do
 #    then
 #        code=$?
 #    fi
-    indent ${INDOPTS} ${INDTYPES} $i
-#    astyle ${ASTOPTS} $i
-    if [ $? -ne 0 ]
+    if [ -d $i ]
     then
-        code=$?
+        for j in $i/*
+        do
+            indent ${INDOPTS} ${INDTYPES} $j
+#           astyle ${ASTOPTS} $i
+            if [ $? -ne 0 ]
+            then
+                code=$?
+            fi
+        done
+    else
+        indent ${INDOPTS} ${INDTYPES} $i
+#       astyle ${ASTOPTS} $i
+        if [ $? -ne 0 ]
+        then
+            code=$?
+        fi
     fi
 done
 exit $code

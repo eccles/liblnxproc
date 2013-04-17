@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "error.h"
+#include <lnxproc/error.h>
 
 #ifdef DEBUG
 #include <stdarg.h>

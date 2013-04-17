@@ -28,8 +28,8 @@
 extern "C" {
 #endif
 
-#include "error.h"
-#include "vector.h"
+#include <lnxproc/error.h>
+#include <lnxproc/vector.h>
 
     union lnxproc_vector_data_t {
         LNXPROC_VECTOR_T *child;

@@ -27,9 +27,9 @@ extern "C" {
 
 #include <stddef.h>
 
-#include "results.h"
+#include <lnxproc/results.h>
 #include "array_private.h"
-#include "base.h"
+#include <lnxproc/base.h>
 
     struct lnxproc_base_t {
         LNXPROC_BASE_METHOD rawread;
