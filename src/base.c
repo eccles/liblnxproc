@@ -224,16 +224,9 @@ base_map(LNXPROC_BASE_T *base)
         if (dim > 0) {
             char *saveptr = c;
 
-/* Allocating on the stack confuses valgrind which reports a use of an 
- * uninitialised variable. Use  the calloc version when testing with valgrind
- */
-#ifdef DEBUG
-            size_t *idx = calloc(dim, sizeof(size_t));
-#else
             size_t idx[dim];
 
-            idx[0] = 0;
-#endif
+            memset(idx, 0, dim * sizeof(size_t));
 
             LNXPROC_DEBUG("%p:Idx[%d] = %d\n", idx, 0, idx[0]);
             while (c < d) {
@@ -250,9 +243,6 @@ base_map(LNXPROC_BASE_T *base)
                             lnxproc_array_set_last(array, idx, dim, saveptr);
 
                         if (ret) {
-#ifdef DEBUG
-                            free(idx);
-#endif
                             return ret;
                         }
 
@@ -277,9 +267,6 @@ base_map(LNXPROC_BASE_T *base)
                     c++;
                 }
             }
-#ifdef DEBUG
-            free(idx);
-#endif
         }
 
 /*
@@ -411,7 +398,7 @@ lnxproc_base_free(LNXPROC_BASE_T *base)
 
     if (base) {
         if (base->prev) {
-            LNXPROC_DEBUG("Free prevoius results \n");
+            LNXPROC_DEBUG("Free previous results \n");
             LNXPROC_RESULTS_FREE(base->prev);
         }
         if (base->results) {

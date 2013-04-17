@@ -501,16 +501,10 @@ lnxproc_array_iterate(LNXPROC_ARRAY_T *array,
     }
 
     if (array->dim > 0) {
-/* Allocating on the stack confuses valgrind which reports a use of an 
- * uninitialised variable. Use the calloc version when testing with valgrind
- */
-#ifdef DEBUG
-        size_t *idx = calloc(array->dim, sizeof(size_t));
-#else
         size_t idx[array->dim];
 
-        idx[0] = 0;
-#endif
+        memset(idx, 0, array->dim * sizeof(size_t));
+
         struct array_iterate_t adata = {
             .data = data,
             .idx = idx,
@@ -525,14 +519,8 @@ lnxproc_array_iterate(LNXPROC_ARRAY_T *array,
 
         if (ret) {
             LNXPROC_ERROR_DEBUG(ret, "\n");
-#ifdef DEBUG
-            free(idx);
-#endif
             return ret;
         }
-#ifdef DEBUG
-        free(idx);
-#endif
     }
 
     LNXPROC_DEBUG("Success\n");

@@ -3,7 +3,7 @@
 
 CC=gcc
 CCFLAGSD=-DDEBUG=1 -g
-CCFLAGS1=-I../src -Wall
+CCFLAGS1=-I../src -Wall -Werror
 CCFLAGS2=$(CCFLAGS1) -fpic
 #CCFLAGS=-g -fpic -I. -Wall
 LDFLAGS1=-L. -llnxproc

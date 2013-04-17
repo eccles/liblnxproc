@@ -23,11 +23,11 @@ This file is part of liblnxproc.
 #include <string.h>
 #include "lnxproc.h"
 
-//#define TEST_ERROR 1
-//#define TEST_RESULTS 1
-//#define TEST_VECTOR 1
-//#define TEST_LIMITS 1
-//#define TEST_ARRAY 1
+#define TEST_ERROR 1
+#define TEST_RESULTS 1
+#define TEST_VECTOR 1
+#define TEST_LIMITS 1
+#define TEST_ARRAY 1
 #define TEST_PROC_CGROUPS 1
 
 /*----------------------------------------------------------------------------*/
@@ -546,6 +546,7 @@ execute_base(LNXPROC_BASE_T *base)
 
             lnxproc_base_lines(base, &lines);
             printf("Proccgroups: %1$d %2$*1$s\n", nbytes, lines);
+
             lnxproc_results_print(res);
             LNXPROC_RESULTS_FREE(res);
         }
@@ -559,7 +560,15 @@ test_proc_cgroups(void)
     LNXPROC_ERROR_T ret = lnxproc_proc_cgroups_new(&proc_cgroups);
 
     if (ret == LNXPROC_OK) {
+        printf("Execute 1\n");
         execute_base(proc_cgroups);
+        printf("Execute 2\n");
+        execute_base(proc_cgroups);
+        printf("Execute 3\n");
+        execute_base(proc_cgroups);
+        printf("Execute 4\n");
+        execute_base(proc_cgroups);
+        printf("Execute 5\n");
         execute_base(proc_cgroups);
         LNXPROC_BASE_FREE(proc_cgroups);
     }

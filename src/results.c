@@ -250,7 +250,7 @@ lnxproc_results_store(LNXPROC_RESULTS_T * results, char *value, char *fmt, ...)
         return LNXPROC_ERROR_RESULTS_NULL;
     }
 
-    LNXPROC_DEBUG("Results %p\n", results);
+    LNXPROC_DEBUG("Results %p Value %p '%s'\n", results, value, value);
 
     if (!results->db) {
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_NOT_OPEN,
@@ -268,10 +268,14 @@ lnxproc_results_store(LNXPROC_RESULTS_T * results, char *value, char *fmt, ...)
     va_end(ap);
     key.dptr = (unsigned char *) buf;
 
+    LNXPROC_DEBUG("Key %d : '%s'\n", key.dsize, key.dptr);
+
     TDB_DATA data;
 
     data.dsize = 1 + strlen(value);
     data.dptr = (unsigned char *) value;
+    LNXPROC_DEBUG("Value %d : '%s'\n", data.dsize, data.dptr);
+
     int flag = TDB_REPLACE;
     int ret = tdb_store(results->db, key, data, flag);
 

@@ -15,6 +15,9 @@ then
     valgrind -v ${VALOPTS} ./test-lnxproc-dbg
 elif [ "$1" = "ddd" ]
 then
+    ddd test-lnxproc
+elif [ "$1" = "ddddbg" ]
+then
     ddd test-lnxproc-dbg
 elif [ "$1" = "dbg" ]
 then
