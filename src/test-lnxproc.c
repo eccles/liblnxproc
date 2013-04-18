@@ -23,16 +23,7 @@ This file is part of liblnxproc.
 #include <string.h>
 #include <lnxproc/lnxproc.h>
 
-//#define TEST_ERROR 1
-//#define TEST_RESULTS 1
-//#define TEST_VECTOR 1
-//#define TEST_LIMITS 1
-//#define TEST_ARRAY 1
-//#define TEST_PROC_CGROUPS 1
-#define TEST_PROC_OSRELEASE 1
-
 /*----------------------------------------------------------------------------*/
-#ifdef TEST_ERROR
 static void
 test_error(void)
 {
@@ -44,10 +35,8 @@ test_error(void)
         LNXPROC_ERROR_DEBUG(i, "Test\n");
     }
 }
-#endif
 
 /*----------------------------------------------------------------------------*/
-#ifdef TEST_RESULTS
 static void
 test_results(void)
 {
@@ -85,9 +74,8 @@ test_results(void)
     db = lnxproc_db_free(db);
 */
 }
-#endif
+
 /*----------------------------------------------------------------------------*/
-#ifdef TEST_LIMITS
 static void
 test_limits(void)
 {
@@ -184,10 +172,7 @@ test_limits(void)
 
 }
 
-#endif
-
 /*----------------------------------------------------------------------------*/
-#ifdef TEST_VECTOR
 static LNXPROC_ERROR_T
 myvector_print(LNXPROC_VECTOR_DATA_T * val, int recursive, void *data,
                size_t idx)
@@ -346,10 +331,8 @@ test_vector(void)
     }
 
 }
-#endif
 
 /*----------------------------------------------------------------------------*/
-#ifdef TEST_ARRAY
 static void
 test_array(void)
 {
@@ -518,14 +501,38 @@ test_array(void)
 
 }
 
-#endif
+/*----------------------------------------------------------------------------*/
+static void
+execute_base(LNXPROC_BASE_T *base)
+{
+    if (base) {
+        LNXPROC_RESULTS_T *res = lnxproc_base_read(base);
+
+        if (!res) {
+            printf("Failure reading proc_cgroups\n");
+        }
+        else {
+            const char *filename = NULL;
+
+            lnxproc_base_filename(base, &filename);
+            printf("Filename : %s\n", filename);
+
+            int nbytes = 0;
+
+            lnxproc_base_nbytes(base, &nbytes);
+
+            char *lines = NULL;
+
+            lnxproc_base_lines(base, &lines);
+            printf("Data : %1$d %2$*1$s\n", nbytes, lines);
+
+            lnxproc_results_print(res);
+            LNXPROC_RESULTS_FREE(res);
+        }
+    }
+}
 
 /*----------------------------------------------------------------------------*/
-#ifdef TEST_PROC_CGROUPS
-
-#define EXECUTE_BASE
-static void execute_base(LNXPROC_BASE_T *base);
-
 static void
 test_proc_cgroups(void)
 {
@@ -546,13 +553,30 @@ test_proc_cgroups(void)
         LNXPROC_BASE_FREE(proc_cgroups);
     }
 }
-#endif
+
 /*----------------------------------------------------------------------------*/
-#ifdef TEST_PROC_OSRELEASE
+static void
+test_proc_hostname(void)
+{
+    LNXPROC_BASE_T *proc_hostname = NULL;
+    LNXPROC_ERROR_T ret = lnxproc_proc_hostname_new(&proc_hostname);
 
-#define EXECUTE_BASE
-static void execute_base(LNXPROC_BASE_T *base);
+    if (ret == LNXPROC_OK) {
+        printf("Execute 1\n");
+        execute_base(proc_hostname);
+        printf("Execute 2\n");
+        execute_base(proc_hostname);
+        printf("Execute 3\n");
+        execute_base(proc_hostname);
+        printf("Execute 4\n");
+        execute_base(proc_hostname);
+        printf("Execute 5\n");
+        execute_base(proc_hostname);
+        LNXPROC_BASE_FREE(proc_hostname);
+    }
+}
 
+/*----------------------------------------------------------------------------*/
 static void
 test_proc_osrelease(void)
 {
@@ -573,65 +597,45 @@ test_proc_osrelease(void)
         LNXPROC_BASE_FREE(proc_osrelease);
     }
 }
-#endif
-
-/*----------------------------------------------------------------------------*/
-#ifdef EXECUTE_BASE
-static void
-execute_base(LNXPROC_BASE_T *base)
-{
-    if (base) {
-        LNXPROC_RESULTS_T *res = lnxproc_base_read(base);
-
-        if (!res) {
-            printf("Failure reading proc_cgroups\n");
-        }
-        else {
-            const char *filename = NULL;
-
-            lnxproc_base_filename(base, &filename);
-            printf("Filename : %s\n", filename);
-
-            int nbytes = 0;
-            lnxproc_base_nbytes(base, &nbytes);
-
-            char *lines = NULL;
-            lnxproc_base_lines(base, &lines);
-            printf("Data : %1$d %2$*1$s\n", nbytes, lines);
-
-            lnxproc_results_print(res);
-            LNXPROC_RESULTS_FREE(res);
-        }
-    }
-}
-#endif
 
 /*----------------------------------------------------------------------------*/
 int
 main(int argc, char *argv[])
 {
 
-#ifdef TEST_ERROR
-    test_error();
-#endif
-#ifdef TEST_RESULTS
-    test_results();
-#endif
-#ifdef TEST_VECTOR
-    test_vector();
-#endif
-#ifdef TEST_LIMITS
-    test_limits();
-#endif
-#ifdef TEST_ARRAY
-    test_array();
-#endif
-#ifdef TEST_PROC_CGROUPS
-    test_proc_cgroups();
-#endif
-#ifdef TEST_PROC_OSRELEASE
-    test_proc_osrelease();
-#endif
-
+    if (argc < 2) {
+        test_error();
+        test_results();
+        test_vector();
+        test_limits();
+        test_array();
+        test_proc_cgroups();
+        test_proc_hostname();
+        test_proc_osrelease();
+    }
+    else if (!strcmp(argv[1], "error")) {
+        test_error();
+    }
+    else if (!strcmp(argv[1], "results")) {
+        test_results();
+    }
+    else if (!strcmp(argv[1], "vector")) {
+        test_vector();
+    }
+    else if (!strcmp(argv[1], "limits")) {
+        test_limits();
+    }
+    else if (!strcmp(argv[1], "array")) {
+        test_array();
+    }
+    else if (!strcmp(argv[1], "proc_cgroups")) {
+        test_proc_cgroups();
+    }
+    else if (!strcmp(argv[1], "proc_hostname")) {
+        test_proc_hostname();
+    }
+    else if (!strcmp(argv[1], "proc_osrelease")) {
+        test_proc_osrelease();
+    }
     return 0;
 }

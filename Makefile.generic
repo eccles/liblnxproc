@@ -39,7 +39,7 @@ $(BIN)-dbg: $(BIN).c $(LIB)-dbg.so
 
 check: $(HDRS) $(SRCS)
 	for d in $(DIRS); do (cd $$d; $(MAKE) check ); done
-	$(RELDIR)/check.sh $(HDRS) $(SRCS) $(PUBHDIR)
+	$(RELDIR)/check.sh $(BIN).c $(HDRS) $(SRCS) $(PUBHDIR)
 
 clean:
 	for d in $(PUBHDIR); do (cd $$d; rm -f *~ ); done
