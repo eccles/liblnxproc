@@ -16,9 +16,7 @@ This file is part of liblnxproc.
 
  Copyright 2013 Paul Hewlett, phewlett76@gmail.com
 
-Typical contents of file /proc/sys/kernel/domainname::
-
-    (none)
+   Reads the file /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
 
 .. note::
    This class is **cached**. The file is only read **once**. Subsequent reads
@@ -27,32 +25,33 @@ Typical contents of file /proc/sys/kernel/domainname::
 '''
 
 from basecache import BaseCache
-
-class ProcSysKernelDomainname(BaseCache):
+class SysCpufreq(BaseCache):
     '''
-    Measures the domainname file from /proc/sys/kernel filesystem
+    Reads cpu frequencey
     '''
     def __init__(self, **kwds):
         '''
         Initialises object fields
         '''
 
-        kwds['filename'] = 'proc/sys/kernel/domainname'
-        kwds['fields'] = 'domainname'
+        kwds['filename'] = \
+                          'sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq'
+        kwds['fields'] = 'freq'
 
-        super(ProcSysKernelDomainname, self).__init__(**kwds)
+        super(SysCpufreq, self).__init__(**kwds)
+#        print "filename %s" % (self.filename)
 
     def normalize(self, timestamp, lines):
         '''
-        The sys/kernel/domainname file is a single value
+        The file is one value in KHz
         '''
         data = {}
-        data[self.fields] = lines[0].rstrip()
+        data[self.fields] = int(lines[0].rstrip())
         return data
 
 if __name__ == "__main__":
     from Test import Test
-    Test(ProcSysKernelDomainname)
+    Test(SysCpufreq)
 
 */
 
@@ -60,10 +59,10 @@ if __name__ == "__main__":
 #include <string.h>
 
 #include "base_private.h"
-#include <lnxproc/proc_domainname.h>
+#include <lnxproc/sys_cpufreq.h>
 
 static LNXPROC_ERROR_T
-proc_domainname_normalize(LNXPROC_BASE_T *base)
+sys_cpufreq_normalize(LNXPROC_BASE_T *base)
 {
     lnxproc_results_store(base->results, base->lines, "/value");
 
@@ -71,12 +70,12 @@ proc_domainname_normalize(LNXPROC_BASE_T *base)
 }
 
 LNXPROC_ERROR_T
-lnxproc_proc_domainname_new(LNXPROC_BASE_T **base)
+lnxproc_sys_cpufreq_new(LNXPROC_BASE_T **base)
 {
 
     return lnxproc_base_new(base,
-                            "/proc/sys/kernel/domainname",
-                            NULL, proc_domainname_normalize, NULL, 64, NULL, 0);
+                            "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq",
+                            NULL, sys_cpufreq_normalize, NULL, 64, NULL, 0);
 }
 
 /*
