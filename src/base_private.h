@@ -35,7 +35,7 @@ extern "C" {
         LNXPROC_BASE_METHOD rawread;
         LNXPROC_BASE_METHOD normalize;
         LNXPROC_READ_METHOD read;
-        const char *filename;
+        char *filename;
         char *lines;
         size_t buflen;
         int nbytes;

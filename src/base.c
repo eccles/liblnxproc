@@ -374,12 +374,23 @@ lnxproc_base_new(LNXPROC_BASE_T **base,
     else {
         p->array = NULL;
     }
+    if (filename) {
+        p->filename = strdup(filename);
+        if (!p->filename) {
+            LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_FILENAME,
+                                "Malloc buffer\n");
+            LNXPROC_BASE_FREE(p);
+            return LNXPROC_ERROR_BASE_MALLOC_FILENAME;
+        }
+    }
+    else {
+        p->filename = NULL;
+    }
     p->results = NULL;
     p->prev = NULL;
     p->rawread = rawread;
     p->normalize = normalize;
     p->read = read;
-    p->filename = filename;
     p->buflen = buflen;
     p->nbytes = 0;
     *base = p;
@@ -409,6 +420,11 @@ lnxproc_base_free(LNXPROC_BASE_T *base)
             LNXPROC_DEBUG("Free Base buffer\n");
             free(base->lines);
             base->lines = NULL;
+        }
+        if (base->filename) {
+            LNXPROC_DEBUG("Free Base filename\n");
+            free(base->filename);
+            base->filename = NULL;
         }
 
         LNXPROC_DEBUG("Free Base\n");
