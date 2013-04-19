@@ -556,6 +556,28 @@ test_proc_cgroups(void)
 
 /*----------------------------------------------------------------------------*/
 static void
+test_proc_diskstats(void)
+{
+    LNXPROC_BASE_T *proc_diskstats = NULL;
+    LNXPROC_ERROR_T ret = lnxproc_proc_diskstats_new(&proc_diskstats);
+
+    if (ret == LNXPROC_OK) {
+        printf("Execute 1\n");
+        execute_base(proc_diskstats);
+        printf("Execute 2\n");
+        execute_base(proc_diskstats);
+        printf("Execute 3\n");
+        execute_base(proc_diskstats);
+        printf("Execute 4\n");
+        execute_base(proc_diskstats);
+        printf("Execute 5\n");
+        execute_base(proc_diskstats);
+        LNXPROC_BASE_FREE(proc_diskstats);
+    }
+}
+
+/*----------------------------------------------------------------------------*/
+static void
 test_proc_domainname(void)
 {
     LNXPROC_BASE_T *proc_domainname = NULL;
@@ -676,6 +698,7 @@ main(int argc, char *argv[])
         test_limits();
         test_array();
         test_proc_cgroups();
+        test_proc_diskstats();
         test_proc_domainname();
         test_proc_hostname();
         test_proc_osrelease();
@@ -699,6 +722,9 @@ main(int argc, char *argv[])
     }
     else if (!strcmp(argv[1], "proc_cgroups")) {
         test_proc_cgroups();
+    }
+    else if (!strcmp(argv[1], "proc_diskstats")) {
+        test_proc_diskstats();
     }
     else if (!strcmp(argv[1], "proc_domainname")) {
         test_proc_domainname();

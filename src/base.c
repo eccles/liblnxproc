@@ -125,6 +125,7 @@ base_rawread(char *filename, char **readbuf, int *nbytes)
 {
     LNXPROC_DEBUG("Filename %s Readbuf %p Nbytes %d\n", filename, *readbuf,
                   *nbytes);
+
     if (*nbytes < 1) {
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_READ_OVERFLOW, "Raw Read %s\n",
                             filename);
@@ -162,6 +163,11 @@ base_rawread(char *filename, char **readbuf, int *nbytes)
     (*readbuf)[inbytes] = '\n';
     *readbuf += inbytes;
     *nbytes -= inbytes;
+    if (*nbytes < 1) {
+        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_READ_OVERFLOW, "Raw Read %s\n",
+                            filename);
+        return LNXPROC_ERROR_BASE_READ_OVERFLOW;
+    }
     return LNXPROC_OK;
 }
 
@@ -369,15 +375,21 @@ base_map(LNXPROC_BASE_T *base)
 
             LNXPROC_DEBUG("Limits %p Dim %d\n", limits, dim);
 
-            char *saveptr = c;
-
             size_t idx[dim];
 
             memset(idx, 0, dim * sizeof(size_t));
 
             LNXPROC_DEBUG("%p:Idx[%d] = %d\n", idx, 0, idx[0]);
+            size_t i;
+
+            for (i = 0; i < dim && c < d; i++) {
+                LNXPROC_DEBUG("At Char %p '%c'\n", c, *c);
+                while (lnxproc_limit_chr(limits + i, *c) && (++c < d));
+            }
+
+            char *saveptr = c;
+
             while (c < d) {
-                size_t i;
                 int increment = 1;
 
                 for (i = 0; i < dim && c < d; i++) {
@@ -396,15 +408,18 @@ base_map(LNXPROC_BASE_T *base)
                         while ((++c < d) && lnxproc_limit_chr(limits + i, *c));
 
                         if (c < d) {
-                            saveptr = c;
-                            LNXPROC_DEBUG("New Saveptr %p\n", saveptr);
                             idx[i]++;
                             LNXPROC_DEBUG("%p:Idx[%d] = %d\n", idx, i, idx[i]);
-                            int j = i + 1;
 
-                            if (dim > j) {
-                                memset(idx + j, 0, (dim - j) * sizeof(size_t));
+                            int j;
+
+                            for (j = i + 1; j < dim; j++) {
+                                idx[j] = 0;
+                                while (lnxproc_limit_chr(limits + j, *c)
+                                       && (++c < d));
                             }
+                            saveptr = c;
+                            LNXPROC_DEBUG("New Saveptr %p\n", saveptr);
 
                         }
                         increment = 0;
@@ -434,7 +449,7 @@ static LNXPROC_ERROR_T
 base_resize_rawread_buffer(LNXPROC_BASE_T *base)
 {
 
-    LNXPROC_DEBUG("Resize lines buffer\n");
+    LNXPROC_DEBUG("Resize lines buffer from %d bytes\n", base->buflen);
     size_t newlen = base->buflen * 2;
     char *p = realloc(base->lines, newlen + 1);
 
@@ -447,6 +462,7 @@ base_resize_rawread_buffer(LNXPROC_BASE_T *base)
     p[newlen] = '\n';
     base->lines = p;
     base->buflen = newlen;
+    LNXPROC_DEBUG("Resize lines buffer to %d bytes\n", base->buflen);
     return LNXPROC_OK;
 }
 
