@@ -509,10 +509,10 @@ execute_base(LNXPROC_BASE_T *base)
         LNXPROC_RESULTS_T *res = lnxproc_base_read(base);
 
         if (!res) {
-            printf("Failure reading proc_cgroups\n");
+            printf("Failure reading base\n");
         }
         else {
-            const char *filename = NULL;
+            char *filename = NULL;
 
             lnxproc_base_filename(base, &filename);
             printf("Filename : %s\n", filename);
@@ -643,6 +643,28 @@ test_sys_cpufreq(void)
 }
 
 /*----------------------------------------------------------------------------*/
+static void
+test_sys_disksectors(void)
+{
+    LNXPROC_BASE_T *sys_disksectors = NULL;
+    LNXPROC_ERROR_T ret = lnxproc_sys_disksectors_new(&sys_disksectors);
+
+    if (ret == LNXPROC_OK) {
+        printf("Execute 1\n");
+        execute_base(sys_disksectors);
+        printf("Execute 2\n");
+        execute_base(sys_disksectors);
+        printf("Execute 3\n");
+        execute_base(sys_disksectors);
+        printf("Execute 4\n");
+        execute_base(sys_disksectors);
+        printf("Execute 5\n");
+        execute_base(sys_disksectors);
+        LNXPROC_BASE_FREE(sys_disksectors);
+    }
+}
+
+/*----------------------------------------------------------------------------*/
 int
 main(int argc, char *argv[])
 {
@@ -658,6 +680,7 @@ main(int argc, char *argv[])
         test_proc_hostname();
         test_proc_osrelease();
         test_sys_cpufreq();
+        test_sys_disksectors();
     }
     else if (!strcmp(argv[1], "error")) {
         test_error();
@@ -688,6 +711,9 @@ main(int argc, char *argv[])
     }
     else if (!strcmp(argv[1], "sys_cpufreq")) {
         test_sys_cpufreq();
+    }
+    else if (!strcmp(argv[1], "sys_disksectors")) {
+        test_sys_disksectors();
     }
     return 0;
 }

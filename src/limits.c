@@ -87,6 +87,11 @@ lnxproc_chars_print(char *chars, size_t nchars, char *buf, size_t buflen)
     int i;
     char c;
 
+    if (nchars == 0) {
+        buf[0] = '\0';
+        return LNXPROC_OK;
+    }
+
     int m = 0;
     char *b = buf;
     int len = buflen - 1;

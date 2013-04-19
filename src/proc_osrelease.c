@@ -70,8 +70,9 @@ LNXPROC_ERROR_T
 lnxproc_proc_osrelease_new(LNXPROC_BASE_T **base)
 {
 
+    char *filenames[] = { "/proc/sys/kernel/osrelease", };
     return lnxproc_base_new(base,
-                            "/proc/sys/kernel/osrelease",
+                            filenames, 1, NULL, NULL,
                             NULL, proc_osrelease_normalize, NULL, 32, NULL, 0);
 }
 

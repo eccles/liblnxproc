@@ -36,6 +36,7 @@ extern "C" {
 #include <lnxproc/proc_hostname.h>
 #include <lnxproc/proc_osrelease.h>
 #include <lnxproc/sys_cpufreq.h>
+#include <lnxproc/sys_disksectors.h>
 
 #ifdef __cplusplus
 }                               // extern "C"

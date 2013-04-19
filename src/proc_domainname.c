@@ -74,8 +74,9 @@ LNXPROC_ERROR_T
 lnxproc_proc_domainname_new(LNXPROC_BASE_T **base)
 {
 
+    char *filenames[1] = { "/proc/sys/kernel/domainname" };
     return lnxproc_base_new(base,
-                            "/proc/sys/kernel/domainname",
+                            filenames, 1, NULL, NULL,
                             NULL, proc_domainname_normalize, NULL, 64, NULL, 0);
 }
 

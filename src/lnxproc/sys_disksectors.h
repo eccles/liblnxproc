@@ -18,39 +18,21 @@
  *
  */
 
-#ifndef LIBLNXPROC_BASE_PRIVATE_H
-#define LIBLNXPROC_BASE_PRIVATE_H 1
-
+#ifndef LIBLNXPROC_SYS_DISKSECTORS_H
+#define LIBLNXPROC_SYS_DISKSECTORS_H 1
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <stddef.h>
-
-#include <lnxproc/results.h>
-#include "array_private.h"
+#include <lnxproc/error.h>
 #include <lnxproc/base.h>
 
-    struct lnxproc_base_t {
-        LNXPROC_BASE_METHOD rawread;
-        LNXPROC_BASE_METHOD normalize;
-        LNXPROC_READ_METHOD read;
-        char **filenames;
-        size_t nfiles;
-        char *fileprefix;
-        char *filesuffix;
-        char *lines;
-        size_t buflen;
-        int nbytes;
-        LNXPROC_ARRAY_T *array;
-        LNXPROC_RESULTS_T *results;
-        LNXPROC_RESULTS_T *prev;
-    };
+    LNXPROC_ERROR_T lnxproc_sys_disksectors_new(LNXPROC_BASE_T **base);
 
 #ifdef __cplusplus
 }                               // extern "C"
 #endif
-#endif                          // LIBLNXPROC_BASE_PRIVATE_H
+#endif                          // LIBLNXPROC_SYS_DISKSECTORSIZE_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
  */

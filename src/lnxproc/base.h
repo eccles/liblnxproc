@@ -38,7 +38,10 @@ extern "C" {
     typedef LNXPROC_RESULTS_T *(*LNXPROC_READ_METHOD) (LNXPROC_BASE_T *base);
 
     LNXPROC_ERROR_T lnxproc_base_new(LNXPROC_BASE_T **base,
-                                     const char *filename,
+                                     char **filenames,
+                                     size_t nfiles,
+                                     char *fileprefix,
+                                     char *filesuffix,
                                      LNXPROC_BASE_METHOD rawread,
                                      LNXPROC_BASE_METHOD normalize,
                                      LNXPROC_READ_METHOD read,
@@ -59,7 +62,7 @@ extern "C" {
                                        LNXPROC_ARRAY_T **array);
 
     LNXPROC_ERROR_T lnxproc_base_filename(LNXPROC_BASE_T *base,
-                                          const char **filename);
+                                          char **filename);
     LNXPROC_ERROR_T lnxproc_base_lines(LNXPROC_BASE_T *base, char **lines);
 
     LNXPROC_ERROR_T lnxproc_base_rawread(LNXPROC_BASE_T *base);

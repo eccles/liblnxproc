@@ -73,9 +73,10 @@ LNXPROC_ERROR_T
 lnxproc_sys_cpufreq_new(LNXPROC_BASE_T **base)
 {
 
-    return lnxproc_base_new(base,
-                            "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq",
-                            NULL, sys_cpufreq_normalize, NULL, 64, NULL, 0);
+    char *filenames[] =
+        { "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq", };
+    return lnxproc_base_new(base, filenames, 1, NULL, NULL, NULL,
+                            sys_cpufreq_normalize, NULL, 64, NULL, 0);
 }
 
 /*

@@ -73,8 +73,9 @@ LNXPROC_ERROR_T
 lnxproc_proc_hostname_new(LNXPROC_BASE_T **base)
 {
 
+    char *filenames[] = { "/proc/sys/kernel/hostname", };
     return lnxproc_base_new(base,
-                            "/proc/sys/kernel/hostname",
+                            filenames, 1, NULL, NULL,
                             NULL, proc_hostname_normalize, NULL, 64, NULL, 0);
 }
 
