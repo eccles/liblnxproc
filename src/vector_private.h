@@ -28,20 +28,84 @@
 extern "C" {
 #endif
 
+#include <stddef.h>
 #include <lnxproc/error.h>
-#include <lnxproc/vector.h>
 
-    union lnxproc_vector_data_t {
-        LNXPROC_VECTOR_T *child;
+    typedef struct _lnxproc_vector_t _LNXPROC_VECTOR_T;
+
+    union _lnxproc_vector_data_t {
+        _LNXPROC_VECTOR_T *child;
         char *value;
     };
+    typedef union _lnxproc_vector_data_t _LNXPROC_VECTOR_DATA_T;
 
-    struct lnxproc_vector_t {
+    struct _lnxproc_vector_t {
         size_t length;
         size_t size;
         int recursive;
-        LNXPROC_VECTOR_DATA_T *data;
+        _LNXPROC_VECTOR_DATA_T *data;
     };
+    typedef struct _lnxproc_vector_t _LNXPROC_VECTOR_T;
+
+    LNXPROC_ERROR_T _lnxproc_vector_new(_LNXPROC_VECTOR_T ** vec,
+                                        size_t size, int recursive);
+
+#ifndef WARN_UNUSED
+#define WARN_UNUSED __attribute__((warn_unused_result))
+#endif
+
+    _LNXPROC_VECTOR_T *_lnxproc_vector_free(_LNXPROC_VECTOR_T *
+                                            vector) WARN_UNUSED;
+
+#define _LNXPROC_VECTOR_FREE(v) {\
+    v =  _lnxproc_vector_free(v);\
+}
+
+    LNXPROC_ERROR_T _lnxproc_data_child(_LNXPROC_VECTOR_DATA_T * val,
+                                        _LNXPROC_VECTOR_T ** vector);
+    LNXPROC_ERROR_T _lnxproc_data_value(_LNXPROC_VECTOR_DATA_T * val,
+                                        char **value);
+
+    LNXPROC_ERROR_T _lnxproc_vector_resize(_LNXPROC_VECTOR_T * vector,
+                                           size_t size);
+
+    LNXPROC_ERROR_T _lnxproc_vector_set_child(_LNXPROC_VECTOR_T * vector,
+                                              size_t idx,
+                                              _LNXPROC_VECTOR_T * child);
+    LNXPROC_ERROR_T _lnxproc_vector_set_value(_LNXPROC_VECTOR_T * vector,
+                                              size_t idx, char *val);
+
+    LNXPROC_ERROR_T _lnxproc_vector_set_last_child(_LNXPROC_VECTOR_T * vector,
+                                                   size_t idx,
+                                                   _LNXPROC_VECTOR_T * child);
+    LNXPROC_ERROR_T _lnxproc_vector_set_last_value(_LNXPROC_VECTOR_T * vector,
+                                                   size_t idx, char *val);
+
+    LNXPROC_ERROR_T _lnxproc_vector_set_length(_LNXPROC_VECTOR_T * vector,
+                                               size_t idx);
+
+    LNXPROC_ERROR_T _lnxproc_vector_child(_LNXPROC_VECTOR_T * vector,
+                                          size_t idx,
+                                          _LNXPROC_VECTOR_T ** child);
+    LNXPROC_ERROR_T _lnxproc_vector_value(_LNXPROC_VECTOR_T * vector,
+                                          size_t idx, char **value);
+
+    LNXPROC_ERROR_T _lnxproc_vector_size(_LNXPROC_VECTOR_T * vector,
+                                         size_t * size);
+
+    typedef
+    LNXPROC_ERROR_T (*_LNXPROC_VECTOR_ITERATE_FUNC) (_LNXPROC_VECTOR_DATA_T *
+                                                     entry, int recursive,
+                                                     void *data, size_t idx);
+
+    LNXPROC_ERROR_T _lnxproc_vector_iterate(_LNXPROC_VECTOR_T * vector,
+                                            void *data,
+                                            int start,
+                                            int end,
+                                            _LNXPROC_VECTOR_ITERATE_FUNC func);
+
+    LNXPROC_ERROR_T _lnxproc_vector_print(_LNXPROC_VECTOR_T * vector,
+                                          int allocated, void *data);
 
 #ifdef __cplusplus
 }                               // extern "C"

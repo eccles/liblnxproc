@@ -35,8 +35,8 @@ extern "C" {
     struct lnxproc_array_t {
         LNXPROC_LIMITS_T *limits;
         size_t dim;
-        LNXPROC_VECTOR_T **saved;
-        LNXPROC_VECTOR_T *vector;
+        _LNXPROC_VECTOR_T **saved;
+        _LNXPROC_VECTOR_T *vector;
     };
 
 #ifdef __cplusplus

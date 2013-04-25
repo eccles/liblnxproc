@@ -26,7 +26,6 @@ extern "C" {
 #endif
 
 #include <lnxproc/error.h>
-#include <lnxproc/vector.h>
 #include <lnxproc/limits.h>
 #include <lnxproc/array.h>
 #include <lnxproc/base.h>

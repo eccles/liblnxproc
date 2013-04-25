@@ -21,7 +21,20 @@ This file is part of liblnxproc.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <lnxproc/lnxproc.h>
+
+#include "lnxproc/error.h"
+#include "vector_private.h"
+#include "lnxproc/limits.h"
+#include "array_private.h"
+#include "base_private.h"
+#include "lnxproc/results.h"
+#include "lnxproc/proc_cgroups.h"
+#include "lnxproc/proc_diskstats.h"
+#include "lnxproc/proc_domainname.h"
+#include "lnxproc/proc_hostname.h"
+#include "lnxproc/proc_osrelease.h"
+#include "lnxproc/sys_cpufreq.h"
+#include "lnxproc/sys_disksectors.h"
 
 /*----------------------------------------------------------------------------*/
 static void
@@ -174,19 +187,19 @@ test_limits(void)
 
 /*----------------------------------------------------------------------------*/
 static LNXPROC_ERROR_T
-myvector_print(LNXPROC_VECTOR_DATA_T * val, int recursive, void *data,
+myvector_print(_LNXPROC_VECTOR_DATA_T * val, int recursive, void *data,
                size_t idx)
 {
     if (recursive) {
-        LNXPROC_VECTOR_T *child = NULL;
+        _LNXPROC_VECTOR_T *child = NULL;
 
-        lnxproc_data_child(val, &child);
+        _lnxproc_data_child(val, &child);
         printf("Child %p : Index %zd\n", child, idx);
     }
     else {
         char *value = NULL;
 
-        lnxproc_data_value(val, &value);
+        _lnxproc_data_value(val, &value);
         printf("Val %p : Index %zd\n", value, idx);
     }
     return 0;
@@ -196,68 +209,68 @@ static void
 test_vector(void)
 {
     printf("Allocate vector for structs\n");
-    LNXPROC_VECTOR_T *vector = NULL;
+    _LNXPROC_VECTOR_T *vector = NULL;
 
-    lnxproc_vector_new(&vector, 2, 1);
-    lnxproc_vector_print(vector, 1, NULL);
+    _lnxproc_vector_new(&vector, 2, 1);
+    _lnxproc_vector_print(vector, 1, NULL);
 
     printf("Allocate vector 1 for strings\n");
-    LNXPROC_VECTOR_T *cvector1 = NULL;
+    _LNXPROC_VECTOR_T *cvector1 = NULL;
 
-    lnxproc_vector_new(&cvector1, 2, 0);
-    lnxproc_vector_print(cvector1, 1, NULL);
+    _lnxproc_vector_new(&cvector1, 2, 0);
+    _lnxproc_vector_print(cvector1, 1, NULL);
 
     printf("Allocate vector 2 for strings\n");
-    LNXPROC_VECTOR_T *cvector2 = NULL;
+    _LNXPROC_VECTOR_T *cvector2 = NULL;
 
-    lnxproc_vector_new(&cvector2, 2, 0);
-    lnxproc_vector_print(cvector2, 1, NULL);
+    _lnxproc_vector_new(&cvector2, 2, 0);
+    _lnxproc_vector_print(cvector2, 1, NULL);
 
     printf("Allocate vector 3 for strings\n");
-    LNXPROC_VECTOR_T *cvector3 = NULL;
+    _LNXPROC_VECTOR_T *cvector3 = NULL;
 
-    lnxproc_vector_new(&cvector3, 2, 0);
-    lnxproc_vector_print(cvector3, 1, NULL);
+    _lnxproc_vector_new(&cvector3, 2, 0);
+    _lnxproc_vector_print(cvector3, 1, NULL);
 
     if (vector && cvector1 && cvector2 && cvector3) {
 
         printf("Add string vector to struct vector at position %d\n", 0);
-        lnxproc_vector_set_child(vector, 0, cvector1);
-        lnxproc_vector_print(vector, 1, NULL);
+        _lnxproc_vector_set_child(vector, 0, cvector1);
+        _lnxproc_vector_print(vector, 1, NULL);
 
         printf
             ("Add string vector to struct vector at position %d (should fail)\n",
              2);
-        lnxproc_vector_set_child(vector, 2, cvector2);
-        lnxproc_vector_print(vector, 1, NULL);
+        _lnxproc_vector_set_child(vector, 2, cvector2);
+        _lnxproc_vector_print(vector, 1, NULL);
 
         printf("Add string vector to struct vector at position %d\n", 1);
-        lnxproc_vector_set_child(vector, 1, cvector2);
-        lnxproc_vector_print(vector, 1, NULL);
+        _lnxproc_vector_set_child(vector, 1, cvector2);
+        _lnxproc_vector_print(vector, 1, NULL);
 
         printf
             ("Add string vector to struct vector at position %d (should resize)\n",
              2);
-        lnxproc_vector_set_child(vector, 2, cvector3);
-        lnxproc_vector_print(vector, 1, NULL);
+        _lnxproc_vector_set_child(vector, 2, cvector3);
+        _lnxproc_vector_print(vector, 1, NULL);
 
         printf("Get string vector from struct vector at position %d\n", 0);
-        LNXPROC_VECTOR_T *myvector = NULL;
+        _LNXPROC_VECTOR_T *myvector = NULL;
 
-        lnxproc_vector_child(vector, 0, &myvector);
+        _lnxproc_vector_child(vector, 0, &myvector);
 
-        lnxproc_vector_print(myvector, 1, NULL);
+        _lnxproc_vector_print(myvector, 1, NULL);
 
         printf
             ("Get string vector from struct vector at position %d (should fail)\n",
              3);
         myvector = NULL;
-        lnxproc_vector_child(vector, 3, &myvector);
-        lnxproc_vector_print(myvector, 1, NULL);
+        _lnxproc_vector_child(vector, 3, &myvector);
+        _lnxproc_vector_print(myvector, 1, NULL);
 
         printf("Resize struct vector - add %d elements\n", 20);
-        lnxproc_vector_resize(vector, 20);
-        lnxproc_vector_print(vector, 1, NULL);
+        _lnxproc_vector_resize(vector, 20);
+        _lnxproc_vector_print(vector, 1, NULL);
 
         char *val1 = "value1";
         char *val2 = "value2";
@@ -280,54 +293,54 @@ test_vector(void)
         printf("Val9 at %1$p with value %1$s\n", val9);
 
         printf("cvector1: Set idx %1$d to value %2$p '%2$s'\n", 0, val2);
-        lnxproc_vector_set_value(cvector1, 0, val2);
-        lnxproc_vector_print(vector, 1, NULL);
+        _lnxproc_vector_set_value(cvector1, 0, val2);
+        _lnxproc_vector_print(vector, 1, NULL);
 
         printf("cvector1: Set idx %1$d to value %2$p '%2$s'\n", 0, val1);
-        lnxproc_vector_set_value(cvector1, 0, val1);
-        lnxproc_vector_print(vector, 1, NULL);
+        _lnxproc_vector_set_value(cvector1, 0, val1);
+        _lnxproc_vector_print(vector, 1, NULL);
 
         printf("cvector1: Set idx %1$d to value %2$p '%2$s'\n", 1, val4);
-        lnxproc_vector_set_value(cvector1, 1, val4);
-        lnxproc_vector_print(vector, 1, NULL);
+        _lnxproc_vector_set_value(cvector1, 1, val4);
+        _lnxproc_vector_print(vector, 1, NULL);
 
         printf("cvector1: Set idx %1$d to value %2$p '%2$s'\n", 2, val7);
-        lnxproc_vector_set_value(cvector1, 2, val7);
-        lnxproc_vector_print(vector, 1, NULL);
+        _lnxproc_vector_set_value(cvector1, 2, val7);
+        _lnxproc_vector_print(vector, 1, NULL);
 
         printf("cvector2: Set idx %1$d to value %2$p '%2$s'\n", 0, val2);
-        lnxproc_vector_set_value(cvector2, 0, val2);
-        lnxproc_vector_print(vector, 1, NULL);
+        _lnxproc_vector_set_value(cvector2, 0, val2);
+        _lnxproc_vector_print(vector, 1, NULL);
 
         printf("cvector2: Set idx %1$d to value %2$p '%2$s'\n", 1, val5);
-        lnxproc_vector_set_value(cvector2, 1, val5);
-        lnxproc_vector_print(vector, 1, NULL);
+        _lnxproc_vector_set_value(cvector2, 1, val5);
+        _lnxproc_vector_print(vector, 1, NULL);
 
         printf("cvector2: Set idx %1$d to value %2$p '%2$s'\n", 2, val7);
-        lnxproc_vector_set_value(cvector2, 2, val7);
-        lnxproc_vector_print(vector, 1, NULL);
+        _lnxproc_vector_set_value(cvector2, 2, val7);
+        _lnxproc_vector_print(vector, 1, NULL);
 
         printf("cvector3: Set idx %1$d to value %2$p '%2$s'\n", 0, val3);
-        lnxproc_vector_set_value(cvector3, 0, val3);
-        lnxproc_vector_print(vector, 1, NULL);
+        _lnxproc_vector_set_value(cvector3, 0, val3);
+        _lnxproc_vector_print(vector, 1, NULL);
 
         printf("cvector3: Set idx %1$d to value %2$p '%2$s'\n", 1, val6);
-        lnxproc_vector_set_value(cvector3, 1, val6);
-        lnxproc_vector_print(vector, 1, NULL);
+        _lnxproc_vector_set_value(cvector3, 1, val6);
+        _lnxproc_vector_print(vector, 1, NULL);
 
         printf("cvector3: Set idx %1$d to value %2$p '%2$s'\n", 2, val9);
-        lnxproc_vector_set_value(cvector3, 2, val9);
-        lnxproc_vector_print(vector, 1, NULL);
+        _lnxproc_vector_set_value(cvector3, 2, val9);
+        _lnxproc_vector_print(vector, 1, NULL);
 
         printf("cvector2: Resize string vector - add %d elements\n", 20);
-        lnxproc_vector_resize(cvector2, 20);
-        lnxproc_vector_print(vector, 1, NULL);
+        _lnxproc_vector_resize(cvector2, 20);
+        _lnxproc_vector_print(vector, 1, NULL);
 
         printf("Print elements %d to %d\n", 1, 2);
-        lnxproc_vector_iterate(vector, NULL, 1, 3, myvector_print);
+        _lnxproc_vector_iterate(vector, NULL, 1, 3, myvector_print);
         printf("\n");
 
-        LNXPROC_VECTOR_FREE(vector);
+        _LNXPROC_VECTOR_FREE(vector);
     }
 
 }

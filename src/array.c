@@ -30,7 +30,7 @@
 #include <lnxproc/limits.h>
 #include "array_private.h"
 
-static LNXPROC_VECTOR_T *
+static _LNXPROC_VECTOR_T *
 array_create(LNXPROC_LIMITS_T limits[], size_t dim, int depth)
 {
     LNXPROC_DEBUG("limits %p\n", limits);
@@ -51,9 +51,10 @@ array_create(LNXPROC_LIMITS_T limits[], size_t dim, int depth)
 
     LNXPROC_DEBUG("recursive %d\n", recursive);
 
-    LNXPROC_VECTOR_T *wvec = NULL;
+    _LNXPROC_VECTOR_T *wvec = NULL;
 
-    LNXPROC_ERROR_T ret = lnxproc_vector_new(&wvec, limit->expected, recursive);
+    LNXPROC_ERROR_T ret =
+        _lnxproc_vector_new(&wvec, limit->expected, recursive);
 
     if (ret) {
         LNXPROC_ERROR_DEBUG(ret, "Create array\n");
@@ -65,13 +66,13 @@ array_create(LNXPROC_LIMITS_T limits[], size_t dim, int depth)
     if (recursive) {
         depth++;
         for (i = 0; i < limit->expected; i++) {
-            LNXPROC_VECTOR_T *f = array_create(limits, dim, depth);
+            _LNXPROC_VECTOR_T *f = array_create(limits, dim, depth);
 
             if (!f) {
                 LNXPROC_DEBUG("Create array failed\n");
                 return NULL;
             }
-            ret = lnxproc_vector_set_last_child(wvec, i, f);
+            ret = _lnxproc_vector_set_last_child(wvec, i, f);
             if (ret) {
                 LNXPROC_ERROR_DEBUG(ret, "Create array\n");
                 return NULL;
@@ -124,7 +125,7 @@ lnxproc_array_new(LNXPROC_ARRAY_T **array, LNXPROC_LIMITS_T limits[],
         }
         p->dim = dim;
 
-        p->saved = calloc(dim, sizeof(LNXPROC_VECTOR_T *));
+        p->saved = calloc(dim, sizeof(_LNXPROC_VECTOR_T *));
         if (!p->saved) {
             LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ARRAY_SAVED_MALLOC,
                                 "Malloc array\n");
@@ -152,7 +153,7 @@ lnxproc_array_new(LNXPROC_ARRAY_T **array, LNXPROC_LIMITS_T limits[],
         p->dim = 0;
 
         p->vector = NULL;
-        ret = lnxproc_vector_new(&p->vector, 1, 0);
+        ret = _lnxproc_vector_new(&p->vector, 1, 0);
         if (ret) {
             LNXPROC_ERROR_DEBUG(ret, "Malloc array\n");
             LNXPROC_ARRAY_FREE(p);
@@ -180,7 +181,7 @@ lnxproc_array_free(LNXPROC_ARRAY_T *array)
             array->saved = NULL;
         }
         if (array->vector) {
-            LNXPROC_VECTOR_FREE(array->vector);
+            _LNXPROC_VECTOR_FREE(array->vector);
         }
 
         LNXPROC_DEBUG("Free array %p\n", array);
@@ -234,7 +235,7 @@ lnxproc_array_set(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim, char *val)
     }
 
     if (dim == 0) {
-        LNXPROC_ERROR_T ret = lnxproc_vector_set_value(array->vector, 0, val);
+        LNXPROC_ERROR_T ret = _lnxproc_vector_set_value(array->vector, 0, val);
 
         if (ret) {
             LNXPROC_ERROR_DEBUG(ret, "\n");
@@ -258,9 +259,9 @@ lnxproc_array_set(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim, char *val)
 
     for (i = 0; i < dim - 1; i++) {
         LNXPROC_DEBUG("Saved[%d] = %p\n", i, array->saved[i]);
-        LNXPROC_VECTOR_T *f = NULL;
+        _LNXPROC_VECTOR_T *f = NULL;
 
-        ret = lnxproc_vector_child(array->saved[i], idx[i], &f);
+        ret = _lnxproc_vector_child(array->saved[i], idx[i], &f);
         if (ret && (ret != LNXPROC_ERROR_VECTOR_INDEX_OUT_OF_RANGE)) {
             LNXPROC_ERROR_DEBUG(ret, "\n");
             return ret;
@@ -271,12 +272,12 @@ lnxproc_array_set(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim, char *val)
         if (!f) {
             int recursive = j < dim - 1 ? 1 : 0;
 
-            ret = lnxproc_vector_new(&f, array->limits[j].expected, recursive);
+            ret = _lnxproc_vector_new(&f, array->limits[j].expected, recursive);
             if (ret) {
                 LNXPROC_ERROR_DEBUG(ret, "\n");
                 return ret;
             }
-            ret = lnxproc_vector_set_child(array->saved[i], idx[i], f);
+            ret = _lnxproc_vector_set_child(array->saved[i], idx[i], f);
             if (ret) {
                 LNXPROC_ERROR_DEBUG(ret, "\n");
                 return ret;
@@ -285,7 +286,7 @@ lnxproc_array_set(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim, char *val)
         array->saved[j] = f;
         LNXPROC_DEBUG("Saved[%d] = %p\n", j, array->saved[j]);
     }
-    ret = lnxproc_vector_set_value(array->saved[dim - 1], idx[dim - 1], val);
+    ret = _lnxproc_vector_set_value(array->saved[dim - 1], idx[dim - 1], val);
     if (ret) {
         LNXPROC_ERROR_DEBUG(ret, "\n");
         return ret;
@@ -321,7 +322,7 @@ lnxproc_array_set_last(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim,
     }
 
     if (dim == 0) {
-        LNXPROC_ERROR_T ret = lnxproc_vector_set_value(array->vector, 0, val);
+        LNXPROC_ERROR_T ret = _lnxproc_vector_set_value(array->vector, 0, val);
 
         if (ret) {
             LNXPROC_ERROR_DEBUG(ret, "\n");
@@ -340,9 +341,9 @@ lnxproc_array_set_last(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim,
 
     for (i = 0; i < dim - 1; i++) {
         LNXPROC_DEBUG("Saved[%d] = %p\n", i, array->saved[i]);
-        LNXPROC_VECTOR_T *f = NULL;
+        _LNXPROC_VECTOR_T *f = NULL;
 
-        ret = lnxproc_vector_child(array->saved[i], idx[i], &f);
+        ret = _lnxproc_vector_child(array->saved[i], idx[i], &f);
         if (ret && (ret != LNXPROC_ERROR_VECTOR_INDEX_OUT_OF_RANGE)) {
             LNXPROC_ERROR_DEBUG(ret, "\n");
             return ret;
@@ -353,12 +354,12 @@ lnxproc_array_set_last(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim,
         if (!f) {
             int recursive = j < dim - 1 ? 1 : 0;
 
-            ret = lnxproc_vector_new(&f, array->limits[j].expected, recursive);
+            ret = _lnxproc_vector_new(&f, array->limits[j].expected, recursive);
             if (ret) {
                 LNXPROC_ERROR_DEBUG(ret, "\n");
                 return ret;
             }
-            ret = lnxproc_vector_set_last_child(array->saved[i], idx[i], f);
+            ret = _lnxproc_vector_set_last_child(array->saved[i], idx[i], f);
             if (ret) {
                 LNXPROC_ERROR_DEBUG(ret, "\n");
                 return ret;
@@ -368,7 +369,8 @@ lnxproc_array_set_last(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim,
         LNXPROC_DEBUG("Saved[%d] = %p\n", j, array->saved[j]);
     }
     ret =
-        lnxproc_vector_set_last_value(array->saved[dim - 1], idx[dim - 1], val);
+        _lnxproc_vector_set_last_value(array->saved[dim - 1], idx[dim - 1],
+                                       val);
     if (ret) {
         LNXPROC_ERROR_DEBUG(ret, "\n");
         return ret;
@@ -405,7 +407,7 @@ lnxproc_array_get(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim,
     LNXPROC_ERROR_T ret;
 
     if (dim == 0) {
-        ret = lnxproc_vector_value(array->vector, 0, value);
+        ret = _lnxproc_vector_value(array->vector, 0, value);
         if (ret) {
             LNXPROC_ERROR_DEBUG(ret, "\n");
             return ret;
@@ -421,9 +423,9 @@ lnxproc_array_get(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim,
 
     for (i = 1; i < array->dim; i++) {
         j = i - 1;
-        LNXPROC_VECTOR_T *f = NULL;
+        _LNXPROC_VECTOR_T *f = NULL;
 
-        ret = lnxproc_vector_child(array->saved[j], idx[j], &f);
+        ret = _lnxproc_vector_child(array->saved[j], idx[j], &f);
 
         if (ret) {
             LNXPROC_ERROR_DEBUG(ret, "\n");
@@ -431,7 +433,7 @@ lnxproc_array_get(LNXPROC_ARRAY_T *array, size_t idx[], size_t dim,
         }
         array->saved[i] = f;
     }
-    ret = lnxproc_vector_value(array->saved[dim - 1], idx[dim - 1], value);
+    ret = _lnxproc_vector_value(array->saved[dim - 1], idx[dim - 1], value);
     if (ret) {
         LNXPROC_ERROR_DEBUG(ret, "\n");
         return ret;
@@ -450,7 +452,7 @@ struct array_iterate_t {
 };
 
 static LNXPROC_ERROR_T
-array_vector_iterate_func(LNXPROC_VECTOR_DATA_T * val, int recursive,
+array_vector_iterate_func(_LNXPROC_VECTOR_DATA_T * val, int recursive,
                           void *data, size_t idx)
 {
 
@@ -473,8 +475,8 @@ array_vector_iterate_func(LNXPROC_VECTOR_DATA_T * val, int recursive,
 
         memcpy(&adata1, adata, sizeof(adata1));
         adata1.depth++;
-        ret = lnxproc_vector_iterate(val->child, &adata1, -1, -1,
-                                     array_vector_iterate_func);
+        ret = _lnxproc_vector_iterate(val->child, &adata1, -1, -1,
+                                      array_vector_iterate_func);
 
     }
     else {
@@ -514,8 +516,8 @@ lnxproc_array_iterate(LNXPROC_ARRAY_T *array,
         };
 
         LNXPROC_ERROR_T ret =
-            lnxproc_vector_iterate(array->vector, &adata, -1, -1,
-                                   array_vector_iterate_func);
+            _lnxproc_vector_iterate(array->vector, &adata, -1, -1,
+                                    array_vector_iterate_func);
 
         if (ret) {
             LNXPROC_ERROR_DEBUG(ret, "\n");
@@ -573,7 +575,7 @@ lnxproc_array_print(LNXPROC_ARRAY_T *array, int allocated)
         size_t idx = 0;
         char *val = NULL;
 
-        ret = lnxproc_vector_value(array->vector, idx, &val);
+        ret = _lnxproc_vector_value(array->vector, idx, &val);
         if (ret) {
             LNXPROC_ERROR_DEBUG(ret, "\n");
             return ret;
