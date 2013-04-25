@@ -1,14 +1,14 @@
 
-SRCS=test-lnxproc.c
-TSKS=test-lnxproc
+TSKS=timing
+SRCS=timing.c
 
 CC=gcc
-CCFLAGS=-DDEBUG=1 -g -I../src -Wall
+CCFLAGS=-O2 -I../src -Wall
 LDFLAGS=-L../src -llnxproc
 
 all: $(TSKS)
 
-test-lnxproc: test-lnxproc.c
+timing: timing.c
 	$(CC) $(CCFLAGS) -o $@ $^ $(LDFLAGS)
 
 check: $(SRCS)
