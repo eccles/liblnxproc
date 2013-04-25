@@ -26,16 +26,16 @@ all: $(BIN) $(BIN)-dbg
 	for d in $(DIRS); do (cd $$d; $(MAKE) ); done
 
 $(LIB).so: $(OBJS)
-	$(CC) $(SOFLAGS) -o $@ $^
+	$(CC) $(SOFLAGS) -o $@ $^ $(DBLIB)
 
 $(LIB)-dbg.so: $(OBJSDBG)
-	$(CC) $(SOFLAGS) -o $@ $^
+	$(CC) $(SOFLAGS) -o $@ $^ $(DBLIB)
 
 $(BIN): $(BIN).c $(LIB).so
-	$(CC) $(CCFLAGS1) -o $@ $^ $(LDFLAGS1) $(DBLIB)
+	$(CC) $(CCFLAGS1) -o $@ $^ $(LDFLAGS1) 
 
 $(BIN)-dbg: $(BIN).c $(LIB)-dbg.so
-	$(CC) $(CCFLAGSD) $(CCFLAGS1) -o $@ $^ $(LDFLAGS2) $(DBLIB)
+	$(CC) $(CCFLAGSD) $(CCFLAGS1) -o $@ $^ $(LDFLAGS2)
 
 check: $(HDRS) $(SRCS)
 	for d in $(DIRS); do (cd $$d; $(MAKE) check ); done

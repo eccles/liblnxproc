@@ -1,3 +1,8 @@
 
+In no particular order:
+
+    - store previous values so that rates can be calculated
+    - privatise all functions that do not need to be public
+    - gather utility functions into one header file
     - autotools
 
