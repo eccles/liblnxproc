@@ -87,6 +87,34 @@ Typical contents of /proc/diskstats::
 #include "base_private.h"
 #include <lnxproc/proc_diskstats.h>
 
+LNXPROC_ERROR_T
+lnxproc_strings_append(char ***strings, size_t * n, char *val)
+{
+    char **p = realloc(*strings, (*n + 1) * sizeof(char *));
+
+    if (!p) {
+        return LNXPROC_ERROR_SYSTEM;
+    }
+
+    p[*n] = strdup(val);
+    (*n)++;
+    *strings = p;
+    return LNXPROC_OK;
+}
+
+void
+lnxproc_strings_free(char **strings, size_t nkeys)
+{
+    if (strings) {
+        int i;
+
+        for (i = 0; i < nkeys; i++) {
+            free(strings[i]);
+        }
+        free(strings);
+    }
+}
+
 static LNXPROC_ERROR_T
 proc_diskstats_normalize(LNXPROC_BASE_T *base)
 {
@@ -94,7 +122,7 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
     LNXPROC_ARRAY_T *array = base->array;
 
     char **keys = NULL;
-    int nkeys = 0;
+    size_t nkeys = 0;
     int key = 2;
     size_t idx[] = { 0, key };
     char *val = NULL;
@@ -102,13 +130,7 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
     while (!lnxproc_array_get(array, idx, 2, &val)) {
         LNXPROC_DEBUG("%1$zd:Val %2$p '%2$s'\n", idx[0], val);
         lnxproc_results_store(results, val, "/key%02d", idx[0]);
-        char **p = realloc(keys, (nkeys + 1) * sizeof(char *));
-
-        if (p) {
-            p[nkeys] = strdup(val);
-            nkeys++;
-            keys = p;
-        }
+        lnxproc_strings_append(&keys, &nkeys, val);
         idx[0]++;
         val = NULL;
     }
@@ -120,7 +142,7 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
         "s_read", "ms_read", "writes", "merge_write", "s_write",
         "ms_write", "ios", "ms_io", "ms_weighted",
     };
-    size_t ncols = sizeof(cols)/sizeof(cols[0]);
+    size_t ncols = sizeof(cols) / sizeof(cols[0]);
 
     int i;
 
@@ -146,10 +168,7 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
             val = NULL;
         }
     }
-    for (i = 0; i < nkeys; i++) {
-        free(keys[i]);
-    }
-    free(keys);
+    lnxproc_strings_free(keys, nkeys);
     return LNXPROC_OK;
 }
 
