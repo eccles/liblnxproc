@@ -191,16 +191,10 @@ myvector_print(_LNXPROC_VECTOR_DATA_T * val, int recursive, void *data,
                size_t idx)
 {
     if (recursive) {
-        _LNXPROC_VECTOR_T *child = NULL;
-
-        _lnxproc_data_child(val, &child);
-        printf("Child %p : Index %zd\n", child, idx);
+        printf("Child %p : Index %zd\n", val->child, idx);
     }
     else {
-        char *value = NULL;
-
-        _lnxproc_data_value(val, &value);
-        printf("Val %p : Index %zd\n", value, idx);
+        printf("Val %p : Index %zd\n", val->value, idx);
     }
     return 0;
 }

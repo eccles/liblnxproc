@@ -56,48 +56,6 @@ vector_realloc_data(_LNXPROC_VECTOR_DATA_T * old, size_t oldsize,
 }
 
 LNXPROC_ERROR_T
-_lnxproc_data_child(_LNXPROC_VECTOR_DATA_T * val, _LNXPROC_VECTOR_T ** vector)
-{
-    if (!val) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_NULL_DATA, "\n");
-        return LNXPROC_ERROR_VECTOR_NULL_DATA;
-    }
-    if (!vector) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_ADDRESS_NULL, "\n");
-        return LNXPROC_ERROR_VECTOR_ADDRESS_NULL;
-    }
-    if (*vector) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_ADDRESS_CONTENTS_NOT_NULL,
-                            "\n");
-        return LNXPROC_ERROR_VECTOR_ADDRESS_CONTENTS_NOT_NULL;
-    }
-
-    *vector = val->child;
-    return LNXPROC_OK;
-}
-
-LNXPROC_ERROR_T
-_lnxproc_data_value(_LNXPROC_VECTOR_DATA_T * val, char **value)
-{
-    if (!val) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_NULL_DATA, "\n");
-        return LNXPROC_ERROR_VECTOR_NULL_DATA;
-    }
-    if (!value) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_ADDRESS_NULL, "\n");
-        return LNXPROC_ERROR_VECTOR_ADDRESS_NULL;
-    }
-    if (*value) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_ADDRESS_CONTENTS_NOT_NULL,
-                            "\n");
-        return LNXPROC_ERROR_VECTOR_ADDRESS_CONTENTS_NOT_NULL;
-    }
-
-    *value = val->value;
-    return LNXPROC_OK;
-}
-
-LNXPROC_ERROR_T
 _lnxproc_vector_new(_LNXPROC_VECTOR_T ** vector, size_t size, int recursive)
 {
 
@@ -269,25 +227,6 @@ _lnxproc_vector_value(_LNXPROC_VECTOR_T * vector, size_t idx, char **value)
 
     *value = vector->data[idx].value;
     LNXPROC_DEBUG("Success (val = %p '%s')\n", *value, *value);
-    return LNXPROC_OK;
-}
-
-LNXPROC_ERROR_T
-_lnxproc_vector_size(_LNXPROC_VECTOR_T * vector, size_t * size)
-{
-    LNXPROC_DEBUG("Vector %p\n", vector);
-
-    if (!vector) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_NULL, "\n");
-        return LNXPROC_ERROR_VECTOR_NULL;
-    }
-    if (!size) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_ADDRESS_NULL, "\n");
-        return LNXPROC_ERROR_VECTOR_ADDRESS_NULL;
-    }
-
-    *size = vector->size;
-    LNXPROC_DEBUG("Success (size = %zd)\n", *size);
     return LNXPROC_OK;
 }
 

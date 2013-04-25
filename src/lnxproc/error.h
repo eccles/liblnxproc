@@ -95,17 +95,7 @@ extern "C" {
 
     typedef enum lnxproc_error_t LNXPROC_ERROR_T;
 
-    typedef void (*LNXPROC_ERROR_CALLBACK) (const char *filename,
-                                            int lineno,
-                                            const char *funcname,
-                                            LNXPROC_ERROR_T err);
-
     const char *lnxproc_strerror(LNXPROC_ERROR_T err, char *buf, size_t buflen);
-
-    void lnxproc_error_print_callback(const char *filename,
-                                      int lineno,
-                                      const char *funcname,
-                                      LNXPROC_ERROR_T err);
 
     int lnxproc_error_check(void);
 

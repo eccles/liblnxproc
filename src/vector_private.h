@@ -61,11 +61,6 @@ extern "C" {
     v =  _lnxproc_vector_free(v);\
 }
 
-    LNXPROC_ERROR_T _lnxproc_data_child(_LNXPROC_VECTOR_DATA_T * val,
-                                        _LNXPROC_VECTOR_T ** vector);
-    LNXPROC_ERROR_T _lnxproc_data_value(_LNXPROC_VECTOR_DATA_T * val,
-                                        char **value);
-
     LNXPROC_ERROR_T _lnxproc_vector_resize(_LNXPROC_VECTOR_T * vector,
                                            size_t size);
 
@@ -89,9 +84,6 @@ extern "C" {
                                           _LNXPROC_VECTOR_T ** child);
     LNXPROC_ERROR_T _lnxproc_vector_value(_LNXPROC_VECTOR_T * vector,
                                           size_t idx, char **value);
-
-    LNXPROC_ERROR_T _lnxproc_vector_size(_LNXPROC_VECTOR_T * vector,
-                                         size_t * size);
 
     typedef
     LNXPROC_ERROR_T (*_LNXPROC_VECTOR_ITERATE_FUNC) (_LNXPROC_VECTOR_DATA_T *

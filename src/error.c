@@ -129,31 +129,6 @@ lnxproc_strerror(LNXPROC_ERROR_T err, char *buf, size_t buflen)
     return errstr[err];
 }
 
-void
-lnxproc_error_print_callback(const char *filename,
-                             int lineno,
-                             const char *funcname, LNXPROC_ERROR_T err)
-{
-    if (err >= ERRSTR_SIZE) {
-        printf("Error: %s[%d] %s -> %s = %d\n", filename, lineno, funcname,
-               unknown_error, err);
-    }
-
-    else if (err > 0) {
-        printf("Error: %s[%d] %s -> %s\n", filename, lineno, funcname,
-               errstr[err]);
-
-    }
-
-    else if (err < 0) {
-        char buf[128];
-
-        strerror_r(-((int) err), buf, sizeof buf);
-        printf("System Error: %s[%d] %s -> %s\n", filename, lineno, funcname,
-               buf);
-    }
-}
-
 int
 lnxproc_error_check(void)
 {
