@@ -84,7 +84,7 @@ static LNXPROC_ERROR_T
 proc_cgroups_normalize(LNXPROC_BASE_T *base)
 {
     LNXPROC_RESULTS_T *results = base->results;
-    LNXPROC_ARRAY_T *array = base->array;
+    _LNXPROC_ARRAY_T *array = base->array;
 
     struct proc_cgroups_env_t env = {
         .results = results,
@@ -93,7 +93,7 @@ proc_cgroups_normalize(LNXPROC_BASE_T *base)
         .key = NULL,
     };
 
-    lnxproc_array_iterate(array, &env, proc_groups_func);
+    _lnxproc_array_iterate(array, &env, proc_groups_func);
     if (env.cols) {
         int i;
 

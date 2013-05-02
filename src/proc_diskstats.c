@@ -124,7 +124,7 @@ static LNXPROC_ERROR_T
 proc_diskstats_normalize(LNXPROC_BASE_T *base)
 {
     LNXPROC_RESULTS_T *results = base->results;
-    LNXPROC_ARRAY_T *array = base->array;
+    _LNXPROC_ARRAY_T *array = base->array;
 
     char **keys = NULL;
     size_t nkeys = 0;
@@ -132,7 +132,7 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
     size_t idx[] = { 0, key };
     char *val = NULL;
 
-    while (!lnxproc_array_get(array, idx, 2, &val)) {
+    while (!_lnxproc_array_get(array, idx, 2, &val)) {
         LNXPROC_DEBUG("%1$zd:Val %2$p '%2$s'\n", idx[0], val);
         lnxproc_results_store(results, val, "/key%02d", idx[0]);
         lnxproc_strings_append(&keys, &nkeys, val);
@@ -159,7 +159,7 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
         idx[0] = i;
         idx[1] = 0;
         val = NULL;
-        while (!lnxproc_array_get(array, idx, 2, &val)) {
+        while (!_lnxproc_array_get(array, idx, 2, &val)) {
             if (idx[1] != key) {
                 LNXPROC_DEBUG("%1$zd,%2$zd:Val %3$p '%3$s'\n", idx[0], idx[1],
                               val);

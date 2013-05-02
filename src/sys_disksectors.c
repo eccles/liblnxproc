@@ -58,14 +58,14 @@ sys_disksectors_normalize(LNXPROC_BASE_T *base)
 {
 
     LNXPROC_RESULTS_T *results = base->results;
-    LNXPROC_ARRAY_T *array = base->array;
+    _LNXPROC_ARRAY_T *array = base->array;
 
     struct env_t env = {
         .results = results,
         .key = NULL,
     };
 
-    lnxproc_array_iterate(array, &env, iter_func);
+    _lnxproc_array_iterate(array, &env, iter_func);
 
     return LNXPROC_OK;
 }

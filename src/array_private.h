@@ -33,40 +33,42 @@ extern "C" {
 #include "limits_private.h"
 #include <lnxproc/array.h>
 
-    struct lnxproc_array_t {
+    struct _lnxproc_array_t {
         LNXPROC_LIMITS_T *limits;
         size_t dim;
         _LNXPROC_VECTOR_T **saved;
         _LNXPROC_VECTOR_T *vector;
     };
-    typedef struct lnxproc_array_t LNXPROC_ARRAY_T;
+    typedef struct _lnxproc_array_t _LNXPROC_ARRAY_T;
 
-    LNXPROC_ERROR_T lnxproc_array_new(LNXPROC_ARRAY_T **array,
-                                      LNXPROC_LIMITS_T limits[], size_t dim);
+    LNXPROC_ERROR_T _lnxproc_array_new(_LNXPROC_ARRAY_T ** array,
+                                       LNXPROC_LIMITS_T limits[], size_t dim);
 
-    LNXPROC_ARRAY_T *lnxproc_array_free(LNXPROC_ARRAY_T *array) WARN_UNUSED;
+    _LNXPROC_ARRAY_T *_lnxproc_array_free(_LNXPROC_ARRAY_T * array) WARN_UNUSED;
 
-#define LNXPROC_ARRAY_FREE(a) {\
-    a = lnxproc_array_free(a);\
+#define _LNXPROC_ARRAY_FREE(a) {\
+    a = _lnxproc_array_free(a);\
 }
 
-    LNXPROC_ERROR_T lnxproc_array_set(LNXPROC_ARRAY_T *array, size_t idx[],
-                                      size_t dim, char *val);
-    LNXPROC_ERROR_T lnxproc_array_set_last(LNXPROC_ARRAY_T *array, size_t idx[],
-                                           size_t dim, char *val);
-    LNXPROC_ERROR_T lnxproc_array_get(LNXPROC_ARRAY_T *array, size_t idx[],
-                                      size_t dim, char **value);
+    LNXPROC_ERROR_T _lnxproc_array_set(_LNXPROC_ARRAY_T * array, size_t idx[],
+                                       size_t dim, char *val);
+    LNXPROC_ERROR_T _lnxproc_array_set_last(_LNXPROC_ARRAY_T * array,
+                                            size_t idx[], size_t dim,
+                                            char *val);
+    LNXPROC_ERROR_T _lnxproc_array_get(_LNXPROC_ARRAY_T * array, size_t idx[],
+                                       size_t dim, char **value);
 
-    typedef LNXPROC_ERROR_T (*LNXPROC_ARRAY_ITERATE_FUNC) (char *val,
-                                                           void *data,
-                                                           size_t idx[],
-                                                           size_t dim);
+    typedef LNXPROC_ERROR_T (*_LNXPROC_ARRAY_ITERATE_FUNC) (char *val,
+                                                            void *data,
+                                                            size_t idx[],
+                                                            size_t dim);
 
-    LNXPROC_ERROR_T lnxproc_array_iterate(LNXPROC_ARRAY_T *array,
-                                          void *data,
-                                          LNXPROC_ARRAY_ITERATE_FUNC func);
+    LNXPROC_ERROR_T _lnxproc_array_iterate(_LNXPROC_ARRAY_T * array,
+                                           void *data,
+                                           _LNXPROC_ARRAY_ITERATE_FUNC func);
 
-    LNXPROC_ERROR_T lnxproc_array_print(LNXPROC_ARRAY_T *array, int allocated);
+    LNXPROC_ERROR_T _lnxproc_array_print(_LNXPROC_ARRAY_T * array,
+                                         int allocated);
 
 #ifdef __cplusplus
 }                               // extern "C"

@@ -35,24 +35,24 @@ extern "C" {
         int len;
     };
 
-    LNXPROC_ERROR_T lnxproc_limits_dup(LNXPROC_LIMITS_T ** newlimits,
-                                       LNXPROC_LIMITS_T limits[], size_t dim);
+    LNXPROC_ERROR_T _lnxproc_limits_dup(LNXPROC_LIMITS_T ** newlimits,
+                                        LNXPROC_LIMITS_T limits[], size_t dim);
 
-    LNXPROC_LIMITS_T *lnxproc_limits_free(LNXPROC_LIMITS_T
-                                          limits[], size_t dim) WARN_UNUSED;
+    LNXPROC_LIMITS_T *_lnxproc_limits_free(LNXPROC_LIMITS_T
+                                           limits[], size_t dim) WARN_UNUSED;
 
-#define LNXPROC_LIMITS_FREE(ll,dd) {\
-    ll = lnxproc_limits_free(ll,dd);\
+#define _LNXPROC_LIMITS_FREE(ll,dd) {\
+    ll = _lnxproc_limits_free(ll,dd);\
 }
 
-    char *lnxproc_limit_chr(LNXPROC_LIMITS_T * limit, char c);
+    char *_lnxproc_limit_chr(LNXPROC_LIMITS_T * limit, char c);
 
-    LNXPROC_ERROR_T lnxproc_chars_print(char *chars, size_t nchars, char *buf,
-                                        size_t buflen);
+    LNXPROC_ERROR_T _lnxproc_chars_print(char *chars, size_t nchars, char *buf,
+                                         size_t buflen);
 
-    LNXPROC_ERROR_T lnxproc_limit_print(LNXPROC_LIMITS_T * limit, char *buf,
-                                        size_t buflen);
-    LNXPROC_ERROR_T lnxproc_limits_print(LNXPROC_LIMITS_T limits[], int dim);
+    LNXPROC_ERROR_T _lnxproc_limit_print(LNXPROC_LIMITS_T * limit, char *buf,
+                                         size_t buflen);
+    LNXPROC_ERROR_T _lnxproc_limits_print(LNXPROC_LIMITS_T limits[], int dim);
 
 #ifdef __cplusplus
 }                               // extern "C"

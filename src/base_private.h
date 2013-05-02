@@ -53,7 +53,7 @@ extern "C" {
         char *lines;
         size_t buflen;
         int nbytes;
-        LNXPROC_ARRAY_T *array;
+        _LNXPROC_ARRAY_T *array;
         LNXPROC_RESULTS_T *results;
         LNXPROC_RESULTS_T *prev;
     };
@@ -70,7 +70,7 @@ extern "C" {
                                      LNXPROC_LIMITS_T limits[], size_t dim);
 
     LNXPROC_ERROR_T lnxproc_base_array(LNXPROC_BASE_T *base,
-                                       LNXPROC_ARRAY_T **array);
+                                       _LNXPROC_ARRAY_T ** array);
 
     LNXPROC_ERROR_T lnxproc_base_filename(LNXPROC_BASE_T *base,
                                           char **filename);

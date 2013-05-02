@@ -31,7 +31,7 @@
 #include "limits_private.h"
 
 char *
-lnxproc_limit_chr(LNXPROC_LIMITS_T * limit, char c)
+_lnxproc_limit_chr(LNXPROC_LIMITS_T * limit, char c)
 {
 
 /*
@@ -53,7 +53,7 @@ lnxproc_limit_chr(LNXPROC_LIMITS_T * limit, char c)
 }
 
 LNXPROC_ERROR_T
-lnxproc_limits_print(LNXPROC_LIMITS_T limits[], int dim)
+_lnxproc_limits_print(LNXPROC_LIMITS_T limits[], int dim)
 {
     if (!limits) {
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_NULL, "\n");
@@ -65,7 +65,7 @@ lnxproc_limits_print(LNXPROC_LIMITS_T limits[], int dim)
     for (i = 0; i < dim; i++) {
         char buf[64];
 
-        lnxproc_limit_print(limits + i, buf, sizeof buf);
+        _lnxproc_limit_print(limits + i, buf, sizeof buf);
 
         printf("Limit %d :%s:\n", i, buf);
     }
@@ -73,7 +73,7 @@ lnxproc_limits_print(LNXPROC_LIMITS_T limits[], int dim)
 }
 
 LNXPROC_ERROR_T
-lnxproc_chars_print(char *chars, size_t nchars, char *buf, size_t buflen)
+_lnxproc_chars_print(char *chars, size_t nchars, char *buf, size_t buflen)
 {
 
     char *cstr[] = {
@@ -124,7 +124,7 @@ lnxproc_chars_print(char *chars, size_t nchars, char *buf, size_t buflen)
 }
 
 LNXPROC_ERROR_T
-lnxproc_limit_print(LNXPROC_LIMITS_T * limit, char *buf, size_t buflen)
+_lnxproc_limit_print(LNXPROC_LIMITS_T * limit, char *buf, size_t buflen)
 {
     buf[0] = '\0';
 
@@ -141,12 +141,12 @@ lnxproc_limit_print(LNXPROC_LIMITS_T * limit, char *buf, size_t buflen)
     b += m;
     len -= m;
 
-    return lnxproc_chars_print(limit->chars, limit->len, b, len);
+    return _lnxproc_chars_print(limit->chars, limit->len, b, len);
 }
 
 LNXPROC_ERROR_T
-lnxproc_limits_dup(LNXPROC_LIMITS_T ** newlimits,
-                   LNXPROC_LIMITS_T limits[], size_t dim)
+_lnxproc_limits_dup(LNXPROC_LIMITS_T ** newlimits,
+                    LNXPROC_LIMITS_T limits[], size_t dim)
 {
     LNXPROC_DEBUG("sizeof ptr %d\n", sizeof(void *));
     LNXPROC_DEBUG("sizeof LNXPROC_LIMITS_T %d\n", sizeof(LNXPROC_LIMITS_T));
@@ -185,7 +185,7 @@ lnxproc_limits_dup(LNXPROC_LIMITS_T ** newlimits,
 #ifdef DEBUG
         char buf[64];
 
-        lnxproc_limit_print(limits + i, buf, sizeof buf);
+        _lnxproc_limit_print(limits + i, buf, sizeof buf);
 
         LNXPROC_DEBUG("Malloc old limit %zd :%s:\n", i, buf);
 #endif
@@ -206,7 +206,7 @@ lnxproc_limits_dup(LNXPROC_LIMITS_T ** newlimits,
         nlimits[i].len = limits[i].len;
 
 #ifdef DEBUG
-        lnxproc_limit_print(nlimits + i, buf, sizeof buf);
+        _lnxproc_limit_print(nlimits + i, buf, sizeof buf);
         LNXPROC_DEBUG("Malloc new limit %zd :%s:\n", i, buf);
 #endif
     }
@@ -215,7 +215,7 @@ lnxproc_limits_dup(LNXPROC_LIMITS_T ** newlimits,
 }
 
 LNXPROC_LIMITS_T *
-lnxproc_limits_free(LNXPROC_LIMITS_T limits[], size_t dim)
+_lnxproc_limits_free(LNXPROC_LIMITS_T limits[], size_t dim)
 {
     if (dim > 0 && limits) {
         LNXPROC_DEBUG("Free Limits buffer %zd\n", dim);

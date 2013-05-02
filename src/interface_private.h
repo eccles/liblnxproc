@@ -32,18 +32,6 @@ extern "C" {
 #include "base_private.h"
 #include <lnxproc/interface.h>
 
-    struct lnxproc_interface_t {
-        LNXPROC_READ_METHOD read;
-        LNXPROC_BASE_T *base;
-    };
-
-    LNXPROC_INTERFACE_T *lnxproc_interface_free(LNXPROC_INTERFACE_T *
-                                                interface) WARN_UNUSED;
-
-#define LNXPROC_INTERFACE_FREE(b) {\
-    b = lnxproc_interface_free(b);\
-}
-
     LNXPROC_ERROR_T lnxproc_interface_new(LNXPROC_INTERFACE_T ** interface,
                                           char **filenames,
                                           size_t nfiles,

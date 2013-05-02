@@ -25,7 +25,26 @@
 extern "C" {
 #endif
 
+#include <lnxproc/util.h>
+#include <lnxproc/error.h>
+#include <lnxproc/base.h>
+
+    struct lnxproc_interface_t {
+        LNXPROC_READ_METHOD read;
+        LNXPROC_BASE_T *base;
+    };
+
     typedef struct lnxproc_interface_t LNXPROC_INTERFACE_T;
+
+    typedef LNXPROC_ERROR_T (*LNXPROC_INTERFACE_METHOD) (LNXPROC_INTERFACE_T **
+                                                         interface);
+
+    LNXPROC_INTERFACE_T *lnxproc_interface_free(LNXPROC_INTERFACE_T *
+                                                interface) WARN_UNUSED;
+
+#define LNXPROC_INTERFACE_FREE(b) {\
+    b = lnxproc_interface_free(b);\
+}
 
 #ifdef __cplusplus
 }                               // extern "C"

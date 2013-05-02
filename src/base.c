@@ -79,7 +79,7 @@ lnxproc_base_nbytes(LNXPROC_BASE_T *base, int *nbytes)
 }
 
 LNXPROC_ERROR_T
-lnxproc_base_array(LNXPROC_BASE_T *base, LNXPROC_ARRAY_T **array)
+lnxproc_base_array(LNXPROC_BASE_T *base, _LNXPROC_ARRAY_T ** array)
 {
     LNXPROC_DEBUG("Base %p\n", base);
 
@@ -113,7 +113,7 @@ lnxproc_base_print(LNXPROC_BASE_T *base)
         printf("Buflen %zd\n", base->buflen);
         printf("Nbytes %d\n", base->nbytes);
         lnxproc_results_print(base->results);
-        return lnxproc_array_print(base->array, 0);
+        return _lnxproc_array_print(base->array, 0);
     }
 
     LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_NULL, "\n");
@@ -344,7 +344,7 @@ base_map(LNXPROC_BASE_T *base)
 {
     LNXPROC_DEBUG("Base %p\n", base);
 
-    LNXPROC_ARRAY_T *array = base->array;
+    _LNXPROC_ARRAY_T *array = base->array;
 
     LNXPROC_DEBUG("Array %p\n", array);
 
@@ -356,7 +356,7 @@ base_map(LNXPROC_BASE_T *base)
 #ifdef DEBUG
     char basebuf[128];
 
-    lnxproc_chars_print(lines, nbytes, basebuf, sizeof basebuf);
+    _lnxproc_chars_print(lines, nbytes, basebuf, sizeof basebuf);
     LNXPROC_DEBUG("Chars %s\n", basebuf);
 #endif
 
@@ -384,7 +384,7 @@ base_map(LNXPROC_BASE_T *base)
 
             for (i = 0; i < dim && c < d; i++) {
                 LNXPROC_DEBUG("At Char %p '%c'\n", c, *c);
-                while (lnxproc_limit_chr(limits + i, *c) && (++c < d));
+                while (_lnxproc_limit_chr(limits + i, *c) && (++c < d));
             }
 
             char *saveptr = c;
@@ -394,18 +394,18 @@ base_map(LNXPROC_BASE_T *base)
 
                 for (i = 0; i < dim && c < d; i++) {
                     LNXPROC_DEBUG("Depth : %d: At Char %p '%c'\n", i, c, *c);
-                    if (lnxproc_limit_chr(limits + i, *c)) {
+                    if (_lnxproc_limit_chr(limits + i, *c)) {
                         *c = '\0';
 
                         LNXPROC_DEBUG("Saveptr %1$p '%1$s'\n", saveptr);
                         int ret =
-                            lnxproc_array_set_last(array, idx, dim, saveptr);
+                            _lnxproc_array_set_last(array, idx, dim, saveptr);
 
                         if (ret) {
                             return ret;
                         }
 
-                        while ((++c < d) && lnxproc_limit_chr(limits + i, *c));
+                        while ((++c < d) && _lnxproc_limit_chr(limits + i, *c));
 
                         if (c < d) {
                             idx[i]++;
@@ -415,7 +415,7 @@ base_map(LNXPROC_BASE_T *base)
 
                             for (j = i + 1; j < dim; j++) {
                                 idx[j] = 0;
-                                while (lnxproc_limit_chr(limits + j, *c)
+                                while (_lnxproc_limit_chr(limits + j, *c)
                                        && (++c < d));
                             }
                             saveptr = c;
@@ -568,7 +568,7 @@ lnxproc_base_new(LNXPROC_BASE_T **base,
     LNXPROC_ERROR_T ret;
 
     if (limits && dim > 0) {
-        ret = lnxproc_array_new(&p->array, limits, dim);
+        ret = _lnxproc_array_new(&p->array, limits, dim);
         if (ret) {
             LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_ARRAY,
                                 "Malloc array\n");
@@ -656,7 +656,7 @@ lnxproc_base_free(LNXPROC_BASE_T *base)
         }
         if (base->array) {
             LNXPROC_DEBUG("Free Array \n");
-            LNXPROC_ARRAY_FREE(base->array);
+            _LNXPROC_ARRAY_FREE(base->array);
         }
         if (base->lines) {
             LNXPROC_DEBUG("Free Base buffer\n");
