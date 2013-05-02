@@ -32,7 +32,7 @@ extern "C" {
 #include "base_private.h"
 #include <lnxproc/interface.h>
 
-    LNXPROC_ERROR_T lnxproc_interface_new(LNXPROC_INTERFACE_T ** interface,
+    LNXPROC_ERROR_T _lnxproc_interface_new(LNXPROC_INTERFACE_T ** interface,
                                           char **filenames,
                                           size_t nfiles,
                                           char *fileprefix,
@@ -44,7 +44,7 @@ extern "C" {
                                           LNXPROC_LIMITS_T limits[],
                                           size_t dim);
 
-    typedef LNXPROC_ERROR_T (*LNXPROC_INTERFACE_METHOD) (LNXPROC_INTERFACE_T **
+    typedef LNXPROC_ERROR_T (*_LNXPROC_INTERFACE_METHOD) (LNXPROC_INTERFACE_T **
                                                          interface);
 
 #ifdef __cplusplus

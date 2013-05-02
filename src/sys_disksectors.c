@@ -84,7 +84,7 @@ lnxproc_sys_disksectors_new(LNXPROC_INTERFACE_T ** interface)
 
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
-    return lnxproc_interface_new(interface,
+    return _lnxproc_interface_new(interface,
                                  NULL, 0, fileprefix, filesuffix,
                                  NULL, sys_disksectors_normalize, NULL,
                                  256, limits, dim);

@@ -122,7 +122,7 @@ lnxproc_proc_cgroups_new(LNXPROC_INTERFACE_T ** interface)
     char *filenames[] = { "/proc/cgroups" };
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
-    return lnxproc_interface_new(interface,
+    return _lnxproc_interface_new(interface,
                                  filenames, 1, NULL, NULL,
                                  NULL, proc_cgroups_normalize, NULL, 256,
                                  limits, dim);

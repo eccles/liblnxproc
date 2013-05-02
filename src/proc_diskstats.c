@@ -189,7 +189,7 @@ lnxproc_proc_diskstats_new(LNXPROC_INTERFACE_T ** interface)
     char *filenames[] = { "/proc/diskstats" };
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
-    return lnxproc_interface_new(interface,
+    return _lnxproc_interface_new(interface,
                                  filenames, 1, NULL, NULL,
                                  NULL, proc_diskstats_normalize, NULL, 256,
                                  limits, dim);

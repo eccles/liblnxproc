@@ -24,7 +24,7 @@
 #include "interface_private.h"
 
 LNXPROC_ERROR_T
-lnxproc_interface_new(LNXPROC_INTERFACE_T ** interface,
+_lnxproc_interface_new(LNXPROC_INTERFACE_T ** interface,
                       char **filenames,
                       size_t nfiles,
                       char *fileprefix,
