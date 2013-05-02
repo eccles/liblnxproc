@@ -25,21 +25,13 @@
 extern "C" {
 #endif
 
-#include <lnxproc/util.h>
+#include <lnxproc/error.h>
 #include <lnxproc/results.h>
 
     typedef struct lnxproc_base_t LNXPROC_BASE_T;
 
     typedef LNXPROC_ERROR_T (*LNXPROC_BASE_METHOD) (LNXPROC_BASE_T *base);
     typedef LNXPROC_RESULTS_T *(*LNXPROC_READ_METHOD) (LNXPROC_BASE_T *base);
-
-    LNXPROC_BASE_T *lnxproc_base_free(LNXPROC_BASE_T *base) WARN_UNUSED;
-
-#define LNXPROC_BASE_FREE(b) {\
-    b = lnxproc_base_free(b);\
-}
-
-    LNXPROC_RESULTS_T *lnxproc_base_read(LNXPROC_BASE_T *base);
 
 #ifdef __cplusplus
 }                               // extern "C"

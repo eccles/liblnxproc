@@ -31,7 +31,8 @@ Typical contents of file /proc/sys/kernel/domainname::
 #include <stdlib.h>
 #include <string.h>
 
-#include "limits_private.h"
+#include "error_private.h"
+#include "results_private.h"
 #include "interface_private.h"
 #include "base_private.h"
 #include <lnxproc/proc_domainname.h>

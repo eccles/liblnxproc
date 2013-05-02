@@ -84,6 +84,8 @@ Typical contents of /proc/diskstats::
 #include <stdlib.h>
 #include <string.h>
 
+#include "error_private.h"
+#include "limits_private.h"
 #include "array_private.h"
 #include "results_private.h"
 #include "interface_private.h"

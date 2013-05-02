@@ -34,7 +34,6 @@ extern "C" {
         char *chars;
         int len;
     };
-    typedef struct lnxproc_limits_t LNXPROC_LIMITS_T;
 
     LNXPROC_ERROR_T lnxproc_limits_dup(LNXPROC_LIMITS_T ** newlimits,
                                        LNXPROC_LIMITS_T limits[], size_t dim);

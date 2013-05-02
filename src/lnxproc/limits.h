@@ -25,6 +25,8 @@
 extern "C" {
 #endif
 
+    typedef struct lnxproc_limits_t LNXPROC_LIMITS_T;
+
 #ifdef __cplusplus
 }                               // extern "C"
 #endif

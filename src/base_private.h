@@ -27,11 +27,20 @@ extern "C" {
 
 #include <stddef.h>
 
+#include "util_private.h"
 #include "error_private.h"
 #include "limits_private.h"
 #include "results_private.h"
 #include "array_private.h"
 #include <lnxproc/base.h>
+
+    LNXPROC_BASE_T *lnxproc_base_free(LNXPROC_BASE_T *base) WARN_UNUSED;
+
+#define LNXPROC_BASE_FREE(b) {\
+    b = lnxproc_base_free(b);\
+}
+
+    LNXPROC_RESULTS_T *lnxproc_base_read(LNXPROC_BASE_T *base);
 
     struct lnxproc_base_t {
         LNXPROC_BASE_METHOD rawread;

@@ -28,7 +28,7 @@ This file is part of liblnxproc.
 #include <stdlib.h>
 #include <string.h>
 
-#include "limits_private.h"
+#include "error_private.h"
 #include "interface_private.h"
 #include "base_private.h"
 #include <lnxproc/sys_cpufreq.h>
