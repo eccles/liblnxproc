@@ -511,12 +511,13 @@ test_array(void)
 
 /*----------------------------------------------------------------------------*/
 static void
-execute_interface(LNXPROC_INTERFACE_T *interface)
+execute_interface(LNXPROC_INTERFACE_T * interface)
 {
     if (interface && interface->base) {
         int i;
-        for( i = 0; i < 5 ; i++ ) {
-            printf("Execute %d\n",i+1);
+
+        for (i = 0; i < 5; i++) {
+            printf("Execute %d\n", i + 1);
             LNXPROC_RESULTS_T *res = interface->read(interface->base);
 
             if (!res) {
@@ -524,19 +525,19 @@ execute_interface(LNXPROC_INTERFACE_T *interface)
             }
             else {
                 char *filename = NULL;
-    
+
                 lnxproc_base_filename(interface->base, &filename);
                 printf("Filename : %s\n", filename);
-    
+
                 int nbytes = 0;
-    
+
                 lnxproc_base_nbytes(interface->base, &nbytes);
-    
+
                 char *lines = NULL;
-    
+
                 lnxproc_base_lines(interface->base, &lines);
                 printf("Data : %1$d %2$*1$s\n", nbytes, lines);
-    
+
                 lnxproc_results_print(res);
                 LNXPROC_RESULTS_FREE(res);
             }

@@ -66,23 +66,23 @@ sys_disksectors_normalize(LNXPROC_BASE_T *base)
 }
 
 LNXPROC_ERROR_T
-lnxproc_sys_disksectors_new(LNXPROC_INTERFACE_T **interface)
+lnxproc_sys_disksectors_new(LNXPROC_INTERFACE_T ** interface)
 {
 
     char *fileprefix = "/sys/block";
     char *filesuffix = "queue/hw_sector_size";
 
     LNXPROC_LIMITS_T limits[] = {
-        { .expected = 9, .chars = "\n", .len = 1},           /* row delimiters */
-        { .expected = 2, .chars = "\t", .len = 1}            /* column delimiters */
+        {.expected = 9,.chars = "\n",.len = 1}, /* row delimiters */
+        {.expected = 2,.chars = "\t",.len = 1}  /* column delimiters */
     };
 
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
     return lnxproc_interface_new(interface,
-                            NULL, 0, fileprefix, filesuffix,
-                            NULL, sys_disksectors_normalize, NULL,
-                            256, limits, dim);
+                                 NULL, 0, fileprefix, filesuffix,
+                                 NULL, sys_disksectors_normalize, NULL,
+                                 256, limits, dim);
 }
 
 /*

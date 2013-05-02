@@ -27,7 +27,8 @@ extern "C" {
 #include <lnxproc/error.h>
 #include <lnxproc/interface.h>
 
-    LNXPROC_ERROR_T lnxproc_proc_diskstats_new(LNXPROC_INTERFACE_T **interface);
+    LNXPROC_ERROR_T lnxproc_proc_diskstats_new(LNXPROC_INTERFACE_T **
+                                               interface);
 
 #ifdef __cplusplus
 }                               // extern "C"

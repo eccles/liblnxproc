@@ -102,25 +102,25 @@ proc_cgroups_normalize(LNXPROC_BASE_T *base)
 }
 
 LNXPROC_ERROR_T
-lnxproc_proc_cgroups_new(LNXPROC_INTERFACE_T **interface)
+lnxproc_proc_cgroups_new(LNXPROC_INTERFACE_T ** interface)
 {
 
     LNXPROC_LIMITS_T limits[] = {
-        { .expected = 9, 
-          .chars = "\n", 
-          .len = 1},           /* row delimiters */
-        { .expected = 4, 
-          .chars = "\t", 
-          .len = 1}            /* column delimiters */
+        {.expected = 9,
+         .chars = "\n",
+         .len = 1},             /* row delimiters */
+        {.expected = 4,
+         .chars = "\t",
+         .len = 1}              /* column delimiters */
     };
 
     char *filenames[] = { "/proc/cgroups" };
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
     return lnxproc_interface_new(interface,
-                            filenames, 1, NULL, NULL,
-                            NULL, proc_cgroups_normalize, NULL, 256, limits,
-                            dim);
+                                 filenames, 1, NULL, NULL,
+                                 NULL, proc_cgroups_normalize, NULL, 256,
+                                 limits, dim);
 }
 
 /*

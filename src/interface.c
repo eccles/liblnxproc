@@ -62,7 +62,12 @@ lnxproc_interface_new(LNXPROC_INTERFACE_T ** interface,
         LNXPROC_INTERFACE_FREE(p);
         return ret;
     }
-    p->read = read;
+    if (read) {
+        p->read = read;
+    }
+    else {
+        p->read = lnxproc_base_read;
+    }
     *interface = p;
     LNXPROC_DEBUG("Successful\n");
     return LNXPROC_OK;

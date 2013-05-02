@@ -60,7 +60,8 @@ extern "C" {
                                           LNXPROC_LIMITS_T limits[],
                                           size_t dim);
 
-    typedef LNXPROC_ERROR_T (*LNXPROC_INTERFACE_METHOD)(LNXPROC_INTERFACE_T ** interface);
+    typedef LNXPROC_ERROR_T (*LNXPROC_INTERFACE_METHOD) (LNXPROC_INTERFACE_T **
+                                                         interface);
 
 #ifdef __cplusplus
 }                               // extern "C"

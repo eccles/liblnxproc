@@ -43,13 +43,14 @@ proc_domainname_normalize(LNXPROC_BASE_T *base)
 }
 
 LNXPROC_ERROR_T
-lnxproc_proc_domainname_new(LNXPROC_INTERFACE_T **interface)
+lnxproc_proc_domainname_new(LNXPROC_INTERFACE_T ** interface)
 {
 
     char *filenames[1] = { "/proc/sys/kernel/domainname" };
     return lnxproc_interface_new(interface,
-                            filenames, 1, NULL, NULL,
-                            NULL, proc_domainname_normalize, NULL, 64, NULL, 0);
+                                 filenames, 1, NULL, NULL,
+                                 NULL, proc_domainname_normalize, NULL, 64,
+                                 NULL, 0);
 }
 
 /*
