@@ -23,14 +23,19 @@ This file is part of liblnxproc.
 #include <lnxproc/lnxproc.h>
 
 static const int ntimes = 1000;
+struct lnxproc_module_t {
+    LNXPROC_INTERFACE_METHOD new;
+    LNXPROC_INTERFACE_T *interface;
+};
+typedef struct lnxproc_module_t LNXPROC_MODULE_T;
 /*----------------------------------------------------------------------------*/
 static void
-execute_base(LNXPROC_BASE_T *base)
+execute_interface(LNXPROC_INTERFACE_T *interface)
 {
-    if (base) {
+    if (interface) {
         int i;
         for( i = 0; i < ntimes; i++ ) {
-            LNXPROC_RESULTS_T *res = lnxproc_base_read(base);
+            LNXPROC_RESULTS_T *res = interface->read(interface->base);
 
             if (!res) {
                 printf("Failure reading base\n");
@@ -39,129 +44,63 @@ execute_base(LNXPROC_BASE_T *base)
                 LNXPROC_RESULTS_FREE(res);
             }
         }
-        LNXPROC_BASE_FREE(base);
+        LNXPROC_INTERFACE_FREE(interface);
     }
 }
 
 /*----------------------------------------------------------------------------*/
 static void
-test_proc_cgroups(void)
+test_module(LNXPROC_MODULE_T *module)
 {
-    LNXPROC_BASE_T *proc_cgroups = NULL;
-    LNXPROC_ERROR_T ret = lnxproc_proc_cgroups_new(&proc_cgroups);
-
-    if (ret == LNXPROC_OK) {
-        execute_base(proc_cgroups);
+    if( module) {
+        LNXPROC_ERROR_T ret = module->new(&module->interface);
+        if (ret == LNXPROC_OK) {
+            execute_interface(module->interface);
+        }
     }
 }
-
-/*----------------------------------------------------------------------------*/
-static void
-test_proc_diskstats(void)
-{
-    LNXPROC_BASE_T *proc_diskstats = NULL;
-    LNXPROC_ERROR_T ret = lnxproc_proc_diskstats_new(&proc_diskstats);
-
-    if (ret == LNXPROC_OK) {
-        execute_base(proc_diskstats);
-    }
-}
-
-/*----------------------------------------------------------------------------*/
-static void
-test_proc_domainname(void)
-{
-    LNXPROC_BASE_T *proc_domainname = NULL;
-    LNXPROC_ERROR_T ret = lnxproc_proc_domainname_new(&proc_domainname);
-
-    if (ret == LNXPROC_OK) {
-        execute_base(proc_domainname);
-    }
-}
-
-/*----------------------------------------------------------------------------*/
-static void
-test_proc_hostname(void)
-{
-    LNXPROC_BASE_T *proc_hostname = NULL;
-    LNXPROC_ERROR_T ret = lnxproc_proc_hostname_new(&proc_hostname);
-
-    if (ret == LNXPROC_OK) {
-        execute_base(proc_hostname);
-        LNXPROC_BASE_FREE(proc_hostname);
-    }
-}
-
-/*----------------------------------------------------------------------------*/
-static void
-test_proc_osrelease(void)
-{
-    LNXPROC_BASE_T *proc_osrelease = NULL;
-    LNXPROC_ERROR_T ret = lnxproc_proc_osrelease_new(&proc_osrelease);
-
-    if (ret == LNXPROC_OK) {
-        execute_base(proc_osrelease);
-    }
-}
-
-/*----------------------------------------------------------------------------*/
-static void
-test_sys_cpufreq(void)
-{
-    LNXPROC_BASE_T *sys_cpufreq = NULL;
-    LNXPROC_ERROR_T ret = lnxproc_sys_cpufreq_new(&sys_cpufreq);
-
-    if (ret == LNXPROC_OK) {
-        execute_base(sys_cpufreq);
-    }
-}
-
-/*----------------------------------------------------------------------------*/
-static void
-test_sys_disksectors(void)
-{
-    LNXPROC_BASE_T *sys_disksectors = NULL;
-    LNXPROC_ERROR_T ret = lnxproc_sys_disksectors_new(&sys_disksectors);
-
-    if (ret == LNXPROC_OK) {
-        execute_base(sys_disksectors);
-    }
-}
-
 /*----------------------------------------------------------------------------*/
 int
 main(int argc, char *argv[])
 {
 
+    LNXPROC_MODULE_T modules[] = {
+        { .new = lnxproc_proc_cgroups_new, .interface = NULL, },
+        { .new = lnxproc_proc_diskstats_new, .interface = NULL, },
+        { .new = lnxproc_proc_domainname_new, .interface = NULL, },
+        { .new = lnxproc_proc_hostname_new, .interface = NULL, },
+        { .new = lnxproc_proc_osrelease_new, .interface = NULL, },
+        { .new = lnxproc_sys_cpufreq_new, .interface = NULL, },
+        { .new = lnxproc_sys_disksectors_new, .interface = NULL, },
+    };
+    size_t nmodules = sizeof(modules)/sizeof(modules[0]);
+
     if (argc < 2) {
-        test_proc_cgroups();
-        test_proc_diskstats();
-        test_proc_domainname();
-        test_proc_hostname();
-        test_proc_osrelease();
-        test_sys_cpufreq();
-        test_sys_disksectors();
+        int i;
+        for( i = 0 ; i < nmodules ; i++ ) {
+            test_module(modules+i);
+        }
     }
     else if (!strcmp(argv[1], "proc_cgroups")) {
-        test_proc_cgroups();
+        test_module(modules+0);
     }
     else if (!strcmp(argv[1], "proc_diskstats")) {
-        test_proc_diskstats();
+        test_module(modules+1);
     }
     else if (!strcmp(argv[1], "proc_domainname")) {
-        test_proc_domainname();
+        test_module(modules+2);
     }
     else if (!strcmp(argv[1], "proc_hostname")) {
-        test_proc_hostname();
+        test_module(modules+3);
     }
     else if (!strcmp(argv[1], "proc_osrelease")) {
-        test_proc_osrelease();
+        test_module(modules+4);
     }
     else if (!strcmp(argv[1], "sys_cpufreq")) {
-        test_sys_cpufreq();
+        test_module(modules+5);
     }
     else if (!strcmp(argv[1], "sys_disksectors")) {
-        test_sys_disksectors();
+        test_module(modules+6);
     }
     return 0;
 }

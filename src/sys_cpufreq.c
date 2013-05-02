@@ -23,42 +23,12 @@ This file is part of liblnxproc.
    return the first value read
 
 '''
-
-from basecache import BaseCache
-class SysCpufreq(BaseCache):
-    '''
-    Reads cpu frequencey
-    '''
-    def __init__(self, **kwds):
-        '''
-        Initialises object fields
-        '''
-
-        kwds['filename'] = \
-                          'sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq'
-        kwds['fields'] = 'freq'
-
-        super(SysCpufreq, self).__init__(**kwds)
-#        print "filename %s" % (self.filename)
-
-    def normalize(self, timestamp, lines):
-        '''
-        The file is one value in KHz
-        '''
-        data = {}
-        data[self.fields] = int(lines[0].rstrip())
-        return data
-
-if __name__ == "__main__":
-    from Test import Test
-    Test(SysCpufreq)
-
 */
 
 #include <stdlib.h>
 #include <string.h>
 
-#include "base_private.h"
+#include "interface_private.h"
 #include <lnxproc/sys_cpufreq.h>
 
 static LNXPROC_ERROR_T
@@ -70,12 +40,12 @@ sys_cpufreq_normalize(LNXPROC_BASE_T *base)
 }
 
 LNXPROC_ERROR_T
-lnxproc_sys_cpufreq_new(LNXPROC_BASE_T **base)
+lnxproc_sys_cpufreq_new(LNXPROC_INTERFACE_T **interface)
 {
 
     char *filenames[] =
         { "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq", };
-    return lnxproc_base_new(base, filenames, 1, NULL, NULL, NULL,
+    return lnxproc_interface_new(interface, filenames, 1, NULL, NULL, NULL,
                             sys_cpufreq_normalize, NULL, 64, NULL, 0);
 }
 

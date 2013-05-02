@@ -25,11 +25,6 @@ This file is part of liblnxproc.
 extern "C" {
 #endif
 
-#include <lnxproc/error.h>
-#include <lnxproc/limits.h>
-#include <lnxproc/array.h>
-#include <lnxproc/base.h>
-#include <lnxproc/results.h>
 #include <lnxproc/proc_cgroups.h>
 #include <lnxproc/proc_diskstats.h>
 #include <lnxproc/proc_domainname.h>

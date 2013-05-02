@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <lnxproc/error.h>
+#include "error_private.h"
 #include "vector_private.h"
 
 static _LNXPROC_VECTOR_DATA_T *

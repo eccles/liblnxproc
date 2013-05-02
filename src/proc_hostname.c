@@ -20,45 +20,12 @@ Typical contents of file /proc/sys/kernel/hostname::
 
     Feynmann
 
-.. note::
-   This class is **cached**. The file is only read **once**. Subsequent reads
-   return the first value read
-
-'''
-
-from basecache import BaseCache
-class ProcSysKernelHostname(BaseCache):
-    '''
-    Measures the hostname file from /proc/sys/kernel filesystem
-    '''
-    def __init__(self, **kwds):
-        '''
-        Initialises object fields
-        '''
-
-        kwds['filename'] = 'proc/sys/kernel/hostname'
-        kwds['fields'] = 'hostname'
-
-        super(ProcSysKernelHostname, self).__init__(**kwds)
-
-    def normalize(self, timestamp, lines):
-        '''
-        The sys/kernel/hostname file is a single value
-        '''
-        data = {}
-        data[self.fields] = lines[0].rstrip()
-        return data
-
-if __name__ == "__main__":
-    from Test import Test
-    Test(ProcSysKernelHostname)
-
 */
 
 #include <stdlib.h>
 #include <string.h>
 
-#include "base_private.h"
+#include "interface_private.h"
 #include <lnxproc/proc_hostname.h>
 
 static LNXPROC_ERROR_T
@@ -70,11 +37,11 @@ proc_hostname_normalize(LNXPROC_BASE_T *base)
 }
 
 LNXPROC_ERROR_T
-lnxproc_proc_hostname_new(LNXPROC_BASE_T **base)
+lnxproc_proc_hostname_new(LNXPROC_INTERFACE_T **interface)
 {
 
     char *filenames[] = { "/proc/sys/kernel/hostname", };
-    return lnxproc_base_new(base,
+    return lnxproc_interface_new(interface,
                             filenames, 1, NULL, NULL,
                             NULL, proc_hostname_normalize, NULL, 64, NULL, 0);
 }

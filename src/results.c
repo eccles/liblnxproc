@@ -28,8 +28,8 @@
 #include <string.h>
 #include <tdb.h>
 
-#include <lnxproc/error.h>
-#include <lnxproc/results.h>
+#include "error_private.h"
+#include "results_private.h"
 
 LNXPROC_ERROR_T
 lnxproc_results_timeval_str(LNXPROC_RESULTS_T * results, char *buf,

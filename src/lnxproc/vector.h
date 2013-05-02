@@ -18,21 +18,20 @@
  *
  */
 
-#ifndef LIBLNXPROC_SYS_CPUFREQ_H
-#define LIBLNXPROC_SYS_CPUFREQ_H 1
+/* This file is a re-implementation of the 'list' type from Python
+ */
+
+#ifndef LIBLNXPROC_VECTOR_H
+#define LIBLNXPROC_VECTOR_H 1
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <lnxproc/error.h>
-#include <lnxproc/interface.h>
-
-    LNXPROC_ERROR_T lnxproc_sys_cpufreq_new(LNXPROC_INTERFACE_T **interface);
-
 #ifdef __cplusplus
 }                               // extern "C"
 #endif
-#endif                          // LIBLNXPROC_SYS_CPUFREQ_H
+#endif                          // LIBLNXPROC_VECTOR_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
  */

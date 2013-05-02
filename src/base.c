@@ -30,9 +30,9 @@
 #include <sys/types.h>
 #include <regex.h>
 
-#include <lnxproc/error.h>
-#include <lnxproc/limits.h>
-#include <lnxproc/results.h>
+#include "error_private.h"
+#include "limits_private.h"
+#include "results_private.h"
 #include "array_private.h"
 #include "base_private.h"
 

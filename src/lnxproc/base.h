@@ -25,28 +25,9 @@
 extern "C" {
 #endif
 
-#include <stddef.h>
-#include <lnxproc/error.h>
-#include <lnxproc/limits.h>
 #include <lnxproc/results.h>
-#include <lnxproc/array.h>
 
-    struct lnxproc_base_t;
     typedef struct lnxproc_base_t LNXPROC_BASE_T;
-
-    typedef LNXPROC_ERROR_T (*LNXPROC_BASE_METHOD) (LNXPROC_BASE_T *base);
-    typedef LNXPROC_RESULTS_T *(*LNXPROC_READ_METHOD) (LNXPROC_BASE_T *base);
-
-    LNXPROC_ERROR_T lnxproc_base_new(LNXPROC_BASE_T **base,
-                                     char **filenames,
-                                     size_t nfiles,
-                                     char *fileprefix,
-                                     char *filesuffix,
-                                     LNXPROC_BASE_METHOD rawread,
-                                     LNXPROC_BASE_METHOD normalize,
-                                     LNXPROC_READ_METHOD read,
-                                     size_t buflen,
-                                     LNXPROC_LIMITS_T limits[], size_t dim);
 
 #ifndef WARN_UNUSED
 #define WARN_UNUSED __attribute__((warn_unused_result))
@@ -58,25 +39,12 @@ extern "C" {
     b = lnxproc_base_free(b);\
 }
 
-    LNXPROC_ERROR_T lnxproc_base_array(LNXPROC_BASE_T *base,
-                                       LNXPROC_ARRAY_T **array);
-
-    LNXPROC_ERROR_T lnxproc_base_filename(LNXPROC_BASE_T *base,
-                                          char **filename);
-    LNXPROC_ERROR_T lnxproc_base_lines(LNXPROC_BASE_T *base, char **lines);
-
-    LNXPROC_ERROR_T lnxproc_base_rawread(LNXPROC_BASE_T *base);
     LNXPROC_RESULTS_T *lnxproc_base_read(LNXPROC_BASE_T *base);
-    LNXPROC_ERROR_T lnxproc_base_normalize(LNXPROC_BASE_T *base);
-
-    LNXPROC_ERROR_T lnxproc_base_nbytes(LNXPROC_BASE_T *base, int *nbytes);
-
-    LNXPROC_ERROR_T lnxproc_base_print(LNXPROC_BASE_T *base);
 
 #ifdef __cplusplus
 }                               // extern "C"
 #endif
-#endif                          // LIBLNXPROC_BASE_H
+#endif                          // LIBLNXPROC_BASE_PRIVATE_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
  */

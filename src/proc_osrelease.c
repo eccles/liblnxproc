@@ -20,42 +20,12 @@ Typical contents of file /proc/sys/kernel/osrelease::
 
     3.5.0-19-generic
 
-.. note::
-   This class is **cached**. The file is only read **once**. Subsequent reads
-   return the first value read
-
-'''
-    '''
-    Measures the osrelease file from /proc/sys/kernel filesystem
-    '''
-    def __init__(self, **kwds):
-        '''
-        Initialises object fields
-        '''
-
-        kwds['filename'] = 'proc/sys/kernel/osrelease'
-        kwds['fields'] = 'osrelease'
-
-        super(ProcSysKernelOsrelease, self).__init__(**kwds)
-
-    def normalize(self, timestamp, lines):
-        '''
-        The sys/kernel/osrelease file is a single value
-        '''
-        data = {}
-        data[self.fields] = lines[0].rstrip()
-        return data
-
-if __name__ == "__main__":
-    from Test import Test
-    Test(ProcSysKernelOsrelease)
-
 */
 
 #include <stdlib.h>
 #include <string.h>
 
-#include "base_private.h"
+#include "interface_private.h"
 #include <lnxproc/proc_osrelease.h>
 
 static LNXPROC_ERROR_T
@@ -67,11 +37,11 @@ proc_osrelease_normalize(LNXPROC_BASE_T *base)
 }
 
 LNXPROC_ERROR_T
-lnxproc_proc_osrelease_new(LNXPROC_BASE_T **base)
+lnxproc_proc_osrelease_new(LNXPROC_INTERFACE_T **interface)
 {
 
     char *filenames[] = { "/proc/sys/kernel/osrelease", };
-    return lnxproc_base_new(base,
+    return lnxproc_interface_new(interface,
                             filenames, 1, NULL, NULL,
                             NULL, proc_osrelease_normalize, NULL, 32, NULL, 0);
 }

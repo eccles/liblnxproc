@@ -25,9 +25,9 @@ extern "C" {
 #endif
 
 #include <lnxproc/error.h>
-#include <lnxproc/base.h>
+#include <lnxproc/interface.h>
 
-    LNXPROC_ERROR_T lnxproc_sys_disksectors_new(LNXPROC_BASE_T **base);
+    LNXPROC_ERROR_T lnxproc_sys_disksectors_new(LNXPROC_INTERFACE_T **interface);
 
 #ifdef __cplusplus
 }                               // extern "C"

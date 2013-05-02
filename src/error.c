@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <lnxproc/error.h>
+#include "error_private.h"
 
 #ifdef DEBUG
 #include <stdarg.h>
@@ -40,7 +40,7 @@ static const char *errstr[] = {
     "Fail to malloc array header",
     "Fail to malloc array data",
     "Array arg is null",
-/*5*/ "Fail to realloc array data",
+/*6*/ "Fail to realloc array data",
     "Array index out of range",
     "Array vector is null",
     "Fail to malloc array vector",
@@ -52,24 +52,25 @@ static const char *errstr[] = {
     "Array dimension out of range",
     "Base arg is null",
     "Base - bad filename specified",
-/*13*/ "Fail to malloc base",
+/*18*/ "Fail to malloc base",
     "Fail to malloc base buffer",
     "Fail to malloc base filename",
     "Fail to malloc base file prefix",
     "Fail to malloc base file suffix",
     "Fail to malloc base array",
     "Fail to malloc base results",
+/*25*/ "Fail to malloc interface",
     "Overflow of raw read buffer",
     "Fail to malloc limits",
     "Limits argument is null",
     "Limit argument is null",
-/*24*/ "Fail to malloc limits entry",
+/*29*/ "Fail to malloc limits entry",
     "Limits address argument is null",
     "Limits address contents is not null",
     "Limits dimension is less than 1",
     "Db arg is null",
     "Db database is not open",
-/*30*/ "Fail to open database",
+/*35*/ "Fail to open database",
     "Fail to close database",
     "Fail to fetch from database",
     "Fail to store in database",
@@ -78,7 +79,7 @@ static const char *errstr[] = {
     "Results buf is null",
     "Results buflength is less than 1",
     "Results timeval address is null",
-/*39*/ "Results address is null",
+/*44*/ "Results address is null",
     "Results address contents is not null",
     "Fail to malloc results",
     "Results key is null",
@@ -86,13 +87,13 @@ static const char *errstr[] = {
     "Results value address is null",
     "Fail to malloc vector header",
     "Fail to malloc vector data",
-/*47*/ "Vector arg is null",
+/*52*/ "Vector arg is null",
     "Fail to realloc vector data",
     "Vector index out of range",
     "Vector data is null",
     "Vector children is null",
     "Vector values is null",
-/*53*/ "Vector address is null",
+/*58*/ "Vector address is null",
     "Vector address contents is not null",
 };
 

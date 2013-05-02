@@ -27,8 +27,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <lnxproc/error.h>
-#include <lnxproc/limits.h>
+#include "error_private.h"
+#include "limits_private.h"
 
 char *
 lnxproc_limit_chr(LNXPROC_LIMITS_T * limit, char c)

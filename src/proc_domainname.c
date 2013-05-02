@@ -26,40 +26,12 @@ Typical contents of file /proc/sys/kernel/domainname::
 
 '''
 
-from basecache import BaseCache
-
-class ProcSysKernelDomainname(BaseCache):
-    '''
-    Measures the domainname file from /proc/sys/kernel filesystem
-    '''
-    def __init__(self, **kwds):
-        '''
-        Initialises object fields
-        '''
-
-        kwds['filename'] = 'proc/sys/kernel/domainname'
-        kwds['fields'] = 'domainname'
-
-        super(ProcSysKernelDomainname, self).__init__(**kwds)
-
-    def normalize(self, timestamp, lines):
-        '''
-        The sys/kernel/domainname file is a single value
-        '''
-        data = {}
-        data[self.fields] = lines[0].rstrip()
-        return data
-
-if __name__ == "__main__":
-    from Test import Test
-    Test(ProcSysKernelDomainname)
-
 */
 
 #include <stdlib.h>
 #include <string.h>
 
-#include "base_private.h"
+#include "interface_private.h"
 #include <lnxproc/proc_domainname.h>
 
 static LNXPROC_ERROR_T
@@ -71,11 +43,11 @@ proc_domainname_normalize(LNXPROC_BASE_T *base)
 }
 
 LNXPROC_ERROR_T
-lnxproc_proc_domainname_new(LNXPROC_BASE_T **base)
+lnxproc_proc_domainname_new(LNXPROC_INTERFACE_T **interface)
 {
 
     char *filenames[1] = { "/proc/sys/kernel/domainname" };
-    return lnxproc_base_new(base,
+    return lnxproc_interface_new(interface,
                             filenames, 1, NULL, NULL,
                             NULL, proc_domainname_normalize, NULL, 64, NULL, 0);
 }

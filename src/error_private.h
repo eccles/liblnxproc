@@ -18,21 +18,19 @@
  *
  */
 
-#ifndef LIBLNXPROC_SYS_CPUFREQ_H
-#define LIBLNXPROC_SYS_CPUFREQ_H 1
+#ifndef LIBLNXPROC_ERROR_PRIVATE_H
+#define LIBLNXPROC_ERROR_PRIVATE_H 1
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include <lnxproc/error.h>
-#include <lnxproc/interface.h>
-
-    LNXPROC_ERROR_T lnxproc_sys_cpufreq_new(LNXPROC_INTERFACE_T **interface);
 
 #ifdef __cplusplus
 }                               // extern "C"
 #endif
-#endif                          // LIBLNXPROC_SYS_CPUFREQ_H
+#endif                          // LIBLNXPROC_ERROR_PRIVATE_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
  */

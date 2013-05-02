@@ -22,12 +22,13 @@ This file is part of liblnxproc.
 #include <stdlib.h>
 #include <string.h>
 
-#include "lnxproc/error.h"
+#include "error_private.h"
 #include "vector_private.h"
-#include "lnxproc/limits.h"
+#include "limits_private.h"
 #include "array_private.h"
 #include "base_private.h"
-#include "lnxproc/results.h"
+#include "interface_private.h"
+#include "results_private.h"
 #include "lnxproc/proc_cgroups.h"
 #include "lnxproc/proc_diskstats.h"
 #include "lnxproc/proc_domainname.h"
@@ -510,32 +511,37 @@ test_array(void)
 
 /*----------------------------------------------------------------------------*/
 static void
-execute_base(LNXPROC_BASE_T *base)
+execute_interface(LNXPROC_INTERFACE_T *interface)
 {
-    if (base) {
-        LNXPROC_RESULTS_T *res = lnxproc_base_read(base);
+    if (interface && interface->base) {
+        int i;
+        for( i = 0; i < 5 ; i++ ) {
+            printf("Execute %d\n",i+1);
+            LNXPROC_RESULTS_T *res = interface->read(interface->base);
 
-        if (!res) {
-            printf("Failure reading base\n");
+            if (!res) {
+                printf("Failure reading base\n");
+            }
+            else {
+                char *filename = NULL;
+    
+                lnxproc_base_filename(interface->base, &filename);
+                printf("Filename : %s\n", filename);
+    
+                int nbytes = 0;
+    
+                lnxproc_base_nbytes(interface->base, &nbytes);
+    
+                char *lines = NULL;
+    
+                lnxproc_base_lines(interface->base, &lines);
+                printf("Data : %1$d %2$*1$s\n", nbytes, lines);
+    
+                lnxproc_results_print(res);
+                LNXPROC_RESULTS_FREE(res);
+            }
         }
-        else {
-            char *filename = NULL;
-
-            lnxproc_base_filename(base, &filename);
-            printf("Filename : %s\n", filename);
-
-            int nbytes = 0;
-
-            lnxproc_base_nbytes(base, &nbytes);
-
-            char *lines = NULL;
-
-            lnxproc_base_lines(base, &lines);
-            printf("Data : %1$d %2$*1$s\n", nbytes, lines);
-
-            lnxproc_results_print(res);
-            LNXPROC_RESULTS_FREE(res);
-        }
+        LNXPROC_INTERFACE_FREE(interface);
     }
 }
 
@@ -543,21 +549,11 @@ execute_base(LNXPROC_BASE_T *base)
 static void
 test_proc_cgroups(void)
 {
-    LNXPROC_BASE_T *proc_cgroups = NULL;
+    LNXPROC_INTERFACE_T *proc_cgroups = NULL;
     LNXPROC_ERROR_T ret = lnxproc_proc_cgroups_new(&proc_cgroups);
 
     if (ret == LNXPROC_OK) {
-        printf("Execute 1\n");
-        execute_base(proc_cgroups);
-        printf("Execute 2\n");
-        execute_base(proc_cgroups);
-        printf("Execute 3\n");
-        execute_base(proc_cgroups);
-        printf("Execute 4\n");
-        execute_base(proc_cgroups);
-        printf("Execute 5\n");
-        execute_base(proc_cgroups);
-        LNXPROC_BASE_FREE(proc_cgroups);
+        execute_interface(proc_cgroups);
     }
 }
 
@@ -565,21 +561,11 @@ test_proc_cgroups(void)
 static void
 test_proc_diskstats(void)
 {
-    LNXPROC_BASE_T *proc_diskstats = NULL;
+    LNXPROC_INTERFACE_T *proc_diskstats = NULL;
     LNXPROC_ERROR_T ret = lnxproc_proc_diskstats_new(&proc_diskstats);
 
     if (ret == LNXPROC_OK) {
-        printf("Execute 1\n");
-        execute_base(proc_diskstats);
-        printf("Execute 2\n");
-        execute_base(proc_diskstats);
-        printf("Execute 3\n");
-        execute_base(proc_diskstats);
-        printf("Execute 4\n");
-        execute_base(proc_diskstats);
-        printf("Execute 5\n");
-        execute_base(proc_diskstats);
-        LNXPROC_BASE_FREE(proc_diskstats);
+        execute_interface(proc_diskstats);
     }
 }
 
@@ -587,21 +573,11 @@ test_proc_diskstats(void)
 static void
 test_proc_domainname(void)
 {
-    LNXPROC_BASE_T *proc_domainname = NULL;
+    LNXPROC_INTERFACE_T *proc_domainname = NULL;
     LNXPROC_ERROR_T ret = lnxproc_proc_domainname_new(&proc_domainname);
 
     if (ret == LNXPROC_OK) {
-        printf("Execute 1\n");
-        execute_base(proc_domainname);
-        printf("Execute 2\n");
-        execute_base(proc_domainname);
-        printf("Execute 3\n");
-        execute_base(proc_domainname);
-        printf("Execute 4\n");
-        execute_base(proc_domainname);
-        printf("Execute 5\n");
-        execute_base(proc_domainname);
-        LNXPROC_BASE_FREE(proc_domainname);
+        execute_interface(proc_domainname);
     }
 }
 
@@ -609,21 +585,11 @@ test_proc_domainname(void)
 static void
 test_proc_hostname(void)
 {
-    LNXPROC_BASE_T *proc_hostname = NULL;
+    LNXPROC_INTERFACE_T *proc_hostname = NULL;
     LNXPROC_ERROR_T ret = lnxproc_proc_hostname_new(&proc_hostname);
 
     if (ret == LNXPROC_OK) {
-        printf("Execute 1\n");
-        execute_base(proc_hostname);
-        printf("Execute 2\n");
-        execute_base(proc_hostname);
-        printf("Execute 3\n");
-        execute_base(proc_hostname);
-        printf("Execute 4\n");
-        execute_base(proc_hostname);
-        printf("Execute 5\n");
-        execute_base(proc_hostname);
-        LNXPROC_BASE_FREE(proc_hostname);
+        execute_interface(proc_hostname);
     }
 }
 
@@ -631,21 +597,11 @@ test_proc_hostname(void)
 static void
 test_proc_osrelease(void)
 {
-    LNXPROC_BASE_T *proc_osrelease = NULL;
+    LNXPROC_INTERFACE_T *proc_osrelease = NULL;
     LNXPROC_ERROR_T ret = lnxproc_proc_osrelease_new(&proc_osrelease);
 
     if (ret == LNXPROC_OK) {
-        printf("Execute 1\n");
-        execute_base(proc_osrelease);
-        printf("Execute 2\n");
-        execute_base(proc_osrelease);
-        printf("Execute 3\n");
-        execute_base(proc_osrelease);
-        printf("Execute 4\n");
-        execute_base(proc_osrelease);
-        printf("Execute 5\n");
-        execute_base(proc_osrelease);
-        LNXPROC_BASE_FREE(proc_osrelease);
+        execute_interface(proc_osrelease);
     }
 }
 
@@ -653,21 +609,11 @@ test_proc_osrelease(void)
 static void
 test_sys_cpufreq(void)
 {
-    LNXPROC_BASE_T *sys_cpufreq = NULL;
+    LNXPROC_INTERFACE_T *sys_cpufreq = NULL;
     LNXPROC_ERROR_T ret = lnxproc_sys_cpufreq_new(&sys_cpufreq);
 
     if (ret == LNXPROC_OK) {
-        printf("Execute 1\n");
-        execute_base(sys_cpufreq);
-        printf("Execute 2\n");
-        execute_base(sys_cpufreq);
-        printf("Execute 3\n");
-        execute_base(sys_cpufreq);
-        printf("Execute 4\n");
-        execute_base(sys_cpufreq);
-        printf("Execute 5\n");
-        execute_base(sys_cpufreq);
-        LNXPROC_BASE_FREE(sys_cpufreq);
+        execute_interface(sys_cpufreq);
     }
 }
 
@@ -675,21 +621,11 @@ test_sys_cpufreq(void)
 static void
 test_sys_disksectors(void)
 {
-    LNXPROC_BASE_T *sys_disksectors = NULL;
+    LNXPROC_INTERFACE_T *sys_disksectors = NULL;
     LNXPROC_ERROR_T ret = lnxproc_sys_disksectors_new(&sys_disksectors);
 
     if (ret == LNXPROC_OK) {
-        printf("Execute 1\n");
-        execute_base(sys_disksectors);
-        printf("Execute 2\n");
-        execute_base(sys_disksectors);
-        printf("Execute 3\n");
-        execute_base(sys_disksectors);
-        printf("Execute 4\n");
-        execute_base(sys_disksectors);
-        printf("Execute 5\n");
-        execute_base(sys_disksectors);
-        LNXPROC_BASE_FREE(sys_disksectors);
+        execute_interface(sys_disksectors);
     }
 }
 
