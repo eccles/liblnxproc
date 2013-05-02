@@ -25,10 +25,11 @@
 extern "C" {
 #endif
 
+#include <lnxproc/util.h>
 #include <lnxproc/error.h>
-#include "limits_private.h"
+#include <lnxproc/limits.h>
 #include <lnxproc/results.h>
-#include "base_private.h"
+#include <lnxproc/base.h>
 
     typedef struct lnxproc_interface_t LNXPROC_INTERFACE_T;
 
@@ -36,10 +37,6 @@ extern "C" {
         LNXPROC_READ_METHOD read;
         LNXPROC_BASE_T *base;
     };
-
-#ifndef WARN_UNUSED
-#define WARN_UNUSED __attribute__((warn_unused_result))
-#endif
 
     LNXPROC_INTERFACE_T *lnxproc_interface_free(LNXPROC_INTERFACE_T *
                                                 interface) WARN_UNUSED;

@@ -33,9 +33,6 @@ extern "C" {
 #include "array_private.h"
 #include <lnxproc/base.h>
 
-    typedef LNXPROC_ERROR_T (*LNXPROC_BASE_METHOD) (LNXPROC_BASE_T *base);
-    typedef LNXPROC_RESULTS_T *(*LNXPROC_READ_METHOD) (LNXPROC_BASE_T *base);
-
     struct lnxproc_base_t {
         LNXPROC_BASE_METHOD rawread;
         LNXPROC_BASE_METHOD normalize;

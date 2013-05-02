@@ -84,7 +84,10 @@ Typical contents of /proc/diskstats::
 #include <stdlib.h>
 #include <string.h>
 
+#include "array_private.h"
+#include "results_private.h"
 #include "interface_private.h"
+#include "base_private.h"
 #include <lnxproc/proc_diskstats.h>
 
 LNXPROC_ERROR_T

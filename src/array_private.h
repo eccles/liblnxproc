@@ -28,6 +28,7 @@
 extern "C" {
 #endif
 
+#include "util_private.h"
 #include "vector_private.h"
 #include "limits_private.h"
 #include <lnxproc/array.h>
@@ -42,10 +43,6 @@ extern "C" {
 
     LNXPROC_ERROR_T lnxproc_array_new(LNXPROC_ARRAY_T **array,
                                       LNXPROC_LIMITS_T limits[], size_t dim);
-
-#ifndef WARN_UNUSED
-#define WARN_UNUSED __attribute__((warn_unused_result))
-#endif
 
     LNXPROC_ARRAY_T *lnxproc_array_free(LNXPROC_ARRAY_T *array) WARN_UNUSED;
 

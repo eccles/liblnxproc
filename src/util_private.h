@@ -18,33 +18,22 @@
  *
  */
 
-#ifndef LIBLNXPROC_BASE_H
-#define LIBLNXPROC_BASE_H 1
+/* Common macros and utility functions
+ */
+
+#ifndef LIBLNXPROC_UTIL_PRIVATE_H
+#define LIBLNXPROC_UTIL_PRIVATE_H 1
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include <lnxproc/util.h>
-#include <lnxproc/results.h>
-
-    typedef struct lnxproc_base_t LNXPROC_BASE_T;
-
-    typedef LNXPROC_ERROR_T (*LNXPROC_BASE_METHOD) (LNXPROC_BASE_T *base);
-    typedef LNXPROC_RESULTS_T *(*LNXPROC_READ_METHOD) (LNXPROC_BASE_T *base);
-
-    LNXPROC_BASE_T *lnxproc_base_free(LNXPROC_BASE_T *base) WARN_UNUSED;
-
-#define LNXPROC_BASE_FREE(b) {\
-    b = lnxproc_base_free(b);\
-}
-
-    LNXPROC_RESULTS_T *lnxproc_base_read(LNXPROC_BASE_T *base);
 
 #ifdef __cplusplus
 }                               // extern "C"
 #endif
-#endif                          // LIBLNXPROC_BASE_PRIVATE_H
+#endif                          // LIBLNXPROC_UTIL_PRIVATE_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
  */

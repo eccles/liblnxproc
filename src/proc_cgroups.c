@@ -33,7 +33,10 @@ typical contents of /proc/cgroups file::
 #include <stdlib.h>
 #include <string.h>
 
+#include "array_private.h"
 #include "interface_private.h"
+#include "results_private.h"
+#include "base_private.h"
 #include <lnxproc/proc_cgroups.h>
 
 struct proc_cgroups_env_t {

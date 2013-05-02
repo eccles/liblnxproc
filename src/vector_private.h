@@ -29,6 +29,7 @@ extern "C" {
 #endif
 
 #include <stddef.h>
+#include "util_private.h"
 #include "error_private.h"
 #include <lnxproc/vector.h>
 
@@ -50,10 +51,6 @@ extern "C" {
 
     LNXPROC_ERROR_T _lnxproc_vector_new(_LNXPROC_VECTOR_T ** vec,
                                         size_t size, int recursive);
-
-#ifndef WARN_UNUSED
-#define WARN_UNUSED __attribute__((warn_unused_result))
-#endif
 
     _LNXPROC_VECTOR_T *_lnxproc_vector_free(_LNXPROC_VECTOR_T *
                                             vector) WARN_UNUSED;

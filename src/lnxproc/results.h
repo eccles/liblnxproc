@@ -26,6 +26,7 @@ extern "C" {
 #endif
 
 #include <sys/time.h>
+#include <lnxproc/util.h>
 #include <lnxproc/db.h>
 #include <lnxproc/error.h>
 
@@ -37,10 +38,6 @@ extern "C" {
     typedef struct lnxproc_results_t LNXPROC_RESULTS_T;
 
     LNXPROC_ERROR_T lnxproc_results_new(LNXPROC_RESULTS_T ** newresults);
-
-#ifndef WARN_UNUSED
-#define WARN_UNUSED __attribute__((warn_unused_result))
-#endif
 
     LNXPROC_RESULTS_T *lnxproc_results_free(LNXPROC_RESULTS_T *
                                             results) WARN_UNUSED;

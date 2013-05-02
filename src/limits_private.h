@@ -25,6 +25,7 @@
 extern "C" {
 #endif
 
+#include "util_private.h"
 #include "error_private.h"
 #include <lnxproc/limits.h>
 
@@ -37,10 +38,6 @@ extern "C" {
 
     LNXPROC_ERROR_T lnxproc_limits_dup(LNXPROC_LIMITS_T ** newlimits,
                                        LNXPROC_LIMITS_T limits[], size_t dim);
-
-#ifndef WARN_UNUSED
-#define WARN_UNUSED __attribute__((warn_unused_result))
-#endif
 
     LNXPROC_LIMITS_T *lnxproc_limits_free(LNXPROC_LIMITS_T
                                           limits[], size_t dim) WARN_UNUSED;
