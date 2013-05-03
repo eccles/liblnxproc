@@ -33,19 +33,19 @@ extern "C" {
 #include <lnxproc/interface.h>
 
     LNXPROC_ERROR_T _lnxproc_interface_new(LNXPROC_INTERFACE_T ** interface,
-                                          char **filenames,
-                                          size_t nfiles,
-                                          char *fileprefix,
-                                          char *filesuffix,
-                                          LNXPROC_BASE_METHOD rawread,
-                                          LNXPROC_BASE_METHOD normalize,
-                                          LNXPROC_READ_METHOD read,
-                                          size_t buflen,
-                                          LNXPROC_LIMITS_T limits[],
-                                          size_t dim);
+                                           char **filenames,
+                                           size_t nfiles,
+                                           char *fileprefix,
+                                           char *filesuffix,
+                                           LNXPROC_BASE_METHOD rawread,
+                                           LNXPROC_BASE_METHOD normalize,
+                                           LNXPROC_READ_METHOD read,
+                                           size_t buflen,
+                                           LNXPROC_LIMITS_T limits[],
+                                           size_t dim);
 
     typedef LNXPROC_ERROR_T (*_LNXPROC_INTERFACE_METHOD) (LNXPROC_INTERFACE_T **
-                                                         interface);
+                                                          interface);
 
 #ifdef __cplusplus
 }                               // extern "C"

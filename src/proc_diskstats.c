@@ -190,9 +190,9 @@ lnxproc_proc_diskstats_new(LNXPROC_INTERFACE_T ** interface)
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
     return _lnxproc_interface_new(interface,
-                                 filenames, 1, NULL, NULL,
-                                 NULL, proc_diskstats_normalize, NULL, 256,
-                                 limits, dim);
+                                  filenames, 1, NULL, NULL,
+                                  NULL, proc_diskstats_normalize, NULL, 256,
+                                  limits, dim);
 }
 
 /*

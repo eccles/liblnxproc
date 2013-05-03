@@ -278,7 +278,7 @@ lnxproc_base_rawread(LNXPROC_BASE_T *base)
     }
 
     LNXPROC_RESULTS_FREE(base->results);
-    int ret = lnxproc_results_new(&base->results);
+    LNXPROC_ERROR_T ret = lnxproc_results_new(&base->results);
 
     if (ret) {
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_RESULTS,
@@ -286,34 +286,25 @@ lnxproc_base_rawread(LNXPROC_BASE_T *base)
         return LNXPROC_ERROR_BASE_MALLOC_RESULTS;
     }
 
-    if (base->rawread) {
-        LNXPROC_DEBUG("Execute specified rawread method %p\n", base->rawread);
-        return base->rawread(base);
-    }
+    LNXPROC_DEBUG("Execute default rawread method\n");
+    int i;
+    char *readbuf = base->lines;
+    int nbytes = base->buflen;
 
-    else {
-        LNXPROC_DEBUG("Execute default rawread method\n");
-        int i;
-        char *readbuf = base->lines;
-        int nbytes = base->buflen;
+    for (i = 0; i < base->nfiles; i++) {
+        ret = base_rawread(base->filenames[i], &readbuf, &nbytes);
 
-        LNXPROC_ERROR_T ret;
-
-        for (i = 0; i < base->nfiles; i++) {
-            ret = base_rawread(base->filenames[i], &readbuf, &nbytes);
-
-            if (ret) {
-                return ret;
-            }
+        if (ret) {
+            return ret;
         }
-        if (base->fileprefix || base->filesuffix) {
-            ret = base_read_glob_files(base, &readbuf, &nbytes);
-            if (ret) {
-                return ret;
-            }
-        }
-        base->nbytes = base->buflen - nbytes;
     }
+    if (base->fileprefix || base->filesuffix) {
+        ret = base_read_glob_files(base, &readbuf, &nbytes);
+        if (ret) {
+            return ret;
+        }
+    }
+    base->nbytes = base->buflen - nbytes;
 
     LNXPROC_DEBUG("Successful\n");
     return LNXPROC_OK;
@@ -328,12 +319,6 @@ lnxproc_base_normalize(LNXPROC_BASE_T *base)
     if (!base) {
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_NULL, "\n");
         return LNXPROC_ERROR_BASE_NULL;
-    }
-
-    if (base->normalize) {
-        LNXPROC_DEBUG("Execute specified normalize method %p\n",
-                      base->normalize);
-        return base->normalize(base);
     }
 
     return LNXPROC_OK;
@@ -476,36 +461,26 @@ lnxproc_base_read(LNXPROC_BASE_T *base)
         return NULL;
     }
 
-    if (base->read) {
-        LNXPROC_DEBUG("Execute specified read method %p\n", base->read);
-        return base->read(base);
+    LNXPROC_DEBUG("Execute default read method\n");
+    LNXPROC_ERROR_T ret;
 
+    do {
+        ret = base->rawread(base);
+        if (ret == LNXPROC_ERROR_BASE_READ_OVERFLOW) {
+            base_resize_rawread_buffer(base);
+        }
+    } while (ret == LNXPROC_ERROR_BASE_READ_OVERFLOW);
+
+    if (ret) {
+        LNXPROC_ERROR_DEBUG(ret, "\n");
+        return NULL;
     }
-
-    else {
-        LNXPROC_DEBUG("Execute default read method\n");
-        LNXPROC_ERROR_T ret;
-
-        do {
-            ret = lnxproc_base_rawread(base);
-            if (ret == LNXPROC_ERROR_BASE_READ_OVERFLOW) {
-                base_resize_rawread_buffer(base);
-            }
-        } while (ret == LNXPROC_ERROR_BASE_READ_OVERFLOW);
-
-        if (ret) {
-            LNXPROC_ERROR_DEBUG(ret, "\n");
-            return NULL;
-        }
-        base_map(base);
-        if (base->normalize) {
-            LNXPROC_DEBUG("Execute default normalize method\n");
-            ret = base->normalize(base);
-            if (ret) {
-                LNXPROC_ERROR_DEBUG(ret, "\n");
-                return NULL;
-            }
-        }
+    base_map(base);
+    LNXPROC_DEBUG("Execute default normalize method\n");
+    ret = base->normalize(base);
+    if (ret) {
+        LNXPROC_ERROR_DEBUG(ret, "\n");
+        return NULL;
     }
 
     LNXPROC_RESULTS_T *res = base->results;
@@ -630,9 +605,24 @@ lnxproc_base_new(LNXPROC_BASE_T **base,
     }
     p->results = NULL;
     p->prev = NULL;
-    p->rawread = rawread;
-    p->normalize = normalize;
-    p->read = read;
+    if (!normalize) {
+        p->normalize = lnxproc_base_normalize;
+    }
+    else {
+        p->normalize = normalize;
+    }
+    if (!read) {
+        p->read = lnxproc_base_read;
+    }
+    else {
+        p->read = read;
+    }
+    if (!rawread) {
+        p->rawread = lnxproc_base_rawread;
+    }
+    else {
+        p->rawread = rawread;
+    }
     p->buflen = buflen;
     p->nbytes = 0;
     *base = p;

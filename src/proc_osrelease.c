@@ -44,9 +44,9 @@ lnxproc_proc_osrelease_new(LNXPROC_INTERFACE_T ** interface)
 
     char *filenames[] = { "/proc/sys/kernel/osrelease", };
     return _lnxproc_interface_new(interface,
-                                 filenames, 1, NULL, NULL,
-                                 NULL, proc_osrelease_normalize, NULL, 32, NULL,
-                                 0);
+                                  filenames, 1, NULL, NULL,
+                                  NULL, proc_osrelease_normalize, NULL, 32,
+                                  NULL, 0);
 }
 
 /*
