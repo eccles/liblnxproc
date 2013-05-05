@@ -36,10 +36,9 @@ typical contents of /proc/cgroups file::
 #include "error_private.h"
 #include "limits_private.h"
 #include "array_private.h"
-#include "interface_private.h"
 #include "results_private.h"
 #include "base_private.h"
-#include <lnxproc/proc_cgroups.h>
+#include "proc_cgroups.h"
 
 struct proc_cgroups_env_t {
     LNXPROC_RESULTS_T *results;
@@ -107,7 +106,7 @@ proc_cgroups_normalize(LNXPROC_BASE_T *base)
 }
 
 LNXPROC_ERROR_T
-lnxproc_proc_cgroups_new(LNXPROC_INTERFACE_T ** interface)
+lnxproc_proc_cgroups_new(LNXPROC_BASE_T ** base)
 {
 
     LNXPROC_LIMITS_T limits[] = {
@@ -122,7 +121,7 @@ lnxproc_proc_cgroups_new(LNXPROC_INTERFACE_T ** interface)
     char *filenames[] = { "/proc/cgroups" };
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
-    return _lnxproc_interface_new(interface,
+    return lnxproc_base_new(base,
                                   filenames, 1, NULL, NULL,
                                   NULL, proc_cgroups_normalize, NULL, 256,
                                   limits, dim);

@@ -26,9 +26,8 @@ Typical contents of file /proc/sys/kernel/osrelease::
 #include <string.h>
 
 #include "error_private.h"
-#include "interface_private.h"
 #include "base_private.h"
-#include <lnxproc/proc_osrelease.h>
+#include "proc_osrelease.h"
 
 static LNXPROC_ERROR_T
 proc_osrelease_normalize(LNXPROC_BASE_T *base)
@@ -39,11 +38,11 @@ proc_osrelease_normalize(LNXPROC_BASE_T *base)
 }
 
 LNXPROC_ERROR_T
-lnxproc_proc_osrelease_new(LNXPROC_INTERFACE_T ** interface)
+lnxproc_proc_osrelease_new(LNXPROC_BASE_T ** base)
 {
 
     char *filenames[] = { "/proc/sys/kernel/osrelease", };
-    return _lnxproc_interface_new(interface,
+    return lnxproc_base_new(base,
                                   filenames, 1, NULL, NULL,
                                   NULL, proc_osrelease_normalize, NULL, 32,
                                   NULL, 0);

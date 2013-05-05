@@ -26,10 +26,9 @@ This file is part of liblnxproc.
 #include "error_private.h"
 #include "array_private.h"
 #include "limits_private.h"
-#include "interface_private.h"
 #include "results_private.h"
 #include "base_private.h"
-#include <lnxproc/sys_disksectors.h>
+#include "sys_disksectors.h"
 
 struct env_t {
     LNXPROC_RESULTS_T *results;
@@ -71,7 +70,7 @@ sys_disksectors_normalize(LNXPROC_BASE_T *base)
 }
 
 LNXPROC_ERROR_T
-lnxproc_sys_disksectors_new(LNXPROC_INTERFACE_T ** interface)
+lnxproc_sys_disksectors_new(LNXPROC_BASE_T ** base)
 {
 
     char *fileprefix = "/sys/block";
@@ -84,7 +83,7 @@ lnxproc_sys_disksectors_new(LNXPROC_INTERFACE_T ** interface)
 
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
-    return _lnxproc_interface_new(interface,
+    return lnxproc_base_new(base,
                                   NULL, 0, fileprefix, filesuffix,
                                   NULL, sys_disksectors_normalize, NULL,
                                   256, limits, dim);

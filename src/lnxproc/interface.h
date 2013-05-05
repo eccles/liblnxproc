@@ -28,23 +28,39 @@ extern "C" {
 #include <lnxproc/util.h>
 #include <lnxproc/error.h>
 #include <lnxproc/base.h>
+#include <lnxproc/results.h>
 
-    struct lnxproc_interface_t {
-        LNXPROC_READ_METHOD read;
-        LNXPROC_BASE_T *base;
-    };
+enum lnxproc_module_type_t {
+        LNXPROC_ALL = 0,
+        LNXPROC_PROC_CGROUPS,
+        LNXPROC_PROC_DISKSTATS,
+        LNXPROC_PROC_DOMAINNAME,
+        LNXPROC_PROC_HOSTNAME, 
+        LNXPROC_PROC_OSRELEASE,
+        LNXPROC_SYS_CPUFREQ,
+        LNXPROC_SYS_DISKSECTORS,
+};
+typedef enum lnxproc_module_type_t LNXPROC_MODULE_TYPE_T;
 
-    typedef struct lnxproc_interface_t LNXPROC_INTERFACE_T;
+typedef LNXPROC_ERROR_T (*LNXPROC_METHOD)(LNXPROC_BASE_T **base);
 
-    typedef LNXPROC_ERROR_T (*LNXPROC_INTERFACE_METHOD) (LNXPROC_INTERFACE_T **
-                                                         interface);
+struct lnxproc_module_t {
+    LNXPROC_METHOD new;
+    LNXPROC_BASE_T *base;
+};
+typedef struct lnxproc_module_t LNXPROC_MODULE_T;
 
-    LNXPROC_INTERFACE_T *lnxproc_interface_free(LNXPROC_INTERFACE_T *
-                                                interface) WARN_UNUSED;
+LNXPROC_ERROR_T lnxproc_init(LNXPROC_MODULE_T ** modules );
 
-#define LNXPROC_INTERFACE_FREE(b) {\
-    b = lnxproc_interface_free(b);\
+    LNXPROC_MODULE_T *lnxproc_free(LNXPROC_MODULE_T *
+                                                module) WARN_UNUSED;
+#define LNXPROC_FREE(b) {\
+    b = lnxproc_free(b);\
 }
+
+LNXPROC_RESULTS_T *lnxproc_read(LNXPROC_MODULE_T * modules,
+                                LNXPROC_MODULE_TYPE_T type );
+
 
 #ifdef __cplusplus
 }                               // extern "C"

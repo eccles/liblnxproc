@@ -18,22 +18,21 @@
  *
  */
 
-#ifndef LIBLNXPROC_SYS_DISKSECTORS_H
-#define LIBLNXPROC_SYS_DISKSECTORS_H 1
+#ifndef LIBLNXPROC_PROC_HOSTNAME_H
+#define LIBLNXPROC_PROC_HOSTNAME_H 1
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include <lnxproc/error.h>
-#include <lnxproc/interface.h>
+#include <lnxproc/base.h>
 
-    LNXPROC_ERROR_T lnxproc_sys_disksectors_new(LNXPROC_INTERFACE_T **
-                                                interface);
+    LNXPROC_ERROR_T lnxproc_proc_hostname_new(LNXPROC_BASE_T ** base);
 
 #ifdef __cplusplus
 }                               // extern "C"
 #endif
-#endif                          // LIBLNXPROC_SYS_DISKSECTORSIZE_H
+#endif                          // LIBLNXPROC_PROC_HOSTNAME_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
  */

@@ -88,9 +88,8 @@ Typical contents of /proc/diskstats::
 #include "limits_private.h"
 #include "array_private.h"
 #include "results_private.h"
-#include "interface_private.h"
 #include "base_private.h"
-#include <lnxproc/proc_diskstats.h>
+#include "proc_diskstats.h"
 
 LNXPROC_ERROR_T
 lnxproc_strings_append(char ***strings, size_t * n, char *val)
@@ -178,7 +177,7 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
 }
 
 LNXPROC_ERROR_T
-lnxproc_proc_diskstats_new(LNXPROC_INTERFACE_T ** interface)
+lnxproc_proc_diskstats_new(LNXPROC_BASE_T ** base)
 {
 
     LNXPROC_LIMITS_T limits[] = {
@@ -189,7 +188,7 @@ lnxproc_proc_diskstats_new(LNXPROC_INTERFACE_T ** interface)
     char *filenames[] = { "/proc/diskstats" };
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
-    return _lnxproc_interface_new(interface,
+    return lnxproc_base_new(base,
                                   filenames, 1, NULL, NULL,
                                   NULL, proc_diskstats_normalize, NULL, 256,
                                   limits, dim);

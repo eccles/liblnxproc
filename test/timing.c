@@ -23,84 +23,49 @@ This file is part of liblnxproc.
 #include <lnxproc/lnxproc.h>
 
 static const int ntimes = 1000;
-struct lnxproc_module_t {
-    LNXPROC_INTERFACE_METHOD new;
-    LNXPROC_INTERFACE_T *interface;
-};
-typedef struct lnxproc_module_t LNXPROC_MODULE_T;
-/*----------------------------------------------------------------------------*/
 static void
-execute_interface(LNXPROC_INTERFACE_T *interface)
+test_module(LNXPROC_MODULE_T *modules, LNXPROC_MODULE_TYPE_T type)
 {
-    if (interface) {
+    if( modules) {
         int i;
         for( i = 0; i < ntimes; i++ ) {
-            LNXPROC_RESULTS_T *res = interface->read(interface->base);
-
-            if (!res) {
-                printf("Failure reading base\n");
-            }
-            else {
-                LNXPROC_RESULTS_FREE(res);
-            }
-        }
-        LNXPROC_INTERFACE_FREE(interface);
-    }
-}
-
-/*----------------------------------------------------------------------------*/
-static void
-test_module(LNXPROC_MODULE_T *module)
-{
-    if( module) {
-        LNXPROC_ERROR_T ret = module->new(&module->interface);
-        if (ret == LNXPROC_OK) {
-            execute_interface(module->interface);
+            LNXPROC_RESULTS_T *res = lnxproc_read(modules,type);
+            LNXPROC_RESULTS_FREE(res);
         }
     }
+    LNXPROC_FREE(modules);
 }
 /*----------------------------------------------------------------------------*/
 int
 main(int argc, char *argv[])
 {
 
-    LNXPROC_MODULE_T modules[] = {
-        { .new = lnxproc_proc_cgroups_new, .interface = NULL, },
-        { .new = lnxproc_proc_diskstats_new, .interface = NULL, },
-        { .new = lnxproc_proc_domainname_new, .interface = NULL, },
-        { .new = lnxproc_proc_hostname_new, .interface = NULL, },
-        { .new = lnxproc_proc_osrelease_new, .interface = NULL, },
-        { .new = lnxproc_sys_cpufreq_new, .interface = NULL, },
-        { .new = lnxproc_sys_disksectors_new, .interface = NULL, },
-    };
-    size_t nmodules = sizeof(modules)/sizeof(modules[0]);
+    LNXPROC_MODULE_T *modules = NULL;
+    lnxproc_init(&modules);
 
     if (argc < 2) {
-        int i;
-        for( i = 0 ; i < nmodules ; i++ ) {
-            test_module(modules+i);
-        }
+        test_module(modules,LNXPROC_ALL);
     }
     else if (!strcmp(argv[1], "proc_cgroups")) {
-        test_module(modules+0);
+        test_module(modules,LNXPROC_PROC_CGROUPS);
     }
     else if (!strcmp(argv[1], "proc_diskstats")) {
-        test_module(modules+1);
+        test_module(modules,LNXPROC_PROC_DISKSTATS);
     }
     else if (!strcmp(argv[1], "proc_domainname")) {
-        test_module(modules+2);
+        test_module(modules,LNXPROC_PROC_DOMAINNAME);
     }
     else if (!strcmp(argv[1], "proc_hostname")) {
-        test_module(modules+3);
+        test_module(modules,LNXPROC_PROC_HOSTNAME);
     }
     else if (!strcmp(argv[1], "proc_osrelease")) {
-        test_module(modules+4);
+        test_module(modules,LNXPROC_PROC_OSRELEASE);
     }
     else if (!strcmp(argv[1], "sys_cpufreq")) {
-        test_module(modules+5);
+        test_module(modules,LNXPROC_SYS_CPUFREQ);
     }
     else if (!strcmp(argv[1], "sys_disksectors")) {
-        test_module(modules+6);
+        test_module(modules,LNXPROC_SYS_DISKSECTORS);
     }
     return 0;
 }

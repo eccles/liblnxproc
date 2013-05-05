@@ -19,77 +19,73 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 #include "error_private.h"
 #include "base_private.h"
 #include "interface_private.h"
+#include "proc_cgroups.h"
+#include "proc_diskstats.h"
+#include "proc_domainname.h"
+#include "proc_hostname.h"
+#include "proc_osrelease.h"
+#include "sys_cpufreq.h"
+#include "sys_disksectors.h"
+
+static LNXPROC_MODULE_T mymodules[] = {
+        { .new = lnxproc_proc_cgroups_new, .base = NULL, },
+        { .new = lnxproc_proc_diskstats_new, .base = NULL, },
+        { .new = lnxproc_proc_domainname_new, .base = NULL, },
+        { .new = lnxproc_proc_hostname_new, .base = NULL, },
+        { .new = lnxproc_proc_osrelease_new, .base = NULL, },
+        { .new = lnxproc_sys_cpufreq_new, .base = NULL, },
+        { .new = lnxproc_sys_disksectors_new, .base = NULL, },
+};
+static size_t nmodules = sizeof(mymodules)/sizeof(mymodules[0]);
 
 LNXPROC_ERROR_T
-_lnxproc_interface_new(LNXPROC_INTERFACE_T ** interface,
-                       char **filenames,
-                       size_t nfiles,
-                       char *fileprefix,
-                       char *filesuffix,
-                       LNXPROC_BASE_METHOD rawread,
-                       LNXPROC_BASE_METHOD normalize,
-                       LNXPROC_READ_METHOD read,
-                       size_t buflen, LNXPROC_LIMITS_T limits[], size_t dim)
-{
-    LNXPROC_DEBUG("rawread %p, normalize %p, read %p\n", rawread,
-                  normalize, read);
-    LNXPROC_DEBUG("sizeof ptr %d\n", sizeof(void *));
-    LNXPROC_DEBUG("sizeof LNXPROC_INTERFACE_T %d\n",
-                  sizeof(LNXPROC_INTERFACE_T));
-
-    LNXPROC_INTERFACE_T *p = calloc(1, sizeof(LNXPROC_INTERFACE_T));
-
+lnxproc_init(LNXPROC_MODULE_T ** modules) {
+    LNXPROC_MODULE_T *p = calloc(1,sizeof(mymodules));
     if (!p) {
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_INTERFACE_MALLOC_INTERFACE,
                             "Malloc interface\n");
         return LNXPROC_ERROR_INTERFACE_MALLOC_INTERFACE;
     }
-
-    LNXPROC_ERROR_T ret = lnxproc_base_new(&p->base,
-                                           filenames,
-                                           nfiles,
-                                           fileprefix,
-                                           filesuffix,
-                                           rawread,
-                                           normalize,
-                                           read,
-                                           buflen, limits, dim);
-
-    if (ret) {
-        LNXPROC_INTERFACE_FREE(p);
-        return ret;
-    }
-    if (read) {
-        p->read = read;
-    }
-    else {
-        p->read = lnxproc_base_read;
-    }
-    *interface = p;
-    LNXPROC_DEBUG("Successful\n");
+    memcpy(p,mymodules,sizeof mymodules);
+    *modules = p;
     return LNXPROC_OK;
 }
-
-LNXPROC_INTERFACE_T *
-lnxproc_interface_free(LNXPROC_INTERFACE_T * interface)
-{
-    LNXPROC_DEBUG("Base %p\n", interface);
-
-    if (interface) {
-        if (interface->base) {
-            LNXPROC_DEBUG("Free base \n");
-            LNXPROC_BASE_FREE(interface->base);
+LNXPROC_MODULE_T *
+lnxproc_free(LNXPROC_MODULE_T * modules) {
+    if( modules ) {
+        int i;
+        for( i=0; i < nmodules; i++ ) {
+            LNXPROC_BASE_FREE(modules[i].base);
         }
-
-        LNXPROC_DEBUG("Free Interface\n");
-        free(interface);
-        interface = NULL;
+        free(modules);
     }
+    return NULL;
+}
 
-    return interface;
+LNXPROC_RESULTS_T *
+lnxproc_read(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type) {
+
+    if( modules ) {
+        if( type == LNXPROC_ALL ) {
+        }
+        else {
+            LNXPROC_MODULE_T *module = modules + type + 1;
+
+            if( !module->base ) {
+                LNXPROC_ERROR_T ret = module->new(&module->base);
+                if(ret) {
+                    return NULL;
+                }
+            }
+
+            return module->base->read(module->base);
+        }
+    }
+    return NULL;
 }
 
 /*

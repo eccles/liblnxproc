@@ -28,13 +28,6 @@ extern "C" {
 #include <lnxproc/base.h>
 #include <lnxproc/results.h>
 #include <lnxproc/interface.h>
-#include <lnxproc/proc_cgroups.h>
-#include <lnxproc/proc_diskstats.h>
-#include <lnxproc/proc_domainname.h>
-#include <lnxproc/proc_hostname.h>
-#include <lnxproc/proc_osrelease.h>
-#include <lnxproc/sys_cpufreq.h>
-#include <lnxproc/sys_disksectors.h>
 
 #ifdef __cplusplus
 }                               // extern "C"
