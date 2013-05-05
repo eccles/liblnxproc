@@ -25,18 +25,14 @@
 extern "C" {
 #endif
 
-#include <lnxproc/error.h>
-#include <lnxproc/results.h>
+#include <stddef.h>
 
     typedef struct lnxproc_base_t LNXPROC_BASE_T;
-
-    typedef LNXPROC_ERROR_T (*LNXPROC_BASE_METHOD) (LNXPROC_BASE_T *base);
-    typedef LNXPROC_RESULTS_T *(*LNXPROC_READ_METHOD) (LNXPROC_BASE_T *base);
 
 #ifdef __cplusplus
 }                               // extern "C"
 #endif
-#endif                          // LIBLNXPROC_BASE_PRIVATE_H
+#endif                          // LIBLNXPROC_BASE_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
  */

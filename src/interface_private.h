@@ -25,12 +25,13 @@
 extern "C" {
 #endif
 
-#include "util_private.h"
-#include "error_private.h"
-#include "limits_private.h"
-#include "results_private.h"
 #include "base_private.h"
 #include <lnxproc/interface.h>
+
+    struct lnxproc_module_t {
+        LNXPROC_METHOD new;
+        LNXPROC_BASE_T *base;
+    };
 
 #ifdef __cplusplus
 }                               // extern "C"

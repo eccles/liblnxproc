@@ -25,9 +25,9 @@ extern "C" {
 #endif
 
 #include <lnxproc/error.h>
-#include <lnxproc/base.h>
+#include "base_private.h"
 
-    LNXPROC_ERROR_T lnxproc_sys_cpufreq_new(LNXPROC_BASE_T ** base);
+    LNXPROC_ERROR_T lnxproc_sys_cpufreq_new(LNXPROC_BASE_T **base);
 
 #ifdef __cplusplus
 }                               // extern "C"

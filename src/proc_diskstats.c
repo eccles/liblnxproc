@@ -177,7 +177,7 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
 }
 
 LNXPROC_ERROR_T
-lnxproc_proc_diskstats_new(LNXPROC_BASE_T ** base)
+lnxproc_proc_diskstats_new(LNXPROC_BASE_T **base)
 {
 
     LNXPROC_LIMITS_T limits[] = {
@@ -189,9 +189,9 @@ lnxproc_proc_diskstats_new(LNXPROC_BASE_T ** base)
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
     return lnxproc_base_new(base,
-                                  filenames, 1, NULL, NULL,
-                                  NULL, proc_diskstats_normalize, NULL, 256,
-                                  limits, dim);
+                            filenames, 1, NULL, NULL,
+                            NULL, proc_diskstats_normalize, NULL, 256,
+                            limits, dim);
 }
 
 /*

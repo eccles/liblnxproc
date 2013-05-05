@@ -39,14 +39,13 @@ proc_hostname_normalize(LNXPROC_BASE_T *base)
 }
 
 LNXPROC_ERROR_T
-lnxproc_proc_hostname_new(LNXPROC_BASE_T ** base)
+lnxproc_proc_hostname_new(LNXPROC_BASE_T **base)
 {
 
     char *filenames[] = { "/proc/sys/kernel/hostname", };
     return lnxproc_base_new(base,
-                                  filenames, 1, NULL, NULL,
-                                  NULL, proc_hostname_normalize, NULL, 64, NULL,
-                                  0);
+                            filenames, 1, NULL, NULL,
+                            NULL, proc_hostname_normalize, NULL, 64, NULL, 0);
 }
 
 /*

@@ -32,33 +32,39 @@
 #include "sys_disksectors.h"
 
 static LNXPROC_MODULE_T mymodules[] = {
-        { .new = lnxproc_proc_cgroups_new, .base = NULL, },
-        { .new = lnxproc_proc_diskstats_new, .base = NULL, },
-        { .new = lnxproc_proc_domainname_new, .base = NULL, },
-        { .new = lnxproc_proc_hostname_new, .base = NULL, },
-        { .new = lnxproc_proc_osrelease_new, .base = NULL, },
-        { .new = lnxproc_sys_cpufreq_new, .base = NULL, },
-        { .new = lnxproc_sys_disksectors_new, .base = NULL, },
+    {.new = lnxproc_proc_cgroups_new,.base = NULL,},
+    {.new = lnxproc_proc_diskstats_new,.base = NULL,},
+    {.new = lnxproc_proc_domainname_new,.base = NULL,},
+    {.new = lnxproc_proc_hostname_new,.base = NULL,},
+    {.new = lnxproc_proc_osrelease_new,.base = NULL,},
+    {.new = lnxproc_sys_cpufreq_new,.base = NULL,},
+    {.new = lnxproc_sys_disksectors_new,.base = NULL,},
 };
-static size_t nmodules = sizeof(mymodules)/sizeof(mymodules[0]);
+
+static size_t nmodules = sizeof(mymodules) / sizeof(mymodules[0]);
 
 LNXPROC_ERROR_T
-lnxproc_init(LNXPROC_MODULE_T ** modules) {
-    LNXPROC_MODULE_T *p = calloc(1,sizeof(mymodules));
+lnxproc_init(LNXPROC_MODULE_T ** modules)
+{
+    LNXPROC_MODULE_T *p = calloc(1, sizeof(mymodules));
+
     if (!p) {
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_INTERFACE_MALLOC_INTERFACE,
                             "Malloc interface\n");
         return LNXPROC_ERROR_INTERFACE_MALLOC_INTERFACE;
     }
-    memcpy(p,mymodules,sizeof mymodules);
+    memcpy(p, mymodules, sizeof mymodules);
     *modules = p;
     return LNXPROC_OK;
 }
+
 LNXPROC_MODULE_T *
-lnxproc_free(LNXPROC_MODULE_T * modules) {
-    if( modules ) {
+lnxproc_free(LNXPROC_MODULE_T * modules)
+{
+    if (modules) {
         int i;
-        for( i=0; i < nmodules; i++ ) {
+
+        for (i = 0; i < nmodules; i++) {
             LNXPROC_BASE_FREE(modules[i].base);
         }
         free(modules);
@@ -67,17 +73,19 @@ lnxproc_free(LNXPROC_MODULE_T * modules) {
 }
 
 LNXPROC_RESULTS_T *
-lnxproc_read(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type) {
+lnxproc_read(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type)
+{
 
-    if( modules ) {
-        if( type == LNXPROC_ALL ) {
+    if (modules) {
+        if (type == LNXPROC_ALL) {
         }
         else {
             LNXPROC_MODULE_T *module = modules + type + 1;
 
-            if( !module->base ) {
+            if (!module->base) {
                 LNXPROC_ERROR_T ret = module->new(&module->base);
-                if(ret) {
+
+                if (ret) {
                     return NULL;
                 }
             }

@@ -27,7 +27,8 @@ extern "C" {
 
 #include "util_private.h"
 #include "error_private.h"
-#include <lnxproc/limits.h>
+
+    typedef struct lnxproc_limits_t LNXPROC_LIMITS_T;
 
     struct lnxproc_limits_t {
         size_t expected;

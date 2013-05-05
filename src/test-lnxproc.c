@@ -511,7 +511,7 @@ test_array(void)
 
 /*----------------------------------------------------------------------------*/
 static void
-execute_base(LNXPROC_BASE_T * base)
+execute_base(LNXPROC_BASE_T *base)
 {
     if (base) {
         int i;

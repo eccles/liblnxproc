@@ -31,7 +31,6 @@ extern "C" {
 #include "util_private.h"
 #include "vector_private.h"
 #include "limits_private.h"
-#include <lnxproc/array.h>
 
     struct _lnxproc_array_t {
         LNXPROC_LIMITS_T *limits;

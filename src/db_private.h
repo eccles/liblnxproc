@@ -25,7 +25,30 @@
 extern "C" {
 #endif
 
-#include <lnxproc/db.h>
+#define LNXPROC_TDB 1
+
+#ifdef LNXPROC_TDB
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <tdb.h>
+
+    typedef TDB_CONTEXT LNXPROC_RESULTS_FILE_T;
+    typedef TDB_DATA LNXPROC_RESULTS_DATA_T;
+
+#define DB_OPEN()  ({\
+    int hash_size = 0;\
+    int tdb_flags = TDB_INTERNAL;\
+    int open_flags = O_RDWR;\
+    mode_t mode = 0;\
+\
+    LNXPROC_RESULTS_FILE_T *db = tdb_open(NULL, hash_size, tdb_flags, open_flags, mode);\
+\
+    db;\
+})\
+
+#endif                          // LNXPROC_TDB
 
 #ifdef __cplusplus
 }                               // extern "C"
