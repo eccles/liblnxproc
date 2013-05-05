@@ -27,7 +27,7 @@ extern "C" {
 
 #include <sys/time.h>
 #include <lnxproc/util.h>
-#include "db_private.h"
+#include <lnxproc/db.h>
 #include <lnxproc/error.h>
 
     struct lnxproc_results_t {

@@ -26,9 +26,9 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
-#include <tdb.h>
 
 #include "error_private.h"
+#include "db_private.h"
 #include "results_private.h"
 
 LNXPROC_ERROR_T

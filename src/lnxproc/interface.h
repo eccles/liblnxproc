@@ -49,6 +49,7 @@ extern "C" {
     LNXPROC_ERROR_T lnxproc_init(LNXPROC_MODULE_T ** modules);
 
     LNXPROC_MODULE_T *lnxproc_free(LNXPROC_MODULE_T * module) WARN_UNUSED;
+
 #define LNXPROC_FREE(b) {\
     b = lnxproc_free(b);\
 }

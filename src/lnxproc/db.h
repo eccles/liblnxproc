@@ -18,14 +18,14 @@
  *
  */
 
-#ifndef LIBLNXPROC_DB_PRIVATE_H
-#define LIBLNXPROC_DB_PRIVATE_H 1
+#ifndef LIBLNXPROC_DB_H
+#define LIBLNXPROC_DB_H 1
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <lnxproc/db.h>
+#define LNXPROC_TDB 1
 
 #ifdef LNXPROC_TDB
 
@@ -34,23 +34,15 @@ extern "C" {
 #include <fcntl.h>
 #include <tdb.h>
 
-#define DB_OPEN()  ({\
-    int hash_size = 0;\
-    int tdb_flags = TDB_INTERNAL;\
-    int open_flags = O_RDWR;\
-    mode_t mode = 0;\
-\
-    LNXPROC_RESULTS_FILE_T *db = tdb_open(NULL, hash_size, tdb_flags, open_flags, mode);\
-\
-    db;\
-})\
+    typedef TDB_CONTEXT LNXPROC_RESULTS_FILE_T;
+    typedef TDB_DATA LNXPROC_RESULTS_DATA_T;
 
 #endif                          // LNXPROC_TDB
 
 #ifdef __cplusplus
 }                               // extern "C"
 #endif
-#endif                          // LIBLNXPROC_DB_PRIVATE_H
+#endif                          // LIBLNXPROC_DB_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
  */

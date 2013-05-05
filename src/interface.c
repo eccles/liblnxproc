@@ -78,6 +78,11 @@ lnxproc_read(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type)
 
     if (modules) {
         if (type == LNXPROC_ALL) {
+            int i;
+
+            for (i = 0; i < nmodules; i++) {
+                lnxproc_read(modules, i);
+            }
         }
         else {
             LNXPROC_MODULE_T *module = modules + type + 1;

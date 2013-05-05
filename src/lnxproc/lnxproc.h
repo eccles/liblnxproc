@@ -25,6 +25,7 @@ This file is part of liblnxproc.
 extern "C" {
 #endif
 
+#include <lnxproc/error.h>
 #include <lnxproc/base.h>
 #include <lnxproc/results.h>
 #include <lnxproc/interface.h>
