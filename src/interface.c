@@ -65,7 +65,7 @@ lnxproc_free(LNXPROC_MODULE_T * modules)
         int i;
 
         for (i = 0; i < nmodules; i++) {
-            LNXPROC_BASE_FREE(modules[i].base);
+            _LNXPROC_BASE_FREE(modules[i].base);
         }
         free(modules);
     }

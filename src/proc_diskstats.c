@@ -188,10 +188,10 @@ lnxproc_proc_diskstats_new(LNXPROC_BASE_T **base)
     char *filenames[] = { "/proc/diskstats" };
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
-    return lnxproc_base_new(base,
-                            filenames, 1, NULL, NULL,
-                            NULL, proc_diskstats_normalize, NULL, 256,
-                            limits, dim);
+    return _lnxproc_base_new(base,
+                             filenames, 1, NULL, NULL,
+                             NULL, proc_diskstats_normalize, NULL, 256,
+                             limits, dim);
 }
 
 /*

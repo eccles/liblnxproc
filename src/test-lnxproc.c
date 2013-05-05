@@ -524,25 +524,14 @@ execute_base(LNXPROC_BASE_T *base)
                 printf("Failure reading base\n");
             }
             else {
-                char *filename = NULL;
-
-                lnxproc_base_filename(base, &filename);
-                printf("Filename : %s\n", filename);
-
-                int nbytes = 0;
-
-                lnxproc_base_nbytes(base, &nbytes);
-
-                char *lines = NULL;
-
-                lnxproc_base_lines(base, &lines);
-                printf("Data : %1$d %2$*1$s\n", nbytes, lines);
+                printf("Filename : %s\n", base->filenames[0]);
+                printf("Data : %1$d %2$*1$s\n", base->nbytes, base->lines);
 
                 lnxproc_results_print(res);
                 LNXPROC_RESULTS_FREE(res);
             }
         }
-        LNXPROC_BASE_FREE(base);
+        _LNXPROC_BASE_FREE(base);
     }
 }
 
