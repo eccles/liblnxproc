@@ -61,32 +61,6 @@ test_results(void)
     _lnxproc_results_print(results);
     _LNXPROC_RESULTS_FREE(results);
 
-/*
-    LNXPROC_DB_DATA_T key = {
-        .dptr = (unsigned char *) "firstkey",
-        .dsize = sizeof "firstkey",
-    };
-    printf("Key is %zd bytes with value %s\n", key.dsize, key.dptr);
-    LNXPROC_DB_DATA_T data = {
-        .dptr = (unsigned char *) "firstdata",
-        .dsize = sizeof "firstdata",
-    };
-    printf("Data is %zd bytes with value %s\n", data.dsize, data.dptr);
-
-    lnxproc_db_store(db, key, data);
-    LNXPROC_DB_DATA_T data1 =
-        lnxproc_db_fetch(db, (char *) key.dptr, key.dsize);
-    printf("Data is %zd bytes with value %s ", data1.dsize, data1.dptr);
-    if (data1.dptr) {
-        printf("Success\n");
-    }
-    else {
-        printf("FAIL\n");
-    }
-
-    free(data1.dptr);
-    db = lnxproc_db_free(db);
-*/
 }
 
 /*----------------------------------------------------------------------------*/
@@ -511,6 +485,26 @@ test_array(void)
 
 /*----------------------------------------------------------------------------*/
 static void
+test_interface(void)
+{
+
+    LNXPROC_MODULE_T *modules = NULL;
+
+    lnxproc_init(&modules);
+    lnxproc_read(modules, LNXPROC_PROC_CGROUPS);
+    lnxproc_read(modules, LNXPROC_PROC_DISKSTATS);
+    lnxproc_read(modules, LNXPROC_PROC_DOMAINNAME);
+    lnxproc_read(modules, LNXPROC_PROC_HOSTNAME);
+    lnxproc_read(modules, LNXPROC_PROC_OSRELEASE);
+    lnxproc_read(modules, LNXPROC_SYS_CPUFREQ);
+    lnxproc_read(modules, LNXPROC_SYS_DISKSECTORS);
+    lnxproc_read(modules, LNXPROC_ALL);
+    LNXPROC_FREE(modules);
+
+}
+
+/*----------------------------------------------------------------------------*/
+static void
 execute_base(LNXPROC_BASE_T *base)
 {
     if (base) {
@@ -632,6 +626,7 @@ main(int argc, char *argv[])
         test_vector();
         test_limits();
         test_array();
+        test_interface();
         test_proc_cgroups();
         test_proc_diskstats();
         test_proc_domainname();
@@ -654,6 +649,9 @@ main(int argc, char *argv[])
     }
     else if (!strcmp(argv[1], "array")) {
         test_array();
+    }
+    else if (!strcmp(argv[1], "interface")) {
+        test_interface();
     }
     else if (!strcmp(argv[1], "proc_cgroups")) {
         test_proc_cgroups();

@@ -20,6 +20,7 @@ This file is part of liblnxproc.
 
 #include <stdio.h>
 #include <string.h>
+#include <sys/time.h>
 #include <lnxproc/lnxproc.h>
 
 static const int ntimes = 1000;
