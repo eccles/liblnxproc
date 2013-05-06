@@ -23,6 +23,7 @@ This file is part of liblnxproc.
 #include <string.h>
 
 #include "error_private.h"
+#include "util_private.h"
 #include "vector_private.h"
 #include "limits_private.h"
 #include "array_private.h"
@@ -48,6 +49,19 @@ test_error(void)
     for (i = 0; i < LNXPROC_ERROR_SIZE; i++) {
         _LNXPROC_ERROR_DEBUG(i, "Test\n");
     }
+}
+
+/*----------------------------------------------------------------------------*/
+static void
+test_util(void)
+{
+    char buf[32];
+    struct timeval tv1 = { .tv_sec=2,.tv_usec=12456 };
+    printf("Tv1 = %s\n", lnxproc_timeval_print(&tv1,buf,sizeof buf));
+    struct timeval tv2 = { .tv_sec=1,.tv_usec=32456 };
+    printf("Tv2 = %s\n", lnxproc_timeval_print(&tv2,buf,sizeof buf));
+    long diff = lnxproc_timediff(&tv1, &tv2);
+    printf("Difference = %ld\n", diff);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -622,6 +636,7 @@ main(int argc, char *argv[])
 
     if (argc < 2) {
         test_error();
+        test_util();
         test_results();
         test_vector();
         test_limits();
@@ -634,6 +649,9 @@ main(int argc, char *argv[])
         test_proc_osrelease();
         test_sys_cpufreq();
         test_sys_disksectors();
+    }
+    else if (!strcmp(argv[1], "util")) {
+        test_util();
     }
     else if (!strcmp(argv[1], "error")) {
         test_error();

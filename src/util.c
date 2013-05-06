@@ -18,30 +18,35 @@
  *
  */
 
-/* Common macros and utility functions
- */
-
-#ifndef LIBLNXPROC_UTIL_H
-#define LIBLNXPROC_UTIL_H 1
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <sys/time.h>
 #include <stddef.h>
+#include <stdio.h>
 
-#ifndef WARN_UNUSED
-#define WARN_UNUSED __attribute__((warn_unused_result))
-#endif
+long
+lnxproc_timediff(struct timeval *tv1, struct timeval *tv2)
+{
+    long res = 0;
+    if( tv1 && tv2 ) {
+        long secdiff = tv1->tv_sec - tv2->tv_sec;
+        long usecdiff = (long)tv1->tv_usec - (long)tv2->tv_usec;
+        if( usecdiff < 0 ) {
+            usecdiff += 1000000;
+            secdiff -= 1;
+        }
+        res = usecdiff + (1000000 * secdiff);
+    }
+    return res;
+}
 
-long lnxproc_timediff(struct timeval *tv1, struct timeval *tv2);
-char * lnxproc_timeval_print(struct timeval *tv, char *buf, size_t len);
-
-#ifdef __cplusplus
-}                               // extern "C"
-#endif
-#endif                          // LIBLNXPROC_UTIL_H
+char *
+lnxproc_timeval_print(struct timeval *tv, char *buf, size_t len )
+{
+    if( tv && buf && (len > 0 )) {
+        snprintf(buf,len,"%lu.%06lu", (unsigned long) tv->tv_sec,
+                                      (unsigned long) tv->tv_usec);
+    }
+    return buf;
+}
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
  */
