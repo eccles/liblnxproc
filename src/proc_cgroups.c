@@ -41,7 +41,7 @@ typical contents of /proc/cgroups file::
 #include "proc_cgroups.h"
 
 struct proc_cgroups_env_t {
-    LNXPROC_RESULTS_T *results;
+    _LNXPROC_RESULTS_T *results;
     int colslen;
     char **cols;
     char *key;
@@ -55,7 +55,7 @@ proc_groups_func(char *val, void *data, size_t idx[], size_t dim)
     struct proc_cgroups_env_t *env = data;
 
     if (idx[0] == 0) {
-        lnxproc_results_store(env->results, val, "/col%02d", idx[1]);
+        _lnxproc_results_store(env->results, val, "/col%02d", idx[1]);
         void *p = realloc(env->cols, (env->colslen + 1) * sizeof(char *));
 
         if (!p) {
@@ -69,11 +69,11 @@ proc_groups_func(char *val, void *data, size_t idx[], size_t dim)
     else {
         if (idx[1] == 0) {
             env->key = val;
-            lnxproc_results_store(env->results, val, "/key%02d", idx[0]);
+            _lnxproc_results_store(env->results, val, "/key%02d", idx[0]);
         }
         else if (idx[1] < env->colslen) {
-            lnxproc_results_store(env->results, val, "/%s/%s", env->key,
-                                  env->cols[idx[1]]);
+            _lnxproc_results_store(env->results, val, "/%s/%s", env->key,
+                                   env->cols[idx[1]]);
         }
     }
     return LNXPROC_OK;
@@ -82,7 +82,7 @@ proc_groups_func(char *val, void *data, size_t idx[], size_t dim)
 static LNXPROC_ERROR_T
 proc_cgroups_normalize(LNXPROC_BASE_T *base)
 {
-    LNXPROC_RESULTS_T *results = base->results;
+    _LNXPROC_RESULTS_T *results = base->results;
     _LNXPROC_ARRAY_T *array = base->current.array;
 
     struct proc_cgroups_env_t env = {

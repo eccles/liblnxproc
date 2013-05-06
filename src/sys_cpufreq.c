@@ -30,12 +30,13 @@ This file is part of liblnxproc.
 
 #include "error_private.h"
 #include "base_private.h"
+#include "results_private.h"
 #include "sys_cpufreq.h"
 
 static LNXPROC_ERROR_T
 sys_cpufreq_normalize(LNXPROC_BASE_T *base)
 {
-    lnxproc_results_store(base->results, base->current.lines, "/value");
+    _lnxproc_results_store(base->results, base->current.lines, "/value");
 
     return LNXPROC_OK;
 }

@@ -31,7 +31,7 @@ This file is part of liblnxproc.
 #include "sys_disksectors.h"
 
 struct env_t {
-    LNXPROC_RESULTS_T *results;
+    _LNXPROC_RESULTS_T *results;
     char *key;
 };
 
@@ -47,7 +47,7 @@ iter_func(char *val, void *data, size_t idx[], size_t dim)
 //        lnxproc_results_store(env->results, val, "/key%02d", idx[0]);
     }
     else {
-        lnxproc_results_store(env->results, val, "/%s", env->key);
+        _lnxproc_results_store(env->results, val, "/%s", env->key);
     }
     return LNXPROC_OK;
 }
@@ -56,7 +56,7 @@ static LNXPROC_ERROR_T
 sys_disksectors_normalize(LNXPROC_BASE_T *base)
 {
 
-    LNXPROC_RESULTS_T *results = base->results;
+    _LNXPROC_RESULTS_T *results = base->results;
     _LNXPROC_ARRAY_T *array = base->current.array;
 
     struct env_t env = {

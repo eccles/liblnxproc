@@ -32,8 +32,8 @@
 #include "results_private.h"
 
 LNXPROC_ERROR_T
-lnxproc_results_timeval_str(LNXPROC_RESULTS_T * results, char *buf,
-                            size_t buflen)
+_lnxproc_results_timeval_str(_LNXPROC_RESULTS_T * results, char *buf,
+                             size_t buflen)
 {
     if (!results) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
@@ -56,7 +56,7 @@ lnxproc_results_timeval_str(LNXPROC_RESULTS_T * results, char *buf,
 }
 
 LNXPROC_ERROR_T
-lnxproc_results_timeval(LNXPROC_RESULTS_T * results, struct timeval **tv)
+_lnxproc_results_timeval(_LNXPROC_RESULTS_T * results, struct timeval **tv)
 {
     _LNXPROC_DEBUG("Results %p\n", results);
     if (!results) {
@@ -71,7 +71,7 @@ lnxproc_results_timeval(LNXPROC_RESULTS_T * results, struct timeval **tv)
 #ifdef DEBUG
     char buf[64];
 
-    lnxproc_results_timeval_str(results, buf, sizeof buf);
+    _lnxproc_results_timeval_str(results, buf, sizeof buf);
     _LNXPROC_DEBUG("Timestamp %s\n", buf);
 #endif
 
@@ -79,7 +79,7 @@ lnxproc_results_timeval(LNXPROC_RESULTS_T * results, struct timeval **tv)
 }
 
 LNXPROC_ERROR_T
-lnxproc_results_tv(LNXPROC_RESULTS_T * results, struct timeval **tv)
+_lnxproc_results_tv(_LNXPROC_RESULTS_T * results, struct timeval **tv)
 {
     _LNXPROC_DEBUG("Results %p\n", results);
     if (!results) {
@@ -96,7 +96,7 @@ lnxproc_results_tv(LNXPROC_RESULTS_T * results, struct timeval **tv)
 #ifdef DEBUG
     char buf[64];
 
-    lnxproc_results_timeval_str(results, buf, sizeof buf);
+    _lnxproc_results_timeval_str(results, buf, sizeof buf);
     _LNXPROC_DEBUG("Timestamp %s\n", buf);
 #endif
 
@@ -111,7 +111,7 @@ internal_print_func(char *key, char *value, void *data)
 }
 
 LNXPROC_ERROR_T
-lnxproc_results_print(LNXPROC_RESULTS_T * results)
+_lnxproc_results_print(_LNXPROC_RESULTS_T * results)
 {
     _LNXPROC_DEBUG("Results %p\n", results);
 
@@ -122,18 +122,19 @@ lnxproc_results_print(LNXPROC_RESULTS_T * results)
 
     char buf[64];
 
-    lnxproc_results_timeval_str(results, buf, sizeof buf);
+    _lnxproc_results_timeval_str(results, buf, sizeof buf);
     printf("Timestamp %s\n", buf);
 
-    return lnxproc_results_iterate(results, internal_print_func, NULL);
+    return _lnxproc_results_iterate(results, internal_print_func, NULL);
 
 }
 
 LNXPROC_ERROR_T
-lnxproc_results_new(LNXPROC_RESULTS_T ** results)
+_lnxproc_results_new(_LNXPROC_RESULTS_T ** results)
 {
     _LNXPROC_DEBUG("sizeof ptr %d\n", sizeof(void *));
-    _LNXPROC_DEBUG("sizeof LNXPROC_RESULTS_T %d\n", sizeof(LNXPROC_RESULTS_T));
+    _LNXPROC_DEBUG("sizeof _LNXPROC_RESULTS_T %d\n",
+                   sizeof(_LNXPROC_RESULTS_T));
     if (!results) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_ADDRESS_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_ADDRESS_NULL;
@@ -145,7 +146,7 @@ lnxproc_results_new(LNXPROC_RESULTS_T ** results)
         return LNXPROC_ERROR_RESULTS_ADDRESS_CONTENTS_NOT_NULL;
     }
 
-    LNXPROC_RESULTS_T *newresults = calloc(1, sizeof(LNXPROC_RESULTS_T));
+    _LNXPROC_RESULTS_T *newresults = calloc(1, sizeof(_LNXPROC_RESULTS_T));
 
     if (!newresults) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
@@ -157,7 +158,7 @@ lnxproc_results_new(LNXPROC_RESULTS_T ** results)
     newresults->db = DB_OPEN();
     if (!newresults->db) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_OPEN, "Open Db\n");
-        LNXPROC_RESULTS_FREE(newresults);
+        _LNXPROC_RESULTS_FREE(newresults);
         return LNXPROC_ERROR_RESULTS_DB_OPEN;
     }
 
@@ -166,8 +167,8 @@ lnxproc_results_new(LNXPROC_RESULTS_T ** results)
     return LNXPROC_OK;
 }
 
-LNXPROC_RESULTS_T *
-lnxproc_results_free(LNXPROC_RESULTS_T * results)
+_LNXPROC_RESULTS_T *
+_lnxproc_results_free(_LNXPROC_RESULTS_T * results)
 {
     _LNXPROC_DEBUG("Results %p\n", results);
 
@@ -193,8 +194,8 @@ lnxproc_results_free(LNXPROC_RESULTS_T * results)
 }
 
 LNXPROC_ERROR_T
-lnxproc_results_fetch(LNXPROC_RESULTS_T * results, char *key, size_t keylen,
-                      LNXPROC_RESULTS_DATA_T * val)
+_lnxproc_results_fetch(_LNXPROC_RESULTS_T * results, char *key, size_t keylen,
+                       LNXPROC_RESULTS_DATA_T * val)
 {
     _LNXPROC_DEBUG("Results %p\n", results);
 
@@ -241,7 +242,8 @@ lnxproc_results_fetch(LNXPROC_RESULTS_T * results, char *key, size_t keylen,
 }
 
 LNXPROC_ERROR_T
-lnxproc_results_store(LNXPROC_RESULTS_T * results, char *value, char *fmt, ...)
+_lnxproc_results_store(_LNXPROC_RESULTS_T * results, char *value, char *fmt,
+                       ...)
 {
     va_list ap;
 
@@ -339,7 +341,7 @@ Samba                            Aug 16, 2000                  TDB_TRAVERSE(3)
 //}
 #ifdef LNXPROC_TDB
 struct db_traverse_env_t {
-    LNXPROC_RESULTS_ITERATE_FUNC func;
+    _LNXPROC_RESULTS_ITERATE_FUNC func;
     void *data;
 };
 static int
@@ -353,8 +355,8 @@ db_traverse_func(TDB_CONTEXT * tdb, TDB_DATA key, TDB_DATA value, void *state)
 #endif
 
 LNXPROC_ERROR_T
-lnxproc_results_iterate(LNXPROC_RESULTS_T * results,
-                        LNXPROC_RESULTS_ITERATE_FUNC func, void *data)
+_lnxproc_results_iterate(_LNXPROC_RESULTS_T * results,
+                         _LNXPROC_RESULTS_ITERATE_FUNC func, void *data)
 {
     if (!results) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");

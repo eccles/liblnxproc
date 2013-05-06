@@ -28,7 +28,6 @@ extern "C" {
 #include <lnxproc/util.h>
 #include <lnxproc/error.h>
 #include <lnxproc/base.h>
-#include <lnxproc/results.h>
 
     enum lnxproc_module_type_t {
         LNXPROC_ALL = 0,

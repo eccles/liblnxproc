@@ -54,12 +54,12 @@ test_error(void)
 static void
 test_results(void)
 {
-    LNXPROC_RESULTS_T *results = NULL;
+    _LNXPROC_RESULTS_T *results = NULL;
 
-    lnxproc_results_new(&results);
+    _lnxproc_results_new(&results);
 
-    lnxproc_results_print(results);
-    LNXPROC_RESULTS_FREE(results);
+    _lnxproc_results_print(results);
+    _LNXPROC_RESULTS_FREE(results);
 
 /*
     LNXPROC_DB_DATA_T key = {
@@ -530,7 +530,7 @@ execute_base(LNXPROC_BASE_T *base)
                 printf("Data : %1$d %2$*1$s\n", base->previous.nbytes,
                        base->previous.lines);
 
-                lnxproc_results_print(base->results);
+                _lnxproc_results_print(base->results);
             }
         }
         _LNXPROC_BASE_FREE(base);

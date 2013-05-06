@@ -1,6 +1,6 @@
 RELDIR=..
 PUBHDIR=../src/lnxproc
-PUBBASEHDRS=lnxproc.h util.h db.h base.h error.h interface.h results.h
+PUBBASEHDRS=lnxproc.h util.h db.h base.h error.h interface.h
 PROCHDRS=proc_cgroups.h proc_diskstats.h proc_domainname.h proc_hostname.h proc_osrelease.h
 SYSHDRS=sys_cpufreq.h sys_disksectors.h
 PUBHDRS=$(PUBBASEHDRS)

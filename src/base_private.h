@@ -61,7 +61,7 @@ extern "C" {
         char *filesuffix;
         LNXPROC_BASE_DATA_T current;
         LNXPROC_BASE_DATA_T previous;
-        LNXPROC_RESULTS_T *results;
+        _LNXPROC_RESULTS_T *results;
     };
 
     LNXPROC_ERROR_T _lnxproc_base_new(LNXPROC_BASE_T **base,

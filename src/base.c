@@ -63,7 +63,7 @@ _lnxproc_base_print(LNXPROC_BASE_T *base)
         printf("Previous Nbytes %d\n", base->previous.nbytes);
         _lnxproc_array_print(base->previous.array, 0);
 
-        lnxproc_results_print(base->results);
+        _lnxproc_results_print(base->results);
         return LNXPROC_OK;
     }
 
@@ -453,8 +453,8 @@ _lnxproc_base_read(LNXPROC_BASE_T *base)
 
     base_map(base);
 
-    LNXPROC_RESULTS_FREE(base->results);
-    ret = lnxproc_results_new(&base->results);
+    _LNXPROC_RESULTS_FREE(base->results);
+    ret = _lnxproc_results_new(&base->results);
 
     if (ret) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_RESULTS,
@@ -668,7 +668,7 @@ _lnxproc_base_free(LNXPROC_BASE_T *base)
         }
         if (base->results) {
             _LNXPROC_DEBUG("Free results \n");
-            LNXPROC_RESULTS_FREE(base->results);
+            _LNXPROC_RESULTS_FREE(base->results);
         }
 
         _LNXPROC_DEBUG("Free Base\n");

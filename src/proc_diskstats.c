@@ -122,7 +122,7 @@ lnxproc_strings_free(char **strings, size_t nkeys)
 static LNXPROC_ERROR_T
 proc_diskstats_normalize(LNXPROC_BASE_T *base)
 {
-    LNXPROC_RESULTS_T *results = base->results;
+    _LNXPROC_RESULTS_T *results = base->results;
     _LNXPROC_ARRAY_T *array = base->current.array;
 
     char **keys = NULL;
@@ -133,7 +133,7 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
 
     while (!_lnxproc_array_get(array, idx, 2, &val)) {
         _LNXPROC_DEBUG("%1$zd:Val %2$p '%2$s'\n", idx[0], val);
-        lnxproc_results_store(results, val, "/key%02d", idx[0]);
+        _lnxproc_results_store(results, val, "/key%02d", idx[0]);
         lnxproc_strings_append(&keys, &nkeys, val);
         idx[0]++;
         val = NULL;
@@ -151,7 +151,7 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
     int i;
 
     for (i = 0; i < ncols; i++) {
-        lnxproc_results_store(results, cols[i], "/col%02d", i);
+        _lnxproc_results_store(results, cols[i], "/col%02d", i);
     }
 
     for (i = 0; i < nrows; i++) {
@@ -162,8 +162,8 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
             if (idx[1] != key) {
                 _LNXPROC_DEBUG("%1$zd,%2$zd:Val %3$p '%3$s'\n", idx[0], idx[1],
                                val);
-                lnxproc_results_store(results, val, "/%s/%s", keys[i],
-                                      cols[idx[1]]);
+                _lnxproc_results_store(results, val, "/%s/%s", keys[i],
+                                       cols[idx[1]]);
                 idx[1]++;
             }
             else {
