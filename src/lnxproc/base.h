@@ -26,6 +26,7 @@ extern "C" {
 #endif
 
     typedef struct lnxproc_base_t LNXPROC_BASE_T;
+    typedef struct lnxproc_base_data_t LNXPROC_BASE_DATA_T;
 
 #ifdef __cplusplus
 }                               // extern "C"

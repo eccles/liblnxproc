@@ -39,7 +39,7 @@ Typical contents of file /proc/sys/kernel/domainname::
 static LNXPROC_ERROR_T
 proc_domainname_normalize(LNXPROC_BASE_T *base)
 {
-    lnxproc_results_store(base->results, base->lines, "/value");
+    lnxproc_results_store(base->results, base->current.lines, "/value");
 
     return LNXPROC_OK;
 }

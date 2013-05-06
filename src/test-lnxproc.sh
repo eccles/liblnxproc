@@ -6,6 +6,7 @@ then
     echo "Must give at least one argument"
     exit 1
 fi
+ulimit -c unlimited
 OPT=$1
 shift
 VALOPTS="--leak-check=full --show-reachable=yes --read-var-info=yes --track-origins=yes"

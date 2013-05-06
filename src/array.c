@@ -92,13 +92,14 @@ _lnxproc_array_new(_LNXPROC_ARRAY_T ** array, _LNXPROC_LIMITS_T limits[],
     _LNXPROC_DEBUG("sizeof _LNXPROC_ARRAY_T %d\n", sizeof(_LNXPROC_ARRAY_T));
 
     if (!array) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ARRAY_ADDRESS_NULL, "Malloc array\n");
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ARRAY_ADDRESS_NULL,
+                             "Malloc array\n");
         return LNXPROC_ERROR_ARRAY_ADDRESS_NULL;
     }
 
     if (*array) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ARRAY_ADDRESS_CONTENTS_NOT_NULL,
-                            "Malloc array\n");
+                             "Malloc array\n");
         return LNXPROC_ERROR_ARRAY_ADDRESS_CONTENTS_NOT_NULL;
     }
 
@@ -111,7 +112,7 @@ _lnxproc_array_new(_LNXPROC_ARRAY_T ** array, _LNXPROC_LIMITS_T limits[],
 
     if (!p) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ARRAY_MALLOC_HEADER,
-                            "Malloc array\n");
+                             "Malloc array\n");
         return LNXPROC_ERROR_ARRAY_MALLOC_HEADER;
     }
 
@@ -128,7 +129,7 @@ _lnxproc_array_new(_LNXPROC_ARRAY_T ** array, _LNXPROC_LIMITS_T limits[],
         p->saved = calloc(dim, sizeof(_LNXPROC_VECTOR_T *));
         if (!p->saved) {
             _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ARRAY_SAVED_MALLOC,
-                                "Malloc array\n");
+                                 "Malloc array\n");
             _LNXPROC_ARRAY_FREE(p);
             return LNXPROC_ERROR_ARRAY_SAVED_MALLOC;
         }
@@ -136,7 +137,7 @@ _lnxproc_array_new(_LNXPROC_ARRAY_T ** array, _LNXPROC_LIMITS_T limits[],
         p->vector = array_create(limits, dim, 0);
         if (!p->vector) {
             _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ARRAY_VECTOR_MALLOC,
-                                "Malloc array\n");
+                                 "Malloc array\n");
             _LNXPROC_ARRAY_FREE(p);
             return LNXPROC_ERROR_ARRAY_VECTOR_MALLOC;
         }
@@ -458,7 +459,8 @@ array_vector_iterate_func(_LNXPROC_VECTOR_DATA_T * val, int recursive,
                           void *data, size_t idx)
 {
 
-    _LNXPROC_DEBUG("Val %p Rec %d Data %p Idx %zd\n", val, recursive, data, idx);
+    _LNXPROC_DEBUG("Val %p Rec %d Data %p Idx %zd\n", val, recursive, data,
+                   idx);
 
     struct array_iterate_t *adata = data;
     size_t *aidx = adata->idx;

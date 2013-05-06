@@ -103,8 +103,8 @@ static const char unknown_error[] = "Unknown error";
 
 #ifdef DEBUG
 void
-_lnxproc_debug(const char *filename, int lineno, const char *funcname, char *fmt,
-              ...)
+_lnxproc_debug(const char *filename, int lineno, const char *funcname,
+               char *fmt, ...)
 {
     va_list args;
 

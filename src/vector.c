@@ -70,7 +70,7 @@ _lnxproc_vector_new(_LNXPROC_VECTOR_T ** vector, size_t size, int recursive)
 
     if (*vector) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_ADDRESS_CONTENTS_NOT_NULL,
-                            "\n");
+                             "\n");
         return LNXPROC_ERROR_VECTOR_ADDRESS_CONTENTS_NOT_NULL;
     }
 
@@ -78,7 +78,7 @@ _lnxproc_vector_new(_LNXPROC_VECTOR_T ** vector, size_t size, int recursive)
 
     if (!p) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_MALLOC_HEADER,
-                            "Malloc vector\n");
+                             "Malloc vector\n");
         return LNXPROC_ERROR_VECTOR_MALLOC_HEADER;
     }
 
@@ -97,7 +97,7 @@ _lnxproc_vector_new(_LNXPROC_VECTOR_T ** vector, size_t size, int recursive)
 
         if (!p->data) {
             _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_MALLOC_DATA,
-                                "Malloc data\n");
+                                 "Malloc data\n");
             _LNXPROC_VECTOR_FREE(p);
             return LNXPROC_ERROR_VECTOR_MALLOC_DATA;
         }
@@ -153,7 +153,7 @@ _lnxproc_vector_resize(_LNXPROC_VECTOR_T * vector, size_t size)
 
     if (!p) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_REALLOC_DATA,
-                            "Realloc values\n");
+                             "Realloc values\n");
         return LNXPROC_ERROR_VECTOR_REALLOC_DATA;
     }
     vector->data = p;
@@ -178,7 +178,7 @@ _lnxproc_vector_child(_LNXPROC_VECTOR_T * vector, size_t idx,
     }
     if (*child) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_ADDRESS_CONTENTS_NOT_NULL,
-                            "\n");
+                             "\n");
         return LNXPROC_ERROR_VECTOR_ADDRESS_CONTENTS_NOT_NULL;
     }
     if (!vector->recursive || !vector->data) {
@@ -187,7 +187,7 @@ _lnxproc_vector_child(_LNXPROC_VECTOR_T * vector, size_t idx,
     }
     if (idx >= vector->size) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_INDEX_OUT_OF_RANGE,
-                            "Idx %zd >= Size %zd\n", idx, vector->size);
+                             "Idx %zd >= Size %zd\n", idx, vector->size);
         return LNXPROC_ERROR_VECTOR_INDEX_OUT_OF_RANGE;
     }
 
@@ -211,7 +211,7 @@ _lnxproc_vector_value(_LNXPROC_VECTOR_T * vector, size_t idx, char **value)
     }
     if (*value) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_ADDRESS_CONTENTS_NOT_NULL,
-                            "\n");
+                             "\n");
         return LNXPROC_ERROR_VECTOR_ADDRESS_CONTENTS_NOT_NULL;
     }
     if (vector->recursive || !vector->data) {
@@ -221,7 +221,7 @@ _lnxproc_vector_value(_LNXPROC_VECTOR_T * vector, size_t idx, char **value)
 
     if (idx >= vector->size) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_INDEX_OUT_OF_RANGE,
-                            "Idx %zd >= Size %zd\n", idx, vector->size);
+                             "Idx %zd >= Size %zd\n", idx, vector->size);
         return LNXPROC_ERROR_VECTOR_INDEX_OUT_OF_RANGE;
     }
 
@@ -254,7 +254,8 @@ _lnxproc_vector_set_child(_LNXPROC_VECTOR_T * vector, size_t idx,
     }
 
     else if (idx == vector->length) {
-        _LNXPROC_DEBUG("Append entry Idx %zd Length %zd\n", idx, vector->length);
+        _LNXPROC_DEBUG("Append entry Idx %zd Length %zd\n", idx,
+                       vector->length);
 
         if (idx == vector->size) {
             _LNXPROC_DEBUG("Resize data Size %zd\n", vector->size);
@@ -275,7 +276,7 @@ _lnxproc_vector_set_child(_LNXPROC_VECTOR_T * vector, size_t idx,
 
     else {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_INDEX_OUT_OF_RANGE,
-                            "Index %zd Length %zd\n", idx, vector->length);
+                             "Index %zd Length %zd\n", idx, vector->length);
         return LNXPROC_ERROR_VECTOR_INDEX_OUT_OF_RANGE;
     }
 
@@ -306,7 +307,8 @@ _lnxproc_vector_set_value(_LNXPROC_VECTOR_T * vector, size_t idx, char *val)
     }
 
     else if (idx == vector->length) {
-        _LNXPROC_DEBUG("Append entry Idx %zd Length %zd\n", idx, vector->length);
+        _LNXPROC_DEBUG("Append entry Idx %zd Length %zd\n", idx,
+                       vector->length);
 
         if (idx == vector->size) {
             _LNXPROC_DEBUG("Resize data Size %zd\n", vector->size);
@@ -327,7 +329,7 @@ _lnxproc_vector_set_value(_LNXPROC_VECTOR_T * vector, size_t idx, char *val)
 
     else {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_INDEX_OUT_OF_RANGE,
-                            "Index %zd Length %zd\n", idx, vector->length);
+                             "Index %zd Length %zd\n", idx, vector->length);
         return LNXPROC_ERROR_VECTOR_INDEX_OUT_OF_RANGE;
     }
 
@@ -379,7 +381,7 @@ _lnxproc_vector_set_length(_LNXPROC_VECTOR_T * vector, size_t idx)
 
     if (idx < 0 || idx >= vector->size) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_INDEX_OUT_OF_RANGE,
-                            "Index %zd Size %zd\n", idx, vector->size);
+                             "Index %zd Size %zd\n", idx, vector->size);
         return LNXPROC_ERROR_VECTOR_INDEX_OUT_OF_RANGE;
     }
 
@@ -394,7 +396,7 @@ _lnxproc_vector_iterate(_LNXPROC_VECTOR_T * vector,
                         int start, int end, _LNXPROC_VECTOR_ITERATE_FUNC func)
 {
     _LNXPROC_DEBUG("Vector %p Data %p Start %d End %d Func %p\n", vector,
-                  data, start, end, func);
+                   data, start, end, func);
 
     if (!vector) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_NULL, "\n");
@@ -450,7 +452,8 @@ static LNXPROC_ERROR_T
 vector_print_internal(_LNXPROC_VECTOR_DATA_T * val, int recursive,
                       void *data, size_t idx)
 {
-    _LNXPROC_DEBUG("Val %p Rec %d Data %p Idx %zd\n", val, recursive, data, idx);
+    _LNXPROC_DEBUG("Val %p Rec %d Data %p Idx %zd\n", val, recursive, data,
+                   idx);
 
     if (val) {
         int depth = 0;

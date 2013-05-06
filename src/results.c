@@ -141,7 +141,7 @@ lnxproc_results_new(LNXPROC_RESULTS_T ** results)
 
     if (*results) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_ADDRESS_CONTENTS_NOT_NULL,
-                            "\n");
+                             "\n");
         return LNXPROC_ERROR_RESULTS_ADDRESS_CONTENTS_NOT_NULL;
     }
 
@@ -180,7 +180,7 @@ lnxproc_results_free(LNXPROC_RESULTS_T * results)
 
             if (ret < 0) {
                 _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_CLOSE,
-                                    "Close Db\n");
+                                     "Close Db\n");
             }
             results->db = NULL;
 #endif
@@ -220,7 +220,7 @@ lnxproc_results_fetch(LNXPROC_RESULTS_T * results, char *key, size_t keylen,
 
     if (!results->db) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_NOT_OPEN,
-                            "Fetch results\n");
+                             "Fetch results\n");
         return LNXPROC_ERROR_RESULTS_DB_NOT_OPEN;
     }
 #ifdef LNXPROC_TDB
@@ -232,7 +232,7 @@ lnxproc_results_fetch(LNXPROC_RESULTS_T * results, char *key, size_t keylen,
     *val = tdb_fetch(results->db, dbkey);
     if (!val->dptr) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_FETCH,
-                            "Fetch results %s\n", tdb_errorstr(results->db));
+                             "Fetch results %s\n", tdb_errorstr(results->db));
         return LNXPROC_ERROR_RESULTS_DB_FETCH;
     }
 #endif
@@ -254,7 +254,7 @@ lnxproc_results_store(LNXPROC_RESULTS_T * results, char *value, char *fmt, ...)
 
     if (!results->db) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_NOT_OPEN,
-                            "Store results\n");
+                             "Store results\n");
         return LNXPROC_ERROR_RESULTS_DB_NOT_OPEN;
     }
 #ifdef LNXPROC_TDB
@@ -281,7 +281,7 @@ lnxproc_results_store(LNXPROC_RESULTS_T * results, char *value, char *fmt, ...)
 
     if (ret < 0) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_STORE,
-                            "Store results %s\n", tdb_errorstr(results->db));
+                             "Store results %s\n", tdb_errorstr(results->db));
         return LNXPROC_ERROR_RESULTS_DB_STORE;
     }
 #endif
@@ -365,7 +365,7 @@ lnxproc_results_iterate(LNXPROC_RESULTS_T * results,
 
     if (!results->db) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_NOT_OPEN,
-                            "Iterate results\n");
+                             "Iterate results\n");
         return LNXPROC_ERROR_RESULTS_DB_NOT_OPEN;
     }
 #ifdef LNXPROC_TDB
@@ -377,7 +377,7 @@ lnxproc_results_iterate(LNXPROC_RESULTS_T * results,
 
     if (ret < 0) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_ITERATE,
-                            "Iterate results %s\n", tdb_errorstr(results->db));
+                             "Iterate results %s\n", tdb_errorstr(results->db));
         return LNXPROC_ERROR_RESULTS_DB_ITERATE;
     }
 #endif

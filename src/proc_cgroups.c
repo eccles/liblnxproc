@@ -51,7 +51,7 @@ static LNXPROC_ERROR_T
 proc_groups_func(char *val, void *data, size_t idx[], size_t dim)
 {
     _LNXPROC_DEBUG("Val %s, Data %p, idx[%d]=%d idx[%d]=%d\n", val, data, 0,
-                  idx[0], 1, idx[1]);
+                   idx[0], 1, idx[1]);
     struct proc_cgroups_env_t *env = data;
 
     if (idx[0] == 0) {
@@ -83,7 +83,7 @@ static LNXPROC_ERROR_T
 proc_cgroups_normalize(LNXPROC_BASE_T *base)
 {
     LNXPROC_RESULTS_T *results = base->results;
-    _LNXPROC_ARRAY_T *array = base->array;
+    _LNXPROC_ARRAY_T *array = base->current.array;
 
     struct proc_cgroups_env_t env = {
         .results = results,

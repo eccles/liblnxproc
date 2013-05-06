@@ -50,7 +50,7 @@ lnxproc_init(LNXPROC_MODULE_T ** modules)
 
     if (!p) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_INTERFACE_MALLOC_INTERFACE,
-                            "Malloc interface\n");
+                             "Malloc interface\n");
         return LNXPROC_ERROR_INTERFACE_MALLOC_INTERFACE;
     }
     memcpy(p, mymodules, sizeof mymodules);
@@ -72,7 +72,7 @@ lnxproc_free(LNXPROC_MODULE_T * modules)
     return NULL;
 }
 
-LNXPROC_RESULTS_T *
+LNXPROC_ERROR_T
 lnxproc_read(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type)
 {
 
@@ -91,14 +91,14 @@ lnxproc_read(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type)
                 LNXPROC_ERROR_T ret = module->new(&module->base);
 
                 if (ret) {
-                    return NULL;
+                    return ret;
                 }
             }
 
             return module->base->read(module->base);
         }
     }
-    return NULL;
+    return LNXPROC_ERROR_INTERFACE_MALLOC_INTERFACE;
 }
 
 /*

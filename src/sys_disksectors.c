@@ -39,7 +39,7 @@ static LNXPROC_ERROR_T
 iter_func(char *val, void *data, size_t idx[], size_t dim)
 {
     _LNXPROC_DEBUG("Val %s, Data %p, idx[%d]=%d idx[%d]=%d\n", val, data, 0,
-                  idx[0], 1, idx[1]);
+                   idx[0], 1, idx[1]);
     struct env_t *env = data;
 
     if (idx[1] == 0) {
@@ -57,7 +57,7 @@ sys_disksectors_normalize(LNXPROC_BASE_T *base)
 {
 
     LNXPROC_RESULTS_T *results = base->results;
-    _LNXPROC_ARRAY_T *array = base->array;
+    _LNXPROC_ARRAY_T *array = base->current.array;
 
     struct env_t env = {
         .results = results,

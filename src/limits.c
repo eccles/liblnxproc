@@ -157,7 +157,7 @@ _lnxproc_limits_dup(_LNXPROC_LIMITS_T ** newlimits,
     }
     if (*newlimits) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_ADDRESS_CONTENTS_NOT_NULL,
-                            "\n");
+                             "\n");
         return LNXPROC_ERROR_LIMITS_ADDRESS_CONTENTS_NOT_NULL;
     }
     if (dim < 1) {
@@ -192,7 +192,7 @@ _lnxproc_limits_dup(_LNXPROC_LIMITS_T ** newlimits,
         nlimits[i].chars = malloc(limits[i].len * sizeof(char));
         if (!nlimits[i].chars) {
             _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_MALLOC_ENTRY,
-                                "Malloc limits entry\n");
+                                 "Malloc limits entry\n");
             int j;
 
             for (j = i - 1; j >= 0; j--) {

@@ -35,7 +35,6 @@ extern "C" {
 #include <lnxproc/base.h>
 
     typedef LNXPROC_ERROR_T (*LNXPROC_BASE_METHOD) (LNXPROC_BASE_T *base);
-    typedef LNXPROC_RESULTS_T *(*LNXPROC_READ_METHOD) (LNXPROC_BASE_T *base);
 
     LNXPROC_BASE_T *_lnxproc_base_free(LNXPROC_BASE_T *base) WARN_UNUSED;
 
@@ -43,22 +42,26 @@ extern "C" {
     b = _lnxproc_base_free(b);\
 }
 
-    LNXPROC_RESULTS_T *_lnxproc_base_read(LNXPROC_BASE_T *base);
+    LNXPROC_ERROR_T _lnxproc_base_read(LNXPROC_BASE_T *base);
 
-    struct lnxproc_base_t {
-        LNXPROC_BASE_METHOD rawread;
-        LNXPROC_BASE_METHOD normalize;
-        LNXPROC_READ_METHOD read;
-        char **filenames;
-        size_t nfiles;
-        char *fileprefix;
-        char *filesuffix;
+    struct lnxproc_base_data_t {
         char *lines;
         size_t buflen;
         int nbytes;
         _LNXPROC_ARRAY_T *array;
+    };
+
+    struct lnxproc_base_t {
+        LNXPROC_BASE_METHOD rawread;
+        LNXPROC_BASE_METHOD normalize;
+        LNXPROC_BASE_METHOD read;
+        char **filenames;
+        size_t nfiles;
+        char *fileprefix;
+        char *filesuffix;
+        LNXPROC_BASE_DATA_T current;
+        LNXPROC_BASE_DATA_T previous;
         LNXPROC_RESULTS_T *results;
-        LNXPROC_RESULTS_T *prev;
     };
 
     LNXPROC_ERROR_T _lnxproc_base_new(LNXPROC_BASE_T **base,
@@ -68,7 +71,7 @@ extern "C" {
                                       char *filesuffix,
                                       LNXPROC_BASE_METHOD rawread,
                                       LNXPROC_BASE_METHOD normalize,
-                                      LNXPROC_READ_METHOD read,
+                                      LNXPROC_BASE_METHOD read,
                                       size_t buflen,
                                       _LNXPROC_LIMITS_T limits[], size_t dim);
 

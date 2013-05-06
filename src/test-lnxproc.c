@@ -518,17 +518,19 @@ execute_base(LNXPROC_BASE_T *base)
 
         for (i = 0; i < 5; i++) {
             printf("Execute %d\n", i + 1);
-            LNXPROC_RESULTS_T *res = base->read(base);
+            LNXPROC_ERROR_T ret = base->read(base);
 
-            if (!res) {
+            if (ret) {
                 printf("Failure reading base\n");
             }
             else {
-                printf("Filename : %s\n", base->filenames[0]);
-                printf("Data : %1$d %2$*1$s\n", base->nbytes, base->lines);
+                if (base->filenames) {
+                    printf("Filename : %s\n", base->filenames[0]);
+                }
+                printf("Data : %1$d %2$*1$s\n", base->previous.nbytes,
+                       base->previous.lines);
 
-                lnxproc_results_print(res);
-                LNXPROC_RESULTS_FREE(res);
+                lnxproc_results_print(base->results);
             }
         }
         _LNXPROC_BASE_FREE(base);

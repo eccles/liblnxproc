@@ -29,8 +29,7 @@ test_module(LNXPROC_MODULE_T *modules, LNXPROC_MODULE_TYPE_T type)
     if( modules) {
         int i;
         for( i = 0; i < ntimes; i++ ) {
-            LNXPROC_RESULTS_T *res = lnxproc_read(modules,type);
-            LNXPROC_RESULTS_FREE(res);
+            lnxproc_read(modules,type);
         }
     }
     LNXPROC_FREE(modules);

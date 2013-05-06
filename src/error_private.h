@@ -36,7 +36,7 @@ extern "C" {
 #include <stdio.h>
 
     void _lnxproc_debug(const char *filename,
-                       int lineno, const char *funcname, char *fmt, ...
+                        int lineno, const char *funcname, char *fmt, ...
         );
 
 #define _LNXPROC_DEBUG(fmt, args...) \
