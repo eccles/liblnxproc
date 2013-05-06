@@ -78,19 +78,12 @@ lnxproc_read(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type)
 
     if (modules) {
         LNXPROC_ERROR_T ret;
+
         if (type == LNXPROC_ALL) {
             int i;
 
-            for (i = 0; i < nmodules; i++) {
-                LNXPROC_MODULE_T *module = modules + i;
-                if (!module->base) {
-                    ret = module->new(&module->base);
-    
-                    if (ret) {
-                        return ret;
-                    }
-                }
-                ret = module->base->read(module->base);
+            for (i = 1; i <= nmodules; i++) {
+                ret = lnxproc_read(modules, i);
                 if (ret) {
                     return ret;
                 }
