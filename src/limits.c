@@ -31,7 +31,7 @@
 #include "limits_private.h"
 
 char *
-_lnxproc_limit_chr(LNXPROC_LIMITS_T * limit, char c)
+_lnxproc_limit_chr(_LNXPROC_LIMITS_T * limit, char c)
 {
 
 /*
@@ -53,7 +53,7 @@ _lnxproc_limit_chr(LNXPROC_LIMITS_T * limit, char c)
 }
 
 LNXPROC_ERROR_T
-_lnxproc_limits_print(LNXPROC_LIMITS_T limits[], int dim)
+_lnxproc_limits_print(_LNXPROC_LIMITS_T limits[], int dim)
 {
     if (!limits) {
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_NULL, "\n");
@@ -124,7 +124,7 @@ _lnxproc_chars_print(char *chars, size_t nchars, char *buf, size_t buflen)
 }
 
 LNXPROC_ERROR_T
-_lnxproc_limit_print(LNXPROC_LIMITS_T * limit, char *buf, size_t buflen)
+_lnxproc_limit_print(_LNXPROC_LIMITS_T * limit, char *buf, size_t buflen)
 {
     buf[0] = '\0';
 
@@ -145,11 +145,11 @@ _lnxproc_limit_print(LNXPROC_LIMITS_T * limit, char *buf, size_t buflen)
 }
 
 LNXPROC_ERROR_T
-_lnxproc_limits_dup(LNXPROC_LIMITS_T ** newlimits,
-                    LNXPROC_LIMITS_T limits[], size_t dim)
+_lnxproc_limits_dup(_LNXPROC_LIMITS_T ** newlimits,
+                    _LNXPROC_LIMITS_T limits[], size_t dim)
 {
     LNXPROC_DEBUG("sizeof ptr %d\n", sizeof(void *));
-    LNXPROC_DEBUG("sizeof LNXPROC_LIMITS_T %d\n", sizeof(LNXPROC_LIMITS_T));
+    LNXPROC_DEBUG("sizeof _LNXPROC_LIMITS_T %d\n", sizeof(_LNXPROC_LIMITS_T));
 
     if (!newlimits) {
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_ADDRESS_NULL, "\n");
@@ -170,7 +170,7 @@ _lnxproc_limits_dup(LNXPROC_LIMITS_T ** newlimits,
     }
 
     LNXPROC_DEBUG("Malloc limits %zd\n", dim);
-    LNXPROC_LIMITS_T *nlimits = calloc(dim, sizeof(LNXPROC_LIMITS_T));
+    _LNXPROC_LIMITS_T *nlimits = calloc(dim, sizeof(_LNXPROC_LIMITS_T));
 
     if (!nlimits) {
         LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_MALLOC, "Malloc limits\n");
@@ -214,8 +214,8 @@ _lnxproc_limits_dup(LNXPROC_LIMITS_T ** newlimits,
     return LNXPROC_OK;
 }
 
-LNXPROC_LIMITS_T *
-_lnxproc_limits_free(LNXPROC_LIMITS_T limits[], size_t dim)
+_LNXPROC_LIMITS_T *
+_lnxproc_limits_free(_LNXPROC_LIMITS_T limits[], size_t dim)
 {
     if (dim > 0 && limits) {
         LNXPROC_DEBUG("Free Limits buffer %zd\n", dim);

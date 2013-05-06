@@ -70,7 +70,7 @@ extern "C" {
                                       LNXPROC_BASE_METHOD normalize,
                                       LNXPROC_READ_METHOD read,
                                       size_t buflen,
-                                      LNXPROC_LIMITS_T limits[], size_t dim);
+                                      _LNXPROC_LIMITS_T limits[], size_t dim);
 
     LNXPROC_ERROR_T _lnxproc_base_rawread(LNXPROC_BASE_T *base);
     LNXPROC_ERROR_T _lnxproc_base_normalize(LNXPROC_BASE_T *base);

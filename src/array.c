@@ -31,13 +31,13 @@
 #include "array_private.h"
 
 static _LNXPROC_VECTOR_T *
-array_create(LNXPROC_LIMITS_T limits[], size_t dim, int depth)
+array_create(_LNXPROC_LIMITS_T limits[], size_t dim, int depth)
 {
     LNXPROC_DEBUG("limits %p\n", limits);
     LNXPROC_DEBUG("dim %d\n", dim);
     LNXPROC_DEBUG("depth %d\n", depth);
 
-    LNXPROC_LIMITS_T *limit = limits + depth;
+    _LNXPROC_LIMITS_T *limit = limits + depth;
 
     LNXPROC_DEBUG("limit %p\n", limit);
 #ifdef DEBUG
@@ -83,7 +83,7 @@ array_create(LNXPROC_LIMITS_T limits[], size_t dim, int depth)
 }
 
 LNXPROC_ERROR_T
-_lnxproc_array_new(_LNXPROC_ARRAY_T ** array, LNXPROC_LIMITS_T limits[],
+_lnxproc_array_new(_LNXPROC_ARRAY_T ** array, _LNXPROC_LIMITS_T limits[],
                    size_t dim)
 {
 

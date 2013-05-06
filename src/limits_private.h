@@ -28,32 +28,32 @@ extern "C" {
 #include "util_private.h"
 #include "error_private.h"
 
-    typedef struct lnxproc_limits_t LNXPROC_LIMITS_T;
+    typedef struct _lnxproc_limits_t _LNXPROC_LIMITS_T;
 
-    struct lnxproc_limits_t {
+    struct _lnxproc_limits_t {
         size_t expected;
         char *chars;
         int len;
     };
 
-    LNXPROC_ERROR_T _lnxproc_limits_dup(LNXPROC_LIMITS_T ** newlimits,
-                                        LNXPROC_LIMITS_T limits[], size_t dim);
+    LNXPROC_ERROR_T _lnxproc_limits_dup(_LNXPROC_LIMITS_T ** newlimits,
+                                        _LNXPROC_LIMITS_T limits[], size_t dim);
 
-    LNXPROC_LIMITS_T *_lnxproc_limits_free(LNXPROC_LIMITS_T
-                                           limits[], size_t dim) WARN_UNUSED;
+    _LNXPROC_LIMITS_T *_lnxproc_limits_free(_LNXPROC_LIMITS_T
+                                            limits[], size_t dim) WARN_UNUSED;
 
 #define _LNXPROC_LIMITS_FREE(ll,dd) {\
     ll = _lnxproc_limits_free(ll,dd);\
 }
 
-    char *_lnxproc_limit_chr(LNXPROC_LIMITS_T * limit, char c);
+    char *_lnxproc_limit_chr(_LNXPROC_LIMITS_T * limit, char c);
 
     LNXPROC_ERROR_T _lnxproc_chars_print(char *chars, size_t nchars, char *buf,
                                          size_t buflen);
 
-    LNXPROC_ERROR_T _lnxproc_limit_print(LNXPROC_LIMITS_T * limit, char *buf,
+    LNXPROC_ERROR_T _lnxproc_limit_print(_LNXPROC_LIMITS_T * limit, char *buf,
                                          size_t buflen);
-    LNXPROC_ERROR_T _lnxproc_limits_print(LNXPROC_LIMITS_T limits[], int dim);
+    LNXPROC_ERROR_T _lnxproc_limits_print(_LNXPROC_LIMITS_T limits[], int dim);
 
 #ifdef __cplusplus
 }                               // extern "C"

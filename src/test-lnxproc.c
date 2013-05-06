@@ -94,14 +94,14 @@ static void
 test_limits(void)
 {
     printf("\nLimits 1\n");
-    LNXPROC_LIMITS_T mylimits1[] = {
+    _LNXPROC_LIMITS_T mylimits1[] = {
         {3, "\n", 1},
     };
     size_t dim1 = sizeof(mylimits1) / sizeof(mylimits1[0]);
 
     _lnxproc_limits_print(mylimits1, dim1);
 
-    LNXPROC_LIMITS_T *limits1 = NULL;
+    _LNXPROC_LIMITS_T *limits1 = NULL;
 
     _lnxproc_limits_dup(&limits1, mylimits1, dim1);
 
@@ -123,7 +123,7 @@ test_limits(void)
     _LNXPROC_LIMITS_FREE(limits1, dim1);
 
     printf("\nLimits 2\n");
-    LNXPROC_LIMITS_T mylimits2[] = {
+    _LNXPROC_LIMITS_T mylimits2[] = {
         {3, "\n", 1}
         ,
         {5, "\t", 1}
@@ -133,7 +133,7 @@ test_limits(void)
 
     _lnxproc_limits_print(mylimits2, dim2);
 
-    LNXPROC_LIMITS_T *limits2 = NULL;
+    _LNXPROC_LIMITS_T *limits2 = NULL;
 
     _lnxproc_limits_dup(&limits2, mylimits2, dim2);
 
@@ -153,7 +153,7 @@ test_limits(void)
     _LNXPROC_LIMITS_FREE(limits2, dim2);
 
     printf("\nLimits 3\n");
-    LNXPROC_LIMITS_T mylimits3[] = {
+    _LNXPROC_LIMITS_T mylimits3[] = {
         {3, "\n", 1}
         ,
         {5, "\t", 1}
@@ -165,7 +165,7 @@ test_limits(void)
 
     _lnxproc_limits_print(mylimits3, dim3);
 
-    LNXPROC_LIMITS_T *limits3 = NULL;
+    _LNXPROC_LIMITS_T *limits3 = NULL;
 
     _lnxproc_limits_dup(&limits3, mylimits3, dim3);
 
@@ -348,7 +348,7 @@ test_array(void)
     char buf[64];
 
     printf("Array 0\n");
-    LNXPROC_LIMITS_T limits0[] = {
+    _LNXPROC_LIMITS_T limits0[] = {
         {3, "\n", 1},
     };
 
@@ -374,7 +374,7 @@ test_array(void)
     _LNXPROC_ARRAY_FREE(array0);
 
     printf("Array 1\n");
-    LNXPROC_LIMITS_T limits1[] = {
+    _LNXPROC_LIMITS_T limits1[] = {
         {3, "\n", 1}
         ,
     };
@@ -426,7 +426,7 @@ test_array(void)
     _LNXPROC_ARRAY_FREE(array1);
 
     printf("Array 2\n");
-    LNXPROC_LIMITS_T limits2[] = {
+    _LNXPROC_LIMITS_T limits2[] = {
         {3, "\n", 1}
         ,
         {5, "\t", 1}
@@ -468,7 +468,7 @@ test_array(void)
     _LNXPROC_ARRAY_FREE(array2);
 
     printf("Array 3\n");
-    LNXPROC_LIMITS_T limits3[] = {
+    _LNXPROC_LIMITS_T limits3[] = {
         {3, "\n", 1}
         ,
         {5, "\t", 1}

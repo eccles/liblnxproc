@@ -33,7 +33,7 @@ extern "C" {
 #include "limits_private.h"
 
     struct _lnxproc_array_t {
-        LNXPROC_LIMITS_T *limits;
+        _LNXPROC_LIMITS_T *limits;
         size_t dim;
         _LNXPROC_VECTOR_T **saved;
         _LNXPROC_VECTOR_T *vector;
@@ -41,7 +41,7 @@ extern "C" {
     typedef struct _lnxproc_array_t _LNXPROC_ARRAY_T;
 
     LNXPROC_ERROR_T _lnxproc_array_new(_LNXPROC_ARRAY_T ** array,
-                                       LNXPROC_LIMITS_T limits[], size_t dim);
+                                       _LNXPROC_LIMITS_T limits[], size_t dim);
 
     _LNXPROC_ARRAY_T *_lnxproc_array_free(_LNXPROC_ARRAY_T * array) WARN_UNUSED;
 

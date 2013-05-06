@@ -299,7 +299,7 @@ base_map(LNXPROC_BASE_T *base)
 
         if (array) {
 
-            LNXPROC_LIMITS_T *limits = base->array->limits;
+            _LNXPROC_LIMITS_T *limits = base->array->limits;
             int dim = base->array->dim;
 
             LNXPROC_DEBUG("Limits %p Dim %d\n", limits, dim);
@@ -442,7 +442,7 @@ _lnxproc_base_new(LNXPROC_BASE_T **base,
                   LNXPROC_BASE_METHOD rawread,
                   LNXPROC_BASE_METHOD normalize,
                   LNXPROC_READ_METHOD read,
-                  size_t buflen, LNXPROC_LIMITS_T limits[], size_t dim)
+                  size_t buflen, _LNXPROC_LIMITS_T limits[], size_t dim)
 {
     LNXPROC_DEBUG("nfiles %d\n", nfiles);
     LNXPROC_DEBUG("filenames %p\n", filenames);

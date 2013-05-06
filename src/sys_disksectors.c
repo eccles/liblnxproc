@@ -76,7 +76,7 @@ lnxproc_sys_disksectors_new(LNXPROC_BASE_T **base)
     char *fileprefix = "/sys/block";
     char *filesuffix = "queue/hw_sector_size";
 
-    LNXPROC_LIMITS_T limits[] = {
+    _LNXPROC_LIMITS_T limits[] = {
         {.expected = 9,.chars = "\n",.len = 1}, /* row delimiters */
         {.expected = 2,.chars = "\t",.len = 1}  /* column delimiters */
     };

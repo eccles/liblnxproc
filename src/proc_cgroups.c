@@ -109,7 +109,7 @@ LNXPROC_ERROR_T
 lnxproc_proc_cgroups_new(LNXPROC_BASE_T **base)
 {
 
-    LNXPROC_LIMITS_T limits[] = {
+    _LNXPROC_LIMITS_T limits[] = {
         {.expected = 9,
          .chars = "\n",
          .len = 1},             /* row delimiters */
