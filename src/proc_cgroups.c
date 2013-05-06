@@ -50,7 +50,7 @@ struct proc_cgroups_env_t {
 static LNXPROC_ERROR_T
 proc_groups_func(char *val, void *data, size_t idx[], size_t dim)
 {
-    LNXPROC_DEBUG("Val %s, Data %p, idx[%d]=%d idx[%d]=%d\n", val, data, 0,
+    _LNXPROC_DEBUG("Val %s, Data %p, idx[%d]=%d idx[%d]=%d\n", val, data, 0,
                   idx[0], 1, idx[1]);
     struct proc_cgroups_env_t *env = data;
 
@@ -59,7 +59,7 @@ proc_groups_func(char *val, void *data, size_t idx[], size_t dim)
         void *p = realloc(env->cols, (env->colslen + 1) * sizeof(char *));
 
         if (!p) {
-            LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_SYSTEM, "\n");
+            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_SYSTEM, "\n");
             return LNXPROC_ERROR_SYSTEM;
         }
         env->cols = p;

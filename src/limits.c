@@ -56,7 +56,7 @@ LNXPROC_ERROR_T
 _lnxproc_limits_print(_LNXPROC_LIMITS_T limits[], int dim)
 {
     if (!limits) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_NULL, "\n");
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_NULL, "\n");
         return LNXPROC_ERROR_LIMITS_NULL;
     }
 
@@ -129,7 +129,7 @@ _lnxproc_limit_print(_LNXPROC_LIMITS_T * limit, char *buf, size_t buflen)
     buf[0] = '\0';
 
     if (!limit) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_NULL, "\n");
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_NULL, "\n");
         return LNXPROC_ERROR_LIMIT_NULL;
     }
 
@@ -148,36 +148,36 @@ LNXPROC_ERROR_T
 _lnxproc_limits_dup(_LNXPROC_LIMITS_T ** newlimits,
                     _LNXPROC_LIMITS_T limits[], size_t dim)
 {
-    LNXPROC_DEBUG("sizeof ptr %d\n", sizeof(void *));
-    LNXPROC_DEBUG("sizeof _LNXPROC_LIMITS_T %d\n", sizeof(_LNXPROC_LIMITS_T));
+    _LNXPROC_DEBUG("sizeof ptr %d\n", sizeof(void *));
+    _LNXPROC_DEBUG("sizeof _LNXPROC_LIMITS_T %d\n", sizeof(_LNXPROC_LIMITS_T));
 
     if (!newlimits) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_ADDRESS_NULL, "\n");
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_ADDRESS_NULL, "\n");
         return LNXPROC_ERROR_LIMITS_ADDRESS_NULL;
     }
     if (*newlimits) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_ADDRESS_CONTENTS_NOT_NULL,
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_ADDRESS_CONTENTS_NOT_NULL,
                             "\n");
         return LNXPROC_ERROR_LIMITS_ADDRESS_CONTENTS_NOT_NULL;
     }
     if (dim < 1) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_ILLEGAL_DIMENSION, "\n");
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_ILLEGAL_DIMENSION, "\n");
         return LNXPROC_ERROR_LIMITS_ILLEGAL_DIMENSION;
     }
     if (!limits) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_NULL, "\n");
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_NULL, "\n");
         return LNXPROC_ERROR_LIMITS_NULL;
     }
 
-    LNXPROC_DEBUG("Malloc limits %zd\n", dim);
+    _LNXPROC_DEBUG("Malloc limits %zd\n", dim);
     _LNXPROC_LIMITS_T *nlimits = calloc(dim, sizeof(_LNXPROC_LIMITS_T));
 
     if (!nlimits) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_MALLOC, "Malloc limits\n");
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_MALLOC, "Malloc limits\n");
         return LNXPROC_ERROR_LIMITS_MALLOC;
     }
 
-    LNXPROC_DEBUG("Malloc limits %p\n", nlimits);
+    _LNXPROC_DEBUG("Malloc limits %p\n", nlimits);
     int i;
 
     for (i = 0; i < dim; i++) {
@@ -187,11 +187,11 @@ _lnxproc_limits_dup(_LNXPROC_LIMITS_T ** newlimits,
 
         _lnxproc_limit_print(limits + i, buf, sizeof buf);
 
-        LNXPROC_DEBUG("Malloc old limit %zd :%s:\n", i, buf);
+        _LNXPROC_DEBUG("Malloc old limit %zd :%s:\n", i, buf);
 #endif
         nlimits[i].chars = malloc(limits[i].len * sizeof(char));
         if (!nlimits[i].chars) {
-            LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_MALLOC_ENTRY,
+            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_MALLOC_ENTRY,
                                 "Malloc limits entry\n");
             int j;
 
@@ -207,7 +207,7 @@ _lnxproc_limits_dup(_LNXPROC_LIMITS_T ** newlimits,
 
 #ifdef DEBUG
         _lnxproc_limit_print(nlimits + i, buf, sizeof buf);
-        LNXPROC_DEBUG("Malloc new limit %zd :%s:\n", i, buf);
+        _LNXPROC_DEBUG("Malloc new limit %zd :%s:\n", i, buf);
 #endif
     }
     *newlimits = nlimits;
@@ -218,17 +218,17 @@ _LNXPROC_LIMITS_T *
 _lnxproc_limits_free(_LNXPROC_LIMITS_T limits[], size_t dim)
 {
     if (dim > 0 && limits) {
-        LNXPROC_DEBUG("Free Limits buffer %zd\n", dim);
+        _LNXPROC_DEBUG("Free Limits buffer %zd\n", dim);
 
         int i;
 
         for (i = 0; i < dim; i++) {
-            LNXPROC_DEBUG("Free Limit buffer %d\n", i);
+            _LNXPROC_DEBUG("Free Limit buffer %d\n", i);
             free(limits[i].chars);
             limits[i].chars = NULL;
         }
 
-        LNXPROC_DEBUG("Free Limits buffer %p\n", limits);
+        _LNXPROC_DEBUG("Free Limits buffer %p\n", limits);
         free(limits);
     }
     return NULL;

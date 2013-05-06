@@ -49,7 +49,7 @@ lnxproc_init(LNXPROC_MODULE_T ** modules)
     LNXPROC_MODULE_T *p = calloc(1, sizeof(mymodules));
 
     if (!p) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_INTERFACE_MALLOC_INTERFACE,
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_INTERFACE_MALLOC_INTERFACE,
                             "Malloc interface\n");
         return LNXPROC_ERROR_INTERFACE_MALLOC_INTERFACE;
     }

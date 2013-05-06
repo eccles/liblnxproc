@@ -36,15 +36,15 @@ lnxproc_results_timeval_str(LNXPROC_RESULTS_T * results, char *buf,
                             size_t buflen)
 {
     if (!results) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_NULL;
     }
     if (!buf) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_BUF_NULL, "\n");
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_BUF_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_BUF_NULL;
     }
     if (buflen < 1) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_BUFLEN_ZERO, "\n");
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_BUFLEN_ZERO, "\n");
         return LNXPROC_ERROR_RESULTS_BUFLEN_ZERO;
     }
 
@@ -58,9 +58,9 @@ lnxproc_results_timeval_str(LNXPROC_RESULTS_T * results, char *buf,
 LNXPROC_ERROR_T
 lnxproc_results_timeval(LNXPROC_RESULTS_T * results, struct timeval **tv)
 {
-    LNXPROC_DEBUG("Results %p\n", results);
+    _LNXPROC_DEBUG("Results %p\n", results);
     if (!results) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_NULL;
     }
 
@@ -72,7 +72,7 @@ lnxproc_results_timeval(LNXPROC_RESULTS_T * results, struct timeval **tv)
     char buf[64];
 
     lnxproc_results_timeval_str(results, buf, sizeof buf);
-    LNXPROC_DEBUG("Timestamp %s\n", buf);
+    _LNXPROC_DEBUG("Timestamp %s\n", buf);
 #endif
 
     return LNXPROC_OK;
@@ -81,14 +81,14 @@ lnxproc_results_timeval(LNXPROC_RESULTS_T * results, struct timeval **tv)
 LNXPROC_ERROR_T
 lnxproc_results_tv(LNXPROC_RESULTS_T * results, struct timeval **tv)
 {
-    LNXPROC_DEBUG("Results %p\n", results);
+    _LNXPROC_DEBUG("Results %p\n", results);
     if (!results) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_NULL;
     }
 
     if (!tv) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_TV_NULL, "\n");
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_TV_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_TV_NULL;
     }
 
@@ -97,7 +97,7 @@ lnxproc_results_tv(LNXPROC_RESULTS_T * results, struct timeval **tv)
     char buf[64];
 
     lnxproc_results_timeval_str(results, buf, sizeof buf);
-    LNXPROC_DEBUG("Timestamp %s\n", buf);
+    _LNXPROC_DEBUG("Timestamp %s\n", buf);
 #endif
 
     return LNXPROC_OK;
@@ -113,10 +113,10 @@ internal_print_func(char *key, char *value, void *data)
 LNXPROC_ERROR_T
 lnxproc_results_print(LNXPROC_RESULTS_T * results)
 {
-    LNXPROC_DEBUG("Results %p\n", results);
+    _LNXPROC_DEBUG("Results %p\n", results);
 
     if (!results) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_NULL;
     }
 
@@ -132,15 +132,15 @@ lnxproc_results_print(LNXPROC_RESULTS_T * results)
 LNXPROC_ERROR_T
 lnxproc_results_new(LNXPROC_RESULTS_T ** results)
 {
-    LNXPROC_DEBUG("sizeof ptr %d\n", sizeof(void *));
-    LNXPROC_DEBUG("sizeof LNXPROC_RESULTS_T %d\n", sizeof(LNXPROC_RESULTS_T));
+    _LNXPROC_DEBUG("sizeof ptr %d\n", sizeof(void *));
+    _LNXPROC_DEBUG("sizeof LNXPROC_RESULTS_T %d\n", sizeof(LNXPROC_RESULTS_T));
     if (!results) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_ADDRESS_NULL, "\n");
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_ADDRESS_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_ADDRESS_NULL;
     }
 
     if (*results) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_ADDRESS_CONTENTS_NOT_NULL,
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_ADDRESS_CONTENTS_NOT_NULL,
                             "\n");
         return LNXPROC_ERROR_RESULTS_ADDRESS_CONTENTS_NOT_NULL;
     }
@@ -148,7 +148,7 @@ lnxproc_results_new(LNXPROC_RESULTS_T ** results)
     LNXPROC_RESULTS_T *newresults = calloc(1, sizeof(LNXPROC_RESULTS_T));
 
     if (!newresults) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_NULL;
     }
 
@@ -156,30 +156,30 @@ lnxproc_results_new(LNXPROC_RESULTS_T ** results)
 
     newresults->db = DB_OPEN();
     if (!newresults->db) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_OPEN, "Open Db\n");
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_OPEN, "Open Db\n");
         LNXPROC_RESULTS_FREE(newresults);
         return LNXPROC_ERROR_RESULTS_DB_OPEN;
     }
 
     *results = newresults;
-    LNXPROC_DEBUG("Successful\n");
+    _LNXPROC_DEBUG("Successful\n");
     return LNXPROC_OK;
 }
 
 LNXPROC_RESULTS_T *
 lnxproc_results_free(LNXPROC_RESULTS_T * results)
 {
-    LNXPROC_DEBUG("Results %p\n", results);
+    _LNXPROC_DEBUG("Results %p\n", results);
 
     if (results) {
-        LNXPROC_DEBUG("Free Results\n");
+        _LNXPROC_DEBUG("Free Results\n");
         if (results->db) {
 #ifdef LNXPROC_TDB
-            LNXPROC_DEBUG("Free Db\n");
+            _LNXPROC_DEBUG("Free Db\n");
             int ret = tdb_close(results->db);
 
             if (ret < 0) {
-                LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_CLOSE,
+                _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_CLOSE,
                                     "Close Db\n");
             }
             results->db = NULL;
@@ -196,30 +196,30 @@ LNXPROC_ERROR_T
 lnxproc_results_fetch(LNXPROC_RESULTS_T * results, char *key, size_t keylen,
                       LNXPROC_RESULTS_DATA_T * val)
 {
-    LNXPROC_DEBUG("Results %p\n", results);
+    _LNXPROC_DEBUG("Results %p\n", results);
 
     if (!results) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_NULL;
     }
 
     if (!key) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_KEY_NULL, "\n");
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_KEY_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_KEY_NULL;
     }
 
     if (keylen < 1) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_KEYLEN_ZERO, "\n");
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_KEYLEN_ZERO, "\n");
         return LNXPROC_ERROR_RESULTS_KEYLEN_ZERO;
     }
 
     if (!val) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_VAL_ADDRESS_NULL, "\n");
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_VAL_ADDRESS_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_VAL_ADDRESS_NULL;
     }
 
     if (!results->db) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_NOT_OPEN,
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_NOT_OPEN,
                             "Fetch results\n");
         return LNXPROC_ERROR_RESULTS_DB_NOT_OPEN;
     }
@@ -231,7 +231,7 @@ lnxproc_results_fetch(LNXPROC_RESULTS_T * results, char *key, size_t keylen,
 
     *val = tdb_fetch(results->db, dbkey);
     if (!val->dptr) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_FETCH,
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_FETCH,
                             "Fetch results %s\n", tdb_errorstr(results->db));
         return LNXPROC_ERROR_RESULTS_DB_FETCH;
     }
@@ -246,14 +246,14 @@ lnxproc_results_store(LNXPROC_RESULTS_T * results, char *value, char *fmt, ...)
     va_list ap;
 
     if (!results) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_NULL;
     }
 
-    LNXPROC_DEBUG("Results %p Value %p '%s'\n", results, value, value);
+    _LNXPROC_DEBUG("Results %p Value %p '%s'\n", results, value, value);
 
     if (!results->db) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_NOT_OPEN,
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_NOT_OPEN,
                             "Store results\n");
         return LNXPROC_ERROR_RESULTS_DB_NOT_OPEN;
     }
@@ -268,19 +268,19 @@ lnxproc_results_store(LNXPROC_RESULTS_T * results, char *value, char *fmt, ...)
     va_end(ap);
     key.dptr = (unsigned char *) buf;
 
-    LNXPROC_DEBUG("Key %d : '%s'\n", key.dsize, key.dptr);
+    _LNXPROC_DEBUG("Key %d : '%s'\n", key.dsize, key.dptr);
 
     TDB_DATA data;
 
     data.dsize = 1 + strlen(value);
     data.dptr = (unsigned char *) value;
-    LNXPROC_DEBUG("Value %d : '%s'\n", data.dsize, data.dptr);
+    _LNXPROC_DEBUG("Value %d : '%s'\n", data.dsize, data.dptr);
 
     int flag = TDB_REPLACE;
     int ret = tdb_store(results->db, key, data, flag);
 
     if (ret < 0) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_STORE,
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_STORE,
                             "Store results %s\n", tdb_errorstr(results->db));
         return LNXPROC_ERROR_RESULTS_DB_STORE;
     }
@@ -357,14 +357,14 @@ lnxproc_results_iterate(LNXPROC_RESULTS_T * results,
                         LNXPROC_RESULTS_ITERATE_FUNC func, void *data)
 {
     if (!results) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_NULL;
     }
 
-    LNXPROC_DEBUG("Results %p\n", results);
+    _LNXPROC_DEBUG("Results %p\n", results);
 
     if (!results->db) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_NOT_OPEN,
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_NOT_OPEN,
                             "Iterate results\n");
         return LNXPROC_ERROR_RESULTS_DB_NOT_OPEN;
     }
@@ -376,7 +376,7 @@ lnxproc_results_iterate(LNXPROC_RESULTS_T * results,
     int ret = tdb_traverse(results->db, db_traverse_func, &env);
 
     if (ret < 0) {
-        LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_ITERATE,
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_ITERATE,
                             "Iterate results %s\n", tdb_errorstr(results->db));
         return LNXPROC_ERROR_RESULTS_DB_ITERATE;
     }

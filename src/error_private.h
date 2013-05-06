@@ -27,6 +27,36 @@ extern "C" {
 
 #include <lnxproc/error.h>
 
+    int _lnxproc_error_check(void);
+
+#define _LNXPROC_ERROR_CHECK() _lnxproc_error_check()
+
+#ifdef DEBUG
+
+#include <stdio.h>
+
+    void _lnxproc_debug(const char *filename,
+                       int lineno, const char *funcname, char *fmt, ...
+        );
+
+#define _LNXPROC_DEBUG(fmt, args...) \
+                          _lnxproc_debug(__FILE__,__LINE__,__func__, fmt, ##args)
+
+#define _LNXPROC_ERROR_DEBUG(s, fmt, args...) {\
+    char buf[32];\
+    const char *c = lnxproc_strerror(s,buf,sizeof buf);\
+    char buf1[64];\
+    snprintf(buf1,sizeof buf1,"Error : %d %s",s,c);\
+    char buf2[64];\
+    snprintf(buf2,sizeof buf2,fmt, ##args);\
+    _lnxproc_debug(__FILE__,__LINE__,__func__, "%s: %s\n", buf1, buf2);\
+}
+
+#else
+#define _LNXPROC_DEBUG(fmt, args...)
+#define _LNXPROC_ERROR_DEBUG(s, fmt, args...)
+#endif
+
 #ifdef __cplusplus
 }                               // extern "C"
 #endif

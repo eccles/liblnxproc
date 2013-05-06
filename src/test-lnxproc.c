@@ -41,12 +41,12 @@ This file is part of liblnxproc.
 static void
 test_error(void)
 {
-    LNXPROC_ERROR_CHECK();
+    _LNXPROC_ERROR_CHECK();
 
     int i;
 
     for (i = 0; i < LNXPROC_ERROR_SIZE; i++) {
-        LNXPROC_ERROR_DEBUG(i, "Test\n");
+        _LNXPROC_ERROR_DEBUG(i, "Test\n");
     }
 }
 

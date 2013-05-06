@@ -25,9 +25,9 @@
 extern "C" {
 #endif
 
-#include <errno.h>
-#include <stddef.h>
-#include <stdio.h>
+//#include <errno.h>
+//#include <stddef.h>
+//#include <stdio.h>
 
     enum lnxproc_error_t {
         LNXPROC_OK = 0,
@@ -97,34 +97,6 @@ extern "C" {
     typedef enum lnxproc_error_t LNXPROC_ERROR_T;
 
     const char *lnxproc_strerror(LNXPROC_ERROR_T err, char *buf, size_t buflen);
-
-    int lnxproc_error_check(void);
-
-#define LNXPROC_ERROR_CHECK() lnxproc_error_check()
-
-#ifdef DEBUG
-
-    void lnxproc_debug(const char *filename,
-                       int lineno, const char *funcname, char *fmt, ...
-        );
-
-#define LNXPROC_DEBUG(fmt, args...) \
-                          lnxproc_debug(__FILE__,__LINE__,__func__, fmt, ##args)
-
-#define LNXPROC_ERROR_DEBUG(s, fmt, args...) {\
-    char buf[32];\
-    const char *c = lnxproc_strerror(s,buf,sizeof buf);\
-    char buf1[64];\
-    snprintf(buf1,sizeof buf1,"Error : %d %s",s,c);\
-    char buf2[64];\
-    snprintf(buf2,sizeof buf2,fmt, ##args);\
-    lnxproc_debug(__FILE__,__LINE__,__func__, "%s: %s\n", buf1, buf2);\
-}
-
-#else
-#define LNXPROC_DEBUG(fmt, args...)
-#define LNXPROC_ERROR_DEBUG(s, fmt, args...)
-#endif
 
 #ifdef __cplusplus
 }                               // extern "C"

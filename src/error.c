@@ -103,7 +103,7 @@ static const char unknown_error[] = "Unknown error";
 
 #ifdef DEBUG
 void
-lnxproc_debug(const char *filename, int lineno, const char *funcname, char *fmt,
+_lnxproc_debug(const char *filename, int lineno, const char *funcname, char *fmt,
               ...)
 {
     va_list args;
@@ -131,7 +131,7 @@ lnxproc_strerror(LNXPROC_ERROR_T err, char *buf, size_t buflen)
 }
 
 int
-lnxproc_error_check(void)
+_lnxproc_error_check(void)
 {
     if (LNXPROC_ERROR_SIZE != ERRSTR_SIZE) {
         int err = LNXPROC_ERROR_MISMATCHED_STRINGS;

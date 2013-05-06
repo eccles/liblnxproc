@@ -132,7 +132,7 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
     char *val = NULL;
 
     while (!_lnxproc_array_get(array, idx, 2, &val)) {
-        LNXPROC_DEBUG("%1$zd:Val %2$p '%2$s'\n", idx[0], val);
+        _LNXPROC_DEBUG("%1$zd:Val %2$p '%2$s'\n", idx[0], val);
         lnxproc_results_store(results, val, "/key%02d", idx[0]);
         lnxproc_strings_append(&keys, &nkeys, val);
         idx[0]++;
@@ -140,7 +140,7 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
     }
     size_t nrows = idx[0];
 
-    LNXPROC_DEBUG("Nrows %zd\n", nrows);
+    _LNXPROC_DEBUG("Nrows %zd\n", nrows);
 
     char *cols[] = { "major", "minor", "name ", "reads", "merge_read",
         "s_read", "ms_read", "writes", "merge_write", "s_write",
@@ -160,7 +160,7 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
         val = NULL;
         while (!_lnxproc_array_get(array, idx, 2, &val)) {
             if (idx[1] != key) {
-                LNXPROC_DEBUG("%1$zd,%2$zd:Val %3$p '%3$s'\n", idx[0], idx[1],
+                _LNXPROC_DEBUG("%1$zd,%2$zd:Val %3$p '%3$s'\n", idx[0], idx[1],
                               val);
                 lnxproc_results_store(results, val, "/%s/%s", keys[i],
                                       cols[idx[1]]);
