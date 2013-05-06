@@ -26,6 +26,7 @@ extern "C" {
 #endif
 
 #include <stddef.h>
+#include <sys/time.h>
 
 #include "util_private.h"
 #include "error_private.h"
@@ -45,6 +46,7 @@ extern "C" {
     LNXPROC_ERROR_T _lnxproc_base_read(LNXPROC_BASE_T *base);
 
     struct lnxproc_base_data_t {
+        struct timeval tv;
         char *lines;
         size_t buflen;
         int nbytes;

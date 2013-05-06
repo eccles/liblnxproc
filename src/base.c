@@ -53,11 +53,16 @@ _lnxproc_base_print(LNXPROC_BASE_T *base)
         for (i = 0; i < base->nfiles; i++) {
             printf("Filename %s\n", base->filenames[i]);
         }
+        printf("Timestamp %lu.%06lu\n", (unsigned long) base->current.tv.tv_sec,
+               (unsigned long) base->current.tv.tv_usec);
         printf("Lines %p\n", base->current.lines);
         printf("Buflen %zd\n", base->current.buflen);
         printf("Nbytes %d\n", base->current.nbytes);
         _lnxproc_array_print(base->current.array, 0);
 
+        printf("Previous Timestamp %lu.%06lu\n",
+               (unsigned long) base->previous.tv.tv_sec,
+               (unsigned long) base->previous.tv.tv_usec);
         printf("Previous Lines %p\n", base->previous.lines);
         printf("Previous Buflen %zd\n", base->previous.buflen);
         printf("Previous Nbytes %d\n", base->previous.nbytes);
@@ -248,6 +253,7 @@ _lnxproc_base_rawread(LNXPROC_BASE_T *base)
         }
     }
     base->current.nbytes = base->current.buflen - nbytes;
+    gettimeofday(&base->current.tv, NULL);
 
     _LNXPROC_DEBUG("Successful\n");
     return LNXPROC_OK;
@@ -484,6 +490,7 @@ _lnxproc_base_read(LNXPROC_BASE_T *base)
         array_new(&base->current, base->previous.array->limits,
                   base->previous.array->dim);
     }
+    memcpy(&base->previous.tv, &base->current.tv, sizeof(base->previous.tv));
     return LNXPROC_OK;
 }
 
@@ -539,6 +546,7 @@ _lnxproc_base_new(LNXPROC_BASE_T **base,
     p->previous.lines = NULL;
     p->previous.buflen = 0;
     p->previous.nbytes = 0;
+    gettimeofday(&p->current.tv, NULL);
 
     ret = array_new(&p->current, limits, dim);
     if (ret) {

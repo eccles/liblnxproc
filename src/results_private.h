@@ -25,13 +25,11 @@
 extern "C" {
 #endif
 
-#include <sys/time.h>
 #include "error_private.h"
 #include "util_private.h"
 #include "db_private.h"
 
     struct _lnxproc_results_t {
-        struct timeval tv;
         LNXPROC_RESULTS_FILE_T *db;
     };
     typedef struct _lnxproc_results_t _LNXPROC_RESULTS_T;
@@ -44,12 +42,6 @@ extern "C" {
     r =  _lnxproc_results_free(r);\
 }
 
-    LNXPROC_ERROR_T _lnxproc_results_timeval(_LNXPROC_RESULTS_T * results,
-                                             struct timeval **tv);
-    LNXPROC_ERROR_T _lnxproc_results_tv(_LNXPROC_RESULTS_T * results,
-                                        struct timeval **tv);
-    LNXPROC_ERROR_T _lnxproc_results_timeval_str(_LNXPROC_RESULTS_T * results,
-                                                 char *buf, size_t buflen);
     LNXPROC_ERROR_T _lnxproc_results_print(_LNXPROC_RESULTS_T * results);
 
     LNXPROC_ERROR_T _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results,
