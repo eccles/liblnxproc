@@ -7,26 +7,29 @@ then
     exit 1
 fi
 ulimit -c unlimited
+BIN=${0%*.sh}
+#echo $BIN
+#exit 0
 OPT=$1
 shift
 VALOPTS="--leak-check=full --show-reachable=yes --read-var-info=yes --track-origins=yes"
 if [ "${OPT}" = "leak" ]
 then
-    valgrind -v ${VALOPTS} ./test-lnxproc $*
+    valgrind -v ${VALOPTS} ${BIN} $*
 elif [ "${OPT}" = "leakdbg" ]
 then
-    valgrind -v ${VALOPTS} ./test-lnxproc-dbg $*
+    valgrind -v ${VALOPTS} ${BIN}-dbg $*
 elif [ "${OPT}" = "ddd" ]
 then
-    ddd test-lnxproc $*
+    ddd ${BIN} $*
 elif [ "${OPT}" = "ddddbg" ]
 then
-    ddd test-lnxproc-dbg $*
+    ddd ${BIN}-dbg $*
 elif [ "${OPT}" = "dbg" ]
 then
-    ./test-lnxproc-dbg $*
+    ${BIN}-dbg $*
 elif [ "${OPT}" = "nodbg" ]
 then
-    ./test-lnxproc $*
+    ${BIN} $*
 fi
 exit 0

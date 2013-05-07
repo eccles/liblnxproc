@@ -446,6 +446,30 @@ _lnxproc_array_get(_LNXPROC_ARRAY_T * array, size_t idx[], size_t dim,
     return LNXPROC_OK;
 }
 
+LNXPROC_ERROR_T
+_lnxproc_array_diff(_LNXPROC_ARRAY_T * previous,
+                    _LNXPROC_ARRAY_T * current,
+                    size_t idx[], size_t dim, int *diff)
+{
+    LNXPROC_ERROR_T ret;
+
+    *diff = 0;
+    char *prev = NULL;
+
+    ret = _lnxproc_array_get(previous, idx, dim, &prev);
+    if (ret) {
+        return ret;
+    }
+    char *curr = NULL;
+
+    ret = _lnxproc_array_get(current, idx, dim, &curr);
+    if (ret) {
+        return ret;
+    }
+    *diff = atoi(curr) - atoi(prev);
+    return LNXPROC_OK;
+}
+
 struct array_iterate_t {
     char *data;
     size_t *idx;

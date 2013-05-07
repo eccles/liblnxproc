@@ -23,13 +23,15 @@
 #include <stdio.h>
 
 long
-lnxproc_timediff(struct timeval *tv1, struct timeval *tv2)
+lnxproc_timeval_diff(struct timeval *start, struct timeval *end)
 {
     long res = 0;
-    if( tv1 && tv2 ) {
-        long secdiff = tv1->tv_sec - tv2->tv_sec;
-        long usecdiff = (long)tv1->tv_usec - (long)tv2->tv_usec;
-        if( usecdiff < 0 ) {
+
+    if (start && end) {
+        long secdiff = end->tv_sec - start->tv_sec;
+        long usecdiff = (long) end->tv_usec - (long) start->tv_usec;
+
+        if (usecdiff < 0) {
             usecdiff += 1000000;
             secdiff -= 1;
         }
@@ -39,14 +41,24 @@ lnxproc_timediff(struct timeval *tv1, struct timeval *tv2)
 }
 
 char *
-lnxproc_timeval_print(struct timeval *tv, char *buf, size_t len )
+lnxproc_timeval_print(struct timeval *tv, char *buf, size_t len)
 {
-    if( tv && buf && (len > 0 )) {
-        snprintf(buf,len,"%lu.%06lu", (unsigned long) tv->tv_sec,
-                                      (unsigned long) tv->tv_usec);
+    if (tv && buf && (len > 0)) {
+        snprintf(buf, len, "%lu.%06lu", (unsigned long) tv->tv_sec,
+                 (unsigned long) tv->tv_usec);
     }
     return buf;
 }
+
+struct timeval
+lnxproc_timeval(void)
+{
+    struct timeval tv;
+
+    gettimeofday(&tv, NULL);
+    return tv;
+}
+
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
  */

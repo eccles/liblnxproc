@@ -56,11 +56,12 @@ static void
 test_util(void)
 {
     char buf[32];
-    struct timeval tv1 = { .tv_sec=2,.tv_usec=12456 };
-    printf("Tv1 = %s\n", lnxproc_timeval_print(&tv1,buf,sizeof buf));
-    struct timeval tv2 = { .tv_sec=1,.tv_usec=32456 };
-    printf("Tv2 = %s\n", lnxproc_timeval_print(&tv2,buf,sizeof buf));
-    long diff = lnxproc_timediff(&tv1, &tv2);
+    struct timeval tv1 = {.tv_sec = 2,.tv_usec = 12456 };
+    printf("Tv1 = %s\n", lnxproc_timeval_print(&tv1, buf, sizeof buf));
+    struct timeval tv2 = {.tv_sec = 1,.tv_usec = 32456 };
+    printf("Tv2 = %s\n", lnxproc_timeval_print(&tv2, buf, sizeof buf));
+    long diff = lnxproc_timeval_diff(&tv1, &tv2);
+
     printf("Difference = %ld\n", diff);
 }
 

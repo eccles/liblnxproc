@@ -35,8 +35,9 @@ extern "C" {
 #define WARN_UNUSED __attribute__((warn_unused_result))
 #endif
 
-long lnxproc_timediff(struct timeval *tv1, struct timeval *tv2);
-char * lnxproc_timeval_print(struct timeval *tv, char *buf, size_t len);
+    long lnxproc_timeval_diff(struct timeval *start, struct timeval *end);
+    char *lnxproc_timeval_print(struct timeval *tv, char *buf, size_t len);
+    struct timeval lnxproc_timeval(void);
 
 #ifdef __cplusplus
 }                               // extern "C"

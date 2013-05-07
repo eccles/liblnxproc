@@ -3,6 +3,7 @@
 
 CC=gcc
 CCFLAGSD=-DDEBUG=1 -g
+CCFLAGSO=-O2
 CCFLAGS1=-I../src -Wall
 CCFLAGS2=$(CCFLAGS1) -fpic
 #CCFLAGS=-g -fpic -I. -Wall
@@ -17,7 +18,7 @@ OBJSDBG=$(SRCS:.c=-dbg.o)
 #TARGETS=$(TGT1) $(TGT2)
 
 %.o: %.c $(HDRS)
-	$(CC) $(CCFLAGS2) -c $< -o $@
+	$(CC) $(CCFLAGSO) $(CCFLAGS2) -c $< -o $@
 
 %-dbg.o: %.c $(HDRS)
 	$(CC) $(CCFLAGSD) $(CCFLAGS2) -c $< -o $@
@@ -32,7 +33,7 @@ $(LIB)-dbg.so: $(OBJSDBG)
 	$(CC) $(SOFLAGS) -o $@ $^ $(DBLIB)
 
 $(BIN): $(BIN).c $(LIB).so
-	$(CC) $(CCFLAGS1) -o $@ $^ $(LDFLAGS1) 
+	$(CC) $(CCFLAGSO) $(CCFLAGS1) -o $@ $^ $(LDFLAGS1) 
 
 $(BIN)-dbg: $(BIN).c $(LIB)-dbg.so
 	$(CC) $(CCFLAGSD) $(CCFLAGS1) -o $@ $^ $(LDFLAGS2)

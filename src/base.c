@@ -27,9 +27,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <glob.h>
-#include <sys/types.h>
 #include <regex.h>
 
+#include "util_private.h"
 #include "error_private.h"
 #include "limits_private.h"
 #include "results_private.h"
@@ -253,7 +253,13 @@ _lnxproc_base_rawread(LNXPROC_BASE_T *base)
         }
     }
     base->current.nbytes = base->current.buflen - nbytes;
-    gettimeofday(&base->current.tv, NULL);
+    base->current.tv = lnxproc_timeval();
+#ifdef DEBUG
+    char buf[32];
+
+    _LNXPROC_DEBUG("Current timestamp %s\n",
+                   lnxproc_timeval_print(&base->current.tv, buf, sizeof buf));
+#endif
 
     _LNXPROC_DEBUG("Successful\n");
     return LNXPROC_OK;
@@ -546,7 +552,13 @@ _lnxproc_base_new(LNXPROC_BASE_T **base,
     p->previous.lines = NULL;
     p->previous.buflen = 0;
     p->previous.nbytes = 0;
-    gettimeofday(&p->current.tv, NULL);
+    p->current.tv = lnxproc_timeval();
+#ifdef DEBUG
+    char buf[32];
+
+    _LNXPROC_DEBUG("Current timestamp %s\n",
+                   lnxproc_timeval_print(&p->current.tv, buf, sizeof buf));
+#endif
 
     ret = array_new(&p->current, limits, dim);
     if (ret) {
@@ -685,6 +697,108 @@ _lnxproc_base_free(LNXPROC_BASE_T *base)
     }
 
     return base;
+}
+
+static LNXPROC_ERROR_T
+base_variable_rate(LNXPROC_BASE_T *base,
+                   size_t idx[], size_t dim, long tdiff, float scale, char *buf,
+                   size_t len)
+{
+
+    int diff;
+
+    LNXPROC_ERROR_T ret =
+        _lnxproc_array_diff(base->previous.array, base->current.array, idx, dim,
+                            &diff);
+
+    if (ret) {
+        return ret;
+    }
+    float rate = (scale * diff) / (tdiff * 1.e-6);
+
+    snprintf(buf, len, "%f", rate);
+
+    return LNXPROC_OK;
+}
+
+LNXPROC_ERROR_T
+_lnxproc_base_variable_rate(LNXPROC_BASE_T *base,
+                            size_t idx[], size_t dim, long tdiff, float scale,
+                            char *buf, size_t len)
+{
+    *buf = '\0';
+    snprintf(buf, len, "0");
+
+    if (!base) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_NULL, "\n");
+        return LNXPROC_ERROR_BASE_NULL;
+    }
+
+    if (!base->current.array || !base->previous.array) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_ARRAY_NULL, "\n");
+        return LNXPROC_ERROR_BASE_ARRAY_NULL;
+    }
+
+    return base_variable_rate(base, idx, dim, tdiff, scale, buf, len);
+}
+
+LNXPROC_ERROR_T
+_lnxproc_base_variable_sample_rate(LNXPROC_BASE_T *base,
+                                   size_t idx[], size_t dim, float scale,
+                                   char *buf, size_t len)
+{
+    *buf = '\0';
+    snprintf(buf, len, "0");
+
+    if (!base) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_NULL, "\n");
+        return LNXPROC_ERROR_BASE_NULL;
+    }
+
+    if (!base->current.array || !base->previous.array) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_ARRAY_NULL, "\n");
+        return LNXPROC_ERROR_BASE_ARRAY_NULL;
+    }
+
+    long tdiff = lnxproc_timeval_diff(&base->previous.tv, &base->current.tv);
+
+    return base_variable_rate(base, idx, dim, tdiff, scale, buf, len);
+}
+
+LNXPROC_ERROR_T
+_lnxproc_base_variable_usage(LNXPROC_BASE_T *base,
+                             size_t idx[], size_t dim, float scale, char *buf,
+                             size_t len)
+{
+    *buf = '\0';
+    snprintf(buf, len, "0");
+
+    if (!base) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_NULL, "\n");
+        return LNXPROC_ERROR_BASE_NULL;
+    }
+
+    if (!base->current.array || !base->previous.array) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_ARRAY_NULL, "\n");
+        return LNXPROC_ERROR_BASE_ARRAY_NULL;
+    }
+
+    int diff;
+
+    LNXPROC_ERROR_T ret =
+        _lnxproc_array_diff(base->previous.array, base->current.array, idx, dim,
+                            &diff);
+
+    if (ret) {
+        return ret;
+    }
+
+    long tdiff = lnxproc_timeval_diff(&base->previous.tv, &base->current.tv);
+
+    float percent = (100.0 * scale * diff) / (tdiff * 1.e-6);
+
+    snprintf(buf, len, "%f", percent);
+    return LNXPROC_OK;
 }
 
 /*

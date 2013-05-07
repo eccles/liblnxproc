@@ -57,6 +57,10 @@ extern "C" {
     LNXPROC_ERROR_T _lnxproc_array_get(_LNXPROC_ARRAY_T * array, size_t idx[],
                                        size_t dim, char **value);
 
+    LNXPROC_ERROR_T _lnxproc_array_diff(_LNXPROC_ARRAY_T * previous,
+                                        _LNXPROC_ARRAY_T * current,
+                                        size_t idx[], size_t dim, int *diff);
+
     typedef LNXPROC_ERROR_T (*_LNXPROC_ARRAY_ITERATE_FUNC) (char *val,
                                                             void *data,
                                                             size_t idx[],

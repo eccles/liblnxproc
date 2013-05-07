@@ -29,11 +29,14 @@ test_module(LNXPROC_MODULE_T *modules, LNXPROC_MODULE_TYPE_T type)
 {
     if( modules) {
         int i;
+        struct timeval start = lnxproc_timeval();
         for( i = 0; i < ntimes; i++ ) {
             lnxproc_read(modules,type);
         }
+        struct timeval end = lnxproc_timeval();
+        long timediff = lnxproc_timeval_diff(&start,&end);
+        printf("%d:Elapsed time = %ld usecs\n", type, timediff/ntimes);
     }
-    LNXPROC_FREE(modules);
 }
 /*----------------------------------------------------------------------------*/
 int
@@ -45,6 +48,13 @@ main(int argc, char *argv[])
 
     if (argc < 2) {
         test_module(modules,LNXPROC_ALL);
+        test_module(modules,LNXPROC_PROC_CGROUPS);
+        test_module(modules,LNXPROC_PROC_DISKSTATS);
+        test_module(modules,LNXPROC_PROC_DOMAINNAME);
+        test_module(modules,LNXPROC_PROC_HOSTNAME);
+        test_module(modules,LNXPROC_PROC_OSRELEASE);
+        test_module(modules,LNXPROC_SYS_CPUFREQ);
+        test_module(modules,LNXPROC_SYS_DISKSECTORS);
     }
     else if (!strcmp(argv[1], "proc_cgroups")) {
         test_module(modules,LNXPROC_PROC_CGROUPS);
@@ -67,5 +77,6 @@ main(int argc, char *argv[])
     else if (!strcmp(argv[1], "sys_disksectors")) {
         test_module(modules,LNXPROC_SYS_DISKSECTORS);
     }
+    LNXPROC_FREE(modules);
     return 0;
 }

@@ -82,6 +82,21 @@ extern "C" {
 
     LNXPROC_ERROR_T _lnxproc_base_print(LNXPROC_BASE_T *base);
 
+    LNXPROC_ERROR_T _lnxproc_base_variable_usage(LNXPROC_BASE_T *base,
+                                                 size_t idx[], size_t dim,
+                                                 float scale, char *buf,
+                                                 size_t len);
+
+    LNXPROC_ERROR_T _lnxproc_base_variable_rate(LNXPROC_BASE_T *base,
+                                                size_t idx[], size_t dim,
+                                                long tdiff, float scale,
+                                                char *buf, size_t len);
+
+    LNXPROC_ERROR_T _lnxproc_base_variable_sample_rate(LNXPROC_BASE_T *base,
+                                                       size_t idx[], size_t dim,
+                                                       float scale, char *buf,
+                                                       size_t len);
+
 #ifdef __cplusplus
 }                               // extern "C"
 #endif

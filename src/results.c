@@ -162,8 +162,8 @@ _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results, char *key, size_t keylen,
 }
 
 LNXPROC_ERROR_T
-_lnxproc_results_store(_LNXPROC_RESULTS_T * results, char *value, char *fmt,
-                       ...)
+_lnxproc_results_store(_LNXPROC_RESULTS_T * results, const char *value,
+                       char *fmt, ...)
 {
     va_list ap;
 

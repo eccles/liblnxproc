@@ -49,7 +49,7 @@ extern "C" {
                                            LNXPROC_RESULTS_DATA_T * val);
 
     LNXPROC_ERROR_T _lnxproc_results_store(_LNXPROC_RESULTS_T * results,
-                                           char *value, char *fmt, ...);
+                                           const char *value, char *fmt, ...);
 
     typedef int (*_LNXPROC_RESULTS_ITERATE_FUNC) (char *key, char *value,
                                                   void *data);

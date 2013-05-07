@@ -123,7 +123,8 @@ static LNXPROC_ERROR_T
 proc_diskstats_normalize(LNXPROC_BASE_T *base)
 {
     _LNXPROC_RESULTS_T *results = base->results;
-    _LNXPROC_ARRAY_T *array = base->current.array;
+    _LNXPROC_ARRAY_T *current = base->current.array;
+    _LNXPROC_ARRAY_T *previous = base->previous.array;
 
     char **keys = NULL;
     size_t nkeys = 0;
@@ -131,7 +132,7 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
     size_t idx[] = { 0, key };
     char *val = NULL;
 
-    while (!_lnxproc_array_get(array, idx, 2, &val)) {
+    while (!_lnxproc_array_get(current, idx, 2, &val)) {
         _LNXPROC_DEBUG("%1$zd:Val %2$p '%2$s'\n", idx[0], val);
         _lnxproc_results_store(results, val, "/key%02d", idx[0]);
         lnxproc_strings_append(&keys, &nkeys, val);
@@ -142,9 +143,20 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
 
     _LNXPROC_DEBUG("Nrows %zd\n", nrows);
 
-    char *cols[] = { "major", "minor", "name ", "reads", "merge_read",
+    static const char *cols[] =
+        { "major", "minor", "name ", "reads", "merge_read",
         "s_read", "ms_read", "writes", "merge_write", "s_write",
         "ms_write", "ios", "ms_io", "ms_weighted",
+    };
+/*
+ * TODO - get sector size from other LNXPROC module.
+ * For now fix it at 512 bytes.
+ */
+#define sectorsize 512
+#define sectorscale sectorsize/1024.0
+    static const float scale[] = { 0.0, 0.0, 0.0, 1.0, 1.0,
+        sectorscale, 1.e-3, 1.0, 1.0, sectorscale,
+        1.e-3, 0.0, 1.e-3, 1.e-3,
     };
     size_t ncols = sizeof(cols) / sizeof(cols[0]);
 
@@ -156,20 +168,66 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
 
     for (i = 0; i < nrows; i++) {
         idx[0] = i;
+
+        idx[1] = 6;             // 'ms_read'
+        int readtime;
+
+        _lnxproc_array_diff(previous, current, idx, 2, &readtime);
+
+        idx[1] = 10;            // 'ms_write'
+        int writetime;
+
+        _lnxproc_array_diff(previous, current, idx, 2, &writetime);
+
         idx[1] = 0;
         val = NULL;
-        while (!_lnxproc_array_get(array, idx, 2, &val)) {
+        while (!_lnxproc_array_get(current, idx, 2, &val)) {
             if (idx[1] != key) {
                 _LNXPROC_DEBUG("%1$zd,%2$zd:Val %3$p '%3$s'\n", idx[0], idx[1],
                                val);
                 _lnxproc_results_store(results, val, "/%s/%s", keys[i],
                                        cols[idx[1]]);
-                idx[1]++;
+                val = NULL;
+                if (readtime > 0) {
+                    if ((idx[1] == 3) ||        // 'reads'
+                        (idx[1] == 4) ||        // 'merge_read'
+                        (idx[1] == 5)) {        // 's_read'
+                        char buf[32];
+
+                        _lnxproc_base_variable_rate(base, idx, 2, scale[idx[1]],
+                                                    readtime, buf, sizeof buf);
+                        _lnxproc_results_store(results, val, "/%s/%s-s",
+                                               keys[i], cols[idx[1]]);
+                        val = NULL;
+                    }
+                }
+                if (writetime > 0) {
+                    if ((idx[1] == 7) ||        // 'writes'
+                        (idx[1] == 8) ||        // 'merge_write'
+                        (idx[1] == 9)) {        // 's_write'
+                        char buf[32];
+
+                        _lnxproc_base_variable_rate(base, idx, 2, scale[idx[1]],
+                                                    writetime, buf, sizeof buf);
+                        _lnxproc_results_store(results, val, "/%s/%s-s",
+                                               keys[i], cols[idx[1]]);
+                        val = NULL;
+                    }
+                }
+                if ((idx[1] == 6) ||    // 'ms_read'
+                    (idx[1] == 10) ||   // 'ms_write'
+                    (idx[1] == 12) ||   // 'ms_io'
+                    (idx[1] == 13)) {   // 'ms_weighted'
+                    char buf[32];
+
+                    _lnxproc_base_variable_usage(base, idx, 2, scale[idx[1]],
+                                                 buf, sizeof buf);
+                    _lnxproc_results_store(results, val, "/%s/%s%%",
+                                           keys[i], cols[idx[1]]);
+                    val = NULL;
+                }
             }
-            else {
-                idx[1] += 2;
-            }
-            val = NULL;
+            idx[1]++;
         }
     }
     lnxproc_strings_free(keys, nkeys);
@@ -181,17 +239,20 @@ lnxproc_proc_diskstats_new(LNXPROC_BASE_T **base)
 {
 
     _LNXPROC_LIMITS_T limits[] = {
-        {.expected = 9,.chars = "\n",.len = 1}, /* row delimiters */
-        {.expected = 14,.chars = " ",.len = 1}  /* column delimiters */
+        {
+         .expected = 9,.chars = "\n",.len = 1}, /* row delimiters */
+        {
+         .expected = 14,.chars = " ",.len = 1}  /* column delimiters */
     };
-
-    char *filenames[] = { "/proc/diskstats" };
+    char *filenames[] = {
+        "/proc/diskstats"
+    };
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
     return _lnxproc_base_new(base,
                              filenames, 1, NULL, NULL,
-                             NULL, proc_diskstats_normalize, NULL, 256,
-                             limits, dim);
+                             NULL,
+                             proc_diskstats_normalize, NULL, 256, limits, dim);
 }
 
 /*
