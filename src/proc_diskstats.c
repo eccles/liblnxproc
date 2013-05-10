@@ -191,7 +191,6 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
                                val);
                 _lnxproc_results_store(results, val, "/%s/%s", keys[i],
                                        cols[idx[1]]);
-                val = NULL;
                 if (readtime > 0) {
                     if ((idx[1] == 3) ||        // 'reads'
                         (idx[1] == 4) ||        // 'merge_read'
@@ -200,9 +199,8 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
 
                         _lnxproc_base_variable_rate(base, idx, 2, scale[idx[1]],
                                                     readtime, buf, sizeof buf);
-                        _lnxproc_results_store(results, val, "/%s/%s-s",
+                        _lnxproc_results_store(results, buf, "/%s/%s-s",
                                                keys[i], cols[idx[1]]);
-                        val = NULL;
                     }
                 }
                 if (writetime > 0) {
@@ -213,9 +211,8 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
 
                         _lnxproc_base_variable_rate(base, idx, 2, scale[idx[1]],
                                                     writetime, buf, sizeof buf);
-                        _lnxproc_results_store(results, val, "/%s/%s-s",
+                        _lnxproc_results_store(results, buf, "/%s/%s-s",
                                                keys[i], cols[idx[1]]);
-                        val = NULL;
                     }
                 }
                 if ((idx[1] == 6) ||    // 'ms_read'
@@ -226,12 +223,12 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
 
                     _lnxproc_base_variable_usage(base, idx, 2, scale[idx[1]],
                                                  buf, sizeof buf);
-                    _lnxproc_results_store(results, val, "/%s/%s%%",
+                    _lnxproc_results_store(results, buf, "/%s/%s%%",
                                            keys[i], cols[idx[1]]);
-                    val = NULL;
                 }
             }
             idx[1]++;
+            val = NULL;
         }
     }
     lnxproc_strings_free(keys, nkeys);

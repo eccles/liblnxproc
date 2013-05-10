@@ -390,7 +390,7 @@ base_map(LNXPROC_BASE_T *base)
 static LNXPROC_ERROR_T
 base_new_rawread_buffer(LNXPROC_BASE_DATA_T * data, size_t newlen)
 {
-    _LNXPROC_DEBUG("Malloc lines buffer to %d bytes\n", data->buflen);
+    _LNXPROC_DEBUG("Malloc lines buffer to %d bytes\n", newlen);
     char *p = realloc(data->lines, newlen + 1);
 
     if (!p) {
@@ -758,6 +758,11 @@ _lnxproc_base_variable_rate(LNXPROC_BASE_T *base,
         return LNXPROC_ERROR_BASE_NULL;
     }
 
+    if (!base->previous) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_PREVIOUS_NULL, "\n");
+        return LNXPROC_ERROR_BASE_PREVIOUS_NULL;
+    }
+
     if (!base->current->array || !base->previous->array) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_ARRAY_NULL, "\n");
         return LNXPROC_ERROR_BASE_ARRAY_NULL;
@@ -777,6 +782,11 @@ _lnxproc_base_variable_sample_rate(LNXPROC_BASE_T *base,
     if (!base) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_NULL, "\n");
         return LNXPROC_ERROR_BASE_NULL;
+    }
+
+    if (!base->previous) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_PREVIOUS_NULL, "\n");
+        return LNXPROC_ERROR_BASE_PREVIOUS_NULL;
     }
 
     if (!base->current->array || !base->previous->array) {
@@ -800,6 +810,11 @@ _lnxproc_base_variable_usage(LNXPROC_BASE_T *base,
     if (!base) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_NULL, "\n");
         return LNXPROC_ERROR_BASE_NULL;
+    }
+
+    if (!base->previous) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_PREVIOUS_NULL, "\n");
+        return LNXPROC_ERROR_BASE_PREVIOUS_NULL;
     }
 
     if (!base->current->array || !base->previous->array) {
