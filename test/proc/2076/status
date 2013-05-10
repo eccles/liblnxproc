@@ -1,0 +1,39 @@
+Name:	zfs-fuse
+State:	S (sleeping)
+Tgid:	2076
+Pid:	2076
+PPid:	1
+TracerPid:	0
+Uid:	0	0	0	0
+Gid:	0	0	0	0
+FDSize:	64
+Groups:	
+VmPeak:	  382124 kB
+VmSize:	  318360 kB
+VmLck:	       0 kB
+VmPin:	       0 kB
+VmHWM:	   37500 kB
+VmRSS:	    1212 kB
+VmData:	  292252 kB
+VmStk:	     136 kB
+VmExe:	    1116 kB
+VmLib:	    4288 kB
+VmPTE:	     400 kB
+VmSwap:	   35952 kB
+Threads:	54
+SigQ:	1/127922
+SigPnd:	0000000000000000
+ShdPnd:	0000000000000000
+SigBlk:	0000000000000000
+SigIgn:	0000000000381000
+SigCgt:	0000000180004003
+CapInh:	0000000000000000
+CapPrm:	ffffffffffffffff
+CapEff:	ffffffffffffffff
+CapBnd:	ffffffffffffffff
+Cpus_allowed:	ff
+Cpus_allowed_list:	0-7
+Mems_allowed:	00000000,00000001
+Mems_allowed_list:	0
+voluntary_ctxt_switches:	6
+nonvoluntary_ctxt_switches:	0

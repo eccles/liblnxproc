@@ -1,0 +1,39 @@
+Name:	gconfd-2
+State:	S (sleeping)
+Tgid:	3192
+Pid:	3192
+PPid:	1
+TracerPid:	0
+Uid:	1000	1000	1000	1000
+Gid:	1000	1000	1000	1000
+FDSize:	64
+Groups:	4 24 27 30 46 107 124 1000 
+VmPeak:	   57940 kB
+VmSize:	   57936 kB
+VmLck:	       0 kB
+VmPin:	       0 kB
+VmHWM:	    3604 kB
+VmRSS:	    3604 kB
+VmData:	    1420 kB
+VmStk:	     136 kB
+VmExe:	      40 kB
+VmLib:	    6084 kB
+VmPTE:	     132 kB
+VmSwap:	       0 kB
+Threads:	1
+SigQ:	0/127974
+SigPnd:	0000000000000000
+ShdPnd:	0000000000000000
+SigBlk:	0000000000000000
+SigIgn:	0000000000000002
+SigCgt:	0000000180004201
+CapInh:	0000000000000000
+CapPrm:	0000000000000000
+CapEff:	0000000000000000
+CapBnd:	ffffffffffffffff
+Cpus_allowed:	ff
+Cpus_allowed_list:	0-7
+Mems_allowed:	00000000,00000001
+Mems_allowed_list:	0
+voluntary_ctxt_switches:	952
+nonvoluntary_ctxt_switches:	7

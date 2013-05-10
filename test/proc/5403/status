@@ -1,0 +1,39 @@
+Name:	chrome-sandbox
+State:	S (sleeping)
+Tgid:	5403
+Pid:	5403
+PPid:	5395
+TracerPid:	0
+Uid:	1000	1000	1000	1000
+Gid:	1000	1000	1000	1000
+FDSize:	64
+Groups:	4 24 27 30 46 107 124 1000 
+VmPeak:	    6460 kB
+VmSize:	    6460 kB
+VmLck:	       0 kB
+VmPin:	       0 kB
+VmHWM:	     396 kB
+VmRSS:	     396 kB
+VmData:	     192 kB
+VmStk:	     136 kB
+VmExe:	      12 kB
+VmLib:	    1980 kB
+VmPTE:	      32 kB
+VmSwap:	       0 kB
+Threads:	1
+SigQ:	0/127974
+SigPnd:	0000000000000000
+ShdPnd:	0000000000000000
+SigBlk:	0000000000000000
+SigIgn:	0000000004001000
+SigCgt:	0000000180000000
+CapInh:	0000000000000000
+CapPrm:	0000000000000000
+CapEff:	0000000000000000
+CapBnd:	ffffffffffffffff
+Cpus_allowed:	ff
+Cpus_allowed_list:	0-7
+Mems_allowed:	00000000,00000001
+Mems_allowed_list:	0
+voluntary_ctxt_switches:	3
+nonvoluntary_ctxt_switches:	1

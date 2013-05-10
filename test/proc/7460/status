@@ -1,0 +1,39 @@
+Name:	system-service-
+State:	S (sleeping)
+Tgid:	7460
+Pid:	7460
+PPid:	1
+TracerPid:	0
+Uid:	0	0	0	0
+Gid:	0	0	0	0
+FDSize:	64
+Groups:	0 
+VmPeak:	   97200 kB
+VmSize:	   97196 kB
+VmLck:	       0 kB
+VmPin:	       0 kB
+VmHWM:	   12088 kB
+VmRSS:	    4936 kB
+VmData:	    6240 kB
+VmStk:	     136 kB
+VmExe:	    2172 kB
+VmLib:	   11888 kB
+VmPTE:	     200 kB
+VmSwap:	    4116 kB
+Threads:	1
+SigQ:	1/127922
+SigPnd:	0000000000000000
+ShdPnd:	0000000000000000
+SigBlk:	0000000000000000
+SigIgn:	0000000001001000
+SigCgt:	0000000180000002
+CapInh:	0000000000000000
+CapPrm:	ffffffffffffffff
+CapEff:	ffffffffffffffff
+CapBnd:	ffffffffffffffff
+Cpus_allowed:	ff
+Cpus_allowed_list:	0-7
+Mems_allowed:	00000000,00000001
+Mems_allowed_list:	0
+voluntary_ctxt_switches:	38
+nonvoluntary_ctxt_switches:	8

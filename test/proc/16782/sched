@@ -1,0 +1,41 @@
+flush-252:2 (16782, #threads: 1)
+---------------------------------------------------------
+se.exec_start                      :     878807120.019040
+se.vruntime                        :      44252129.339589
+se.sum_exec_runtime                :          1149.346490
+se.statistics.wait_start           :             0.000000
+se.statistics.sleep_start          :     878807120.019040
+se.statistics.block_start          :             0.000000
+se.statistics.sleep_max            :         60826.443368
+se.statistics.block_max            :            48.093871
+se.statistics.exec_max             :             1.312554
+se.statistics.slice_max            :             0.152383
+se.statistics.wait_max             :             0.561878
+se.statistics.wait_sum             :             7.579727
+se.statistics.wait_count           :                34142
+se.statistics.iowait_sum           :           110.768217
+se.statistics.iowait_count         :                    8
+se.nr_migrations                   :                27708
+se.statistics.nr_migrations_cold   :                    0
+se.statistics.nr_failed_migrations_affine:                    0
+se.statistics.nr_failed_migrations_running:                   95
+se.statistics.nr_failed_migrations_hot:                    0
+se.statistics.nr_forced_migrations :                    0
+se.statistics.nr_wakeups           :                34061
+se.statistics.nr_wakeups_sync      :                    0
+se.statistics.nr_wakeups_migrate   :                27627
+se.statistics.nr_wakeups_local     :                 1376
+se.statistics.nr_wakeups_remote    :                32685
+se.statistics.nr_wakeups_affine    :                  151
+se.statistics.nr_wakeups_affine_attempts:                 5511
+se.statistics.nr_wakeups_passive   :                    0
+se.statistics.nr_wakeups_idle      :                    0
+avg_atom                           :             0.033742
+avg_per_cpu                        :             0.041480
+nr_switches                        :                34062
+nr_voluntary_switches              :                34062
+nr_involuntary_switches            :                    0
+se.load.weight                     :                 1024
+policy                             :                    0
+prio                               :                  120
+clock-delta                        :                   90

@@ -1,0 +1,39 @@
+Name:	gnome-keyring-d
+State:	S (sleeping)
+Tgid:	24799
+Pid:	24799
+PPid:	1
+TracerPid:	0
+Uid:	1000	1000	1000	1000
+Gid:	1000	1000	1000	1000
+FDSize:	64
+Groups:	4 24 27 30 46 107 124 133 134 1000 
+VmPeak:	  454148 kB
+VmSize:	  454020 kB
+VmLck:	     136 kB
+VmPin:	       0 kB
+VmHWM:	    5532 kB
+VmRSS:	    5436 kB
+VmData:	  387088 kB
+VmStk:	     136 kB
+VmExe:	     896 kB
+VmLib:	    7076 kB
+VmPTE:	     184 kB
+VmSwap:	       0 kB
+Threads:	7
+SigQ:	0/127922
+SigPnd:	0000000000000000
+ShdPnd:	0000000000000000
+SigBlk:	0000000000005201
+SigIgn:	0000000000001000
+SigCgt:	0000000180000000
+CapInh:	0000000000000000
+CapPrm:	0000000000004000
+CapEff:	0000000000004000
+CapBnd:	ffffffffffffffff
+Cpus_allowed:	ff
+Cpus_allowed_list:	0-7
+Mems_allowed:	00000000,00000001
+Mems_allowed_list:	0
+voluntary_ctxt_switches:	5284
+nonvoluntary_ctxt_switches:	39

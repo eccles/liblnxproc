@@ -1,0 +1,39 @@
+Name:	atd
+State:	S (sleeping)
+Tgid:	1551
+Pid:	1551
+PPid:	1
+TracerPid:	0
+Uid:	0	1	1	1
+Gid:	0	1	1	1
+FDSize:	64
+Groups:	
+VmPeak:	   16908 kB
+VmSize:	   16908 kB
+VmLck:	       0 kB
+VmPin:	       0 kB
+VmHWM:	     156 kB
+VmRSS:	     156 kB
+VmData:	     188 kB
+VmStk:	     136 kB
+VmExe:	      20 kB
+VmLib:	    2152 kB
+VmPTE:	      48 kB
+VmSwap:	       0 kB
+Threads:	1
+SigQ:	1/127974
+SigPnd:	0000000000000000
+ShdPnd:	0000000000000000
+SigBlk:	0000000000000000
+SigIgn:	0000000000000000
+SigCgt:	0000000000014003
+CapInh:	0000000000000000
+CapPrm:	ffffffffffffffff
+CapEff:	0000000000000000
+CapBnd:	ffffffffffffffff
+Cpus_allowed:	ff
+Cpus_allowed_list:	0-7
+Mems_allowed:	00000000,00000001
+Mems_allowed_list:	0
+voluntary_ctxt_switches:	11
+nonvoluntary_ctxt_switches:	0

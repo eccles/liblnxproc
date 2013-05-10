@@ -1,0 +1,1 @@
+/opt/google/chrome/chrome --type=gpu-process --channel=14144.1.1379795710 --enable-crash-reporter=1FCD74D3C3DBB0205274128915948802,Ubuntu 12.10 --supports-dual-gpus=false --gpu-vendor-id=0x10de --gpu-device-id=0x0a65 --gpu-driver-vendor=NVIDIA --gpu-driver-version=304.51 --enable-crash-reporter=1FCD74D3C3DBB0205274128915948802,Ubuntu 12.10

@@ -1,0 +1,39 @@
+Name:	smbd
+State:	S (sleeping)
+Tgid:	1574
+Pid:	1574
+PPid:	1
+TracerPid:	0
+Uid:	0	0	0	0
+Gid:	0	0	0	0
+FDSize:	64
+Groups:	
+VmPeak:	  124464 kB
+VmSize:	  123948 kB
+VmLck:	       0 kB
+VmPin:	       0 kB
+VmHWM:	    5664 kB
+VmRSS:	    2380 kB
+VmData:	     636 kB
+VmStk:	     136 kB
+VmExe:	    9532 kB
+VmLib:	   10276 kB
+VmPTE:	     256 kB
+VmSwap:	     772 kB
+Threads:	1
+SigQ:	1/127922
+SigPnd:	0000000000000000
+ShdPnd:	0000000000000000
+SigBlk:	0000000000001880
+SigIgn:	0000000000000000
+SigCgt:	0000000180014661
+CapInh:	0000000000000000
+CapPrm:	ffffffffffffffff
+CapEff:	ffffffffffffffff
+CapBnd:	ffffffffffffffff
+Cpus_allowed:	ff
+Cpus_allowed_list:	0-7
+Mems_allowed:	00000000,00000001
+Mems_allowed_list:	0
+voluntary_ctxt_switches:	16826
+nonvoluntary_ctxt_switches:	29

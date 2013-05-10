@@ -1,0 +1,33 @@
+           CPU0       CPU1       CPU2       CPU3       CPU4       CPU5       CPU6       CPU7       
+  0:         44          0          0          0          0          0          0          0   IO-APIC-edge      timer
+  1:          3          0          0          0          0          0          0          0   IO-APIC-edge      i8042
+  8:          1          0          0          0          0          0          0          0   IO-APIC-edge      rtc0
+  9:          0          0          0          0          0          0          0          0   IO-APIC-fasteoi   acpi
+ 16:    2105350    2301335    1779540    1868680          0          0          0          0   IO-APIC-fasteoi   ehci_hcd:usb1, nvidia
+ 17:      16508          0          0          0          0          0          0          0   IO-APIC-fasteoi   ahci, snd_hda_intel
+ 23:     162749     352621     326367     328555          0          0          0          0   IO-APIC-fasteoi   ehci_hcd:usb2
+ 40:          0          0          0          0          0          0          0          0   PCI-MSI-edge      PCIe PME
+ 41:          0          0          0          0          0          0          0          0   PCI-MSI-edge      PCIe PME
+ 42:          0          0          0          0          0          0          0          0   PCI-MSI-edge      PCIe PME
+ 43:          0          0          0          0          0          0          0          0   PCI-MSI-edge      PCIe PME
+ 44:          0          0          0          0          0          0          0          0   PCI-MSI-edge      PCIe PME
+ 45:    6142087    5407400    5378791    7618150          0          0          0          0   PCI-MSI-edge      ahci
+ 46:         28          0          0          0          0          0          0          0   PCI-MSI-edge      xhci_hcd
+ 47:    6996752          0          0          0          0          0          0          0   PCI-MSI-edge      eth0
+ 48:         12          0          0          0          0          0          0          0   PCI-MSI-edge      mei
+ 49:       1298          0          0          0          0          0          0          0   PCI-MSI-edge      snd_hda_intel
+NMI:      52616      52963      52301      52582       9405       9350       8617       7780   Non-maskable interrupts
+LOC:  595448324  627695005  628542325  619853802  116375431  101555508   90736017   76385281   Local timer interrupts
+SPU:          0          0          0          0          0          0          0          0   Spurious interrupts
+PMI:      52616      52963      52301      52582       9405       9350       8617       7780   Performance monitoring interrupts
+IWI:          0          0          0          0          0          0          0          0   IRQ work interrupts
+RTR:          7          0          0          0          0          0          0          0   APIC ICR read retries
+RES:   14589041    5834141    1866954    1868186     373494     231554     230365     251906   Rescheduling interrupts
+CAL:   14040601   13694634   14077478   14458403     765216     777367     776598     671025   Function call interrupts
+TLB:    1786197    1788852    1755915    1760281     429461     434314     408398     400400   TLB shootdowns
+TRM:          0          0          0          0          0          0          0          0   Thermal event interrupts
+THR:          0          0          0          0          0          0          0          0   Threshold APIC interrupts
+MCE:          0          0          0          0          0          0          0          0   Machine check exceptions
+MCP:       2939       2939       2939       2939       2939       2939       2939       2939   Machine check polls
+ERR:          0
+MIS:          0

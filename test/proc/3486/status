@@ -1,0 +1,39 @@
+Name:	kvm
+State:	S (sleeping)
+Tgid:	3486
+Pid:	3486
+PPid:	1
+TracerPid:	0
+Uid:	122	122	122	122
+Gid:	133	133	133	133
+FDSize:	64
+Groups:	133 
+VmPeak:	 5638012 kB
+VmSize:	 5211820 kB
+VmLck:	       0 kB
+VmPin:	       0 kB
+VmHWM:	 1324304 kB
+VmRSS:	 1316788 kB
+VmData:	 4990092 kB
+VmStk:	     136 kB
+VmExe:	    3660 kB
+VmLib:	   31336 kB
+VmPTE:	    3372 kB
+VmSwap:	    3432 kB
+Threads:	3
+SigQ:	3/127922
+SigPnd:	0000000000000000
+ShdPnd:	0000000000000000
+SigBlk:	0000000010002240
+SigIgn:	0000000000001000
+SigCgt:	0000000180006243
+CapInh:	0000000000000000
+CapPrm:	0000000000000000
+CapEff:	0000000000000000
+CapBnd:	ffffffffffffffff
+Cpus_allowed:	ff
+Cpus_allowed_list:	0-7
+Mems_allowed:	00000000,00000001
+Mems_allowed_list:	0
+voluntary_ctxt_switches:	885514388
+nonvoluntary_ctxt_switches:	192070

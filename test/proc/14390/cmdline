@@ -1,0 +1,1 @@
+/opt/google/chrome/chrome --type=plugin --plugin-path=/opt/google/talkplugin/libnpgoogletalk.so --lang=en-GB --channel=14144.11.487927618 --enable-crash-reporter=1FCD74D3C3DBB0205274128915948802,Ubuntu 12.10

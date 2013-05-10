@@ -1,0 +1,39 @@
+Name:	chrome
+State:	S (sleeping)
+Tgid:	14195
+Pid:	14195
+PPid:	14144
+TracerPid:	0
+Uid:	1000	1000	1000	1000
+Gid:	1000	1000	1000	1000
+FDSize:	128
+Groups:	4 24 27 30 46 107 124 133 134 1000 
+VmPeak:	  381820 kB
+VmSize:	  354248 kB
+VmLck:	       0 kB
+VmPin:	       0 kB
+VmHWM:	   87020 kB
+VmRSS:	   60432 kB
+VmData:	   39128 kB
+VmStk:	     284 kB
+VmExe:	   78100 kB
+VmLib:	   52428 kB
+VmPTE:	     620 kB
+VmSwap:	       0 kB
+Threads:	3
+SigQ:	0/127922
+SigPnd:	0000000000000000
+ShdPnd:	0000000000000000
+SigBlk:	0000000000000000
+SigIgn:	0000000004001002
+SigCgt:	00000001c00004e8
+CapInh:	0000000000001000
+CapPrm:	0000000000000000
+CapEff:	0000000000000000
+CapBnd:	ffffffffffffffff
+Cpus_allowed:	ff
+Cpus_allowed_list:	0-7
+Mems_allowed:	00000000,00000001
+Mems_allowed_list:	0
+voluntary_ctxt_switches:	4851
+nonvoluntary_ctxt_switches:	89

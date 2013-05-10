@@ -1,0 +1,39 @@
+Name:	NetworkManager
+State:	S (sleeping)
+Tgid:	1552
+Pid:	1552
+PPid:	1
+TracerPid:	0
+Uid:	0	0	0	0
+Gid:	0	0	0	0
+FDSize:	64
+Groups:	
+VmPeak:	  311760 kB
+VmSize:	  246356 kB
+VmLck:	       0 kB
+VmPin:	       0 kB
+VmHWM:	    5844 kB
+VmRSS:	    5844 kB
+VmData:	  148404 kB
+VmStk:	     136 kB
+VmExe:	     964 kB
+VmLib:	   11464 kB
+VmPTE:	     204 kB
+VmSwap:	       0 kB
+Threads:	3
+SigQ:	1/127974
+SigPnd:	0000000000000000
+ShdPnd:	0000000000000000
+SigBlk:	0000000000005207
+SigIgn:	0000000000001000
+SigCgt:	0000000180010000
+CapInh:	0000000000000000
+CapPrm:	ffffffffffffffff
+CapEff:	ffffffffffffffff
+CapBnd:	ffffffffffffffff
+Cpus_allowed:	ff
+Cpus_allowed_list:	0-7
+Mems_allowed:	00000000,00000001
+Mems_allowed_list:	0
+voluntary_ctxt_switches:	932
+nonvoluntary_ctxt_switches:	13
