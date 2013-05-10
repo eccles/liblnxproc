@@ -24,25 +24,53 @@ This file is part of liblnxproc.
 #include <lnxproc/lnxproc.h>
 
 static const int ntimes = 1000;
-#define TEST_MODULE(m,t)  test_module(m,t, #t)
+static int testtype = 0; // timing test
+#define TEST_MODULE(m,t)  time_module(m,t, #t)
 static void
-test_module(LNXPROC_MODULE_T *modules, LNXPROC_MODULE_TYPE_T type, char *str)
+time_module(LNXPROC_MODULE_T *modules, LNXPROC_MODULE_TYPE_T type, char *str)
 {
     if( modules) {
-        int i;
-        struct timeval start = lnxproc_timeval();
-        for( i = 0; i < ntimes; i++ ) {
-            lnxproc_read(modules,type);
+
+        lnxproc_read(modules,type);
+
+        if( testtype == 0 ) {
+            struct timeval start = lnxproc_timeval();
+
+            int i;
+            for( i = 0; i < ntimes; i++ ) {
+                lnxproc_read(modules,type);
+            }
+
+            struct timeval end = lnxproc_timeval();
+            long timediff = lnxproc_timeval_diff(&start,&end);
+            printf("%d:%s:Elapsed time = %ld usecs\n", type, str, timediff/ntimes);
         }
-        struct timeval end = lnxproc_timeval();
-        long timediff = lnxproc_timeval_diff(&start,&end);
-        printf("%d:%s:Elapsed time = %ld usecs\n", type, str, timediff/ntimes);
+        else if( testtype == 1 ) {
+            lnxproc_read(modules,type);
+            printf("%d:%s:Results\n", type, str);
+            lnxproc_print(modules,type);
+        }
     }
 }
 /*----------------------------------------------------------------------------*/
 int
 main(int argc, char *argv[])
 {
+
+    printf("Command %s\n", argv[0]);
+
+    if( !strcmp(argv[0],"./timing") ||
+        !strcmp(argv[0],"./timing-dbg")) {
+        testtype = 0;
+    }
+    else if( !strcmp(argv[0],"./testing") ||
+             !strcmp(argv[0],"./testing-dbg")) {
+        testtype = 1;
+    }
+    else {
+        printf("Illegal command %s\n", argv[0]);
+        return 1;
+    }
 
     LNXPROC_MODULE_T *modules = NULL;
     lnxproc_init(&modules);
