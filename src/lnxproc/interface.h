@@ -55,6 +55,8 @@ extern "C" {
 
     LNXPROC_ERROR_T lnxproc_read(LNXPROC_MODULE_T * modules,
                                  LNXPROC_MODULE_TYPE_T type);
+    LNXPROC_ERROR_T lnxproc_print(LNXPROC_MODULE_T * modules,
+                                  LNXPROC_MODULE_TYPE_T type);
 
 #ifdef __cplusplus
 }                               // extern "C"

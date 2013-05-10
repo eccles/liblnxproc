@@ -47,7 +47,7 @@ extern "C" {
     const char *c = lnxproc_strerror(s,buf,sizeof buf);\
     char buf1[64];\
     snprintf(buf1,sizeof buf1,"Error : %d %s",s,c);\
-    char buf2[64];\
+    char buf2[512];\
     snprintf(buf2,sizeof buf2,fmt, ##args);\
     _lnxproc_debug(__FILE__,__LINE__,__func__, "%s: %s\n", buf1, buf2);\
 }

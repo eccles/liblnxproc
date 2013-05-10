@@ -530,6 +530,8 @@ _lnxproc_array_iterate(_LNXPROC_ARRAY_T * array,
         return LNXPROC_ERROR_ARRAY_VECTOR_NULL;
     }
 
+    LNXPROC_ERROR_T ret;
+
     if (array->dim > 0) {
         size_t idx[array->dim];
 
@@ -543,10 +545,26 @@ _lnxproc_array_iterate(_LNXPROC_ARRAY_T * array,
             .func = func,
         };
 
-        LNXPROC_ERROR_T ret =
+        ret =
             _lnxproc_vector_iterate(array->vector, &adata, -1, -1,
                                     array_vector_iterate_func);
 
+        if (ret) {
+            _LNXPROC_ERROR_DEBUG(ret, "\n");
+            return ret;
+        }
+    }
+    else {
+        size_t idx = 0;
+        char *val = NULL;
+
+        ret = _lnxproc_vector_value(array->vector, idx, &val);
+        if (ret) {
+            _LNXPROC_ERROR_DEBUG(ret, "\n");
+            return ret;
+        }
+
+        ret = func(val, NULL, &idx, 1);
         if (ret) {
             _LNXPROC_ERROR_DEBUG(ret, "\n");
             return ret;
@@ -592,28 +610,10 @@ _lnxproc_array_print(_LNXPROC_ARRAY_T * array, int allocated)
     printf("Array limits at  %p\n", array->limits);
     printf("Array dim %zd\n", array->dim);
     _lnxproc_limits_print(array->limits, array->dim);
-    if (array->dim > 0) {
-        ret = _lnxproc_array_iterate(array, NULL, array_print_internal);
-        if (ret) {
-            _LNXPROC_ERROR_DEBUG(ret, "\n");
-            return ret;
-        }
-    }
-    else {
-        size_t idx = 0;
-        char *val = NULL;
-
-        ret = _lnxproc_vector_value(array->vector, idx, &val);
-        if (ret) {
-            _LNXPROC_ERROR_DEBUG(ret, "\n");
-            return ret;
-        }
-
-        ret = array_print_internal(val, NULL, &idx, 1);
-        if (ret) {
-            _LNXPROC_ERROR_DEBUG(ret, "\n");
-            return ret;
-        }
+    ret = _lnxproc_array_iterate(array, NULL, array_print_internal);
+    if (ret) {
+        _LNXPROC_ERROR_DEBUG(ret, "\n");
+        return ret;
     }
 
     printf("\n");

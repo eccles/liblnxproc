@@ -104,7 +104,37 @@ lnxproc_read(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type)
             return module->base->read(module->base);
         }
     }
-    return LNXPROC_ERROR_INTERFACE_MALLOC_INTERFACE;
+    return LNXPROC_ERROR_INTERFACE_NULL;
+}
+
+LNXPROC_ERROR_T
+lnxproc_print(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type)
+{
+    if (modules) {
+        LNXPROC_ERROR_T ret;
+
+        if (type == LNXPROC_ALL) {
+            int i;
+
+            for (i = 1; i <= nmodules; i++) {
+                ret = lnxproc_print(modules, i);
+                if (ret) {
+                    return ret;
+                }
+            }
+            return ret;
+        }
+        else {
+            LNXPROC_MODULE_T *module = modules + type - 1;
+
+            if (!module->base) {
+                return LNXPROC_ERROR_INTERFACE_NULL_BASE;
+            }
+
+            return _lnxproc_results_print(module->base->results);
+        }
+    }
+    return LNXPROC_ERROR_INTERFACE_NULL;
 }
 
 /*

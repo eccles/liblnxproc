@@ -91,6 +91,7 @@ base_rawread(char *filename, char **readbuf, int *nbytes)
     }
 
     _LNXPROC_DEBUG("Open %s\n", filename);
+
     int fd = open(filename, O_RDONLY);
 
     if (fd < 0) {
@@ -602,8 +603,18 @@ _lnxproc_base_new(LNXPROC_BASE_T **base,
         }
         int i;
 
+        char *testroot = getenv("LNXPROC_TESTROOT");
+
         for (i = 0; i < nfiles; i++) {
-            p->filenames[i] = strdup(filenames[i]);
+            if (testroot) {
+                char fname[FILENAME_MAX];
+
+                snprintf(fname, sizeof fname, "%s%s", testroot, filenames[i]);
+                p->filenames[i] = strdup(fname);
+            }
+            else {
+                p->filenames[i] = strdup(filenames[i]);
+            }
             if (!p->filenames[i]) {
                 _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_FILENAME,
                                      "Malloc filenames %d\n", i);

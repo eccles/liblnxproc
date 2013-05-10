@@ -338,7 +338,7 @@ test_array(void)
 
     printf("Array 0\n");
     _LNXPROC_LIMITS_T limits0[] = {
-        {3, "\n", 1},
+        {1, "\n", 1},
     };
 
     _LNXPROC_ARRAY_T *array0 = NULL;
