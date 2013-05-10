@@ -83,7 +83,7 @@ static LNXPROC_ERROR_T
 proc_cgroups_normalize(LNXPROC_BASE_T *base)
 {
     _LNXPROC_RESULTS_T *results = base->results;
-    _LNXPROC_ARRAY_T *array = base->current.array;
+    _LNXPROC_ARRAY_T *array = base->current->array;
 
     struct proc_cgroups_env_t env = {
         .results = results,

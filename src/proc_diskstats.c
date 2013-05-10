@@ -123,8 +123,12 @@ static LNXPROC_ERROR_T
 proc_diskstats_normalize(LNXPROC_BASE_T *base)
 {
     _LNXPROC_RESULTS_T *results = base->results;
-    _LNXPROC_ARRAY_T *current = base->current.array;
-    _LNXPROC_ARRAY_T *previous = base->previous.array;
+    _LNXPROC_ARRAY_T *current = base->current->array;
+    _LNXPROC_ARRAY_T *previous = NULL;
+
+    if (base->previous) {
+        previous = base->previous->array;
+    }
 
     char **keys = NULL;
     size_t nkeys = 0;
@@ -168,16 +172,16 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
 
     for (i = 0; i < nrows; i++) {
         idx[0] = i;
+        int readtime = 0;
+        int writetime = 0;
 
-        idx[1] = 6;             // 'ms_read'
-        int readtime;
+        if (previous) {
+            idx[1] = 6;         // 'ms_read'
+            _lnxproc_array_diff(previous, current, idx, 2, &readtime);
 
-        _lnxproc_array_diff(previous, current, idx, 2, &readtime);
-
-        idx[1] = 10;            // 'ms_write'
-        int writetime;
-
-        _lnxproc_array_diff(previous, current, idx, 2, &writetime);
+            idx[1] = 10;        // 'ms_write'
+            _lnxproc_array_diff(previous, current, idx, 2, &writetime);
+        }
 
         idx[1] = 0;
         val = NULL;
@@ -231,6 +235,7 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
         }
     }
     lnxproc_strings_free(keys, nkeys);
+    _lnxproc_base_store_previous(base);
     return LNXPROC_OK;
 }
 

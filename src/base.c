@@ -53,21 +53,23 @@ _lnxproc_base_print(LNXPROC_BASE_T *base)
         for (i = 0; i < base->nfiles; i++) {
             printf("Filename %s\n", base->filenames[i]);
         }
-        printf("Timestamp %lu.%06lu\n", (unsigned long) base->current.tv.tv_sec,
-               (unsigned long) base->current.tv.tv_usec);
-        printf("Lines %p\n", base->current.lines);
-        printf("Buflen %zd\n", base->current.buflen);
-        printf("Nbytes %d\n", base->current.nbytes);
-        _lnxproc_array_print(base->current.array, 0);
+        printf("Timestamp %lu.%06lu\n",
+               (unsigned long) base->current->tv.tv_sec,
+               (unsigned long) base->current->tv.tv_usec);
+        printf("Lines %p\n", base->current->lines);
+        printf("Buflen %zd\n", base->current->buflen);
+        printf("Nbytes %d\n", base->current->nbytes);
+        _lnxproc_array_print(base->current->array, 0);
 
-        printf("Previous Timestamp %lu.%06lu\n",
-               (unsigned long) base->previous.tv.tv_sec,
-               (unsigned long) base->previous.tv.tv_usec);
-        printf("Previous Lines %p\n", base->previous.lines);
-        printf("Previous Buflen %zd\n", base->previous.buflen);
-        printf("Previous Nbytes %d\n", base->previous.nbytes);
-        _lnxproc_array_print(base->previous.array, 0);
-
+        if (base->previous) {
+            printf("Previous Timestamp %lu.%06lu\n",
+                   (unsigned long) base->previous->tv.tv_sec,
+                   (unsigned long) base->previous->tv.tv_usec);
+            printf("Previous Lines %p\n", base->previous->lines);
+            printf("Previous Buflen %zd\n", base->previous->buflen);
+            printf("Previous Nbytes %d\n", base->previous->nbytes);
+            _lnxproc_array_print(base->previous->array, 0);
+        }
         _lnxproc_results_print(base->results);
         return LNXPROC_OK;
     }
@@ -235,8 +237,8 @@ _lnxproc_base_rawread(LNXPROC_BASE_T *base)
 
     _LNXPROC_DEBUG("Execute default rawread method\n");
     int i;
-    char *readbuf = base->current.lines;
-    int nbytes = base->current.buflen;
+    char *readbuf = base->current->lines;
+    int nbytes = base->current->buflen;
     LNXPROC_ERROR_T ret;
 
     for (i = 0; i < base->nfiles; i++) {
@@ -252,13 +254,13 @@ _lnxproc_base_rawread(LNXPROC_BASE_T *base)
             return ret;
         }
     }
-    base->current.nbytes = base->current.buflen - nbytes;
-    base->current.tv = lnxproc_timeval();
+    base->current->nbytes = base->current->buflen - nbytes;
+    base->current->tv = lnxproc_timeval();
 #ifdef DEBUG
     char buf[32];
 
     _LNXPROC_DEBUG("Current timestamp %s\n",
-                   lnxproc_timeval_print(&base->current.tv, buf, sizeof buf));
+                   lnxproc_timeval_print(&base->current->tv, buf, sizeof buf));
 #endif
 
     _LNXPROC_DEBUG("Successful\n");
@@ -284,12 +286,12 @@ base_map(LNXPROC_BASE_T *base)
 {
     _LNXPROC_DEBUG("Base %p\n", base);
 
-    _LNXPROC_ARRAY_T *array = base->current.array;
+    _LNXPROC_ARRAY_T *array = base->current->array;
 
     _LNXPROC_DEBUG("Array %p\n", array);
 
-    char *lines = base->current.lines;
-    int nbytes = base->current.nbytes;
+    char *lines = base->current->lines;
+    int nbytes = base->current->nbytes;
 
     _LNXPROC_DEBUG("Lines %p Nbytes %d\n", lines, nbytes);
 
@@ -310,8 +312,8 @@ base_map(LNXPROC_BASE_T *base)
 
         if (array) {
 
-            _LNXPROC_LIMITS_T *limits = base->current.array->limits;
-            int dim = base->current.array->dim;
+            _LNXPROC_LIMITS_T *limits = base->current->array->limits;
+            int dim = base->current->array->dim;
 
             _LNXPROC_DEBUG("Limits %p Dim %d\n", limits, dim);
 
@@ -406,8 +408,9 @@ base_new_rawread_buffer(LNXPROC_BASE_DATA_T * data, size_t newlen)
 static LNXPROC_ERROR_T
 base_resize_rawread_buffer(LNXPROC_BASE_T *base)
 {
-    _LNXPROC_DEBUG("Resize lines buffer from %d bytes\n", base->current.buflen);
-    return base_new_rawread_buffer(&base->current, base->current.buflen * 2);
+    _LNXPROC_DEBUG("Resize lines buffer from %d bytes\n",
+                   base->current->buflen);
+    return base_new_rawread_buffer(base->current, base->current->buflen * 2);
 }
 
 /*
@@ -481,22 +484,57 @@ _lnxproc_base_read(LNXPROC_BASE_T *base)
         return ret;
     }
 
-    if (base->previous.lines) {
-        free(base->previous.lines);
+    return LNXPROC_OK;
+}
+
+static LNXPROC_ERROR_T
+_base_data_new(LNXPROC_BASE_DATA_T * data,
+               size_t buflen, _LNXPROC_LIMITS_T limits[], size_t dim)
+{
+    data->tv = lnxproc_timeval();
+#ifdef DEBUG
+    char buf[32];
+
+    _LNXPROC_DEBUG("Current timestamp %s\n",
+                   lnxproc_timeval_print(&data->tv, buf, sizeof buf));
+#endif
+
+    LNXPROC_ERROR_T ret = base_new_rawread_buffer(data, buflen);
+
+    if (ret) {
+        return ret;
     }
-    base->previous.lines = base->current.lines;
-    base->current.lines = NULL;
-    base->previous.buflen = base->current.buflen;
-    base->previous.nbytes = base->current.nbytes;
-    base_new_rawread_buffer(&base->current, base->current.nbytes + 1);
-    if (base->current.array) {
-        _LNXPROC_ARRAY_FREE(base->previous.array);
-        base->previous.array = base->current.array;
-        base->current.array = NULL;
-        array_new(&base->current, base->previous.array->limits,
-                  base->previous.array->dim);
+
+    ret = array_new(data, limits, dim);
+    if (ret) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_ARRAY, "Malloc array\n");
+        return LNXPROC_ERROR_BASE_MALLOC_ARRAY;
     }
-    memcpy(&base->previous.tv, &base->current.tv, sizeof(base->previous.tv));
+
+    return LNXPROC_OK;
+
+}
+
+LNXPROC_ERROR_T
+_lnxproc_base_store_previous(LNXPROC_BASE_T *base)
+{
+    if (base) {
+        if (!base->previous) {
+            LNXPROC_ERROR_T ret = _base_data_new(base->data + 1,
+                                                 base->current->buflen,
+                                                 base->current->array->limits,
+                                                 base->current->array->dim);
+
+            if (ret) {
+                return ret;
+            }
+            base->previous = base->data + 1;
+        }
+        LNXPROC_BASE_DATA_T *tmp = base->current;
+
+        base->current = base->previous;
+        base->previous = tmp;
+    }
     return LNXPROC_OK;
 }
 
@@ -543,30 +581,15 @@ _lnxproc_base_new(LNXPROC_BASE_T **base,
         return LNXPROC_ERROR_BASE_MALLOC_BASE;
     }
 
-    _LNXPROC_DEBUG("Calloc lines buffer\n");
-    ret = base_new_rawread_buffer(&p->current, buflen);
+    _LNXPROC_DEBUG("Malloc data area\n");
+    ret = _base_data_new(p->data + 0, buflen, limits, dim);
     if (ret) {
         _LNXPROC_BASE_FREE(p);
         return ret;
     }
-    p->previous.lines = NULL;
-    p->previous.buflen = 0;
-    p->previous.nbytes = 0;
-    p->current.tv = lnxproc_timeval();
-#ifdef DEBUG
-    char buf[32];
 
-    _LNXPROC_DEBUG("Current timestamp %s\n",
-                   lnxproc_timeval_print(&p->current.tv, buf, sizeof buf));
-#endif
-
-    ret = array_new(&p->current, limits, dim);
-    if (ret) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_ARRAY, "Malloc array\n");
-        _LNXPROC_BASE_FREE(p);
-        return LNXPROC_ERROR_BASE_MALLOC_ARRAY;
-    }
-    p->previous.array = NULL;
+    p->current = p->data + 0;
+    p->previous = NULL;
 
     p->nfiles = 0;
     if (filenames) {
@@ -663,8 +686,8 @@ _lnxproc_base_free(LNXPROC_BASE_T *base)
     _LNXPROC_DEBUG("Base %p\n", base);
 
     if (base) {
-        base_data_free(&base->current);
-        base_data_free(&base->previous);
+        base_data_free(base->current);
+        base_data_free(base->previous);
         if (base->filenames) {
             _LNXPROC_DEBUG("Free Base filenames\n");
             int i;
@@ -708,7 +731,8 @@ base_variable_rate(LNXPROC_BASE_T *base,
     int diff;
 
     LNXPROC_ERROR_T ret =
-        _lnxproc_array_diff(base->previous.array, base->current.array, idx, dim,
+        _lnxproc_array_diff(base->previous->array, base->current->array, idx,
+                            dim,
                             &diff);
 
     if (ret) {
@@ -734,7 +758,7 @@ _lnxproc_base_variable_rate(LNXPROC_BASE_T *base,
         return LNXPROC_ERROR_BASE_NULL;
     }
 
-    if (!base->current.array || !base->previous.array) {
+    if (!base->current->array || !base->previous->array) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_ARRAY_NULL, "\n");
         return LNXPROC_ERROR_BASE_ARRAY_NULL;
     }
@@ -755,12 +779,12 @@ _lnxproc_base_variable_sample_rate(LNXPROC_BASE_T *base,
         return LNXPROC_ERROR_BASE_NULL;
     }
 
-    if (!base->current.array || !base->previous.array) {
+    if (!base->current->array || !base->previous->array) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_ARRAY_NULL, "\n");
         return LNXPROC_ERROR_BASE_ARRAY_NULL;
     }
 
-    long tdiff = lnxproc_timeval_diff(&base->previous.tv, &base->current.tv);
+    long tdiff = lnxproc_timeval_diff(&base->previous->tv, &base->current->tv);
 
     return base_variable_rate(base, idx, dim, tdiff, scale, buf, len);
 }
@@ -778,7 +802,7 @@ _lnxproc_base_variable_usage(LNXPROC_BASE_T *base,
         return LNXPROC_ERROR_BASE_NULL;
     }
 
-    if (!base->current.array || !base->previous.array) {
+    if (!base->current->array || !base->previous->array) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_ARRAY_NULL, "\n");
         return LNXPROC_ERROR_BASE_ARRAY_NULL;
     }
@@ -786,14 +810,15 @@ _lnxproc_base_variable_usage(LNXPROC_BASE_T *base,
     int diff;
 
     LNXPROC_ERROR_T ret =
-        _lnxproc_array_diff(base->previous.array, base->current.array, idx, dim,
+        _lnxproc_array_diff(base->previous->array, base->current->array, idx,
+                            dim,
                             &diff);
 
     if (ret) {
         return ret;
     }
 
-    long tdiff = lnxproc_timeval_diff(&base->previous.tv, &base->current.tv);
+    long tdiff = lnxproc_timeval_diff(&base->previous->tv, &base->current->tv);
 
     float percent = (100.0 * scale * diff) / (tdiff * 1.e-6);
 

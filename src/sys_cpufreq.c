@@ -36,7 +36,7 @@ This file is part of liblnxproc.
 static LNXPROC_ERROR_T
 sys_cpufreq_normalize(LNXPROC_BASE_T *base)
 {
-    _lnxproc_results_store(base->results, base->current.lines, "/value");
+    _lnxproc_results_store(base->results, base->current->lines, "/value");
 
     return LNXPROC_OK;
 }

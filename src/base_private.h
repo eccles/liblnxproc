@@ -61,8 +61,9 @@ extern "C" {
         size_t nfiles;
         char *fileprefix;
         char *filesuffix;
-        LNXPROC_BASE_DATA_T current;
-        LNXPROC_BASE_DATA_T previous;
+        LNXPROC_BASE_DATA_T *current;
+        LNXPROC_BASE_DATA_T *previous;
+        LNXPROC_BASE_DATA_T data[2];
         _LNXPROC_RESULTS_T *results;
     };
 
@@ -96,6 +97,8 @@ extern "C" {
                                                        size_t idx[], size_t dim,
                                                        float scale, char *buf,
                                                        size_t len);
+
+    LNXPROC_ERROR_T _lnxproc_base_store_previous(LNXPROC_BASE_T *base);
 
 #ifdef __cplusplus
 }                               // extern "C"

@@ -536,9 +536,10 @@ execute_base(LNXPROC_BASE_T *base)
                 if (base->filenames) {
                     printf("Filename : %s\n", base->filenames[0]);
                 }
-                printf("Data : %1$d %2$*1$s\n", base->previous.nbytes,
-                       base->previous.lines);
-
+                if (base->previous) {
+                    printf("Data : %1$d %2$*1$s\n", base->previous->nbytes,
+                           base->previous->lines);
+                }
                 _lnxproc_results_print(base->results);
             }
         }
