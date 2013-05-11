@@ -734,6 +734,58 @@ _lnxproc_base_free(LNXPROC_BASE_T *base)
 }
 
 static LNXPROC_ERROR_T
+base_null_method(LNXPROC_BASE_T *base)
+{
+    return LNXPROC_OK;
+}
+
+LNXPROC_ERROR_T
+_lnxproc_base_memoize(LNXPROC_BASE_T *base)
+{
+    if (!base) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_NULL, "\n");
+        return LNXPROC_ERROR_BASE_NULL;
+    }
+
+    if (!base->memoize_read) {
+        base->memoize_read = base->read;
+        base->read = base_null_method;
+    }
+    if (!base->memoize_rawread) {
+        base->memoize_rawread = base->rawread;
+        base->rawread = base_null_method;
+    }
+    if (!base->memoize_normalize) {
+        base->memoize_normalize = base->normalize;
+        base->normalize = base_null_method;
+    }
+    return LNXPROC_OK;
+}
+
+LNXPROC_ERROR_T
+_lnxproc_base_unmemoize(LNXPROC_BASE_T *base)
+{
+    if (!base) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_NULL, "\n");
+        return LNXPROC_ERROR_BASE_NULL;
+    }
+
+    if (base->memoize_read) {
+        base->read = base->memoize_read;
+        base->memoize_read = NULL;
+    }
+    if (base->memoize_rawread) {
+        base->rawread = base->memoize_rawread;
+        base->memoize_rawread = NULL;
+    }
+    if (base->memoize_normalize) {
+        base->normalize = base->memoize_normalize;
+        base->memoize_normalize = NULL;
+    }
+    return LNXPROC_OK;
+}
+
+static LNXPROC_ERROR_T
 base_variable_rate(LNXPROC_BASE_T *base,
                    size_t idx[], size_t dim, long tdiff, float scale, char *buf,
                    size_t len)

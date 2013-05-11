@@ -74,7 +74,7 @@ _lnxproc_vector_new(_LNXPROC_VECTOR_T ** vector, size_t size, int recursive)
         return LNXPROC_ERROR_VECTOR_ADDRESS_CONTENTS_NOT_NULL;
     }
 
-    _LNXPROC_VECTOR_T *p = calloc(1,sizeof(_LNXPROC_VECTOR_T));
+    _LNXPROC_VECTOR_T *p = calloc(1, sizeof(_LNXPROC_VECTOR_T));
 
     if (!p) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_MALLOC_HEADER,

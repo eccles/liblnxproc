@@ -33,6 +33,7 @@ static LNXPROC_ERROR_T
 proc_osrelease_normalize(LNXPROC_BASE_T *base)
 {
     _lnxproc_results_store(base->results, base->current->lines, "/value");
+    _lnxproc_base_memoize(base);
 
     return LNXPROC_OK;
 }

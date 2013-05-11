@@ -65,6 +65,7 @@ sys_disksectors_normalize(LNXPROC_BASE_T *base)
     };
 
     _lnxproc_array_iterate(array, &env, iter_func);
+    _lnxproc_base_memoize(base);
 
     return LNXPROC_OK;
 }

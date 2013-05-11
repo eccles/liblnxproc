@@ -57,6 +57,9 @@ extern "C" {
         LNXPROC_BASE_METHOD rawread;
         LNXPROC_BASE_METHOD normalize;
         LNXPROC_BASE_METHOD read;
+        LNXPROC_BASE_METHOD memoize_rawread;
+        LNXPROC_BASE_METHOD memoize_normalize;
+        LNXPROC_BASE_METHOD memoize_read;
         char **filenames;
         size_t nfiles;
         char *fileprefix;
@@ -99,6 +102,9 @@ extern "C" {
                                                        size_t len);
 
     LNXPROC_ERROR_T _lnxproc_base_store_previous(LNXPROC_BASE_T *base);
+
+    LNXPROC_ERROR_T _lnxproc_base_memoize(LNXPROC_BASE_T *base);
+    LNXPROC_ERROR_T _lnxproc_base_unmemoize(LNXPROC_BASE_T *base);
 
 #ifdef __cplusplus
 }                               // extern "C"
