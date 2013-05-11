@@ -177,15 +177,11 @@ test_limits(void)
 
 /*----------------------------------------------------------------------------*/
 static LNXPROC_ERROR_T
-myvector_print(_LNXPROC_VECTOR_DATA_T * val, int recursive, void *data,
-               size_t idx)
+myvector_print(_LNXPROC_VECTOR_T * child, char *value, int recursive,
+               void *data, size_t idx)
 {
-    if (recursive) {
-        printf("Child %p : Index %zd\n", val->child, idx);
-    }
-    else {
-        printf("Val %p : Index %zd\n", val->value, idx);
-    }
+    printf("Child %p : Index %zd\n", child, idx);
+    printf("Val %p : Index %zd\n", value, idx);
     return 0;
 }
 
@@ -338,7 +334,7 @@ test_array(void)
 
     printf("Array 0\n");
     _LNXPROC_LIMITS_T limits0[] = {
-        { .chars="\n", .len=1},
+        {.chars = "\n",.len = 1},
     };
 
     _LNXPROC_ARRAY_T *array0 = NULL;
@@ -358,13 +354,20 @@ test_array(void)
     printf("Got value %1$p '%1$s' : %2$s\n", val,
            lnxproc_strerror(ret, buf, sizeof buf));
 
+    val = array0->vector->values[0];
+    printf("Got value %1$p '%1$s'\n", val);
+
+    ret = _lnxproc_vector_print(array0->vector, 1, NULL);
+    printf("Print Array 0 vector : %s\n",
+           lnxproc_strerror(ret, buf, sizeof buf));
+
     ret = _lnxproc_array_print(array0, 1);
     printf("Print Array 0 : %s\n", lnxproc_strerror(ret, buf, sizeof buf));
     _LNXPROC_ARRAY_FREE(array0);
 
     printf("Array 1\n");
     _LNXPROC_LIMITS_T limits1[] = {
-        { .expected=3, .chars="\n", .len=1}
+        {.expected = 3,.chars = "\n",.len = 1}
         ,
     };
     size_t dim1 = sizeof(limits1) / sizeof(limits1[0]);
@@ -395,20 +398,30 @@ test_array(void)
     printf("Put value %1$p '%1$s' : %2$s\n", in3,
            lnxproc_strerror(ret, buf, sizeof buf));
 
+    char **values1 = (char **) array1->vector->values;
+
+    printf("Got values %1$p\n", values1);
+
     val = NULL;
     ret = _lnxproc_array_get(array1, idx1, dim1, &val);
-    printf("Got value %1$p '%1$s' : %2$s\n", val,
-           lnxproc_strerror(ret, buf, sizeof buf));
+    printf("Got value %3$zd -> %1$p '%1$s' : %2$s\n", val,
+           lnxproc_strerror(ret, buf, sizeof buf), idx1[0]);
+    val = values1[idx1[0]];
+    printf("Direct value %2$zd -> %1$p '%1$s'\n", val, idx1[0]);
 
     val = NULL;
     ret = _lnxproc_array_get(array1, idx12, dim1, &val);
-    printf("Got value %1$p '%1$s' : %2$s\n", val,
-           lnxproc_strerror(ret, buf, sizeof buf));
+    printf("Got value %3$zd -> %1$p '%1$s' : %2$s\n", val,
+           lnxproc_strerror(ret, buf, sizeof buf), idx12[0]);
+    val = values1[idx12[0]];
+    printf("Direct value %2$zd -> %1$p '%1$s'\n", val, idx12[0]);
 
     val = NULL;
     ret = _lnxproc_array_get(array1, idx13, dim1, &val);
-    printf("Got value %1$p '%1$s' : %2$s\n", val,
-           lnxproc_strerror(ret, buf, sizeof buf));
+    printf("Got value %3$zd -> %1$p '%1$s' : %2$s\n", val,
+           lnxproc_strerror(ret, buf, sizeof buf), idx13[0]);
+    //val = values1[idx13[0]];
+    //printf("Direct value %2$zd -> %1$p '%1$s'\n", val, idx13[0]);
 
     ret = _lnxproc_array_print(array1, 1);
     printf("Print Array 1 : %s\n", lnxproc_strerror(ret, buf, sizeof buf));
@@ -416,9 +429,9 @@ test_array(void)
 
     printf("Array 2\n");
     _LNXPROC_LIMITS_T limits2[] = {
-        { .expected=3, .chars="\n", .len=1}
+        {.expected = 3,.chars = "\n",.len = 1}
         ,
-        { .expected=5, .chars="\t", .len=1}
+        {.expected = 5,.chars = "\t",.len = 1}
         ,
     };
     size_t dim2 = sizeof(limits2) / sizeof(limits2[0]);
@@ -441,15 +454,24 @@ test_array(void)
     printf("Put value %1$p '%1$s' : %2$s\n", in10,
            lnxproc_strerror(ret, buf, sizeof buf));
 
+    char ***values2 = (char ***) array2->vector->values;
+
+    printf("Got values %1$p\n", values2);
+
     val = NULL;
     ret = _lnxproc_array_get(array2, idx2, dim2, &val);
-    printf("Got value %1$p '%1$s' : %2$s\n", val,
-           lnxproc_strerror(ret, buf, sizeof buf));
+    printf("Got value %3$zd,%4$zd -> %1$p '%1$s' : %2$s\n", val,
+           lnxproc_strerror(ret, buf, sizeof buf), idx2[0], idx2[1]);
+    val = values2[idx2[0]][idx2[1]];
+    printf("Direct value %2$zd,%3$zd -> %1$p '%1$s'\n", val, idx2[0], idx2[1]);
 
     val = NULL;
     ret = _lnxproc_array_get(array2, idx21, dim2, &val);
-    printf("Got value %1$p '%1$s' : %2$s\n", val,
-           lnxproc_strerror(ret, buf, sizeof buf));
+    printf("Got value %3$zd,%4$zd -> %1$p '%1$s' : %2$s\n", val,
+           lnxproc_strerror(ret, buf, sizeof buf), idx21[0], idx21[1]);
+    val = values2[idx21[0]][idx21[1]];
+    printf("Direct value %2$zd,%3$zd -> %1$p '%1$s'\n", val, idx21[0],
+           idx21[1]);
 
     ret = _lnxproc_array_print(array2, 1);
     printf("Print Array 2 : %s\n", lnxproc_strerror(ret, buf, sizeof buf));
@@ -458,11 +480,11 @@ test_array(void)
 
     printf("Array 3\n");
     _LNXPROC_LIMITS_T limits3[] = {
-        { .expected=3, .chars="\n", .len=1}
+        {.expected = 3,.chars = "\n",.len = 1}
         ,
-        { .expected=5, .chars="\t", .len=1}
+        {.expected = 5,.chars = "\t",.len = 1}
         ,
-        { .expected=5, .chars="", .len=1}
+        {.expected = 5,.chars = "",.len = 1}
         ,
     };
     size_t dim3 = sizeof(limits3) / sizeof(limits3[0]);
@@ -491,6 +513,36 @@ test_array(void)
     ret = _lnxproc_array_set_last(array3, idx32, dim3, in123);
     printf("Put value %1$p '%1$s' : %2$s\n", in123,
            lnxproc_strerror(ret, buf, sizeof buf));
+
+    char ****values3 = (char ****) array3->vector->values;
+
+    printf("Got values %1$p\n", values3);
+
+    val = NULL;
+    ret = _lnxproc_array_get(array3, idx3, dim3, &val);
+    printf("Got value %3$zd,%4$zd,%5$zd -> %1$p '%1$s' : %2$s\n", val,
+           lnxproc_strerror(ret, buf, sizeof buf), idx3[0], idx3[1], idx3[2]);
+    val = values3[idx3[0]][idx3[1]][idx3[2]];
+    printf("Direct value %2$zd,%3$zd,%4$zd -> %1$p '%1$s'\n", val, idx3[0],
+           idx3[1], idx3[2]);
+
+    val = NULL;
+    ret = _lnxproc_array_get(array3, idx31, dim3, &val);
+    printf("Got value %3$zd,%4$zd,%5$zd -> %1$p '%1$s' : %2$s\n", val,
+           lnxproc_strerror(ret, buf, sizeof buf), idx31[0], idx31[1],
+           idx31[2]);
+    val = values3[idx31[0]][idx31[1]][idx31[2]];
+    printf("Direct value %2$zd,%3$zd,%4$zd -> %1$p '%1$s'\n", val, idx31[0],
+           idx31[1], idx31[2]);
+
+    val = NULL;
+    ret = _lnxproc_array_get(array3, idx32, dim3, &val);
+    printf("Got value %3$zd,%4$zd,%5$zd -> %1$p '%1$s' : %2$s\n", val,
+           lnxproc_strerror(ret, buf, sizeof buf), idx32[0], idx32[1],
+           idx32[2]);
+    val = values3[idx32[0]][idx32[1]][idx32[2]];
+    printf("Direct value %2$zd,%3$zd,%4$zd -> %1$p '%1$s'\n", val, idx32[0],
+           idx32[1], idx32[2]);
 
     ret = _lnxproc_array_print(array3, 1);
     printf("Print Array 3 : %s\n", lnxproc_strerror(ret, buf, sizeof buf));

@@ -105,6 +105,8 @@ extern "C" {
 
     LNXPROC_ERROR_T _lnxproc_base_memoize(LNXPROC_BASE_T *base);
     LNXPROC_ERROR_T _lnxproc_base_unmemoize(LNXPROC_BASE_T *base);
+    LNXPROC_ERROR_T _lnxproc_base_timeval_diff(LNXPROC_BASE_T *base,
+                                               float *tdiff);
 
 #ifdef __cplusplus
 }                               // extern "C"

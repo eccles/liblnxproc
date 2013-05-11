@@ -480,12 +480,12 @@ struct array_iterate_t {
 };
 
 static LNXPROC_ERROR_T
-array_vector_iterate_func(_LNXPROC_VECTOR_DATA_T * val, int recursive,
+array_vector_iterate_func(_LNXPROC_VECTOR_T * child, char *value, int recursive,
                           void *data, size_t idx)
 {
 
-    _LNXPROC_DEBUG("Val %p Rec %d Data %p Idx %zd\n", val, recursive, data,
-                   idx);
+    _LNXPROC_DEBUG("Child %p Val %p Rec %d Data %p Idx %zd\n", child, value,
+                   recursive, data, idx);
 
     struct array_iterate_t *adata = data;
     size_t *aidx = adata->idx;
@@ -504,13 +504,13 @@ array_vector_iterate_func(_LNXPROC_VECTOR_DATA_T * val, int recursive,
 
         memcpy(&adata1, adata, sizeof(adata1));
         adata1.depth++;
-        ret = _lnxproc_vector_iterate(val->child, &adata1, -1,
-                                      adata->allocated ? val->child->size : -1,
+        ret = _lnxproc_vector_iterate(child, &adata1, -1,
+                                      adata->allocated ? child->size : -1,
                                       array_vector_iterate_func);
 
     }
     else {
-        ret = adata->func(val->value, adata->data, aidx, adim);
+        ret = adata->func(value, adata->data, aidx, adim);
     }
 
     return ret;

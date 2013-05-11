@@ -81,6 +81,7 @@ Typical contents of /proc/diskstats::
 
 */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -90,34 +91,6 @@ Typical contents of /proc/diskstats::
 #include "results_private.h"
 #include "base_private.h"
 #include "proc_diskstats.h"
-
-LNXPROC_ERROR_T
-lnxproc_strings_append(char ***strings, size_t * n, char *val)
-{
-    char **p = realloc(*strings, (*n + 1) * sizeof(char *));
-
-    if (!p) {
-        return LNXPROC_ERROR_SYSTEM;
-    }
-
-    p[*n] = strdup(val);
-    (*n)++;
-    *strings = p;
-    return LNXPROC_OK;
-}
-
-void
-lnxproc_strings_free(char **strings, size_t nkeys)
-{
-    if (strings) {
-        int i;
-
-        for (i = 0; i < nkeys; i++) {
-            free(strings[i]);
-        }
-        free(strings);
-    }
-}
 
 static LNXPROC_ERROR_T
 proc_diskstats_normalize(LNXPROC_BASE_T *base)
@@ -130,22 +103,18 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
         previous = base->previous->array;
     }
 
-    char **keys = NULL;
-    size_t nkeys = 0;
-    int key = 2;
-    size_t idx[] = { 0, key };
+    int keycol = 2;
     char *val = NULL;
 
-    while (!_lnxproc_array_get(current, idx, 2, &val)) {
-        _LNXPROC_DEBUG("%1$zd:Val %2$p '%2$s'\n", idx[0], val);
-        _lnxproc_results_store(results, val, "/key%02d", idx[0]);
-        lnxproc_strings_append(&keys, &nkeys, val);
-        idx[0]++;
-        val = NULL;
-    }
-    size_t nrows = idx[0];
+    size_t nrows = current->vector->length;
 
     _LNXPROC_DEBUG("Nrows %zd\n", nrows);
+    char ***values = (char ***) current->vector->values;
+    char ***prev = NULL;
+
+    if (previous) {
+        prev = (char ***) previous->vector->values;
+    }
 
     static const char *cols[] =
         { "major", "minor", "name ", "reads", "merge_read",
@@ -159,79 +128,80 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
 #define sectorsize 512
 #define sectorscale sectorsize/1024.0
     static const float scale[] = { 0.0, 0.0, 0.0, 1.0, 1.0,
-        sectorscale, 1.e-3, 1.0, 1.0, sectorscale,
-        1.e-3, 0.0, 1.e-3, 1.e-3,
+        sectorscale, 1.e-1, 1.0, 1.0, sectorscale,
+        1.e-1, 0.0, 1.e-1, 1.e-1,
     };
     size_t ncols = sizeof(cols) / sizeof(cols[0]);
 
+    float tdiff;
+
+    _lnxproc_base_timeval_diff(base, &tdiff);
+
     int i;
 
-    for (i = 0; i < ncols; i++) {
-        _lnxproc_results_store(results, cols[i], "/col%02d", i);
-    }
-
     for (i = 0; i < nrows; i++) {
-        idx[0] = i;
-        int readtime = 0;
-        int writetime = 0;
+        char *key = values[i][keycol];
+
+        _LNXPROC_DEBUG("%1$zd:Key %2$p '%2$s'\n", i, key);
+
+        float readtime = 0;
+        float writetime = 0;
 
         if (previous) {
-            idx[1] = 6;         // 'ms_read'
-            _lnxproc_array_diff(previous, current, idx, 2, &readtime);
-
-            idx[1] = 10;        // 'ms_write'
-            _lnxproc_array_diff(previous, current, idx, 2, &writetime);
+            readtime = 1.e-6 * (atoi(values[i][6]) - atoi(prev[i][6]));
+            writetime = 1.e-6 * (atoi(values[i][10]) - atoi(prev[i][10]));
         }
 
-        idx[1] = 0;
-        val = NULL;
-        while (!_lnxproc_array_get(current, idx, 2, &val)) {
-            if (idx[1] != key) {
-                _LNXPROC_DEBUG("%1$zd,%2$zd:Val %3$p '%3$s'\n", idx[0], idx[1],
-                               val);
-                _lnxproc_results_store(results, val, "/%s/%s", keys[i],
-                                       cols[idx[1]]);
-                if (readtime > 0) {
-                    if ((idx[1] == 3) ||        // 'reads'
-                        (idx[1] == 4) ||        // 'merge_read'
-                        (idx[1] == 5)) {        // 's_read'
-                        char buf[32];
+        int j;
 
-                        _lnxproc_base_variable_rate(base, idx, 2, scale[idx[1]],
-                                                    readtime, buf, sizeof buf);
-                        _lnxproc_results_store(results, buf, "/%s/%s-s",
-                                               keys[i], cols[idx[1]]);
-                    }
-                }
-                if (writetime > 0) {
-                    if ((idx[1] == 7) ||        // 'writes'
-                        (idx[1] == 8) ||        // 'merge_write'
-                        (idx[1] == 9)) {        // 's_write'
-                        char buf[32];
+        for (j = 0; j < ncols; j++) {
+            if (j == keycol)
+                continue;
+            int diff;
+            float rate;
+            char buf[32];
 
-                        _lnxproc_base_variable_rate(base, idx, 2, scale[idx[1]],
-                                                    writetime, buf, sizeof buf);
-                        _lnxproc_results_store(results, buf, "/%s/%s-s",
-                                               keys[i], cols[idx[1]]);
-                    }
-                }
-                if ((idx[1] == 6) ||    // 'ms_read'
-                    (idx[1] == 10) ||   // 'ms_write'
-                    (idx[1] == 12) ||   // 'ms_io'
-                    (idx[1] == 13)) {   // 'ms_weighted'
-                    char buf[32];
+            val = values[i][j];
+            _lnxproc_results_store(results, val, "/%s/%s", key, cols[j]);
+            if (readtime > 0.0) {
+                if ((j == 3) || // 'reads'
+                    (j == 4) || // 'merge_read'
+                    (j == 5)) { // 's_read'
 
-                    _lnxproc_base_variable_usage(base, idx, 2, scale[idx[1]],
-                                                 buf, sizeof buf);
-                    _lnxproc_results_store(results, buf, "/%s/%s%%",
-                                           keys[i], cols[idx[1]]);
+                    diff = atoi(values[i][j]) - atoi(prev[i][j]);
+                    rate = (scale[j] * diff) / readtime;
+                    snprintf(buf, sizeof buf, "%f", rate);
+                    _lnxproc_results_store(results, buf, "/%s/%s-s",
+                                           key, cols[j]);
                 }
             }
-            idx[1]++;
-            val = NULL;
+            if (writetime > 0.0) {
+                if ((j == 7) || // 'writes'
+                    (j == 8) || // 'merge_write'
+                    (j == 9)) { // 's_write'
+
+                    diff = atoi(values[i][j]) - atoi(prev[i][j]);
+                    rate = (scale[j] * diff) / writetime;
+                    snprintf(buf, sizeof buf, "%f", rate);
+                    _lnxproc_results_store(results, buf, "/%s/%s-s",
+                                           key, cols[j]);
+                }
+            }
+            if (tdiff > 0.0) {
+                if ((j == 6) || // 'ms_read'
+                    (j == 10) ||        // 'ms_write'
+                    (j == 12) ||        // 'ms_io'
+                    (j == 13)) {        // 'ms_weighted'
+
+                    diff = atoi(values[i][j]) - atoi(prev[i][j]);
+                    rate = (scale[j] * diff) / tdiff;
+                    snprintf(buf, sizeof buf, "%5.1f", rate);
+                    _lnxproc_results_store(results, buf, "/%s/%s%%",
+                                           key, cols[j]);
+                }
+            }
         }
     }
-    lnxproc_strings_free(keys, nkeys);
     _lnxproc_base_store_previous(base);
     return LNXPROC_OK;
 }

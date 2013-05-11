@@ -835,6 +835,30 @@ _lnxproc_base_variable_rate(LNXPROC_BASE_T *base,
 }
 
 LNXPROC_ERROR_T
+_lnxproc_base_timeval_diff(LNXPROC_BASE_T *base, float *tdiff)
+{
+    *tdiff = 0.0;
+    if (!base) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_NULL, "\n");
+        return LNXPROC_ERROR_BASE_NULL;
+    }
+
+    if (!base->previous) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_PREVIOUS_NULL, "\n");
+        return LNXPROC_ERROR_BASE_PREVIOUS_NULL;
+    }
+
+    if (!base->current->array || !base->previous->array) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_ARRAY_NULL, "\n");
+        return LNXPROC_ERROR_BASE_ARRAY_NULL;
+    }
+
+    *tdiff =
+        1.e-6 * lnxproc_timeval_diff(&base->previous->tv, &base->current->tv);
+    return LNXPROC_OK;
+}
+
+LNXPROC_ERROR_T
 _lnxproc_base_variable_sample_rate(LNXPROC_BASE_T *base,
                                    size_t idx[], size_t dim, float scale,
                                    char *buf, size_t len)

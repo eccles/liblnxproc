@@ -34,17 +34,19 @@ extern "C" {
 
     typedef struct _lnxproc_vector_t _LNXPROC_VECTOR_T;
 
-    union _lnxproc_vector_data_t {
-        _LNXPROC_VECTOR_T *child;
-        char *value;
-    };
-    typedef union _lnxproc_vector_data_t _LNXPROC_VECTOR_DATA_T;
+//    struct _lnxproc_vector_data_t {
+//        _LNXPROC_VECTOR_T *child;
+//        char *value;
+//    };
+//    typedef struct _lnxproc_vector_data_t _LNXPROC_VECTOR_DATA_T;
 
     struct _lnxproc_vector_t {
         size_t length;
         size_t size;
         int recursive;
-        _LNXPROC_VECTOR_DATA_T *data;
+//        _LNXPROC_VECTOR_DATA_T *data;
+        _LNXPROC_VECTOR_T **children;
+        char **values;
     };
     typedef struct _lnxproc_vector_t _LNXPROC_VECTOR_T;
 
@@ -83,9 +85,10 @@ extern "C" {
                                           size_t idx, char **value);
 
     typedef
-    LNXPROC_ERROR_T (*_LNXPROC_VECTOR_ITERATE_FUNC) (_LNXPROC_VECTOR_DATA_T *
-                                                     entry, int recursive,
-                                                     void *data, size_t idx);
+    LNXPROC_ERROR_T (*_LNXPROC_VECTOR_ITERATE_FUNC) (_LNXPROC_VECTOR_T *
+                                                     child, char *value,
+                                                     int recursive, void *data,
+                                                     size_t idx);
 
     LNXPROC_ERROR_T _lnxproc_vector_iterate(_LNXPROC_VECTOR_T * vector,
                                             void *data,
