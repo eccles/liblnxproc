@@ -195,7 +195,11 @@ _lnxproc_vector_resize(_LNXPROC_VECTOR_T * vector, size_t size)
                              "Realloc values\n");
         return LNXPROC_ERROR_VECTOR_REALLOC_DATA;
     }
-    vector->children = p;
+
+    if (p != vector->children) {
+        _LNXPROC_DEBUG("Children moved from %p to %p\n", vector->children, p);
+        vector->children = p;
+    }
 
     char **q = vector_realloc_values(vector->values, osize, size);
 
@@ -204,7 +208,21 @@ _lnxproc_vector_resize(_LNXPROC_VECTOR_T * vector, size_t size)
                              "Realloc values\n");
         return LNXPROC_ERROR_VECTOR_REALLOC_DATA;
     }
-    vector->values = q;
+    if (q != vector->values) {
+        _LNXPROC_DEBUG("Values moved from %p to %p\n", vector->values, q);
+        int i;
+
+        _LNXPROC_VECTOR_T *par = vector->parent;
+
+        if (par) {
+            for (i = 0; i < osize; i++) {
+                if (par->values[i] == (char *) vector->values) {
+                    par->values[i] = (char *) q;
+                }
+            }
+        }
+        vector->values = q;
+    }
     vector->size += size;
     _LNXPROC_DEBUG("Success\n");
 
@@ -298,6 +316,7 @@ _lnxproc_vector_set_child(_LNXPROC_VECTOR_T * vector, size_t idx,
     if (idx < vector->length) {
         _LNXPROC_DEBUG("Set entry %zd to %p\n", idx, child);
         vector->children[idx] = child;
+        child->parent = vector;
         _LNXPROC_DEBUG("Set value %zd to %p\n", idx, child->values);
         vector->values[idx] = (char *) child->values;
     }
@@ -318,6 +337,7 @@ _lnxproc_vector_set_child(_LNXPROC_VECTOR_T * vector, size_t idx,
 
         _LNXPROC_DEBUG("Append entry %zd to %p\n", idx, child);
         vector->children[idx] = child;
+        child->parent = vector;
         _LNXPROC_DEBUG("Append value %zd to %p\n", idx, child->values);
         vector->values[idx] = (char *) child->values;
         vector->length = idx + 1;
@@ -556,6 +576,8 @@ _lnxproc_vector_print(_LNXPROC_VECTOR_T * vector, int allocated, void *data)
 
     vector_print_depth(printvar.depth);
     printf("Vector at %p\n", vector);
+    vector_print_depth(printvar.depth);
+    printf("Vector parent %p\n", vector->parent);
     vector_print_depth(printvar.depth);
     printf("Vector size %zd\n", vector->size);
     vector_print_depth(printvar.depth);

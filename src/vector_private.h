@@ -34,17 +34,11 @@ extern "C" {
 
     typedef struct _lnxproc_vector_t _LNXPROC_VECTOR_T;
 
-//    struct _lnxproc_vector_data_t {
-//        _LNXPROC_VECTOR_T *child;
-//        char *value;
-//    };
-//    typedef struct _lnxproc_vector_data_t _LNXPROC_VECTOR_DATA_T;
-
     struct _lnxproc_vector_t {
         size_t length;
         size_t size;
         int recursive;
-//        _LNXPROC_VECTOR_DATA_T *data;
+        _LNXPROC_VECTOR_T *parent;
         _LNXPROC_VECTOR_T **children;
         char **values;
     };
