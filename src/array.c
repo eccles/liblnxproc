@@ -516,7 +516,8 @@ array_vector_iterate_func(_LNXPROC_VECTOR_DATA_T * val, int recursive,
 
 LNXPROC_ERROR_T
 _lnxproc_array_iterate(_LNXPROC_ARRAY_T * array,
-                       void *data, _LNXPROC_ARRAY_ITERATE_FUNC func)
+                       void *data, int allocated,
+                       _LNXPROC_ARRAY_ITERATE_FUNC func)
 {
     _LNXPROC_DEBUG("Array %p Data %p Func %p\n", array, data, func);
 
@@ -546,7 +547,8 @@ _lnxproc_array_iterate(_LNXPROC_ARRAY_T * array,
         };
 
         ret =
-            _lnxproc_vector_iterate(array->vector, &adata, -1, -1,
+            _lnxproc_vector_iterate(array->vector, &adata, -1,
+                                    allocated ? array->vector->size : -1,
                                     array_vector_iterate_func);
 
         if (ret) {
@@ -610,7 +612,7 @@ _lnxproc_array_print(_LNXPROC_ARRAY_T * array, int allocated)
     printf("Array limits at  %p\n", array->limits);
     printf("Array dim %zd\n", array->dim);
     _lnxproc_limits_print(array->limits, array->dim);
-    ret = _lnxproc_array_iterate(array, NULL, array_print_internal);
+    ret = _lnxproc_array_iterate(array, NULL, allocated, array_print_internal);
     if (ret) {
         _LNXPROC_ERROR_DEBUG(ret, "\n");
         return ret;

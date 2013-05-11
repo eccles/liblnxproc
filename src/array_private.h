@@ -69,6 +69,7 @@ extern "C" {
 
     LNXPROC_ERROR_T _lnxproc_array_iterate(_LNXPROC_ARRAY_T * array,
                                            void *data,
+                                           int allocated,
                                            _LNXPROC_ARRAY_ITERATE_FUNC func);
 
     LNXPROC_ERROR_T _lnxproc_array_print(_LNXPROC_ARRAY_T * array,

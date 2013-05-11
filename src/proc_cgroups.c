@@ -92,7 +92,7 @@ proc_cgroups_normalize(LNXPROC_BASE_T *base)
         .key = NULL,
     };
 
-    _lnxproc_array_iterate(array, &env, proc_groups_func);
+    _lnxproc_array_iterate(array, &env, 0, proc_groups_func);
     if (env.cols) {
         int i;
 
