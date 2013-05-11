@@ -471,6 +471,7 @@ _lnxproc_array_diff(_LNXPROC_ARRAY_T * previous,
 }
 
 struct array_iterate_t {
+    int allocated;
     char *data;
     size_t *idx;
     int dim;
@@ -503,7 +504,8 @@ array_vector_iterate_func(_LNXPROC_VECTOR_DATA_T * val, int recursive,
 
         memcpy(&adata1, adata, sizeof(adata1));
         adata1.depth++;
-        ret = _lnxproc_vector_iterate(val->child, &adata1, -1, -1,
+        ret = _lnxproc_vector_iterate(val->child, &adata1, -1,
+                                      adata->allocated ? val->child->size : -1,
                                       array_vector_iterate_func);
 
     }
@@ -539,6 +541,7 @@ _lnxproc_array_iterate(_LNXPROC_ARRAY_T * array,
         memset(idx, 0, array->dim * sizeof(size_t));
 
         struct array_iterate_t adata = {
+            .allocated = allocated,
             .data = data,
             .idx = idx,
             .dim = array->dim,
