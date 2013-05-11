@@ -338,7 +338,7 @@ test_array(void)
 
     printf("Array 0\n");
     _LNXPROC_LIMITS_T limits0[] = {
-        {1, "\n", 1},
+        { .chars="\n", .len=1},
     };
 
     _LNXPROC_ARRAY_T *array0 = NULL;
@@ -364,7 +364,7 @@ test_array(void)
 
     printf("Array 1\n");
     _LNXPROC_LIMITS_T limits1[] = {
-        {3, "\n", 1}
+        { .expected=3, .chars="\n", .len=1}
         ,
     };
     size_t dim1 = sizeof(limits1) / sizeof(limits1[0]);
@@ -416,9 +416,9 @@ test_array(void)
 
     printf("Array 2\n");
     _LNXPROC_LIMITS_T limits2[] = {
-        {3, "\n", 1}
+        { .expected=3, .chars="\n", .len=1}
         ,
-        {5, "\t", 1}
+        { .expected=5, .chars="\t", .len=1}
         ,
     };
     size_t dim2 = sizeof(limits2) / sizeof(limits2[0]);
@@ -458,11 +458,11 @@ test_array(void)
 
     printf("Array 3\n");
     _LNXPROC_LIMITS_T limits3[] = {
-        {3, "\n", 1}
+        { .expected=3, .chars="\n", .len=1}
         ,
-        {5, "\t", 1}
+        { .expected=5, .chars="\t", .len=1}
         ,
-        {5, "", 1}
+        { .expected=5, .chars="", .len=1}
         ,
     };
     size_t dim3 = sizeof(limits3) / sizeof(limits3[0]);
