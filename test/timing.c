@@ -24,34 +24,45 @@ This file is part of liblnxproc.
 #include <lnxproc/lnxproc.h>
 
 static const int ntimes = 1000;
-static int testtype = 0; // timing test
+static int testtype = 0;        // timing test
+
 #define TEST_MODULE(m,t)  time_module(m,t, #t)
 static void
-time_module(LNXPROC_MODULE_T *modules, LNXPROC_MODULE_TYPE_T type, char *str)
+time_module(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type, char *str)
 {
-    if( modules) {
+    if (modules) {
 
-        lnxproc_read(modules,type);
+        lnxproc_read(modules, type);
+        lnxproc_read(modules, type);
+        lnxproc_read(modules, type);
 
-        if( testtype == 0 ) {
+        if (testtype == 0) {
             struct timeval start = lnxproc_timeval();
 
             int i;
-            for( i = 0; i < ntimes; i++ ) {
-                lnxproc_read(modules,type);
+
+            for (i = 0; i < ntimes; i++) {
+                lnxproc_read(modules, type);
             }
 
             struct timeval end = lnxproc_timeval();
-            long timediff = lnxproc_timeval_diff(&start,&end);
-            printf("%d:%s:Elapsed time = %ld usecs\n", type, str, timediff/ntimes);
+            long timediff = lnxproc_timeval_diff(&start, &end);
+
+            printf("%d:%s:Elapsed time = %ld usecs\n", type, str,
+                   timediff / ntimes);
         }
-        else if( testtype == 1 ) {
-            lnxproc_read(modules,type);
-            printf("%d:%s:Results\n", type, str);
-            lnxproc_print(modules,type);
+        else if (testtype == 1) {
+            lnxproc_read(modules, type);
+            printf("%d:%s:Results 1\n", type, str);
+            lnxproc_print(modules, type);
+
+            lnxproc_read(modules, type);
+            printf("%d:%s:Results 2\n", type, str);
+            lnxproc_print(modules, type);
         }
     }
 }
+
 /*----------------------------------------------------------------------------*/
 int
 main(int argc, char *argv[])
@@ -59,12 +70,13 @@ main(int argc, char *argv[])
 
     printf("Command %s\n", argv[0]);
 
-    if( !strcmp(argv[0],"./timing") ||
-        !strcmp(argv[0],"./timing-dbg")) {
+    if (!strcmp(argv[0], "./timing") ||
+        !strcmp(argv[0], "./timing-dbg") || !strcmp(argv[0], "./timing-prf")) {
         testtype = 0;
     }
-    else if( !strcmp(argv[0],"./testing") ||
-             !strcmp(argv[0],"./testing-dbg")) {
+    else if (!strcmp(argv[0], "./testing") ||
+             !strcmp(argv[0], "./testing-dbg") ||
+             !strcmp(argv[0], "./testing-prf")) {
         testtype = 1;
     }
     else {
@@ -73,38 +85,39 @@ main(int argc, char *argv[])
     }
 
     LNXPROC_MODULE_T *modules = NULL;
+
     lnxproc_init(&modules);
 
     if (argc < 2) {
-        TEST_MODULE(modules,LNXPROC_ALL);
-        TEST_MODULE(modules,LNXPROC_PROC_CGROUPS);
-        TEST_MODULE(modules,LNXPROC_PROC_DISKSTATS);
-        TEST_MODULE(modules,LNXPROC_PROC_DOMAINNAME);
-        TEST_MODULE(modules,LNXPROC_PROC_HOSTNAME);
-        TEST_MODULE(modules,LNXPROC_PROC_OSRELEASE);
-        TEST_MODULE(modules,LNXPROC_SYS_CPUFREQ);
-        TEST_MODULE(modules,LNXPROC_SYS_DISKSECTORS);
+        TEST_MODULE(modules, LNXPROC_ALL);
+        TEST_MODULE(modules, LNXPROC_PROC_CGROUPS);
+        TEST_MODULE(modules, LNXPROC_PROC_DISKSTATS);
+        TEST_MODULE(modules, LNXPROC_PROC_DOMAINNAME);
+        TEST_MODULE(modules, LNXPROC_PROC_HOSTNAME);
+        TEST_MODULE(modules, LNXPROC_PROC_OSRELEASE);
+        TEST_MODULE(modules, LNXPROC_SYS_CPUFREQ);
+        TEST_MODULE(modules, LNXPROC_SYS_DISKSECTORS);
     }
     else if (!strcmp(argv[1], "proc_cgroups")) {
-        TEST_MODULE(modules,LNXPROC_PROC_CGROUPS);
+        TEST_MODULE(modules, LNXPROC_PROC_CGROUPS);
     }
     else if (!strcmp(argv[1], "proc_diskstats")) {
-        TEST_MODULE(modules,LNXPROC_PROC_DISKSTATS);
+        TEST_MODULE(modules, LNXPROC_PROC_DISKSTATS);
     }
     else if (!strcmp(argv[1], "proc_domainname")) {
-        TEST_MODULE(modules,LNXPROC_PROC_DOMAINNAME);
+        TEST_MODULE(modules, LNXPROC_PROC_DOMAINNAME);
     }
     else if (!strcmp(argv[1], "proc_hostname")) {
-        TEST_MODULE(modules,LNXPROC_PROC_HOSTNAME);
+        TEST_MODULE(modules, LNXPROC_PROC_HOSTNAME);
     }
     else if (!strcmp(argv[1], "proc_osrelease")) {
-        TEST_MODULE(modules,LNXPROC_PROC_OSRELEASE);
+        TEST_MODULE(modules, LNXPROC_PROC_OSRELEASE);
     }
     else if (!strcmp(argv[1], "sys_cpufreq")) {
-        TEST_MODULE(modules,LNXPROC_SYS_CPUFREQ);
+        TEST_MODULE(modules, LNXPROC_SYS_CPUFREQ);
     }
     else if (!strcmp(argv[1], "sys_disksectors")) {
-        TEST_MODULE(modules,LNXPROC_SYS_DISKSECTORS);
+        TEST_MODULE(modules, LNXPROC_SYS_DISKSECTORS);
     }
     LNXPROC_FREE(modules);
     return 0;

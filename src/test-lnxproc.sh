@@ -15,6 +15,8 @@ then
     ln timing testing
     rm -f testing-dbg
     ln timing-dbg testing-dbg
+    rm -f testing-prf
+    ln timing-prf testing-prf
 fi
 #echo $LNXPROC_TESTROOT
 #echo $BIN
@@ -37,8 +39,14 @@ then
 elif [ "${OPT}" = "dbg" ]
 then
     ${BIN}-dbg $*
+elif [ "${OPT}" = "prf" ]
+then
+    ${BIN}-prf $*
 elif [ "${OPT}" = "nodbg" ]
 then
     ${BIN} $*
+elif [ "${OPT}" = "time" ]
+then
+    time ${BIN} $*
 fi
 exit 0
