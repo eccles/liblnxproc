@@ -40,68 +40,32 @@ typical contents of /proc/cgroups file::
 #include "base_private.h"
 #include "proc_cgroups.h"
 
-struct proc_cgroups_env_t {
-    _LNXPROC_RESULTS_T *results;
-    int colslen;
-    char **cols;
-    char *key;
-};
-
-static LNXPROC_ERROR_T
-proc_groups_func(char *val, void *data, size_t idx[], size_t dim)
-{
-    _LNXPROC_DEBUG("Val %s, Data %p, idx[%d]=%d idx[%d]=%d\n", val, data, 0,
-                   idx[0], 1, idx[1]);
-    struct proc_cgroups_env_t *env = data;
-
-    if (idx[0] == 0) {
-        _lnxproc_results_store(env->results, val, "/col%02d", idx[1]);
-        void *p = realloc(env->cols, (env->colslen + 1) * sizeof(char *));
-
-        if (!p) {
-            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_SYSTEM, "\n");
-            return LNXPROC_ERROR_SYSTEM;
-        }
-        env->cols = p;
-        env->colslen += 1;
-        env->cols[idx[1]] = strdup(val);
-    }
-    else {
-        if (idx[1] == 0) {
-            env->key = val;
-            _lnxproc_results_store(env->results, val, "/key%02d", idx[0]);
-        }
-        else if (idx[1] < env->colslen) {
-            _lnxproc_results_store(env->results, val, "/%s/%s", env->key,
-                                   env->cols[idx[1]]);
-        }
-    }
-    return LNXPROC_OK;
-}
-
 static LNXPROC_ERROR_T
 proc_cgroups_normalize(LNXPROC_BASE_T *base)
 {
     _LNXPROC_RESULTS_T *results = base->results;
     _LNXPROC_ARRAY_T *array = base->current->array;
 
-    struct proc_cgroups_env_t env = {
-        .results = results,
-        .colslen = 0,
-        .cols = NULL,
-        .key = NULL,
-    };
+    size_t nrows = array->vector->length;
 
-    _lnxproc_array_iterate(array, &env, 0, proc_groups_func);
-    if (env.cols) {
-        int i;
+    _LNXPROC_DEBUG("Nrows %zd\n", nrows);
+    char ***values = (char ***) array->vector->values;
+    char *val;
+    char *colkey;
+    char *rowkey;
 
-        for (i = 0; i < env.colslen; i++) {
-            free(env.cols[i]);
+    int i, j;
+
+    for (i = 1; i < nrows; i++) {
+        size_t ncols = array->vector->children[i]->length;
+
+        rowkey = values[i][0];
+        for (j = 1; j < ncols; j++) {
+            colkey = values[0][j];
+            val = values[i][j];
+            _lnxproc_results_store(results, val, "/%s/%s", rowkey, colkey);
         }
-        free(env.cols);
     }
-
     return LNXPROC_OK;
 }
 

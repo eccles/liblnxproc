@@ -44,7 +44,6 @@ iter_func(char *val, void *data, size_t idx[], size_t dim)
 
     if (idx[1] == 0) {
         env->key = val;
-//        lnxproc_results_store(env->results, val, "/key%02d", idx[0]);
     }
     else {
         _lnxproc_results_store(env->results, val, "/%s", env->key);

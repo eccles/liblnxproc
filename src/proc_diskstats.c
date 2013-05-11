@@ -154,6 +154,7 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
 
         int j;
 
+        ncols = current->vector->children[i]->length;
         for (j = 0; j < ncols; j++) {
             if (j == keycol)
                 continue;
