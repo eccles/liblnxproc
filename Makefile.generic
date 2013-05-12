@@ -11,8 +11,6 @@ CCFLAGS2=$(CCFLAGS1) -fpic
 LDFLAGS1=-L. -llnxproc
 LDFLAGS2=-L. -llnxproc-dbg
 LDFLAGS3=-pg 
-#DBLIB=-ltdb
-DBLIB=
 SOFLAGS=-shared
 OBJS=$(SRCS:.c=.o)
 OBJSDBG=$(SRCS:.c=-dbg.o)
@@ -34,10 +32,10 @@ all: $(BIN) $(BIN)-dbg $(BIN)-prf
 	for d in $(DIRS); do (cd $$d; $(MAKE) ); done
 
 $(LIB).so: $(OBJS)
-	$(CC) $(SOFLAGS) -o $@ $^ $(DBLIB)
+	$(CC) $(SOFLAGS) -o $@ $^
 
 $(LIB)-dbg.so: $(OBJSDBG)
-	$(CC) $(SOFLAGS) -o $@ $^ $(DBLIB)
+	$(CC) $(SOFLAGS) -o $@ $^
 
 $(LIB)-prf.a: $(OBJSPRF)
 	ar rcs $@ $^ 
@@ -49,7 +47,7 @@ $(BIN)-dbg: $(BIN).c $(LIB)-dbg.so
 	$(CC) $(CCFLAGSD) $(CCFLAGS1) -o $@ $^ $(LDFLAGS2)
 
 $(BIN)-prf: $(BIN).c $(LIB)-prf.a
-	$(CC) $(CCFLAGSP) $(CCFLAGS1) -o $@ $^ $(LDFLAGS3) $(DBLIB)
+	$(CC) $(CCFLAGSP) $(CCFLAGS1) -o $@ $^ $(LDFLAGS3)
 
 check: $(HDRS) $(SRCS)
 	for d in $(DIRS); do (cd $$d; $(MAKE) check ); done

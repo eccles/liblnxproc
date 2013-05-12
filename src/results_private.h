@@ -28,21 +28,10 @@
 extern "C" {
 #endif
 
-//#define LNXPROC_TDB 1
-#ifdef LNXPROC_TDB
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <tdb.h>
-
-    typedef TDB_DATA LNXPROC_RESULTS_DATA_T;
-#else
     typedef struct {
         char *dptr;
         size_t dsize;
     } LNXPROC_RESULTS_DATA_T;
-
-#endif                          // LNXPROC_TDB
 
     struct _lnxproc_results_table_t {
         char key[32];
@@ -54,9 +43,6 @@ extern "C" {
         size_t size;
         size_t length;
         _LNXPROC_RESULTS_TABLE_T *table;
-#ifdef LNXPROC_TDB
-        TDB_CONTEXT *tdb;
-#endif                          // LNXPROC_TDB
     };
     typedef struct _lnxproc_results_t _LNXPROC_RESULTS_T;
 

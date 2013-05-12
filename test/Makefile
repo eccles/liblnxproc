@@ -9,7 +9,7 @@ CCFLAGSDBG=-g -I../src -Wall -Winline
 CCFLAGSPRF=-pg -g -I../src -Wall -Winline
 LDFLAGS=-L../src -llnxproc
 LDFLAGSDBG=-L../src -llnxproc-dbg
-LDFLAGSPRF=../src/liblnxproc-prf.a -pg -ltdb
+LDFLAGSPRF=../src/liblnxproc-prf.a -pg
 
 all: $(TSKS)
 
