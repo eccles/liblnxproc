@@ -54,7 +54,7 @@ LNXPROC_ERROR_T
 _lnxproc_chars_print(char *chars, size_t nchars, char *buf, size_t buflen)
 {
 
-    char *cstr[] = {
+    const char *cstr[] = {
         "NUL '\\0'", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK",
         "BEL '\\a'", "BS '\\b'", "HT '\\t'", "LF '\\n'", "VT '\\v'", "FF '\\f'",
         "CR '\\r'",
@@ -74,7 +74,7 @@ _lnxproc_chars_print(char *chars, size_t nchars, char *buf, size_t buflen)
     char *b = buf;
     int len = buflen - 1;
 
-    for (i = 0; i < nchars && len > 0; i++) {
+    for (i = 0; i < nchars && len > 1; i++) {
         c = chars[i];
         if (c < 33) {
             m = snprintf(b, len, "%s ", cstr[(int) c]);

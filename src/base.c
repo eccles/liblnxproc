@@ -146,8 +146,8 @@ base_read_glob_files(LNXPROC_BASE_T *base, char **readbuf, int *nbytes)
 
     const char *globwild = "*";
     const char *regwild = "([[:alnum:]_.+-]+)";
-    char globpat[128];
-    char regpat[128];
+    char globpat[FILENAME_MAX];
+    char regpat[FILENAME_MAX];
 
     if (base->fileprefix) {
         if (base->filesuffix) {
@@ -207,7 +207,6 @@ base_read_glob_files(LNXPROC_BASE_T *base, char **readbuf, int *nbytes)
         _LNXPROC_DEBUG("Regex exec returns %s\n", errbuf);
 #endif
         if (ret == 0) {
-//            for (j = 0; j < pmlen; j++) {
             j = 1;
             if (pmatch[j].rm_so > -1) {
                 char *s = globbuf.gl_pathv[i] + (int) pmatch[j].rm_so;
@@ -217,6 +216,10 @@ base_read_glob_files(LNXPROC_BASE_T *base, char **readbuf, int *nbytes)
                                (int) pmatch[j].rm_so, (int) pmatch[j].rm_eo,
                                len, s);
                 int n = snprintf(*readbuf, *nbytes, "%.*s\t", len, s);
+
+                if (n > (*nbytes) - 1) {
+                    n = (*nbytes) - 1;
+                }
 
                 *readbuf += n;
                 *nbytes -= n;
@@ -228,7 +231,6 @@ base_read_glob_files(LNXPROC_BASE_T *base, char **readbuf, int *nbytes)
                     return ret;
                 }
             }
-//           }
         }
     }
     globfree(&globbuf);
@@ -794,6 +796,7 @@ _lnxproc_base_unmemoize(LNXPROC_BASE_T *base)
     return LNXPROC_OK;
 }
 
+#ifdef LNXPROC_UNUSED
 static LNXPROC_ERROR_T
 base_variable_rate(LNXPROC_BASE_T *base,
                    size_t idx[], size_t dim, long tdiff, float scale, char *buf,
@@ -842,6 +845,7 @@ _lnxproc_base_variable_rate(LNXPROC_BASE_T *base,
 
     return base_variable_rate(base, idx, dim, tdiff, scale, buf, len);
 }
+#endif
 
 LNXPROC_ERROR_T
 _lnxproc_base_timeval_diff(LNXPROC_BASE_T *base, float *tdiff)
@@ -867,6 +871,7 @@ _lnxproc_base_timeval_diff(LNXPROC_BASE_T *base, float *tdiff)
     return LNXPROC_OK;
 }
 
+#ifdef LNXPROC_UNUSED
 LNXPROC_ERROR_T
 _lnxproc_base_variable_sample_rate(LNXPROC_BASE_T *base,
                                    size_t idx[], size_t dim, float scale,
@@ -936,6 +941,7 @@ _lnxproc_base_variable_usage(LNXPROC_BASE_T *base,
     snprintf(buf, len, "%f", percent);
     return LNXPROC_OK;
 }
+#endif
 
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab

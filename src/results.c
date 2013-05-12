@@ -275,9 +275,21 @@ _lnxproc_results_add(_LNXPROC_RESULTS_T * results, const char *value,
     va_start(ap, fmt);
 #ifdef LNXPROC_TDB
     size_t ksize = 1 + vsnprintf(entry->key, sizeof entry->key, fmt, ap);
+
+    if (ksize > sizeof entry->key) {
+        _LNXPROC_DEBUG("WARNING: Key length %zd exceeds %zd bytes\n", ksize,
+                       sizeof entry->key);
+        ksize = sizeof entry->key;
+    }
 #else
 #ifdef DEBUG
     size_t ksize = 1 + vsnprintf(entry->key, sizeof entry->key, fmt, ap);
+
+    if (ksize > sizeof entry->key) {
+        _LNXPROC_DEBUG("WARNING: Key length %zd exceeds %zd bytes\n", ksize,
+                       sizeof entry->key);
+        ksize = sizeof entry->key;
+    }
 #else
     vsnprintf(entry->key, sizeof entry->key, fmt, ap);
 #endif
@@ -289,8 +301,12 @@ _lnxproc_results_add(_LNXPROC_RESULTS_T * results, const char *value,
 
     size_t dsize = 1 + strlen(value);
 
-    memcpy(entry->value, value,
-           dsize > sizeof entry->value ? sizeof entry->value : dsize);
+    if (dsize > sizeof entry->value) {
+        _LNXPROC_DEBUG("WARNING: Value length %zd exceeds %zd bytes\n", dsize,
+                       sizeof entry->value);
+        dsize = sizeof entry->value;
+    }
+    memcpy(entry->value, value, dsize);
 
     _LNXPROC_DEBUG("Value %d : '%s'\n", dsize, entry->value);
 

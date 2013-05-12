@@ -95,6 +95,7 @@ extern "C" {
 
     LNXPROC_ERROR_T _lnxproc_base_print(LNXPROC_BASE_T *base);
 
+#ifdef LNXPROC_UNUSED
     LNXPROC_ERROR_T _lnxproc_base_variable_usage(LNXPROC_BASE_T *base,
                                                  size_t idx[], size_t dim,
                                                  float scale, char *buf,
@@ -109,6 +110,7 @@ extern "C" {
                                                        size_t idx[], size_t dim,
                                                        float scale, char *buf,
                                                        size_t len);
+#endif
 
     LNXPROC_ERROR_T _lnxproc_base_store_previous(LNXPROC_BASE_T *base);
 
