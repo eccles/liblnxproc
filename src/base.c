@@ -478,15 +478,6 @@ _lnxproc_base_read(LNXPROC_BASE_T *base)
 
     base->current->map_time = lnxproc_timeval_diff(&start, &end);
 
-    _LNXPROC_RESULTS_FREE(base->results);
-    ret = _lnxproc_results_new(&base->results);
-
-    if (ret) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_RESULTS,
-                             "Malloc results\n");
-        return LNXPROC_ERROR_BASE_MALLOC_RESULTS;
-    }
-
     start = lnxproc_timeval();
     _LNXPROC_DEBUG("Execute normalize method\n");
     ret = base->normalize(base);
@@ -664,6 +655,12 @@ _lnxproc_base_new(LNXPROC_BASE_T **base,
         p->filesuffix = NULL;
     }
     p->results = NULL;
+    ret = _lnxproc_results_new(&p->results);
+    if (ret) {
+        _LNXPROC_ERROR_DEBUG(ret, "Malloc results\n");
+        _LNXPROC_BASE_FREE(p);
+        return ret;
+    }
     if (!normalize) {
         p->normalize = _lnxproc_base_normalize;
     }

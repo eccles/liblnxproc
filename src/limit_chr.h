@@ -41,7 +41,10 @@ extern "C" {
             for (i = 0; i < limit->len; i++) {
                 if (c == limit->chars[i]) {
                     return limit->chars + i;
-        }}} return NULL;
+                }
+            }
+        }
+        return NULL;
     }
 
 #ifdef __cplusplus
