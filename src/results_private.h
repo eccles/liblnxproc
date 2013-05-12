@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-#define LNXPROC_TDB 1
+#define LNXPROC_TDB 0
 #ifdef LNXPROC_TDB
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -44,7 +44,16 @@ extern "C" {
 
 #endif                          // LNXPROC_TDB
 
+    struct _lnxproc_results_table_t {
+        char key[32];
+        char value[32];
+    };
+    typedef struct _lnxproc_results_table_t _LNXPROC_RESULTS_TABLE_T;
+
     struct _lnxproc_results_t {
+        size_t size;
+        size_t length;
+        _LNXPROC_RESULTS_TABLE_T *table;
 #ifdef LNXPROC_TDB
         TDB_CONTEXT *tdb;
 #endif                          // LNXPROC_TDB
@@ -61,12 +70,15 @@ extern "C" {
 
     LNXPROC_ERROR_T _lnxproc_results_print(_LNXPROC_RESULTS_T * results);
 
+    LNXPROC_ERROR_T _lnxproc_results_init(_LNXPROC_RESULTS_T * results,
+                                          size_t nentries);
+
     LNXPROC_ERROR_T _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results,
                                            char *key, size_t keylen,
                                            LNXPROC_RESULTS_DATA_T * val);
 
-    LNXPROC_ERROR_T _lnxproc_results_store(_LNXPROC_RESULTS_T * results,
-                                           const char *value, char *fmt, ...);
+    LNXPROC_ERROR_T _lnxproc_results_add(_LNXPROC_RESULTS_T * results,
+                                         const char *value, char *fmt, ...);
 
     typedef int (*_LNXPROC_RESULTS_ITERATE_FUNC) (char *key, char *value,
                                                   void *data);

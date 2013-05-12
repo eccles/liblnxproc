@@ -139,6 +139,7 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
 
     int i;
 
+    _lnxproc_results_init(results, nrows);
     for (i = 0; i < nrows; i++) {
         char *key = values[i][keycol];
 
@@ -163,7 +164,7 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
             char buf[32];
 
             val = values[i][j];
-            _lnxproc_results_store(results, val, "/%s/%s", key, cols[j]);
+            _lnxproc_results_add(results, val, "/%s/%s", key, cols[j]);
             if (readtime > 0.0) {
                 if ((j == 3) || // 'reads'
                     (j == 4) || // 'merge_read'
@@ -172,8 +173,8 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
                     diff = atoi(values[i][j]) - atoi(prev[i][j]);
                     rate = (scale[j] * diff) / readtime;
                     snprintf(buf, sizeof buf, "%f", rate);
-                    _lnxproc_results_store(results, buf, "/%s/%s-s",
-                                           key, cols[j]);
+                    _lnxproc_results_add(results, buf, "/%s/%s-s",
+                                         key, cols[j]);
                 }
             }
             if (writetime > 0.0) {
@@ -184,8 +185,8 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
                     diff = atoi(values[i][j]) - atoi(prev[i][j]);
                     rate = (scale[j] * diff) / writetime;
                     snprintf(buf, sizeof buf, "%f", rate);
-                    _lnxproc_results_store(results, buf, "/%s/%s-s",
-                                           key, cols[j]);
+                    _lnxproc_results_add(results, buf, "/%s/%s-s",
+                                         key, cols[j]);
                 }
             }
             if (tdiff > 0.0) {
@@ -197,8 +198,8 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
                     diff = atoi(values[i][j]) - atoi(prev[i][j]);
                     rate = (scale[j] * diff) / tdiff;
                     snprintf(buf, sizeof buf, "%5.1f", rate);
-                    _lnxproc_results_store(results, buf, "/%s/%s%%",
-                                           key, cols[j]);
+                    _lnxproc_results_add(results, buf, "/%s/%s%%",
+                                         key, cols[j]);
                 }
             }
         }

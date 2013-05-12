@@ -46,7 +46,7 @@ iter_func(char *val, void *data, size_t idx[], size_t dim)
         env->key = val;
     }
     else {
-        _lnxproc_results_store(env->results, val, "/%s", env->key);
+        _lnxproc_results_add(env->results, val, "/%s", env->key);
     }
     return LNXPROC_OK;
 }
@@ -63,6 +63,7 @@ sys_disksectors_normalize(LNXPROC_BASE_T *base)
         .key = NULL,
     };
 
+    _lnxproc_results_init(results, 2);
     _lnxproc_array_iterate(array, &env, 0, iter_func);
     _lnxproc_base_memoize(base);
 

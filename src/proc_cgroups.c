@@ -56,6 +56,7 @@ proc_cgroups_normalize(LNXPROC_BASE_T *base)
 
     int i, j;
 
+    _lnxproc_results_init(results, nrows);
     for (i = 1; i < nrows; i++) {
         size_t ncols = array->vector->children[i]->length;
 
@@ -63,7 +64,7 @@ proc_cgroups_normalize(LNXPROC_BASE_T *base)
         for (j = 1; j < ncols; j++) {
             colkey = values[0][j];
             val = values[i][j];
-            _lnxproc_results_store(results, val, "/%s/%s", rowkey, colkey);
+            _lnxproc_results_add(results, val, "/%s/%s", rowkey, colkey);
         }
     }
     return LNXPROC_OK;

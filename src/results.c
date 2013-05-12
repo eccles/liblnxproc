@@ -67,12 +67,16 @@ _lnxproc_results_new(_LNXPROC_RESULTS_T ** results)
         return LNXPROC_ERROR_RESULTS_ADDRESS_CONTENTS_NOT_NULL;
     }
 
-    _LNXPROC_RESULTS_T *newresults = calloc(1, sizeof(_LNXPROC_RESULTS_T));
+    _LNXPROC_RESULTS_T *p = calloc(1, sizeof(_LNXPROC_RESULTS_T));
 
-    if (!newresults) {
+    if (!p) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_NULL;
     }
+
+    p->size = 0;
+    p->length = 0;
+    p->table = NULL;
 
 #ifdef LNXPROC_TDB
     int hash_size = 0;
@@ -80,15 +84,15 @@ _lnxproc_results_new(_LNXPROC_RESULTS_T ** results)
     int open_flags = O_RDWR;
     mode_t mode = 0;
 
-    newresults->tdb = tdb_open(NULL, hash_size, tdb_flags, open_flags, mode);
-    if (!newresults->tdb) {
+    p->tdb = tdb_open(NULL, hash_size, tdb_flags, open_flags, mode);
+    if (!p->tdb) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_OPEN, "Open Db\n");
-        _LNXPROC_RESULTS_FREE(newresults);
+        _LNXPROC_RESULTS_FREE(p);
         return LNXPROC_ERROR_RESULTS_DB_OPEN;
     }
 #endif                          // LNXPROC_TDB
 
-    *results = newresults;
+    *results = p;
     _LNXPROC_DEBUG("Successful\n");
     return LNXPROC_OK;
 }
@@ -100,6 +104,10 @@ _lnxproc_results_free(_LNXPROC_RESULTS_T * results)
 
     if (results) {
         _LNXPROC_DEBUG("Free Results\n");
+        if (results->table) {
+            free(results->table);
+            results->table = NULL;
+        }
 #ifdef LNXPROC_TDB
         if (results->tdb) {
             _LNXPROC_DEBUG("Free Db\n");
@@ -117,6 +125,58 @@ _lnxproc_results_free(_LNXPROC_RESULTS_T * results)
     }
 
     return results;
+}
+
+static LNXPROC_ERROR_T
+realloc_results_table(_LNXPROC_RESULTS_T * results, size_t nentries)
+{
+    _LNXPROC_DEBUG("Table %p nentries %zd\n", results->table, nentries);
+    _LNXPROC_DEBUG("Sizeof table entry %zd\n",
+                   sizeof(_LNXPROC_RESULTS_TABLE_T));
+
+    size_t nsize =
+        (nentries + results->size) * sizeof(_LNXPROC_RESULTS_TABLE_T);
+    _LNXPROC_DEBUG("Nsize %zd\n", nsize);
+    _LNXPROC_RESULTS_TABLE_T *t = realloc(results->table, nsize);
+
+    if (!t) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_TABLE_MALLOC, "\n");
+        return LNXPROC_ERROR_RESULTS_TABLE_MALLOC;
+    }
+    int i;
+
+    _LNXPROC_DEBUG("New Table %p\n", t);
+    for (i = results->size; i < (nentries + results->size); i++) {
+        _LNXPROC_DEBUG("Clear %d bytes at %p\n",
+                       sizeof(_LNXPROC_RESULTS_TABLE_T), t + i);
+    }
+    results->table = t;
+    results->size += nentries;
+
+    _LNXPROC_DEBUG("New Table size %zd\n", results->size);
+    return LNXPROC_OK;
+}
+
+LNXPROC_ERROR_T
+_lnxproc_results_init(_LNXPROC_RESULTS_T * results, size_t nentries)
+{
+    if (!results) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
+        return LNXPROC_ERROR_RESULTS_NULL;
+    }
+
+    _LNXPROC_DEBUG("Table %p nentries %zd\n", results->table, nentries);
+    if (nentries > results->size) {
+        LNXPROC_ERROR_T ret =
+            realloc_results_table(results, nentries - results->size);
+
+        if (ret) {
+            _LNXPROC_ERROR_DEBUG(ret, "\n");
+            return ret;
+        }
+    }
+    results->length = 0;
+    return LNXPROC_OK;
 }
 
 LNXPROC_ERROR_T
@@ -145,14 +205,31 @@ _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results, char *key, size_t keylen,
         return LNXPROC_ERROR_RESULTS_VAL_ADDRESS_NULL;
     }
 
-#ifdef LNXPROC_TDB
+#ifndef LNXPROC_TDB
+    if (!results->table) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_TABLE_NULL,
+                             "Fetch results\n");
+        return LNXPROC_ERROR_RESULTS_TABLE_NULL;
+    }
+    int i;
+    _LNXPROC_RESULTS_TABLE_T *table = results->table;
+
+    for (i = 0; i < results->length; i++) {
+        if (!strcmp(table->key, key)) {
+            val->dsize = strlen(table->key);
+            val->dptr = strdup(table->value);
+        }
+    }
+    val->dsize = 1;
+    val->dptr = strdup("");
+#else
     if (!results->tdb) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_NOT_OPEN,
                              "Fetch results\n");
         return LNXPROC_ERROR_RESULTS_DB_NOT_OPEN;
     }
 
-    LNXPROC_RESULTS_DATA_T dbkey = {
+    TDB_DATA dbkey = {
         .dsize = keylen,
         .dptr = (unsigned char *) key,
     };
@@ -169,8 +246,8 @@ _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results, char *key, size_t keylen,
 }
 
 LNXPROC_ERROR_T
-_lnxproc_results_store(_LNXPROC_RESULTS_T * results, const char *value,
-                       char *fmt, ...)
+_lnxproc_results_add(_LNXPROC_RESULTS_T * results, const char *value,
+                     char *fmt, ...)
 {
     if (!results) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
@@ -179,6 +256,41 @@ _lnxproc_results_store(_LNXPROC_RESULTS_T * results, const char *value,
 
     _LNXPROC_DEBUG("Results %p Value %p '%s'\n", results, value, value);
 
+    if (!results->table) {
+        results->length = 0;
+        results->size = 0;
+    }
+    if (results->length >= results->size) {
+        LNXPROC_ERROR_T ret = realloc_results_table(results, 1);
+
+        if (ret) {
+            _LNXPROC_ERROR_DEBUG(ret, "Add results\n");
+            return ret;
+        }
+    }
+    va_list ap;
+
+    _LNXPROC_RESULTS_TABLE_T *entry = results->table + results->length;
+
+    va_start(ap, fmt);
+    size_t ksize = 1 + vsnprintf(entry->key, sizeof entry->key, fmt, ap);
+
+    va_end(ap);
+
+    char *kptr = entry->key;
+
+    _LNXPROC_DEBUG("Key %d : '%s'\n", ksize, kptr);
+
+    size_t dsize = 1 + strlen(value);
+
+    memcpy(entry->value, value,
+           dsize > sizeof entry->value ? sizeof entry->value : dsize);
+    char *dptr = entry->value;
+
+    _LNXPROC_DEBUG("Value %d : '%s'\n", dsize, dptr);
+
+    results->length++;
+
 #ifdef LNXPROC_TDB
     if (!results->tdb) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_NOT_OPEN,
@@ -186,23 +298,15 @@ _lnxproc_results_store(_LNXPROC_RESULTS_T * results, const char *value,
         return LNXPROC_ERROR_RESULTS_DB_NOT_OPEN;
     }
 
-    va_list ap;
-    char buf[128];
-
     TDB_DATA key;
 
-    va_start(ap, fmt);
-    key.dsize = 1 + vsnprintf(buf, sizeof buf, fmt, ap);
-    va_end(ap);
-    key.dptr = (unsigned char *) buf;
-
-    _LNXPROC_DEBUG("Key %d : '%s'\n", key.dsize, key.dptr);
+    key.dsize = ksize;
+    key.dptr = (unsigned char *) kptr;
 
     TDB_DATA data;
 
-    data.dsize = 1 + strlen(value);
-    data.dptr = (unsigned char *) value;
-    _LNXPROC_DEBUG("Value %d : '%s'\n", data.dsize, data.dptr);
+    data.dsize = dsize;
+    data.dptr = (unsigned char *) dptr;
 
     int flag = TDB_REPLACE;
     int ret = tdb_store(results->tdb, key, data, flag);
@@ -216,7 +320,7 @@ _lnxproc_results_store(_LNXPROC_RESULTS_T * results, const char *value,
     return LNXPROC_OK;
 }
 
-#ifdef LNXPROC_TDB
+#ifdef LNXPROC_TDB_UNUSED
 struct db_traverse_env_t {
     _LNXPROC_RESULTS_ITERATE_FUNC func;
     void *data;
@@ -241,8 +345,15 @@ _lnxproc_results_iterate(_LNXPROC_RESULTS_T * results,
     }
 
     _LNXPROC_DEBUG("Results %p\n", results);
+    if (results->table) {
+        int i;
+        _LNXPROC_RESULTS_TABLE_T *table = results->table;
 
-#ifdef LNXPROC_TDB
+        for (i = 0; i < results->length; i++) {
+            func(table[i].key, table[i].value, data);
+        }
+    }
+#ifdef LNXPROC_TDB_UNUSED
     if (!results->tdb) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_NOT_OPEN,
                              "Iterate results\n");
