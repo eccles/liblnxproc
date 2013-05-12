@@ -23,14 +23,31 @@
 
 #include "error_private.h"
 #include "util_private.h"
-#include "db_private.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#define LNXPROC_TDB 1
+#ifdef LNXPROC_TDB
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <tdb.h>
+
+    typedef TDB_DATA LNXPROC_RESULTS_DATA_T;
+#else
+    typedef struct {
+        char *dptr;
+        size_t dsize;
+    } LNXPROC_RESULTS_DATA_T;
+
+#endif                          // LNXPROC_TDB
+
     struct _lnxproc_results_t {
-        LNXPROC_RESULTS_FILE_T *db;
+#ifdef LNXPROC_TDB
+        TDB_CONTEXT *tdb;
+#endif                          // LNXPROC_TDB
     };
     typedef struct _lnxproc_results_t _LNXPROC_RESULTS_T;
 

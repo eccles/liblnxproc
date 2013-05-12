@@ -27,7 +27,6 @@
 #include <string.h>
 
 #include "error_private.h"
-#include "db_private.h"
 #include "results_private.h"
 
 static int
@@ -75,12 +74,19 @@ _lnxproc_results_new(_LNXPROC_RESULTS_T ** results)
         return LNXPROC_ERROR_RESULTS_NULL;
     }
 
-    newresults->db = DB_OPEN();
-    if (!newresults->db) {
+#ifdef LNXPROC_TDB
+    int hash_size = 0;
+    int tdb_flags = TDB_INTERNAL;
+    int open_flags = O_RDWR;
+    mode_t mode = 0;
+
+    newresults->tdb = tdb_open(NULL, hash_size, tdb_flags, open_flags, mode);
+    if (!newresults->tdb) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_OPEN, "Open Db\n");
         _LNXPROC_RESULTS_FREE(newresults);
         return LNXPROC_ERROR_RESULTS_DB_OPEN;
     }
+#endif                          // LNXPROC_TDB
 
     *results = newresults;
     _LNXPROC_DEBUG("Successful\n");
@@ -94,18 +100,18 @@ _lnxproc_results_free(_LNXPROC_RESULTS_T * results)
 
     if (results) {
         _LNXPROC_DEBUG("Free Results\n");
-        if (results->db) {
 #ifdef LNXPROC_TDB
+        if (results->tdb) {
             _LNXPROC_DEBUG("Free Db\n");
-            int ret = tdb_close(results->db);
+            int ret = tdb_close(results->tdb);
 
             if (ret < 0) {
                 _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_CLOSE,
                                      "Close Db\n");
             }
-            results->db = NULL;
-#endif
+            results->tdb = NULL;
         }
+#endif
         free(results);
         results = NULL;
     }
@@ -139,21 +145,22 @@ _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results, char *key, size_t keylen,
         return LNXPROC_ERROR_RESULTS_VAL_ADDRESS_NULL;
     }
 
-    if (!results->db) {
+#ifdef LNXPROC_TDB
+    if (!results->tdb) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_NOT_OPEN,
                              "Fetch results\n");
         return LNXPROC_ERROR_RESULTS_DB_NOT_OPEN;
     }
-#ifdef LNXPROC_TDB
+
     LNXPROC_RESULTS_DATA_T dbkey = {
         .dsize = keylen,
         .dptr = (unsigned char *) key,
     };
 
-    *val = tdb_fetch(results->db, dbkey);
+    *val = tdb_fetch(results->tdb, dbkey);
     if (!val->dptr) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_FETCH,
-                             "Fetch results %s\n", tdb_errorstr(results->db));
+                             "Fetch results %s\n", tdb_errorstr(results->tdb));
         return LNXPROC_ERROR_RESULTS_DB_FETCH;
     }
 #endif
@@ -165,8 +172,6 @@ LNXPROC_ERROR_T
 _lnxproc_results_store(_LNXPROC_RESULTS_T * results, const char *value,
                        char *fmt, ...)
 {
-    va_list ap;
-
     if (!results) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_NULL;
@@ -174,13 +179,14 @@ _lnxproc_results_store(_LNXPROC_RESULTS_T * results, const char *value,
 
     _LNXPROC_DEBUG("Results %p Value %p '%s'\n", results, value, value);
 
-    if (!results->db) {
+#ifdef LNXPROC_TDB
+    if (!results->tdb) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_NOT_OPEN,
                              "Store results\n");
         return LNXPROC_ERROR_RESULTS_DB_NOT_OPEN;
     }
-#ifdef LNXPROC_TDB
 
+    va_list ap;
     char buf[128];
 
     TDB_DATA key;
@@ -199,21 +205,17 @@ _lnxproc_results_store(_LNXPROC_RESULTS_T * results, const char *value,
     _LNXPROC_DEBUG("Value %d : '%s'\n", data.dsize, data.dptr);
 
     int flag = TDB_REPLACE;
-    int ret = tdb_store(results->db, key, data, flag);
+    int ret = tdb_store(results->tdb, key, data, flag);
 
     if (ret < 0) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_STORE,
-                             "Store results %s\n", tdb_errorstr(results->db));
+                             "Store results %s\n", tdb_errorstr(results->tdb));
         return LNXPROC_ERROR_RESULTS_DB_STORE;
     }
 #endif
     return LNXPROC_OK;
 }
 
-//typedef int (*RESULTS_ITERATE_FUNC)(char *key,char *value,void *env);
-//static int db_traverse_func(char *key,char *value,void *env) {
-//    return LNXPROC_OK;
-//}
 #ifdef LNXPROC_TDB
 struct db_traverse_env_t {
     _LNXPROC_RESULTS_ITERATE_FUNC func;
@@ -240,21 +242,22 @@ _lnxproc_results_iterate(_LNXPROC_RESULTS_T * results,
 
     _LNXPROC_DEBUG("Results %p\n", results);
 
-    if (!results->db) {
+#ifdef LNXPROC_TDB
+    if (!results->tdb) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_NOT_OPEN,
                              "Iterate results\n");
         return LNXPROC_ERROR_RESULTS_DB_NOT_OPEN;
     }
-#ifdef LNXPROC_TDB
     struct db_traverse_env_t env = {
         .func = func,
         .data = data,
     };
-    int ret = tdb_traverse(results->db, db_traverse_func, &env);
+    int ret = tdb_traverse(results->tdb, db_traverse_func, &env);
 
     if (ret < 0) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_DB_ITERATE,
-                             "Iterate results %s\n", tdb_errorstr(results->db));
+                             "Iterate results %s\n",
+                             tdb_errorstr(results->tdb));
         return LNXPROC_ERROR_RESULTS_DB_ITERATE;
     }
 #endif
