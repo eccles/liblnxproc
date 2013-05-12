@@ -24,13 +24,13 @@
 #ifndef LIBLNXPROC_ARRAY_PRIVATE_H
 #define LIBLNXPROC_ARRAY_PRIVATE_H 1
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "util_private.h"
 #include "vector_private.h"
 #include "limits_private.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
     struct _lnxproc_array_t {
         _LNXPROC_LIMITS_T *limits;

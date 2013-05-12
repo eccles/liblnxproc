@@ -24,11 +24,11 @@
 #ifndef LIBLNXPROC_UTIL_PRIVATE_H
 #define LIBLNXPROC_UTIL_PRIVATE_H 1
 
+#include <lnxproc/util.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <lnxproc/util.h>
 
 #ifdef __cplusplus
 }                               // extern "C"

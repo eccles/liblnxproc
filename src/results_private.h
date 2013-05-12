@@ -21,13 +21,13 @@
 #ifndef LIBLNXPROC_RESULTS_PRIVATE_H
 #define LIBLNXPROC_RESULTS_PRIVATE_H 1
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "error_private.h"
 #include "util_private.h"
 #include "db_private.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
     struct _lnxproc_results_t {
         LNXPROC_RESULTS_FILE_T *db;

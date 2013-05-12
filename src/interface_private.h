@@ -21,12 +21,12 @@
 #ifndef LIBLNXPROC_INTERFACE_PRIVATE_H
 #define LIBLNXPROC_INTERFACE_PRIVATE_H 1
 
+#include "base_private.h"
+#include <lnxproc/interface.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "base_private.h"
-#include <lnxproc/interface.h>
 
     struct lnxproc_module_t {
         LNXPROC_METHOD new;

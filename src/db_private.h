@@ -21,11 +21,11 @@
 #ifndef LIBLNXPROC_DB_PRIVATE_H
 #define LIBLNXPROC_DB_PRIVATE_H 1
 
+#include <lnxproc/db.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <lnxproc/db.h>
 
 #ifdef LNXPROC_TDB
 

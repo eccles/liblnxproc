@@ -21,11 +21,11 @@
 #ifndef LIBLNXPROC_ERROR_PRIVATE_H
 #define LIBLNXPROC_ERROR_PRIVATE_H 1
 
+#include <lnxproc/error.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <lnxproc/error.h>
 
     int _lnxproc_error_check(void);
 

@@ -21,12 +21,12 @@
 #ifndef LIBLNXPROC_LIMITS_PRIVATE_H
 #define LIBLNXPROC_LIMITS_PRIVATE_H 1
 
+#include "util_private.h"
+#include "error_private.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "util_private.h"
-#include "error_private.h"
 
     typedef struct _lnxproc_limits_t _LNXPROC_LIMITS_T;
 

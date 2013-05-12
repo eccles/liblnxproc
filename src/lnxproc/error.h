@@ -25,10 +25,6 @@
 extern "C" {
 #endif
 
-//#include <errno.h>
-//#include <stddef.h>
-//#include <stdio.h>
-
     enum lnxproc_error_t {
         LNXPROC_OK = 0,
         LNXPROC_ERROR_MISMATCHED_STRINGS,

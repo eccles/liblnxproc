@@ -21,14 +21,14 @@ This file is part of liblnxproc.
 #ifndef LIBLNXPROC_H
 #define LIBLNXPROC_H 1
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <lnxproc/util.h>
 #include <lnxproc/error.h>
 #include <lnxproc/base.h>
 #include <lnxproc/interface.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifdef __cplusplus
 }                               // extern "C"

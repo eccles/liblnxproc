@@ -21,13 +21,13 @@
 #ifndef LIBLNXPROC_INTERFACE_H
 #define LIBLNXPROC_INTERFACE_H 1
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <lnxproc/util.h>
 #include <lnxproc/error.h>
 #include <lnxproc/base.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
     enum lnxproc_module_type_t {
         LNXPROC_ALL = 0,

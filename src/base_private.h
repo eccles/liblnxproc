@@ -28,12 +28,20 @@ extern "C" {
 #include <stddef.h>
 #include <sys/time.h>
 
+#ifdef __cplusplus
+}                               // extern "C"
+#endif
+
 #include "util_private.h"
 #include "error_private.h"
 #include "limits_private.h"
 #include "results_private.h"
 #include "array_private.h"
 #include <lnxproc/base.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
     typedef LNXPROC_ERROR_T (*LNXPROC_BASE_METHOD) (LNXPROC_BASE_T *base);
 

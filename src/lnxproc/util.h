@@ -24,12 +24,12 @@
 #ifndef LIBLNXPROC_UTIL_H
 #define LIBLNXPROC_UTIL_H 1
 
+#include <sys/time.h>
+#include <stddef.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <sys/time.h>
-#include <stddef.h>
 
 #ifndef WARN_UNUSED
 #define WARN_UNUSED __attribute__((warn_unused_result))

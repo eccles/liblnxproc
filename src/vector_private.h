@@ -24,13 +24,14 @@
 #ifndef LIBLNXPROC_VECTOR_PRIVATE_H
 #define LIBLNXPROC_VECTOR_PRIVATE_H 1
 
+#include "util_private.h"
+#include "error_private.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include <stddef.h>
-#include "util_private.h"
-#include "error_private.h"
 
     typedef struct _lnxproc_vector_t _LNXPROC_VECTOR_T;
 
