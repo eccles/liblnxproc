@@ -273,21 +273,26 @@ _lnxproc_results_add(_LNXPROC_RESULTS_T * results, const char *value,
     _LNXPROC_RESULTS_TABLE_T *entry = results->table + results->length;
 
     va_start(ap, fmt);
+#ifdef LNXPROC_TDB
     size_t ksize = 1 + vsnprintf(entry->key, sizeof entry->key, fmt, ap);
+#else
+#ifdef DEBUG
+    size_t ksize = 1 + vsnprintf(entry->key, sizeof entry->key, fmt, ap);
+#else
+    vsnprintf(entry->key, sizeof entry->key, fmt, ap);
+#endif
+#endif
 
     va_end(ap);
 
-    char *kptr = entry->key;
-
-    _LNXPROC_DEBUG("Key %d : '%s'\n", ksize, kptr);
+    _LNXPROC_DEBUG("Key %d : '%s'\n", ksize, entry->key);
 
     size_t dsize = 1 + strlen(value);
 
     memcpy(entry->value, value,
            dsize > sizeof entry->value ? sizeof entry->value : dsize);
-    char *dptr = entry->value;
 
-    _LNXPROC_DEBUG("Value %d : '%s'\n", dsize, dptr);
+    _LNXPROC_DEBUG("Value %d : '%s'\n", dsize, entry->value);
 
     results->length++;
 
@@ -301,12 +306,12 @@ _lnxproc_results_add(_LNXPROC_RESULTS_T * results, const char *value,
     TDB_DATA key;
 
     key.dsize = ksize;
-    key.dptr = (unsigned char *) kptr;
+    key.dptr = (unsigned char *) entry->key;
 
     TDB_DATA data;
 
     data.dsize = dsize;
-    data.dptr = (unsigned char *) dptr;
+    data.dptr = (unsigned char *) entry->value;
 
     int flag = TDB_REPLACE;
     int ret = tdb_store(results->tdb, key, data, flag);

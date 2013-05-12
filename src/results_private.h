@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-#define LNXPROC_TDB 0
+//#define LNXPROC_TDB 1
 #ifdef LNXPROC_TDB
 #include <sys/types.h>
 #include <sys/stat.h>

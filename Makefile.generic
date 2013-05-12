@@ -11,7 +11,8 @@ CCFLAGS2=$(CCFLAGS1) -fpic
 LDFLAGS1=-L. -llnxproc
 LDFLAGS2=-L. -llnxproc-dbg
 LDFLAGS3=-pg 
-DBLIB=-ltdb
+#DBLIB=-ltdb
+DBLIB=
 SOFLAGS=-shared
 OBJS=$(SRCS:.c=.o)
 OBJSDBG=$(SRCS:.c=-dbg.o)
