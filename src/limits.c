@@ -30,28 +30,6 @@
 #include "error_private.h"
 #include "limits_private.h"
 
-char *
-_lnxproc_limit_chr(_LNXPROC_LIMITS_T * limit, char c)
-{
-
-/*
- * replaces
- * char *ret = strchr(limit->chars, c); 
- *
- * because we want to include the trailing NUL char if required
- */
-    if (limit) {
-        int i;
-
-        for (i = 0; i < limit->len; i++) {
-            if (c == limit->chars[i]) {
-                return limit->chars + i;
-            }
-        }
-    }
-    return NULL;
-}
-
 LNXPROC_ERROR_T
 _lnxproc_limits_print(_LNXPROC_LIMITS_T limits[], int dim)
 {

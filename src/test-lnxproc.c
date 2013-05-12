@@ -26,6 +26,7 @@ This file is part of liblnxproc.
 #include "util_private.h"
 #include "vector_private.h"
 #include "limits_private.h"
+#include "limit_chr.h"
 #include "array_private.h"
 #include "base_private.h"
 #include "interface_private.h"
@@ -97,14 +98,14 @@ test_limits(void)
     int i;
 
     for (i = 0; i < dim1; i++) {
-        char *c = _lnxproc_limit_chr(limits1 + i, ' ');
+        char *c = limit_chr(limits1 + i, ' ');
 
         printf("Compare ' ' to entry %d : Result = %p\n", i, c);
-        c = _lnxproc_limit_chr(limits1 + i, '\n');
+        c = limit_chr(limits1 + i, '\n');
         printf("Compare '\\n' to entry %d : Result = %p\n", i, c);
-        c = _lnxproc_limit_chr(limits1 + i, '\0');
+        c = limit_chr(limits1 + i, '\0');
         printf("Compare '\\0' to entry %d : Result = %p\n", i, c);
-        c = _lnxproc_limit_chr(limits1 + i, '\t');
+        c = limit_chr(limits1 + i, '\t');
         printf("Compare '\\t' to entry %d : Result = %p\n", i, c);
     }
     _lnxproc_limits_print(limits1, dim1);
@@ -127,14 +128,14 @@ test_limits(void)
     _lnxproc_limits_dup(&limits2, mylimits2, dim2);
 
     for (i = 0; i < dim2; i++) {
-        char *c = _lnxproc_limit_chr(limits2 + i, ' ');
+        char *c = limit_chr(limits2 + i, ' ');
 
         printf("Compare ' ' to entry %d : Result = %p\n", i, c);
-        c = _lnxproc_limit_chr(limits2 + i, '\n');
+        c = limit_chr(limits2 + i, '\n');
         printf("Compare '\\n' to entry %d : Result = %p\n", i, c);
-        c = _lnxproc_limit_chr(limits2 + i, '\0');
+        c = limit_chr(limits2 + i, '\0');
         printf("Compare '\\0' to entry %d : Result = %p\n", i, c);
-        c = _lnxproc_limit_chr(limits2 + i, '\t');
+        c = limit_chr(limits2 + i, '\t');
         printf("Compare '\\t' to entry %d : Result = %p\n", i, c);
     }
     _lnxproc_limits_print(limits2, dim2);
@@ -159,14 +160,14 @@ test_limits(void)
     _lnxproc_limits_dup(&limits3, mylimits3, dim3);
 
     for (i = 0; i < dim3; i++) {
-        char *c = _lnxproc_limit_chr(limits3 + i, ' ');
+        char *c = limit_chr(limits3 + i, ' ');
 
         printf("Compare ' ' to entry %d : Result = %p\n", i, c);
-        c = _lnxproc_limit_chr(limits3 + i, '\n');
+        c = limit_chr(limits3 + i, '\n');
         printf("Compare '\\n' to entry %d : Result = %p\n", i, c);
-        c = _lnxproc_limit_chr(limits3 + i, '\0');
+        c = limit_chr(limits3 + i, '\0');
         printf("Compare '\\0' to entry %d : Result = %p\n", i, c);
-        c = _lnxproc_limit_chr(limits3 + i, '\t');
+        c = limit_chr(limits3 + i, '\t');
         printf("Compare '\\t' to entry %d : Result = %p\n", i, c);
     }
     _lnxproc_limits_print(limits3, dim3);
@@ -592,7 +593,7 @@ execute_base(LNXPROC_BASE_T *base)
                     printf("Data : %1$d %2$*1$s\n", base->previous->nbytes,
                            base->previous->lines);
                 }
-                _lnxproc_results_print(base->results);
+                _lnxproc_base_print(base);
             }
         }
         _LNXPROC_BASE_FREE(base);

@@ -22,6 +22,16 @@
 #include <stddef.h>
 #include <stdio.h>
 
+/*
+static void *memdup(void *old, size_t len) {
+    void * ret =NULL;
+    ret = calloc(1,len);
+    if( ret ) {
+        memcpy(ret,old,len);
+    }
+    return ret;
+}
+*/
 long
 lnxproc_timeval_diff(struct timeval *start, struct timeval *end)
 {

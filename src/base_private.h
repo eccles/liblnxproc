@@ -31,14 +31,12 @@ extern "C" {
 #ifdef __cplusplus
 }                               // extern "C"
 #endif
-
 #include "util_private.h"
 #include "error_private.h"
 #include "limits_private.h"
 #include "results_private.h"
 #include "array_private.h"
 #include <lnxproc/base.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -54,6 +52,9 @@ extern "C" {
     LNXPROC_ERROR_T _lnxproc_base_read(LNXPROC_BASE_T *base);
 
     struct lnxproc_base_data_t {
+        long rawread_time;
+        long map_time;
+        long normalize_time;
         struct timeval tv;
         char *lines;
         size_t buflen;

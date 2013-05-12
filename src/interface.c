@@ -108,6 +108,45 @@ lnxproc_read(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type)
 }
 
 LNXPROC_ERROR_T
+lnxproc_performance(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type,
+                    long *rawread_time, long *map_time, long *normalize_time)
+{
+
+    if (modules) {
+        if (type == LNXPROC_ALL) {
+            if (rawread_time) {
+                *rawread_time = 0;
+            }
+            if (map_time) {
+                *map_time = 0;
+            }
+            if (normalize_time) {
+                *normalize_time = 0;
+            }
+        }
+        else {
+            LNXPROC_MODULE_T *module = modules + type - 1;
+
+            if (module->base) {
+                LNXPROC_BASE_T *base = module->base;
+
+                if (rawread_time) {
+                    *rawread_time = base->current->rawread_time;
+                }
+                if (map_time) {
+                    *map_time = base->current->map_time;
+                }
+                if (normalize_time) {
+                    *normalize_time = base->current->normalize_time;
+                }
+                return LNXPROC_OK;
+            }
+        }
+    }
+    return LNXPROC_ERROR_INTERFACE_NULL;
+}
+
+LNXPROC_ERROR_T
 lnxproc_print(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type)
 {
     if (modules) {

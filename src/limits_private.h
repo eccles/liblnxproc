@@ -46,8 +46,6 @@ extern "C" {
     ll = _lnxproc_limits_free(ll,dd);\
 }
 
-    char *_lnxproc_limit_chr(_LNXPROC_LIMITS_T * limit, char c);
-
     LNXPROC_ERROR_T _lnxproc_chars_print(char *chars, size_t nchars, char *buf,
                                          size_t buflen);
 

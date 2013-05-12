@@ -35,6 +35,7 @@
 #include "results_private.h"
 #include "array_private.h"
 #include "base_private.h"
+#include "limit_chr.h"
 
 LNXPROC_ERROR_T
 _lnxproc_base_print(LNXPROC_BASE_T *base)
@@ -56,6 +57,9 @@ _lnxproc_base_print(LNXPROC_BASE_T *base)
         printf("Timestamp %lu.%06lu\n",
                (unsigned long) base->current->tv.tv_sec,
                (unsigned long) base->current->tv.tv_usec);
+        printf("Rawread duration %ld usecs\n", base->current->rawread_time);
+        printf("Map duration %ld usecs\n", base->current->map_time);
+        printf("Normalize duration %ld usecs\n", base->current->normalize_time);
         printf("Lines %p\n", base->current->lines);
         printf("Buflen %zd\n", base->current->buflen);
         printf("Nbytes %d\n", base->current->nbytes);
@@ -65,6 +69,12 @@ _lnxproc_base_print(LNXPROC_BASE_T *base)
             printf("Previous Timestamp %lu.%06lu\n",
                    (unsigned long) base->previous->tv.tv_sec,
                    (unsigned long) base->previous->tv.tv_usec);
+            printf("Previous Rawread duration %ld usecs\n",
+                   base->previous->rawread_time);
+            printf("Previous Map duration %ld usecs\n",
+                   base->previous->map_time);
+            printf("Previous Normalize duration %ld usecs\n",
+                   base->previous->normalize_time);
             printf("Previous Lines %p\n", base->previous->lines);
             printf("Previous Buflen %zd\n", base->previous->buflen);
             printf("Previous Nbytes %d\n", base->previous->nbytes);
@@ -256,13 +266,6 @@ _lnxproc_base_rawread(LNXPROC_BASE_T *base)
         }
     }
     base->current->nbytes = base->current->buflen - nbytes;
-    base->current->tv = lnxproc_timeval();
-#ifdef DEBUG
-    char buf[32];
-
-    _LNXPROC_DEBUG("Current timestamp %s\n",
-                   lnxproc_timeval_print(&base->current->tv, buf, sizeof buf));
-#endif
 
     _LNXPROC_DEBUG("Successful\n");
     return LNXPROC_OK;
@@ -327,7 +330,7 @@ base_map(LNXPROC_BASE_T *base)
 
             for (i = 0; i < dim && c < d; i++) {
                 _LNXPROC_DEBUG("At Char %p '%c'\n", c, *c);
-                while (_lnxproc_limit_chr(limits + i, *c) && (++c < d));
+                while (limit_chr(limits + i, *c) && (++c < d));
             }
 
             char *saveptr = c;
@@ -337,7 +340,7 @@ base_map(LNXPROC_BASE_T *base)
 
                 for (i = 0; i < dim && c < d; i++) {
                     _LNXPROC_DEBUG("Depth : %d: At Char %p '%c'\n", i, c, *c);
-                    if (_lnxproc_limit_chr(limits + i, *c)) {
+                    if (limit_chr(limits + i, *c)) {
                         *c = '\0';
 
                         _LNXPROC_DEBUG("Saveptr %1$p '%1$s'\n", saveptr);
@@ -348,7 +351,7 @@ base_map(LNXPROC_BASE_T *base)
                             return ret;
                         }
 
-                        while ((++c < d) && _lnxproc_limit_chr(limits + i, *c));
+                        while ((++c < d) && limit_chr(limits + i, *c));
 
                         if (c < d) {
                             idx[i]++;
@@ -358,7 +361,7 @@ base_map(LNXPROC_BASE_T *base)
 
                             for (j = i + 1; j < dim; j++) {
                                 idx[j] = 0;
-                                while (_lnxproc_limit_chr(limits + j, *c)
+                                while (limit_chr(limits + j, *c)
                                        && (++c < d));
                             }
                             saveptr = c;
@@ -414,16 +417,6 @@ base_resize_rawread_buffer(LNXPROC_BASE_T *base)
     return base_new_rawread_buffer(base->current, base->current->buflen * 2);
 }
 
-/*
-static void *memdup(void *old, size_t len) {
-    void * ret =NULL;
-    ret = calloc(1,len);
-    if( ret ) {
-        memcpy(ret,old,len);
-    }
-    return ret;
-}
-*/
 static LNXPROC_ERROR_T
 array_new(LNXPROC_BASE_DATA_T * data, _LNXPROC_LIMITS_T limits[], size_t dim)
 {
@@ -445,6 +438,8 @@ array_new(LNXPROC_BASE_DATA_T * data, _LNXPROC_LIMITS_T limits[], size_t dim)
 LNXPROC_ERROR_T
 _lnxproc_base_read(LNXPROC_BASE_T *base)
 {
+    struct timeval start = lnxproc_timeval();
+
     _LNXPROC_DEBUG("Base %p\n", base);
 
     if (!base) {
@@ -462,12 +457,26 @@ _lnxproc_base_read(LNXPROC_BASE_T *base)
         }
     } while (ret == LNXPROC_ERROR_BASE_READ_OVERFLOW);
 
+    base->current->tv = lnxproc_timeval();
+    base->current->rawread_time =
+        lnxproc_timeval_diff(&start, &base->current->tv);
+#ifdef DEBUG
+    char buf[32];
+
+    _LNXPROC_DEBUG("Current timestamp %s\n",
+                   lnxproc_timeval_print(&base->current->tv, buf, sizeof buf));
+#endif
+
     if (ret) {
         _LNXPROC_ERROR_DEBUG(ret, "\n");
         return ret;
     }
 
+    start = lnxproc_timeval();
     base_map(base);
+    struct timeval end = lnxproc_timeval();
+
+    base->current->map_time = lnxproc_timeval_diff(&start, &end);
 
     _LNXPROC_RESULTS_FREE(base->results);
     ret = _lnxproc_results_new(&base->results);
@@ -478,8 +487,11 @@ _lnxproc_base_read(LNXPROC_BASE_T *base)
         return LNXPROC_ERROR_BASE_MALLOC_RESULTS;
     }
 
+    start = lnxproc_timeval();
     _LNXPROC_DEBUG("Execute normalize method\n");
     ret = base->normalize(base);
+    end = lnxproc_timeval();
+    base->current->normalize_time = lnxproc_timeval_diff(&start, &end);
     if (ret) {
         _LNXPROC_ERROR_DEBUG(ret, "\n");
         return ret;
