@@ -20,12 +20,13 @@
 
 #ifndef LIBLNXPROC_PROC_CGROUPS_H
 #define LIBLNXPROC_PROC_CGROUPS_H 1
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include <lnxproc/error.h>
 #include "base_private.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
     LNXPROC_ERROR_T lnxproc_proc_cgroups_new(LNXPROC_BASE_T **base);
 

@@ -20,12 +20,13 @@
 
 #ifndef LIBLNXPROC_PROC_DISKSTATS_H
 #define LIBLNXPROC_PROC_DISKSTATS_H 1
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include <lnxproc/error.h>
 #include "base_private.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
     LNXPROC_ERROR_T lnxproc_proc_diskstats_new(LNXPROC_BASE_T **base);
 
