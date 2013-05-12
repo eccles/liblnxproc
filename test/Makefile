@@ -4,12 +4,12 @@ TSKS=timing timing-dbg timing-prf
 SRCS=timing.c
 
 CC=gcc
-CCFLAGS=-O2 -I../src -Wall
-CCFLAGSDBG=-g -I../src -Wall
-CCFLAGSPRF=-pg -g -I../src -Wall
+CCFLAGS=-O2 -I../src -Wall -Winline
+CCFLAGSDBG=-g -I../src -Wall -Winline
+CCFLAGSPRF=-pg -g -I../src -Wall -Winline
 LDFLAGS=-L../src -llnxproc
 LDFLAGSDBG=-L../src -llnxproc-dbg
-LDFLAGSPRF=-L../src -llnxproc-prf
+LDFLAGSPRF=../src/liblnxproc-prf.a -pg -ltdb
 
 all: $(TSKS)
 
@@ -19,7 +19,7 @@ timing: timing.c
 timing-dbg: timing.c
 	$(CC) $(CCFLAGSDBG) -o $@ $^ $(LDFLAGSDBG)
 
-timing-prf: timing.c
+timing-prf: timing.c 
 	$(CC) $(CCFLAGSPRF) -o $@ $^ $(LDFLAGSPRF)
 
 check: $(SRCS)

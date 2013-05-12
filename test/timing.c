@@ -37,19 +37,31 @@ time_module(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type, char *str)
         lnxproc_read(modules, type);
 
         if (testtype == 0) {
+            long rawread_time;
+            long map_time;
+            long normalize_time;
+            float sum_rawread_time = 0;
+            float sum_map_time = 0;
+            float sum_normalize_time = 0;
             struct timeval start = lnxproc_timeval();
 
             int i;
 
             for (i = 0; i < ntimes; i++) {
                 lnxproc_read(modules, type);
+                lnxproc_performance(modules, type, &rawread_time, &map_time,
+                                    &normalize_time);
+                sum_rawread_time += rawread_time;
+                sum_map_time += map_time;
+                sum_normalize_time += normalize_time;
             }
 
             struct timeval end = lnxproc_timeval();
             long timediff = lnxproc_timeval_diff(&start, &end);
 
-            printf("%d:%s:Elapsed time = %ld usecs\n", type, str,
-                   timediff / ntimes);
+            printf("%d:%s:Elapsed time = %ld usecs (%.1f,%.1f,%.1f)\n", type,
+                   str, timediff / ntimes, sum_rawread_time / ntimes,
+                   sum_map_time / ntimes, sum_normalize_time / ntimes);
         }
         else if (testtype == 1) {
             lnxproc_read(modules, type);

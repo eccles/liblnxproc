@@ -5,12 +5,12 @@ CC=gcc
 CCFLAGSD=-DDEBUG=1 -g
 CCFLAGSP=-pg -g
 CCFLAGSO=-O2
-CCFLAGS1=-I../src -Wall
+CCFLAGS1=-I../src -Wall -Winline
 CCFLAGS2=$(CCFLAGS1) -fpic
 #CCFLAGS=-g -fpic -I. -Wall
 LDFLAGS1=-L. -llnxproc
 LDFLAGS2=-L. -llnxproc-dbg
-LDFLAGS3=-L. -llnxproc-prf
+LDFLAGS3=-pg 
 DBLIB=-ltdb
 SOFLAGS=-shared
 OBJS=$(SRCS:.c=.o)
@@ -38,8 +38,8 @@ $(LIB).so: $(OBJS)
 $(LIB)-dbg.so: $(OBJSDBG)
 	$(CC) $(SOFLAGS) -o $@ $^ $(DBLIB)
 
-$(LIB)-prf.so: $(OBJSPRF)
-	$(CC) $(SOFLAGS) -o $@ $^ $(DBLIB)
+$(LIB)-prf.a: $(OBJSPRF)
+	ar rcs $@ $^ 
 
 $(BIN): $(BIN).c $(LIB).so
 	$(CC) $(CCFLAGSO) $(CCFLAGS1) -o $@ $^ $(LDFLAGS1) 
@@ -47,8 +47,8 @@ $(BIN): $(BIN).c $(LIB).so
 $(BIN)-dbg: $(BIN).c $(LIB)-dbg.so
 	$(CC) $(CCFLAGSD) $(CCFLAGS1) -o $@ $^ $(LDFLAGS2)
 
-$(BIN)-prf: $(BIN).c $(LIB)-prf.so
-	$(CC) $(CCFLAGSP) $(CCFLAGS1) -o $@ $^ $(LDFLAGS3)
+$(BIN)-prf: $(BIN).c $(LIB)-prf.a
+	$(CC) $(CCFLAGSP) $(CCFLAGS1) -o $@ $^ $(LDFLAGS3) $(DBLIB)
 
 check: $(HDRS) $(SRCS)
 	for d in $(DIRS); do (cd $$d; $(MAKE) check ); done
@@ -56,5 +56,5 @@ check: $(HDRS) $(SRCS)
 
 clean:
 	for d in $(PUBHDIR); do (cd $$d; rm -f *~ ); done
-	rm -f $(BIN) $(BIN)-dbg $(BIN)-prf *.o *.so *~ *.orig core* vgcore* x y z
+	rm -f $(BIN) $(BIN)-dbg $(BIN)-prf *.a *.o *.so *~ *.orig core* vgcore* x y z X Y
 
