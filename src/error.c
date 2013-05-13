@@ -123,7 +123,7 @@ _lnxproc_debug(const char *filename, int lineno, const char *funcname,
 }
 #endif
 const char *
-lnxproc_strerror(LNXPROC_ERROR_T err, char *buf, size_t buflen)
+lnxproc_strerror(int err, char *buf, size_t buflen)
 {
     if (err < 0) {
         strerror_r(-((int) err), buf, buflen);

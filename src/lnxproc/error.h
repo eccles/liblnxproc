@@ -95,10 +95,9 @@ extern "C" {
         LNXPROC_ERROR_VECTOR_ADDRESS_CONTENTS_NOT_NULL,
         LNXPROC_ERROR_SIZE
     };
+    typedef int LNXPROC_ERROR_T;
 
-    typedef enum lnxproc_error_t LNXPROC_ERROR_T;
-
-    const char *lnxproc_strerror(LNXPROC_ERROR_T err, char *buf, size_t buflen);
+    const char *lnxproc_strerror(int err, char *buf, size_t buflen);
 
 #ifdef __cplusplus
 }                               // extern "C"
