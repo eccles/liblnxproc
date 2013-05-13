@@ -111,6 +111,9 @@ base_rawread(char *filename, char **readbuf, int *nbytes)
         return myerrno;
     }
 
+    /* we do not have to check return status of close as we are only
+     * reading the file
+     */
     _LNXPROC_DEBUG("Read %s\n", filename);
     int inbytes = read(fd, *readbuf, *nbytes);
 
@@ -118,16 +121,13 @@ base_rawread(char *filename, char **readbuf, int *nbytes)
         int myerrno = -errno;
 
         _LNXPROC_ERROR_DEBUG(myerrno, "Read %s\n", filename);
+        _LNXPROC_DEBUG("Close %s\n", filename);
+        close(fd);
+
         return myerrno;
     }
 
     _LNXPROC_DEBUG("Nbytes %d read\n", inbytes);
-
-    /* we do not have to check return status of close as we are only
-     * reading the file
-     */
-    _LNXPROC_DEBUG("Close %s\n", filename);
-    close(fd);
 
     (*readbuf)[inbytes] = '\n';
     *readbuf += inbytes;
@@ -232,9 +232,13 @@ base_read_glob_files(LNXPROC_BASE_T *base, char **readbuf, int *nbytes)
                 _LNXPROC_DEBUG("Readbuf %p Nbytes %d\n", *readbuf, *nbytes);
                 ret = base_rawread(globbuf.gl_pathv[i], readbuf, nbytes);
                 if (ret) {
-                    globfree(&globbuf);
-                    regfree(&reg);
-                    return ret;
+                    if (ret == LNXPROC_ERROR_BASE_READ_OVERFLOW) {
+                        globfree(&globbuf);
+                        regfree(&reg);
+                        return ret;
+                    }
+                    *readbuf -= n;
+                    *nbytes += n;
                 }
             }
         }
