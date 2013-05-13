@@ -31,25 +31,31 @@
 static _LNXPROC_VECTOR_T **
 vector_malloc_children(size_t size)
 {
-    size_t n = size * sizeof(_LNXPROC_VECTOR_T *);
-    _LNXPROC_VECTOR_T **p = calloc(1, n);
-
-    return p;
+    return calloc(size, sizeof(_LNXPROC_VECTOR_T *));
 }
 
 static _LNXPROC_VECTOR_T **
 vector_realloc_children(_LNXPROC_VECTOR_T ** old, size_t oldsize,
                         size_t addsize)
 {
+    _LNXPROC_DEBUG("Old %p oldsize %zd addsize %zd\n", old, oldsize, addsize);
+
     size_t nsize = oldsize + addsize;
     size_t n = nsize * sizeof(_LNXPROC_VECTOR_T *);
+
+    _LNXPROC_DEBUG("nsize %zd n %zd\n", nsize, n);
+
     _LNXPROC_VECTOR_T **p = realloc(old, n);
 
+    _LNXPROC_DEBUG("New %p\n", p);
     if (p) {
-        _LNXPROC_VECTOR_T **prev = p + oldsize;
+        _LNXPROC_VECTOR_T **extra = p + oldsize;
+
+        _LNXPROC_DEBUG("Extra %p\n", extra);
 
         n = addsize * sizeof(_LNXPROC_VECTOR_T *);
-        memset(prev, 0, n);
+        _LNXPROC_DEBUG("n %zd\n", n);
+        memset(extra, 0, n);
     }
 
     return p;
@@ -58,24 +64,31 @@ vector_realloc_children(_LNXPROC_VECTOR_T ** old, size_t oldsize,
 static char **
 vector_malloc_values(size_t size)
 {
-    size_t n = size * sizeof(char *);
-    char **p = calloc(1, n);
-
-    return p;
+    return calloc(size, sizeof(char *));
 }
 
 static char **
 vector_realloc_values(char **old, size_t oldsize, size_t addsize)
 {
+    _LNXPROC_DEBUG("Old %p oldsize %zd addsize %zd\n", old, oldsize, addsize);
+
     size_t nsize = oldsize + addsize;
     size_t n = nsize * sizeof(char *);
+
+    _LNXPROC_DEBUG("nsize %zd n %zd\n", nsize, n);
+
     char **p = realloc(old, n);
 
+    _LNXPROC_DEBUG("New %p\n", p);
+
     if (p) {
-        char **prev = p + oldsize;
+        char **extra = p + oldsize;
+
+        _LNXPROC_DEBUG("Extra %p\n", extra);
 
         n = addsize * sizeof(char *);
-        memset(prev, 0, n);
+        _LNXPROC_DEBUG("n %zd\n", n);
+        memset(extra, 0, n);
     }
 
     return p;
@@ -119,13 +132,15 @@ _lnxproc_vector_new(_LNXPROC_VECTOR_T ** vector, size_t size, int recursive)
     if (size > 0) {
         _LNXPROC_DEBUG("Malloc %zd words of child\n", size);
 
-        p->children = vector_malloc_children(size);
+        if (recursive) {
+            p->children = vector_malloc_children(size);
 
-        if (!p->children) {
-            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_MALLOC_DATA,
-                                 "Malloc data\n");
-            _LNXPROC_VECTOR_FREE(p);
-            return LNXPROC_ERROR_VECTOR_MALLOC_DATA;
+            if (!p->children) {
+                _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_MALLOC_DATA,
+                                     "Malloc data\n");
+                _LNXPROC_VECTOR_FREE(p);
+                return LNXPROC_ERROR_VECTOR_MALLOC_DATA;
+            }
         }
 
         p->values = vector_malloc_values(size);
@@ -136,11 +151,6 @@ _lnxproc_vector_new(_LNXPROC_VECTOR_T ** vector, size_t size, int recursive)
             _LNXPROC_VECTOR_FREE(p);
             return LNXPROC_ERROR_VECTOR_MALLOC_DATA;
         }
-    }
-
-    else {
-        p->children = NULL;
-        p->values = NULL;
     }
 
     *vector = p;
@@ -187,20 +197,23 @@ _lnxproc_vector_resize(_LNXPROC_VECTOR_T * vector, size_t size)
     }
 
     size_t osize = vector->size;
-    _LNXPROC_VECTOR_T **p =
-        vector_realloc_children(vector->children, osize, size);
 
-    if (!p) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_REALLOC_DATA,
-                             "Realloc values\n");
-        return LNXPROC_ERROR_VECTOR_REALLOC_DATA;
+    if (vector->recursive) {
+        _LNXPROC_VECTOR_T **p =
+            vector_realloc_children(vector->children, osize, size);
+
+        if (!p) {
+            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_REALLOC_DATA,
+                                 "Realloc children\n");
+            return LNXPROC_ERROR_VECTOR_REALLOC_DATA;
+        }
+
+        if (p != vector->children) {
+            _LNXPROC_DEBUG("Children of vector %p moved from %p to %p\n",
+                           vector, vector->children, p);
+            vector->children = p;
+        }
     }
-
-    if (p != vector->children) {
-        _LNXPROC_DEBUG("Children moved from %p to %p\n", vector->children, p);
-        vector->children = p;
-    }
-
     char **q = vector_realloc_values(vector->values, osize, size);
 
     if (!q) {
@@ -209,14 +222,21 @@ _lnxproc_vector_resize(_LNXPROC_VECTOR_T * vector, size_t size)
         return LNXPROC_ERROR_VECTOR_REALLOC_DATA;
     }
     if (q != vector->values) {
-        _LNXPROC_DEBUG("Values moved from %p to %p\n", vector->values, q);
-        int i;
+        _LNXPROC_DEBUG("Values of vector %p moved from %p to %p\n", vector,
+                       vector->values, q);
 
         _LNXPROC_VECTOR_T *par = vector->parent;
 
+        _LNXPROC_DEBUG("Parent of vector %p is %p\n", vector, par);
+
         if (par) {
-            for (i = 0; i < osize; i++) {
+            int i;
+
+            for (i = 0; i < par->size; i++) {
                 if (par->values[i] == (char *) vector->values) {
+                    _LNXPROC_DEBUG
+                        ("Changed parent vector at position %d from %p to %p\n",
+                         i, par->values[i], q);
                     par->values[i] = (char *) q;
                 }
             }
@@ -313,19 +333,17 @@ _lnxproc_vector_set_child(_LNXPROC_VECTOR_T * vector, size_t idx,
         return LNXPROC_ERROR_VECTOR_NULL_CHILDREN;
     }
 
-    if (idx < vector->length) {
-        _LNXPROC_DEBUG("Set entry %zd to %p\n", idx, child);
-        vector->children[idx] = child;
-        child->parent = vector;
-        _LNXPROC_DEBUG("Set value %zd to %p\n", idx, child->values);
-        vector->values[idx] = (char *) child->values;
+    if (idx > vector->length) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_INDEX_OUT_OF_RANGE,
+                             "Index %zd Length %zd\n", idx, vector->length);
+        return LNXPROC_ERROR_VECTOR_INDEX_OUT_OF_RANGE;
     }
 
-    else if (idx == vector->length) {
+    if (idx == vector->length) {
         _LNXPROC_DEBUG("Append entry Idx %zd Length %zd\n", idx,
                        vector->length);
 
-        if (idx == vector->size) {
+        if (idx >= vector->size) {
             _LNXPROC_DEBUG("Resize data Size %zd\n", vector->size);
             LNXPROC_ERROR_T ret = _lnxproc_vector_resize(vector, 1);
 
@@ -334,22 +352,17 @@ _lnxproc_vector_set_child(_LNXPROC_VECTOR_T * vector, size_t idx,
                 return ret;
             }
         }
-
-        _LNXPROC_DEBUG("Append entry %zd to %p\n", idx, child);
-        vector->children[idx] = child;
-        child->parent = vector;
-        _LNXPROC_DEBUG("Append value %zd to %p\n", idx, child->values);
-        vector->values[idx] = (char *) child->values;
         vector->length = idx + 1;
         _LNXPROC_DEBUG("Vector length is now %zd\n", vector->length);
-
     }
-
-    else {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_INDEX_OUT_OF_RANGE,
-                             "Index %zd Length %zd\n", idx, vector->length);
-        return LNXPROC_ERROR_VECTOR_INDEX_OUT_OF_RANGE;
-    }
+    _LNXPROC_DEBUG("Set Vector %p child %zd to %p\n", vector, idx, child);
+    vector->children[idx] = child;
+    _LNXPROC_DEBUG("Set parent of %p to %p(%d)\n", child, vector, idx);
+    child->parent = vector;
+    child->idx = idx;
+    _LNXPROC_DEBUG("Set Vector %p value %zd to %p\n", vector, idx,
+                   child->values);
+    vector->values[idx] = (char *) child->values;
 
     _LNXPROC_DEBUG("Success\n");
     return LNXPROC_OK;
@@ -370,14 +383,13 @@ _lnxproc_vector_set_value(_LNXPROC_VECTOR_T * vector, size_t idx, char *val)
         return LNXPROC_ERROR_VECTOR_NULL_VALUES;
     }
 
-    if (idx < vector->length) {
-        _LNXPROC_DEBUG
-            ("Set normal entry (not an append) Idx %zd Length %zd\n", idx,
-             vector->length);
-        vector->values[idx] = val;
+    if (idx > vector->length) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_INDEX_OUT_OF_RANGE,
+                             "Index %zd Length %zd\n", idx, vector->length);
+        return LNXPROC_ERROR_VECTOR_INDEX_OUT_OF_RANGE;
     }
 
-    else if (idx == vector->length) {
+    if (idx == vector->length) {
         _LNXPROC_DEBUG("Append entry Idx %zd Length %zd\n", idx,
                        vector->length);
 
@@ -391,18 +403,13 @@ _lnxproc_vector_set_value(_LNXPROC_VECTOR_T * vector, size_t idx, char *val)
             }
         }
 
-        _LNXPROC_DEBUG("Set entry %zd to %p\n", idx, val);
-        vector->values[idx] = val;
         vector->length = idx + 1;
         _LNXPROC_DEBUG("Vector length is now %zd\n", vector->length);
 
     }
 
-    else {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_INDEX_OUT_OF_RANGE,
-                             "Index %zd Length %zd\n", idx, vector->length);
-        return LNXPROC_ERROR_VECTOR_INDEX_OUT_OF_RANGE;
-    }
+    _LNXPROC_DEBUG("Set Vector %p entry Idx %zd to %p\n", vector, idx, val);
+    vector->values[idx] = val;
 
     _LNXPROC_DEBUG("Success\n");
     return LNXPROC_OK;
@@ -463,52 +470,43 @@ _lnxproc_vector_set_length(_LNXPROC_VECTOR_T * vector, size_t idx)
 
 LNXPROC_ERROR_T
 _lnxproc_vector_iterate(_LNXPROC_VECTOR_T * vector,
-                        void *data,
-                        int start, int end, _LNXPROC_VECTOR_ITERATE_FUNC func)
+                        int depth, int allocated, void *data,
+                        _LNXPROC_VECTOR_ITERATE_FUNC func)
 {
-    _LNXPROC_DEBUG("Vector %p Data %p Start %d End %d Func %p\n", vector,
-                   data, start, end, func);
+    _LNXPROC_DEBUG("Vector %p Depth %d Data %p Func %p\n", vector,
+                   depth, data, func);
 
     if (!vector) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_NULL, "\n");
         return LNXPROC_ERROR_VECTOR_NULL;
     }
 
-    if (!vector->children || !vector->values) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_VECTOR_NULL_DATA, "\n");
-        return LNXPROC_ERROR_VECTOR_NULL_DATA;
-    }
+    func(vector, depth, data);
 
-    if (start < 0) {
-        start = 0;
-    }
-    else if (start > vector->length) {
-        start = vector->length;
-    }
+    if (vector->children) {
+        int end;
 
-    if (end < 0) {
-        end = vector->length;
-    }
-    else if (end > vector->size) {
-        end = vector->size;
-    }
+        if (allocated) {
+            end = vector->size;
+        }
+        else {
+            end = vector->length;
+        }
 
-    _LNXPROC_DEBUG("Iterate from %d to %d\n", start, end);
-    int i;
+        _LNXPROC_DEBUG("Iterate from 0 to %d\n", end);
+        int i;
 
-    for (i = start; i < end; i++) {
-        func(vector->children[i], vector->values[i], vector->recursive, data,
-             i);
+        depth++;
+        for (i = 0; i < end; i++) {
+            if (vector->children[i]) {
+                _lnxproc_vector_iterate(vector->children[i], depth, allocated,
+                                        data, func);
+            }
+        }
     }
-
     _LNXPROC_DEBUG("Success\n");
     return LNXPROC_OK;
 }
-
-struct printvar_t {
-    int depth;
-    int allocated;
-};
 
 static void
 vector_print_depth(int depth)
@@ -521,33 +519,45 @@ vector_print_depth(int depth)
 }
 
 static LNXPROC_ERROR_T
-vector_print_internal(_LNXPROC_VECTOR_T * child, char *value, int recursive,
-                      void *data, size_t idx)
+vector_print_internal(_LNXPROC_VECTOR_T * vector, int depth, void *data)
 {
-    _LNXPROC_DEBUG("Child %p Val %p Rec %d Data %p Idx %zd\n", child, value,
-                   recursive, data, idx);
-
-    int depth = 0;
-    int allocated = 0;
-    struct printvar_t *printvar = NULL;
-
-    if (data) {
-        printvar = data;
-        depth = printvar->depth;
-        allocated = printvar->allocated;
-    }
+    _LNXPROC_DEBUG("Vector %p Depth %d Data %p\n", vector, depth, data);
 
     vector_print_depth(depth);
-    if (recursive) {
-        printf("--> %zd:Value %p\n", idx, value);
+    printf("Vector at %p\n", vector);
+    vector_print_depth(depth);
+    printf("Vector parent %p(%d)\n", vector->parent, vector->idx);
+    vector_print_depth(depth);
+    printf("Vector size %zd\n", vector->size);
+    vector_print_depth(depth);
+    printf("Vector length %zd\n", vector->length);
+    vector_print_depth(depth);
+    printf("Vector recursive %d\n", vector->recursive);
+    if (vector->children) {
         vector_print_depth(depth);
-        printf("--> %zd:Child %p\n", idx, child);
+        printf("Vector children at %p\n", vector->children);
+        vector_print_depth(depth);
+        printf("Vector values at %p\n", vector->values);
+        if (vector->values) {
+            int i;
 
-        _lnxproc_vector_print(child, allocated, data);
+            for (i = 0; i < vector->length; i++) {
+                vector_print_depth(depth);
+                printf("--> %1$d: %2$p\n", i, vector->values[i]);
+            }
+        }
     }
-    else {
-        printf("--> %1$zd:Value %2$p '%2$s'\n", idx, value);
+    else if (vector->values) {
+        vector_print_depth(depth);
+        printf("Vector values at %p\n", vector->values);
+        int i;
+
+        for (i = 0; i < vector->length; i++) {
+            vector_print_depth(depth);
+            printf("--> %1$d: %2$p '%2$s'\n", i, vector->values[i]);
+        }
     }
+    printf("\n");
     return LNXPROC_OK;
 }
 
@@ -561,45 +571,7 @@ _lnxproc_vector_print(_LNXPROC_VECTOR_T * vector, int allocated, void *data)
         return LNXPROC_ERROR_VECTOR_NULL;
     }
 
-    struct printvar_t printvar;
-
-    if (data) {
-        struct printvar_t *oldprintvar = data;
-
-        printvar.depth = oldprintvar->depth + 1;
-        printvar.allocated = oldprintvar->allocated;
-    }
-    else {
-        printvar.depth = 0;
-        printvar.allocated = allocated;
-    }
-
-    vector_print_depth(printvar.depth);
-    printf("Vector at %p\n", vector);
-    vector_print_depth(printvar.depth);
-    printf("Vector parent %p\n", vector->parent);
-    vector_print_depth(printvar.depth);
-    printf("Vector size %zd\n", vector->size);
-    vector_print_depth(printvar.depth);
-    printf("Vector length %zd\n", vector->length);
-    vector_print_depth(printvar.depth);
-    printf("Vector recursive %d\n", vector->recursive);
-    if (vector->children) {
-        vector_print_depth(printvar.depth);
-        printf("Vector children at %p\n", vector->children);
-    }
-    if (vector->values) {
-        vector_print_depth(printvar.depth);
-        printf("Vector values at %p\n", vector->values);
-    }
-    if (allocated) {
-        _lnxproc_vector_iterate(vector, &printvar, -1, vector->size,
-                                vector_print_internal);
-    }
-    else {
-        _lnxproc_vector_iterate(vector, &printvar, -1, -1,
-                                vector_print_internal);
-    }
+    _lnxproc_vector_iterate(vector, 0, allocated, NULL, vector_print_internal);
     printf("\n");
     return LNXPROC_OK;
 }

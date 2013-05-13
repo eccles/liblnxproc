@@ -239,7 +239,6 @@ _lnxproc_array_set(_LNXPROC_ARRAY_T * array, size_t idx[], size_t dim,
     _LNXPROC_VECTOR_T *saved[dim];
 
     saved[0] = array->vector;
-    _LNXPROC_DEBUG("Saved[%d] = %p\n", 0, saved[0]);
 
     LNXPROC_ERROR_T ret;
     int i;
@@ -329,7 +328,6 @@ _lnxproc_array_set_last(_LNXPROC_ARRAY_T * array, size_t idx[], size_t dim,
     int i;
 
     for (i = 0; i < dim - 1; i++) {
-        _LNXPROC_DEBUG("Saved[%d] = %p\n", i, saved[i]);
         _LNXPROC_VECTOR_T *f = NULL;
 
         ret = _lnxproc_vector_child(saved[i], idx[i], &f);
@@ -461,44 +459,35 @@ struct array_iterate_t {
     char *data;
     size_t *idx;
     int dim;
-    int depth;
     _LNXPROC_ARRAY_ITERATE_FUNC func;
 };
 
 static LNXPROC_ERROR_T
-array_vector_iterate_func(_LNXPROC_VECTOR_T * child, char *value, int recursive,
-                          void *data, size_t idx)
+array_vector_iterate_func(_LNXPROC_VECTOR_T * vector, int depth, void *data)
 {
 
-    _LNXPROC_DEBUG("Child %p Val %p Rec %d Data %p Idx %zd\n", child, value,
-                   recursive, data, idx);
+    _LNXPROC_DEBUG("Child %p Depth %d Data %p\n", vector, depth, data);
 
     struct array_iterate_t *adata = data;
     size_t *aidx = adata->idx;
     size_t adim = adata->dim;
 
 #ifdef DEBUG
-    _LNXPROC_DEBUG("Adata: Data %p Depth %d\n", adata->data, adata->depth);
+    _LNXPROC_DEBUG("Adata: Data %p\n", adata->data);
     DEBUG_IDX(aidx, adim);
 #endif
 
     LNXPROC_ERROR_T ret = LNXPROC_OK;
 
-    aidx[adata->depth] = idx;
-    if (recursive) {
-        struct array_iterate_t adata1;
+    aidx[depth] = vector->idx;
+    if (!vector->recursive && vector->values && vector->length > 0) {
+        int i;
 
-        memcpy(&adata1, adata, sizeof(adata1));
-        adata1.depth++;
-        ret = _lnxproc_vector_iterate(child, &adata1, -1,
-                                      adata->allocated ? child->size : -1,
-                                      array_vector_iterate_func);
-
+        for (i = 0; i < vector->length; i++) {
+            aidx[depth] = i;
+            ret = adata->func(vector->values[i], adata->data, aidx, adim);
+        }
     }
-    else {
-        ret = adata->func(value, adata->data, aidx, adim);
-    }
-
     return ret;
 }
 
@@ -531,13 +520,11 @@ _lnxproc_array_iterate(_LNXPROC_ARRAY_T * array,
             .data = data,
             .idx = idx,
             .dim = array->dim,
-            .depth = 0,
             .func = func,
         };
 
         ret =
-            _lnxproc_vector_iterate(array->vector, &adata, -1,
-                                    allocated ? array->vector->size : -1,
+            _lnxproc_vector_iterate(array->vector, 0, allocated, &adata,
                                     array_vector_iterate_func);
 
         if (ret) {
@@ -575,6 +562,7 @@ array_print_internal(char *val, void *data, size_t idx[], size_t dim)
 #endif
     int i;
 
+    printf("--> ");
     for (i = 0; i < dim; i++) {
         printf("%zd ", idx[i]);
     }

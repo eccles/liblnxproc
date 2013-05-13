@@ -40,6 +40,7 @@ extern "C" {
         size_t size;
         int recursive;
         _LNXPROC_VECTOR_T *parent;
+        int idx;
         _LNXPROC_VECTOR_T **children;
         char **values;
     };
@@ -81,14 +82,13 @@ extern "C" {
 
     typedef
     LNXPROC_ERROR_T (*_LNXPROC_VECTOR_ITERATE_FUNC) (_LNXPROC_VECTOR_T *
-                                                     child, char *value,
-                                                     int recursive, void *data,
-                                                     size_t idx);
+                                                     vector, int depth,
+                                                     void *data);
 
     LNXPROC_ERROR_T _lnxproc_vector_iterate(_LNXPROC_VECTOR_T * vector,
+                                            int depth,
+                                            int allocated,
                                             void *data,
-                                            int start,
-                                            int end,
                                             _LNXPROC_VECTOR_ITERATE_FUNC func);
 
     LNXPROC_ERROR_T _lnxproc_vector_print(_LNXPROC_VECTOR_T * vector,
