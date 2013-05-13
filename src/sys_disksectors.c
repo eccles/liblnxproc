@@ -79,7 +79,7 @@ lnxproc_sys_disksectors_new(LNXPROC_BASE_T **base)
 
     _LNXPROC_LIMITS_T limits[] = {
         {.expected = 9,.chars = "\n",.len = 1}, /* row delimiters */
-        {.expected = 2,.chars = "\t",.len = 1}  /* column delimiters */
+        {.expected = 1,.chars = "\t",.len = 1}  /* column delimiters */
     };
 
     size_t dim = sizeof(limits) / sizeof(limits[0]);

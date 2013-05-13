@@ -149,6 +149,11 @@ base_read_glob_files(LNXPROC_BASE_T *base, char **readbuf, int *nbytes)
     char globpat[FILENAME_MAX];
     char regpat[FILENAME_MAX];
 
+    _LNXPROC_ARRAY_T *array = base->current->array;
+    size_t dim = array->dim;
+    _LNXPROC_LIMITS_T *limits = array->limits;
+    char separator = limits[dim - 1].chars[0];
+
     if (base->fileprefix) {
         if (base->filesuffix) {
             snprintf(globpat, sizeof globpat, "%s/%s/%s", base->fileprefix,
@@ -215,7 +220,8 @@ base_read_glob_files(LNXPROC_BASE_T *base, char **readbuf, int *nbytes)
                 _LNXPROC_DEBUG("%d:%d:Match from %d to %d '%.*s'\n", i, j,
                                (int) pmatch[j].rm_so, (int) pmatch[j].rm_eo,
                                len, s);
-                int n = snprintf(*readbuf, *nbytes, "%.*s\t", len, s);
+                int n =
+                    snprintf(*readbuf, *nbytes, "%.*s%c", len, s, separator);
 
                 if (n > (*nbytes) - 1) {
                     n = (*nbytes) - 1;
