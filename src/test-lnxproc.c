@@ -38,6 +38,7 @@ This file is part of liblnxproc.
 #include "proc_osrelease.h"
 #include "sys_cpufreq.h"
 #include "sys_disksectors.h"
+#include "proc_pid_stat.h"
 
 /*----------------------------------------------------------------------------*/
 static void
@@ -178,11 +179,9 @@ test_limits(void)
 
 /*----------------------------------------------------------------------------*/
 static LNXPROC_ERROR_T
-myvector_print(_LNXPROC_VECTOR_T * child, char *value, int recursive,
-               void *data, size_t idx)
+myvector_print(_LNXPROC_VECTOR_T * vector, int depth, void *data)
 {
-    printf("Child %p : Index %zd\n", child, idx);
-    printf("Val %p : Index %zd\n", value, idx);
+    printf("Vector %p Depth %d\n", vector, depth);
     return 0;
 }
 
@@ -318,7 +317,7 @@ test_vector(void)
         _lnxproc_vector_print(vector, 1, NULL);
 
         printf("Print elements %d to %d\n", 1, 2);
-        _lnxproc_vector_iterate(vector, NULL, 1, 3, myvector_print);
+        _lnxproc_vector_iterate(vector, 0, 0, NULL, myvector_print);
         printf("\n");
 
         _LNXPROC_VECTOR_FREE(vector);
@@ -685,6 +684,18 @@ test_sys_disksectors(void)
 }
 
 /*----------------------------------------------------------------------------*/
+static void
+test_proc_pid_stat(void)
+{
+    LNXPROC_BASE_T *proc_pid_stat = NULL;
+    LNXPROC_ERROR_T ret = lnxproc_proc_pid_stat_new(&proc_pid_stat);
+
+    if (ret == LNXPROC_OK) {
+        execute_base(proc_pid_stat);
+    }
+}
+
+/*----------------------------------------------------------------------------*/
 int
 main(int argc, char *argv[])
 {
@@ -704,6 +715,7 @@ main(int argc, char *argv[])
         test_proc_osrelease();
         test_sys_cpufreq();
         test_sys_disksectors();
+        test_proc_pid_stat();
     }
     else if (!strcmp(argv[1], "util")) {
         test_util();
@@ -746,6 +758,9 @@ main(int argc, char *argv[])
     }
     else if (!strcmp(argv[1], "sys_disksectors")) {
         test_sys_disksectors();
+    }
+    else if (!strcmp(argv[1], "proc_pid_stat")) {
+        test_proc_pid_stat();
     }
     return 0;
 }

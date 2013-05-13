@@ -30,6 +30,7 @@
 #include "proc_osrelease.h"
 #include "sys_cpufreq.h"
 #include "sys_disksectors.h"
+#include "proc_pid_stat.h"
 
 static LNXPROC_MODULE_T mymodules[] = {
     {.new = lnxproc_proc_cgroups_new,.base = NULL,},
@@ -39,6 +40,7 @@ static LNXPROC_MODULE_T mymodules[] = {
     {.new = lnxproc_proc_osrelease_new,.base = NULL,},
     {.new = lnxproc_sys_cpufreq_new,.base = NULL,},
     {.new = lnxproc_sys_disksectors_new,.base = NULL,},
+    {.new = lnxproc_proc_pid_stat_new,.base = NULL,},
 };
 
 static size_t nmodules = sizeof(mymodules) / sizeof(mymodules[0]);

@@ -38,6 +38,7 @@ extern "C" {
         LNXPROC_PROC_OSRELEASE,
         LNXPROC_SYS_CPUFREQ,
         LNXPROC_SYS_DISKSECTORS,
+        LNXPROC_PROC_PID_STAT,
     };
     typedef enum lnxproc_module_type_t LNXPROC_MODULE_TYPE_T;
 

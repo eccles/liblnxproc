@@ -109,6 +109,7 @@ main(int argc, char *argv[])
         TEST_MODULE(modules, LNXPROC_PROC_OSRELEASE);
         TEST_MODULE(modules, LNXPROC_SYS_CPUFREQ);
         TEST_MODULE(modules, LNXPROC_SYS_DISKSECTORS);
+        TEST_MODULE(modules, LNXPROC_PROC_PID_STAT);
     }
     else if (!strcmp(argv[1], "proc_cgroups")) {
         TEST_MODULE(modules, LNXPROC_PROC_CGROUPS);
@@ -130,6 +131,9 @@ main(int argc, char *argv[])
     }
     else if (!strcmp(argv[1], "sys_disksectors")) {
         TEST_MODULE(modules, LNXPROC_SYS_DISKSECTORS);
+    }
+    else if (!strcmp(argv[1], "proc_pid_stat")) {
+        TEST_MODULE(modules, LNXPROC_PROC_PID_STAT);
     }
     LNXPROC_FREE(modules);
     return 0;

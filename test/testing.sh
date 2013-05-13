@@ -32,10 +32,10 @@ then
     valgrind -v ${VALOPTS} ${BIN}-dbg $*
 elif [ "${OPT}" = "ddd" ]
 then
-    ddd ${BIN} $*
+    ddd ${BIN}
 elif [ "${OPT}" = "ddddbg" ]
 then
-    ddd ${BIN}-dbg $*
+    ddd ${BIN}-dbg
 elif [ "${OPT}" = "dbg" ]
 then
     ${BIN}-dbg $*
