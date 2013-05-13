@@ -40,6 +40,9 @@ extern "C" {
     typedef struct _lnxproc_results_table_t _LNXPROC_RESULTS_TABLE_T;
 
     struct _lnxproc_results_t {
+        long jiffies_per_sec;
+        float secs_per_jiffy;
+        long page_size;
         size_t size;
         size_t length;
         _LNXPROC_RESULTS_TABLE_T *table;

@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "error_private.h"
 #include "results_private.h"
@@ -46,6 +47,11 @@ _lnxproc_results_print(_LNXPROC_RESULTS_T * results)
         return LNXPROC_ERROR_RESULTS_NULL;
     }
 
+    printf("Jiffies per second = %ld\n", results->jiffies_per_sec);
+    printf("Seconds per jiffy = %f\n", results->secs_per_jiffy);
+    printf("Page size = %ld\n", results->page_size);
+    printf("Table size = %zd\n", results->size);
+    printf("Table length = %zd\n", results->length);
     return _lnxproc_results_iterate(results, internal_print_func, NULL);
 
 }
@@ -77,6 +83,10 @@ _lnxproc_results_new(_LNXPROC_RESULTS_T ** results)
     p->size = 0;
     p->length = 0;
     p->table = NULL;
+
+    p->jiffies_per_sec = sysconf(_SC_CLK_TCK);
+    p->secs_per_jiffy = 1.0 / p->jiffies_per_sec;
+    p->page_size = sysconf(_SC_PAGE_SIZE) / 1024;
 
     *results = p;
     _LNXPROC_DEBUG("Successful\n");
