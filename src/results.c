@@ -52,6 +52,13 @@ _lnxproc_results_print(_LNXPROC_RESULTS_T * results)
     printf("Page size = %ld\n", results->page_size);
     printf("Table size = %zd\n", results->size);
     printf("Table length = %zd\n", results->length);
+    printf("Hash = %p\n", results->hash);
+    if(results->hash) {
+        _LNXPROC_RESULTS_TABLE_T *entry, *tmp;
+        HASH_ITER(hh, results->hash, entry, tmp) {
+            printf("Hash Key: %s = %s\n", entry->key, entry->value);
+        }
+    }
     return _lnxproc_results_iterate(results, internal_print_func, NULL);
 
 }
@@ -83,6 +90,7 @@ _lnxproc_results_new(_LNXPROC_RESULTS_T ** results)
     p->size = 0;
     p->length = 0;
     p->table = NULL;
+    p->hash = NULL;
 
     p->jiffies_per_sec = sysconf(_SC_CLK_TCK);
     p->secs_per_jiffy = 1.0 / p->jiffies_per_sec;
@@ -104,6 +112,7 @@ _lnxproc_results_free(_LNXPROC_RESULTS_T * results)
             free(results->table);
             results->table = NULL;
         }
+        HASH_CLEAR(hh,results->hash);
         free(results);
         results = NULL;
     }
@@ -118,6 +127,8 @@ realloc_results_table(_LNXPROC_RESULTS_T * results, size_t nentries)
     _LNXPROC_DEBUG("Sizeof table entry %zd\n",
                    sizeof(_LNXPROC_RESULTS_TABLE_T));
 
+    HASH_CLEAR(hh,results->hash);
+
     size_t nsize =
         (nentries + results->size) * sizeof(_LNXPROC_RESULTS_TABLE_T);
     _LNXPROC_DEBUG("Nsize %zd\n", nsize);
@@ -130,9 +141,16 @@ realloc_results_table(_LNXPROC_RESULTS_T * results, size_t nentries)
     int i;
 
     _LNXPROC_DEBUG("New Table %p\n", t);
+    for (i = 0; i < results->length; i++) {
+        _LNXPROC_RESULTS_TABLE_T *entry = t+i;
+        HASH_ADD_STR(results->hash,key,entry);
+    }
+
     for (i = results->size; i < (nentries + results->size); i++) {
+        _LNXPROC_RESULTS_TABLE_T *entry = t+i;
         _LNXPROC_DEBUG("Clear %d bytes at %p\n",
-                       sizeof(_LNXPROC_RESULTS_TABLE_T), t + i);
+                       sizeof(_LNXPROC_RESULTS_TABLE_T), entry);
+        memset(entry,0,sizeof(_LNXPROC_RESULTS_TABLE_T));
     }
     results->table = t;
     results->size += nentries;
@@ -159,6 +177,7 @@ _lnxproc_results_init(_LNXPROC_RESULTS_T * results, size_t nentries)
             return ret;
         }
     }
+    HASH_CLEAR(hh,results->hash);
     results->length = 0;
     return LNXPROC_OK;
 }
@@ -195,7 +214,6 @@ _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results, char **value,
     va_list ap;
 
     va_start(ap, fmt);
-#ifdef DEBUG
     size_t ksize = 1 + vsnprintf(key, sizeof key, fmt, ap);
 
     if (ksize > sizeof key) {
@@ -203,13 +221,18 @@ _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results, char **value,
                        sizeof key);
         ksize = sizeof key;
     }
-#else
-    vsnprintf(key, sizeof key, fmt, ap);
-#endif
-
     va_end(ap);
 
     _LNXPROC_DEBUG("Key %s\n", key);
+    if( results->hash) {
+        _LNXPROC_RESULTS_TABLE_T *entry;
+        HASH_FIND(hh,results->hash,key,ksize,entry);
+        if( entry ) {
+            *value = entry->value;
+            _LNXPROC_DEBUG("Value %s\n", entry->value);
+        }
+    }
+    else {
     int i;
     _LNXPROC_RESULTS_TABLE_T *table = results->table;
 
@@ -220,6 +243,7 @@ _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results, char **value,
             _LNXPROC_DEBUG("Value %s\n", table[i].value);
             return LNXPROC_OK;
         }
+    }
     }
     return LNXPROC_OK;
 }
@@ -232,13 +256,19 @@ _lnxproc_results_add(_LNXPROC_RESULTS_T * results, const char *value,
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_NULL;
     }
+    if (!value) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_VAL_ADDRESS_NULL, "\n");
+        return LNXPROC_ERROR_RESULTS_VAL_ADDRESS_NULL;
+    }
 
-    _LNXPROC_DEBUG("Results %p Value %p '%s'\n", results, value, value);
+    _LNXPROC_DEBUG("Results %1$p Value %2$p '%2$s'\n", results, value);
 
     if (!results->table) {
         results->length = 0;
         results->size = 0;
+        HASH_CLEAR(hh,results->hash);
     }
+
     if (results->length >= results->size) {
         LNXPROC_ERROR_T ret = realloc_results_table(results, 1);
 
@@ -252,7 +282,6 @@ _lnxproc_results_add(_LNXPROC_RESULTS_T * results, const char *value,
     _LNXPROC_RESULTS_TABLE_T *entry = results->table + results->length;
 
     va_start(ap, fmt);
-#ifdef DEBUG
     size_t ksize = 1 + vsnprintf(entry->key, sizeof entry->key, fmt, ap);
 
     if (ksize > sizeof entry->key) {
@@ -260,10 +289,6 @@ _lnxproc_results_add(_LNXPROC_RESULTS_T * results, const char *value,
                        sizeof entry->key);
         ksize = sizeof entry->key;
     }
-#else
-    vsnprintf(entry->key, sizeof entry->key, fmt, ap);
-#endif
-
     va_end(ap);
 
     _LNXPROC_DEBUG("Key %d : '%s'\n", ksize, entry->key);
@@ -279,6 +304,7 @@ _lnxproc_results_add(_LNXPROC_RESULTS_T * results, const char *value,
 
     _LNXPROC_DEBUG("Value %d : '%s'\n", dsize, entry->value);
 
+    HASH_ADD(hh,results->hash,key,ksize-1,entry);
     results->length++;
 
     return LNXPROC_OK;
