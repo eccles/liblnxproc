@@ -106,103 +106,6 @@ Description::
    return a dictionary with fewer fields. The assumption is that newer kernels
    will never delete any fields from previous versions.
 
-'''
-############################################################################
-
-import util
-from pidtype import PidType
-from procpid import ProcPid
-
-class ProcPidStat(ProcPid):
-    '''
-    Measures the stat file from /proc/<pid> filesystem
-    '''
-    def __init__(self, **kwds):
-        '''
-        Initialises object fields
-        '''
-
-        kwds['filename'] = 'stat'
-        kwds['fields'] = [ 'pid', 'comm', 'state', 'ppid',
-                           'pgrp', 'session', 'tty_nr', 'tpgid', 
-                           'flags', 'minflt', 'cminflt', 'majflt', 
-                           'cmajflt', 'utime', 'stime', 'cutime', 
-                           'cstime', 'priority', 'nice', 'num_threads', 
-                           'itrealvalue', 'starttime', 'vsize', 'rss', 
-                           'rlim', 'startcode', 'endcode', 'startstack', 
-                           'kstkesp', 'kstkeip', 'signal', 'blocked', 
-                           'sigignore', 'sigcatch', 'wchan', 'nswap', 
-                           'cnswap', 'exit_signal', 'processor', 
-                           'rt_priority', 'policy', 'delay_blkio_ticks', 
-                           'guest_time', 'cguest_time' ]
-
-        super(ProcPidStat, self).__init__(**kwds)
-
-        self.prev = None
-
-    def normalize1(self, lines):
-        '''
-        Pre-normalize function. Used by the ProcAllpid() class for
-        efficiency
-        '''
-        data = {}
-        if lines:
-            vals = lines[0].split()
-
-            data = dict(zip(self.fields[:3], vals[:3] ))
-            data.update(dict(zip(self.fields[3:], 
-                                 [ int(val) for val in vals[3:] ])))
-
-            for pidfield in ('pid', 'ppid', 'pgrp', 'tpgid'):
-                data[pidfield] = PidType(data[pidfield])
-    
-            if 'comm' in data:
-                data['comm'] = data['comm'][1:-1]
-
-        return data
-
-    def normalize2(self, timestamp, data):
-        '''
-        Post-normalize function. Used by the ProcAllpid() class for
-        efficiency 
-        '''
-        for timefield in ('utime', 'stime', 'cutime', 'cstime', 'starttime',
-                          'itrealvalue', 'guest_time', 'cguest_time'):
-            util.jiffy_to_secs(data, timefield)
-
-        util.divide(data, 'vsize', 1024)
-        util.page_to_kib(data, 'rss')
-        util.page_to_kib(data, 'nswap')
-        util.page_to_kib(data, 'cnswap')
-        util.divide(data, 'rlim', 1024)
-        util.multiply(data, 'delay_blkio_ticks', 1000000)
-
-        if self.prev:
-            tdiff = timestamp - self.prev[0]
-            prev = self.prev[1]
-            util.percent(data, prev, 'utime', tdiff)
-            util.percent(data, prev, 'stime', tdiff)
-            util.percent(data, prev, 'cutime', tdiff)
-            util.percent(data, prev, 'cstime', tdiff)
-
-        self.prev = (timestamp, data)
-
-        return self.filter(data)
-
-    def normalize(self, timestamp, lines):
-        '''
-        Normalize is split into 2 halves for efficiency when  called from
-        the ProcAllpid() class. Normal operation uses this method 
-        '''
-        data = self.normalize1(lines)
-        return self.normalize2(timestamp, data)
-
-if __name__ == "__main__":
-    from Test import Test
-#    Test(ProcPidStat, pid=getpid(),
-#                      include=r'^comm|^[a-z]*pid|^utime|^stime|pgrp|rss|vsize')
-    Test(ProcPidStat)
-
 */
 
 #include <stdio.h>
@@ -226,6 +129,14 @@ proc_pid_stat_normalize(LNXPROC_BASE_T *base)
 
     _LNXPROC_DEBUG("Nrows %zd\n", nrows);
     char ***values = (char ***) array->vector->values;
+
+/*
+    char ***prev = NULL;
+
+    if (base->previous && base->previous->array ) {
+        prev = (char ***) base->previous->array->vector->values;
+    }
+*/
     char *val;
     char *rowkey;
 
@@ -246,6 +157,10 @@ proc_pid_stat_normalize(LNXPROC_BASE_T *base)
         "guest_time", "cguest_time"
     };
     size_t ncolkeys = sizeof(colkey) / sizeof(colkey[0]);
+
+    float tdiff;
+
+    _lnxproc_base_timeval_diff(base, &tdiff);
 
     _lnxproc_results_init(results, nrows);
     for (i = 0; i < nrows; i++) {
@@ -272,8 +187,14 @@ proc_pid_stat_normalize(LNXPROC_BASE_T *base)
             else if ((j == 14) ||       // utime
                      (j == 15) ||       // stime
                      (j == 16) ||       // cutime
-                     (j == 17) ||       // cstime
-                     (j == 21) ||       // itrealvalue
+                     (j == 17)) {       // cstime
+                float fval = atoi(val) * results->secs_per_jiffy;
+
+                snprintf(buf, sizeof buf, "%f", fval);
+                _lnxproc_results_add(results, buf, "/%s/%s", rowkey, colkey[j]);
+
+            }
+            else if ((j == 21) ||       // itrealvalue
                      (j == 22) ||       // starttime
                      (j == 42) ||       // guest_time
                      (j == 43) ||       // cguest_time
@@ -287,6 +208,34 @@ proc_pid_stat_normalize(LNXPROC_BASE_T *base)
             }
         }
     }
+/*
+ * different pids may appear at different positions in the array - so we have to 
+ * remember the locations of each pid entry in order to calculate usage etc.
+ */
+/*
+    if( prev && (tdiff > 0.0) ) {
+        for (i = 0; i < nrows; i++) {
+            rowkey = values[i][0];
+            for (j = 14; j < 18; j++) {
+                char buf[32];
+                //char *pval = prev[i][j];
+                LNXPROC_RESULTS_DATA_T value = { .dsize =0, .dptr = NULL };
+                int n = snprintf(buf, sizeof buf, "/%s/%s", rowkey, colkey[j]);
+                if( !_lnxproc_results_fetch(results, buf,n, &value)) {
+                }
+
+                    long diff = atoi(val) - atoi(pval);
+                    float usage = (diff * results->secs_per_jiffy)/tdiff;
+                    snprintf(buf, sizeof buf, "%5.1f", usage);
+                    _lnxproc_results_add(results, buf, "/%s/%s%%",
+                                         rowkey, colkey[j]);
+
+            }
+        }
+    }
+
+    _lnxproc_base_store_previous(base);
+*/
     return LNXPROC_OK;
 }
 
