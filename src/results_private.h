@@ -28,11 +28,6 @@
 extern "C" {
 #endif
 
-    typedef struct {
-        char *dptr;
-        size_t dsize;
-    } LNXPROC_RESULTS_DATA_T;
-
     struct _lnxproc_results_table_t {
         char key[32];
         char value[32];
@@ -63,8 +58,7 @@ extern "C" {
                                           size_t nentries);
 
     LNXPROC_ERROR_T _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results,
-                                           char *key, size_t keylen,
-                                           LNXPROC_RESULTS_DATA_T * val);
+                                           char **value, char *fmt, ...);
 
     LNXPROC_ERROR_T _lnxproc_results_add(_LNXPROC_RESULTS_T * results,
                                          const char *value, char *fmt, ...);

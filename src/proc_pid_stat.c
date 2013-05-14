@@ -130,13 +130,12 @@ proc_pid_stat_normalize(LNXPROC_BASE_T *base)
     _LNXPROC_DEBUG("Nrows %zd\n", nrows);
     char ***values = (char ***) array->vector->values;
 
-/*
-    char ***prev = NULL;
+    float tdiff = 0.0;
 
-    if (base->previous && base->previous->array ) {
-        prev = (char ***) base->previous->array->vector->values;
+    if (base->previous && base->previous->array) {
+        _lnxproc_base_timeval_diff(base, &tdiff);
     }
-*/
+
     char *val;
     char *rowkey;
 
@@ -157,10 +156,6 @@ proc_pid_stat_normalize(LNXPROC_BASE_T *base)
         "guest_time", "cguest_time"
     };
     size_t ncolkeys = sizeof(colkey) / sizeof(colkey[0]);
-
-    float tdiff;
-
-    _lnxproc_base_timeval_diff(base, &tdiff);
 
     _lnxproc_results_init(results, nrows);
     for (i = 0; i < nrows; i++) {
@@ -212,30 +207,31 @@ proc_pid_stat_normalize(LNXPROC_BASE_T *base)
  * different pids may appear at different positions in the array - so we have to 
  * remember the locations of each pid entry in order to calculate usage etc.
  */
-/*
-    if( prev && (tdiff > 0.0) ) {
+    if (tdiff > 0.0) {
+        char *pval = NULL;
+
         for (i = 0; i < nrows; i++) {
             rowkey = values[i][0];
             for (j = 14; j < 18; j++) {
-                char buf[32];
-                //char *pval = prev[i][j];
-                LNXPROC_RESULTS_DATA_T value = { .dsize =0, .dptr = NULL };
-                int n = snprintf(buf, sizeof buf, "/%s/%s", rowkey, colkey[j]);
-                if( !_lnxproc_results_fetch(base->previous->results, buf,n, &value)) {
+                _lnxproc_results_fetch(base->previous->results, &pval, "/%s/%s",
+                                       rowkey, colkey[j]);
+                if (pval) {
+                    _lnxproc_results_fetch(results, &val, "/%s/%s", rowkey,
+                                           colkey[j]);
+                    if (val) {
+                        char buf[32];
+                        float usage = (atof(val) - atof(pval)) / tdiff;
+
+                        snprintf(buf, sizeof buf, "%5.1f", usage);
+                        _lnxproc_results_add(results, buf, "/%s/%s%%",
+                                             rowkey, colkey[j]);
+                    }
                 }
-
-                    long diff = atoi(val) - atoi(pval);
-                    float usage = (diff * results->secs_per_jiffy)/tdiff;
-                    snprintf(buf, sizeof buf, "%5.1f", usage);
-                    _lnxproc_results_add(results, buf, "/%s/%s%%",
-                                         rowkey, colkey[j]);
-
             }
         }
     }
 
     _lnxproc_base_store_previous(base);
-*/
     return LNXPROC_OK;
 }
 

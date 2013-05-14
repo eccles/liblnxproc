@@ -164,27 +164,23 @@ _lnxproc_results_init(_LNXPROC_RESULTS_T * results, size_t nentries)
 }
 
 LNXPROC_ERROR_T
-_lnxproc_results_fetch(_LNXPROC_RESULTS_T * results, char *key, size_t keylen,
-                       LNXPROC_RESULTS_DATA_T * val)
+_lnxproc_results_fetch(_LNXPROC_RESULTS_T * results, char **value,
+                       char *fmt, ...)
 {
     _LNXPROC_DEBUG("Results %p\n", results);
 
+    *value = NULL;
     if (!results) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_NULL;
     }
 
-    if (!key) {
+    if (!fmt) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_KEY_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_KEY_NULL;
     }
 
-    if (keylen < 1) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_KEYLEN_ZERO, "\n");
-        return LNXPROC_ERROR_RESULTS_KEYLEN_ZERO;
-    }
-
-    if (!val) {
+    if (!value) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_VAL_ADDRESS_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_VAL_ADDRESS_NULL;
     }
@@ -194,18 +190,37 @@ _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results, char *key, size_t keylen,
                              "Fetch results\n");
         return LNXPROC_ERROR_RESULTS_TABLE_NULL;
     }
+
+    char key[32];
+    va_list ap;
+
+    va_start(ap, fmt);
+#ifdef DEBUG
+    size_t ksize = 1 + vsnprintf(key, sizeof key, fmt, ap);
+
+    if (ksize > sizeof key) {
+        _LNXPROC_DEBUG("WARNING: Key length %zd exceeds %zd bytes\n", ksize,
+                       sizeof key);
+        ksize = sizeof key;
+    }
+#else
+    vsnprintf(key, sizeof key, fmt, ap);
+#endif
+
+    va_end(ap);
+
+    _LNXPROC_DEBUG("Key %s\n", key);
     int i;
     _LNXPROC_RESULTS_TABLE_T *table = results->table;
 
     for (i = 0; i < results->length; i++) {
-        if (!strcmp(table->key, key)) {
-            val->dsize = strlen(table->key);
-            val->dptr = strdup(table->value);
+        _LNXPROC_DEBUG("%d key %s\n", i, table[i].key);
+        if (!strcmp(table[i].key, key)) {
+            *value = table[i].value;
+            _LNXPROC_DEBUG("Value %s\n", table[i].value);
+            return LNXPROC_OK;
         }
     }
-    val->dsize = 1;
-    val->dptr = strdup("");
-
     return LNXPROC_OK;
 }
 
