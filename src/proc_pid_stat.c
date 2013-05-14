@@ -220,7 +220,8 @@ proc_pid_stat_normalize(LNXPROC_BASE_T *base)
                                            colkey[j]);
                     if (val) {
                         char buf[32];
-                        float usage = (atof(val) - atof(pval)) / tdiff;
+                        float usage =
+                            ((atof(val) - atof(pval)) * 100.0) / tdiff;
 
                         snprintf(buf, sizeof buf, "%5.1f", usage);
                         _lnxproc_results_add(results, buf, "/%s/%s%%",
