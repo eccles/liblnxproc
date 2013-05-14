@@ -463,10 +463,12 @@ struct array_iterate_t {
 };
 
 static LNXPROC_ERROR_T
-array_vector_iterate_func(_LNXPROC_VECTOR_T * vector, int depth, void *data)
+array_vector_iterate_func(_LNXPROC_VECTOR_T * vector, int idx, int depth,
+                          void *data)
 {
 
-    _LNXPROC_DEBUG("Child %p Depth %d Data %p\n", vector, depth, data);
+    _LNXPROC_DEBUG("Vector %p Idx %d Parent %p Depth %d Data %p\n", vector, idx,
+                   vector->parent, depth, data);
 
     struct array_iterate_t *adata = data;
     size_t *aidx = adata->idx;
@@ -479,7 +481,10 @@ array_vector_iterate_func(_LNXPROC_VECTOR_T * vector, int depth, void *data)
 
     LNXPROC_ERROR_T ret = LNXPROC_OK;
 
-    aidx[depth] = vector->idx;
+    if (vector->parent && (depth > 0)) {
+        aidx[depth - 1] = idx;
+        _LNXPROC_DEBUG("parent aidx[%d] = %d\n", depth - 1, aidx[depth - 1]);
+    }
     if (!vector->recursive && vector->values && vector->length > 0) {
         int i;
 
@@ -524,7 +529,7 @@ _lnxproc_array_iterate(_LNXPROC_ARRAY_T * array,
         };
 
         ret =
-            _lnxproc_vector_iterate(array->vector, 0, allocated, &adata,
+            _lnxproc_vector_iterate(array->vector, 0, 0, allocated, &adata,
                                     array_vector_iterate_func);
 
         if (ret) {

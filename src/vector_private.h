@@ -82,10 +82,11 @@ extern "C" {
 
     typedef
     LNXPROC_ERROR_T (*_LNXPROC_VECTOR_ITERATE_FUNC) (_LNXPROC_VECTOR_T *
-                                                     vector, int depth,
+                                                     vector, int idx, int depth,
                                                      void *data);
 
     LNXPROC_ERROR_T _lnxproc_vector_iterate(_LNXPROC_VECTOR_T * vector,
+                                            int idx,
                                             int depth,
                                             int allocated,
                                             void *data,

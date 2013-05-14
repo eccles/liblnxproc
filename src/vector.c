@@ -470,7 +470,7 @@ _lnxproc_vector_set_length(_LNXPROC_VECTOR_T * vector, size_t idx)
 
 LNXPROC_ERROR_T
 _lnxproc_vector_iterate(_LNXPROC_VECTOR_T * vector,
-                        int depth, int allocated, void *data,
+                        int idx, int depth, int allocated, void *data,
                         _LNXPROC_VECTOR_ITERATE_FUNC func)
 {
     _LNXPROC_DEBUG("Vector %p Depth %d Data %p Func %p\n", vector,
@@ -481,7 +481,7 @@ _lnxproc_vector_iterate(_LNXPROC_VECTOR_T * vector,
         return LNXPROC_ERROR_VECTOR_NULL;
     }
 
-    func(vector, depth, data);
+    func(vector, idx, depth, data);
 
     if (vector->children) {
         int end;
@@ -499,10 +499,11 @@ _lnxproc_vector_iterate(_LNXPROC_VECTOR_T * vector,
         depth++;
         for (i = 0; i < end; i++) {
             if (vector->children[i]) {
-                _lnxproc_vector_iterate(vector->children[i], depth, allocated,
-                                        data, func);
+                _lnxproc_vector_iterate(vector->children[i], i, depth,
+                                        allocated, data, func);
             }
         }
+        depth--;
     }
     _LNXPROC_DEBUG("Success\n");
     return LNXPROC_OK;
@@ -519,12 +520,14 @@ vector_print_depth(int depth)
 }
 
 static LNXPROC_ERROR_T
-vector_print_internal(_LNXPROC_VECTOR_T * vector, int depth, void *data)
+vector_print_internal(_LNXPROC_VECTOR_T * vector, int idx, int depth,
+                      void *data)
 {
-    _LNXPROC_DEBUG("Vector %p Depth %d Data %p\n", vector, depth, data);
+    _LNXPROC_DEBUG("Vector %p Idx %d, Depth %d Data %p\n", vector, idx, depth,
+                   data);
 
     vector_print_depth(depth);
-    printf("Vector at %p\n", vector);
+    printf("Vector at %p(%d)\n", vector, idx);
     vector_print_depth(depth);
     printf("Vector parent %p(%d)\n", vector->parent, vector->idx);
     vector_print_depth(depth);
@@ -571,7 +574,8 @@ _lnxproc_vector_print(_LNXPROC_VECTOR_T * vector, int allocated, void *data)
         return LNXPROC_ERROR_VECTOR_NULL;
     }
 
-    _lnxproc_vector_iterate(vector, 0, allocated, NULL, vector_print_internal);
+    _lnxproc_vector_iterate(vector, 0, 0, allocated, NULL,
+                            vector_print_internal);
     printf("\n");
     return LNXPROC_OK;
 }

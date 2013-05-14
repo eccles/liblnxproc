@@ -179,9 +179,9 @@ test_limits(void)
 
 /*----------------------------------------------------------------------------*/
 static LNXPROC_ERROR_T
-myvector_print(_LNXPROC_VECTOR_T * vector, int depth, void *data)
+myvector_print(_LNXPROC_VECTOR_T * vector, int idx, int depth, void *data)
 {
-    printf("Vector %p Depth %d\n", vector, depth);
+    printf("Vector %p Idx %d Depth %d\n", vector, idx, depth);
     return 0;
 }
 
@@ -317,7 +317,7 @@ test_vector(void)
         _lnxproc_vector_print(vector, 1, NULL);
 
         printf("Print elements %d to %d\n", 1, 2);
-        _lnxproc_vector_iterate(vector, 0, 0, NULL, myvector_print);
+        _lnxproc_vector_iterate(vector, 0, 0, 0, NULL, myvector_print);
         printf("\n");
 
         _LNXPROC_VECTOR_FREE(vector);
