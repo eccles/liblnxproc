@@ -122,7 +122,7 @@ Description::
 static LNXPROC_ERROR_T
 proc_pid_stat_normalize(LNXPROC_BASE_T *base)
 {
-    _LNXPROC_RESULTS_T *results = base->results;
+    _LNXPROC_RESULTS_T *results = base->current->results;
     _LNXPROC_ARRAY_T *array = base->current->array;
 
     size_t nrows = array->vector->length;
@@ -221,7 +221,7 @@ proc_pid_stat_normalize(LNXPROC_BASE_T *base)
                 //char *pval = prev[i][j];
                 LNXPROC_RESULTS_DATA_T value = { .dsize =0, .dptr = NULL };
                 int n = snprintf(buf, sizeof buf, "/%s/%s", rowkey, colkey[j]);
-                if( !_lnxproc_results_fetch(results, buf,n, &value)) {
+                if( !_lnxproc_results_fetch(base->previous->results, buf,n, &value)) {
                 }
 
                     long diff = atoi(val) - atoi(pval);

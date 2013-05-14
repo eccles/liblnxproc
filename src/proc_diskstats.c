@@ -95,7 +95,7 @@ Typical contents of /proc/diskstats::
 static LNXPROC_ERROR_T
 proc_diskstats_normalize(LNXPROC_BASE_T *base)
 {
-    _LNXPROC_RESULTS_T *results = base->results;
+    _LNXPROC_RESULTS_T *results = base->current->results;
     _LNXPROC_ARRAY_T *current = base->current->array;
     _LNXPROC_ARRAY_T *previous = NULL;
 

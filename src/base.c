@@ -65,6 +65,7 @@ _lnxproc_base_print(LNXPROC_BASE_T *base)
         printf("Buflen %zd\n", base->current->buflen);
         printf("Nbytes %d\n", base->current->nbytes);
         _lnxproc_array_print(base->current->array, 0);
+        _lnxproc_results_print(base->current->results);
 
         if (base->previous) {
             printf("Previous Timestamp %lu.%06lu\n",
@@ -80,8 +81,8 @@ _lnxproc_base_print(LNXPROC_BASE_T *base)
             printf("Previous Buflen %zd\n", base->previous->buflen);
             printf("Previous Nbytes %d\n", base->previous->nbytes);
             _lnxproc_array_print(base->previous->array, 0);
+            _lnxproc_results_print(base->previous->results);
         }
-        _lnxproc_results_print(base->results);
         return LNXPROC_OK;
     }
 
@@ -528,6 +529,12 @@ _base_data_new(LNXPROC_BASE_DATA_T * data,
         return LNXPROC_ERROR_BASE_MALLOC_ARRAY;
     }
 
+    data->results = NULL;
+    ret = _lnxproc_results_new(&data->results);
+    if (ret) {
+        _LNXPROC_ERROR_DEBUG(ret, "Malloc results\n");
+        return ret;
+    }
     return LNXPROC_OK;
 
 }
@@ -681,13 +688,6 @@ _lnxproc_base_new(LNXPROC_BASE_T **base,
     else {
         p->filesuffix = NULL;
     }
-    p->results = NULL;
-    ret = _lnxproc_results_new(&p->results);
-    if (ret) {
-        _LNXPROC_ERROR_DEBUG(ret, "Malloc results\n");
-        _LNXPROC_BASE_FREE(p);
-        return ret;
-    }
     if (!normalize) {
         p->normalize = _lnxproc_base_normalize;
     }
@@ -723,6 +723,10 @@ base_data_free(LNXPROC_BASE_DATA_T * data)
             _LNXPROC_DEBUG("Free Base buffer\n");
             free(data->lines);
             data->lines = NULL;
+        }
+        if (data->results) {
+            _LNXPROC_DEBUG("Free results \n");
+            _LNXPROC_RESULTS_FREE(data->results);
         }
     }
 }
@@ -760,10 +764,6 @@ _lnxproc_base_free(LNXPROC_BASE_T *base)
             _LNXPROC_DEBUG("Free Base file suffix\n");
             free(base->filesuffix);
             base->filesuffix = NULL;
-        }
-        if (base->results) {
-            _LNXPROC_DEBUG("Free results \n");
-            _LNXPROC_RESULTS_FREE(base->results);
         }
 
         _LNXPROC_DEBUG("Free Base\n");

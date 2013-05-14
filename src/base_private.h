@@ -60,6 +60,7 @@ extern "C" {
         size_t buflen;
         int nbytes;
         _LNXPROC_ARRAY_T *array;
+        _LNXPROC_RESULTS_T *results;
     };
 
     struct lnxproc_base_t {
@@ -77,7 +78,6 @@ extern "C" {
         LNXPROC_BASE_DATA_T *current;
         LNXPROC_BASE_DATA_T *previous;
         LNXPROC_BASE_DATA_T data[2];
-        _LNXPROC_RESULTS_T *results;
     };
 
     LNXPROC_ERROR_T _lnxproc_base_new(LNXPROC_BASE_T **base,

@@ -172,7 +172,7 @@ lnxproc_print(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type)
                 return LNXPROC_ERROR_INTERFACE_NULL_BASE;
             }
 
-            return _lnxproc_results_print(module->base->results);
+            return _lnxproc_results_print(module->base->current->results);
         }
     }
     return LNXPROC_ERROR_INTERFACE_NULL;

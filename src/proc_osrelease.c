@@ -32,8 +32,9 @@ Typical contents of file /proc/sys/kernel/osrelease::
 static LNXPROC_ERROR_T
 proc_osrelease_normalize(LNXPROC_BASE_T *base)
 {
-    _lnxproc_results_init(base->results, 1);
-    _lnxproc_results_add(base->results, base->current->lines, "/value");
+    _lnxproc_results_init(base->current->results, 1);
+    _lnxproc_results_add(base->current->results, base->current->lines,
+                         "/value");
     _lnxproc_base_memoize(base);
 
     return LNXPROC_OK;

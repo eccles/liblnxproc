@@ -55,7 +55,7 @@ static LNXPROC_ERROR_T
 sys_disksectors_normalize(LNXPROC_BASE_T *base)
 {
 
-    _LNXPROC_RESULTS_T *results = base->results;
+    _LNXPROC_RESULTS_T *results = base->current->results;
     _LNXPROC_ARRAY_T *array = base->current->array;
 
     struct env_t env = {
