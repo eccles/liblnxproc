@@ -48,7 +48,7 @@ lnxproc_sys_cpufreq_new(LNXPROC_BASE_T **base)
 
     char *filenames[] =
         { "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq", };
-    return _lnxproc_base_new(base, filenames, 1, NULL, NULL, NULL,
+    return _lnxproc_base_new(base, filenames, 1, NULL, NULL, NULL, NULL,
                              sys_cpufreq_normalize, NULL, 64, NULL, 0);
 }
 

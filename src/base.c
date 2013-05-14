@@ -47,6 +47,7 @@ _lnxproc_base_print(LNXPROC_BASE_T *base)
         printf("Normalize %p\n", base->normalize);
         printf("Read %p\n", base->read);
         printf("File prefix %1$p '%1$s'\n", base->fileprefix);
+        printf("File glob %1$p '%1$s'\n", base->fileglob);
         printf("File suffix %1$p '%1$s'\n", base->filesuffix);
         printf("Filenames %p\n", base->filenames);
         int i;
@@ -144,7 +145,7 @@ static LNXPROC_ERROR_T
 base_read_glob_files(LNXPROC_BASE_T *base, char **readbuf, int *nbytes)
 {
 
-    const char *globwild = "*";
+    const char *globwild = base->fileglob;
     const char *regwild = "([[:alnum:]_.+-]+)";
     char globpat[FILENAME_MAX];
     char regpat[FILENAME_MAX];
@@ -271,7 +272,7 @@ _lnxproc_base_rawread(LNXPROC_BASE_T *base)
             return ret;
         }
     }
-    if (base->fileprefix || base->filesuffix) {
+    if (base->fileglob && (base->fileprefix || base->filesuffix)) {
         ret = base_read_glob_files(base, &readbuf, &nbytes);
         if (ret) {
             return ret;
@@ -559,6 +560,7 @@ _lnxproc_base_new(LNXPROC_BASE_T **base,
                   char **filenames,
                   size_t nfiles,
                   char *fileprefix,
+                  char *fileglob,
                   char *filesuffix,
                   LNXPROC_BASE_METHOD rawread,
                   LNXPROC_BASE_METHOD normalize,
@@ -570,6 +572,7 @@ _lnxproc_base_new(LNXPROC_BASE_T **base,
     _LNXPROC_DEBUG("nfiles %d\n", nfiles);
     _LNXPROC_DEBUG("filenames %p\n", filenames);
     _LNXPROC_DEBUG("fileprefix %1$p '%1$s'\n", fileprefix);
+    _LNXPROC_DEBUG("fileglob %1$p '%1$s'\n", fileglob);
     _LNXPROC_DEBUG("filesuffix %1$p '%1$s'\n", filesuffix);
     _LNXPROC_DEBUG("rawread %p, normalize %p, read %p\n", rawread,
                    normalize, read);
@@ -654,6 +657,18 @@ _lnxproc_base_new(LNXPROC_BASE_T **base,
     else {
         p->fileprefix = NULL;
     }
+    if (fileglob) {
+        p->fileglob = strdup(fileglob);
+        if (!p->fileglob) {
+            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_FILEGLOB,
+                                 "Malloc fileglob\n");
+            _LNXPROC_BASE_FREE(p);
+            return LNXPROC_ERROR_BASE_MALLOC_FILEGLOB;
+        }
+    }
+    else {
+        p->fileglob = NULL;
+    }
     if (filesuffix) {
         p->filesuffix = strdup(filesuffix);
         if (!p->filesuffix) {
@@ -735,6 +750,11 @@ _lnxproc_base_free(LNXPROC_BASE_T *base)
             _LNXPROC_DEBUG("Free Base file prefix\n");
             free(base->fileprefix);
             base->fileprefix = NULL;
+        }
+        if (base->fileglob) {
+            _LNXPROC_DEBUG("Free Base file glob\n");
+            free(base->fileglob);
+            base->fileglob = NULL;
         }
         if (base->filesuffix) {
             _LNXPROC_DEBUG("Free Base file suffix\n");

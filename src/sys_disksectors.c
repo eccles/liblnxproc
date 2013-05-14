@@ -75,6 +75,7 @@ lnxproc_sys_disksectors_new(LNXPROC_BASE_T **base)
 {
 
     char *fileprefix = "/sys/block";
+    char *fileglob = "*";
     char *filesuffix = "queue/hw_sector_size";
 
     _LNXPROC_LIMITS_T limits[] = {
@@ -85,7 +86,7 @@ lnxproc_sys_disksectors_new(LNXPROC_BASE_T **base)
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
     return _lnxproc_base_new(base,
-                             NULL, 0, fileprefix, filesuffix,
+                             NULL, 0, fileprefix, fileglob, filesuffix,
                              NULL, sys_disksectors_normalize, NULL,
                              256, limits, dim);
 }

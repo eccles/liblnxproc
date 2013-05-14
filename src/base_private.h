@@ -72,6 +72,7 @@ extern "C" {
         char **filenames;
         size_t nfiles;
         char *fileprefix;
+        char *fileglob;
         char *filesuffix;
         LNXPROC_BASE_DATA_T *current;
         LNXPROC_BASE_DATA_T *previous;
@@ -83,6 +84,7 @@ extern "C" {
                                       char **filenames,
                                       size_t nfiles,
                                       char *fileprefix,
+                                      char *fileglob,
                                       char *filesuffix,
                                       LNXPROC_BASE_METHOD rawread,
                                       LNXPROC_BASE_METHOD normalize,

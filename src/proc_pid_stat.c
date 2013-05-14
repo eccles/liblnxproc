@@ -303,12 +303,13 @@ lnxproc_proc_pid_stat_new(LNXPROC_BASE_T **base)
          .len = 1}              /* column delimiters */
     };
 
-    char *fileprefix = { "/proc" };
-    char *filesuffix = { "stat" };
+    char *fileprefix = "/proc";
+    char *fileglob = "[1-9]*";
+    char *filesuffix = "stat";
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
     return _lnxproc_base_new(base,
-                             NULL, 0, fileprefix, filesuffix,
+                             NULL, 0, fileprefix, fileglob, filesuffix,
                              NULL, proc_pid_stat_normalize, NULL, 256,
                              limits, dim);
 }
