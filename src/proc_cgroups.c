@@ -63,10 +63,13 @@ proc_cgroups_normalize(LNXPROC_BASE_T *base)
         rowkey = values[i][0];
         for (j = 1; j < ncols; j++) {
             colkey = values[0][j];
-            val = values[i][j];
-            _lnxproc_results_add(results, val, "/%s/%s", rowkey, colkey);
+            if (colkey) {
+                val = values[i][j];
+                _lnxproc_results_add(results, val, "/%s/%s", rowkey, colkey);
+            }
         }
     }
+    _lnxproc_results_hash(results);
     return LNXPROC_OK;
 }
 
