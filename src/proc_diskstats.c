@@ -95,33 +95,47 @@ Typical contents of /proc/diskstats::
 static LNXPROC_ERROR_T
 proc_diskstats_normalize(LNXPROC_BASE_T *base)
 {
-    _LNXPROC_RESULTS_T *results = base->current->results;
-    _LNXPROC_ARRAY_T *current = base->current->array;
-    _LNXPROC_ARRAY_T *previous = NULL;
+    LNXPROC_BASE_DATA_T *data = base->current;
+    _LNXPROC_RESULTS_T *results = data->results;
+    _LNXPROC_ARRAY_T *current = data->array;
 
-    if (base->previous) {
-        previous = base->previous->array;
+    _LNXPROC_DEBUG("Current data is %d at %p\n", data->id, data);
+    _LNXPROC_DEBUG("Current results is at %p\n", results);
+
+    float tdiff = 0.0;
+    LNXPROC_BASE_DATA_T *pdata = base->previous;
+    _LNXPROC_RESULTS_T *presults = NULL;
+
+    if (pdata) {
+        _lnxproc_base_timeval_diff(base, &tdiff);
+        presults = pdata->results;
+        _LNXPROC_DEBUG("Previous data is %d at %p\n", pdata->id, pdata);
+        _LNXPROC_DEBUG("Previous results is at %p\n", presults);
+        _LNXPROC_DEBUG("Time difference = %f secs\n", tdiff);
     }
 
-    int keycol = 2;
-    char *val = NULL;
-
-    size_t nrows = current->vector->length;
+    const size_t nrows = current->vector->length;
 
     _LNXPROC_DEBUG("Nrows %zd\n", nrows);
     char ***values = (char ***) current->vector->values;
-    char ***prev = NULL;
 
-    if (previous) {
-        prev = (char ***) previous->vector->values;
-    }
-
-    static const char *cols[] =
-        { "major", "minor", "name ", "reads", "merge_read",
-        "s_read", "ms_read", "writes", "merge_write", "s_write",
-        "ms_write", "ios", "ms_io", "ms_weighted",
-    };
-    static size_t numcols = sizeof(cols) / sizeof(cols[0]);
+#define MAJORKEYCOL 0
+#define MINORKEYCOL 1
+#define NAMECOL 2
+#define KEYCOL NAMECOL
+#define READSCOL 3
+#define MERGE_READCOL 4
+#define S_READCOL 5
+#define MS_READCOL 6
+#define WRITESCOL 7
+#define MERGE_WRITECOL 8
+#define S_WRITECOL 9
+#define MS_WRITECOL 10
+#define IOSCOL 11
+#define MS_IOCOL 12
+#define MS_WEIGHTEDCOL 13
+    static const int const precols[] = { MS_READCOL, MS_WRITECOL, };
+    static const int nprecols = sizeof(precols) / sizeof(precols[0]);
 
 /*
  * TODO - get sector size from other LNXPROC module.
@@ -129,88 +143,155 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
  */
 #define sectorsize 512
 #define sectorscale sectorsize/1024.0
-    static const float scale[] = { 0.0, 0.0, 0.0, 1.0, 1.0,
-        sectorscale, 1.e-1, 1.0, 1.0, sectorscale,
-        1.e-1, 0.0, 1.e-1, 1.e-1,
+    struct par_t {
+        const char *name;
+        const float scale;
     };
-    size_t ncols = sizeof(cols) / sizeof(cols[0]);
-
-    float tdiff;
-
-    _lnxproc_base_timeval_diff(base, &tdiff);
-
-    _LNXPROC_DEBUG("Time difference = %f\n", tdiff);
+    static const struct par_t pars[] = { {.name = "major",.scale = 0.0,},
+    {.name = "minor",.scale = 0.0,},
+    {.name = "name ",.scale = 0.0,},
+    {.name = "reads",.scale = 1.0,},
+    {.name = "merge_read",.scale = 1.0,},
+    {.name = "s_read",.scale = sectorscale,},
+    {.name = "ms_read",.scale = 1.e-3,},
+    {.name = "writes",.scale = 1.0,},
+    {.name = "merge_write",.scale = 1.0,},
+    {.name = "s_write",.scale = sectorscale,},
+    {.name = "ms_write",.scale = 1.e-3,},
+    {.name = "ios",.scale = 0.0,},
+    {.name = "ms_io",.scale = 1.e-1,},
+    {.name = "ms_weighted",.scale = 1.e-1,},
+    };
+    static const size_t numcols = sizeof(pars) / sizeof(pars[0]);
 
     int i;
 
     _lnxproc_results_init(results, nrows);
     for (i = 0; i < nrows; i++) {
-        char *key = values[i][keycol];
+        char *val = NULL;
+        char *pval = NULL;
+        char reskey[32];
+        char buf[32];
+        char *key = values[i][KEYCOL];
 
         if (!key)
             continue;
 
         _LNXPROC_DEBUG("%1$d:Key %2$p '%2$s'\n", i, key);
 
-        float readtime = 0;
-        float writetime = 0;
+        float iodiff[nprecols];
 
-        if (previous) {
-            readtime = 1.e-6 * (atoi(values[i][6]) - atoi(prev[i][6]));
-            writetime = 1.e-6 * (atoi(values[i][10]) - atoi(prev[i][10]));
-            _LNXPROC_DEBUG("%d:Readtime = %f\n", i, readtime);
-            _LNXPROC_DEBUG("%d:Writetime = %f\n", i, writetime);
-        }
+        memset(iodiff, 0, sizeof iodiff);
 
         int j;
 
-        ncols = current->vector->children[i]->length;
+        for (j = 0; j < nprecols; j++) {        // ms_read, ms_write
+            int k = precols[j];
+
+            val = values[i][k];
+            if (val) {
+                float secs = pars[k].scale * atoi(val);
+
+                snprintf(buf, sizeof buf, "%f", secs);
+                snprintf(reskey, sizeof reskey, "/%s/%s", key, pars[k].name);
+                _LNXPROC_DEBUG("%d,%d:Curr %s = %s\n", i, k, reskey, buf);
+                _lnxproc_results_add(results, buf, "%s", reskey);
+                if (presults) {
+                    _lnxproc_results_fetch(presults, &pval, "%s", reskey);
+                    _LNXPROC_DEBUG("%d,%d:Prev %s = %s\n", i, k, reskey, pval);
+                    if (pval) {
+                        iodiff[j] = secs - atof(pval);
+                        _LNXPROC_DEBUG("%d:iodiff %s = %f\n", i, reskey,
+                                       iodiff[j]);
+                    }
+                }
+            }
+        }
+
+        size_t ncols = current->vector->children[i]->length;
         int n = ncols > numcols ? numcols : ncols;
 
         for (j = 0; j < n; j++) {
-            if (j == keycol)
+            if (j == KEYCOL || j == MS_READCOL || j == MS_WRITECOL)
                 continue;
-            int diff;
-            float rate;
-            char buf[32];
+            float out = 0.0;
+
+            snprintf(reskey, sizeof reskey, "/%s/%s", key, pars[j].name);
 
             val = values[i][j];
-            _lnxproc_results_add(results, val, "/%s/%s", key, cols[j]);
-            if (readtime > 0.0) {
-                if ((j == 3) || // 'reads'
-                    (j == 4) || // 'merge_read'
-                    (j == 5)) { // 's_read'
+            _LNXPROC_DEBUG("%d,%d:Curr value %s = %s\n", i, j, reskey, val);
+            if (!val)
+                continue;
 
-                    diff = atoi(values[i][j]) - atoi(prev[i][j]);
-                    rate = (scale[j] * diff) / readtime;
-                    snprintf(buf, sizeof buf, "%f", rate);
-                    _lnxproc_results_add(results, buf, "/%s/%s-s",
-                                         key, cols[j]);
+            if (j > NAMECOL) {
+                out = pars[j].scale * atoi(val);
+                snprintf(buf, sizeof buf, "%f", out);
+                _lnxproc_results_add(results, buf, "%s", reskey);
+                _LNXPROC_DEBUG("%d,%d:Curr %s = %s\n", i, j, reskey, buf);
+            }
+            else {
+                _lnxproc_results_add(results, val, "%s", reskey);
+                _LNXPROC_DEBUG("%d,%d:Curr %s = %s\n", i, j, reskey, val);
+            }
+
+            if (!presults)
+                continue;
+
+            if (iodiff[0] > 0.0) {
+                if ((j == READSCOL) || (j == MERGE_READCOL) || (j == S_READCOL)) {
+
+                    _lnxproc_results_fetch(presults, &pval, "%s", reskey);
+                    _LNXPROC_DEBUG("%d,%d:Prev %s = %s\n", i, j, reskey, pval);
+                    if (!pval)
+                        continue;
+
+                    snprintf(buf, sizeof buf, "%f",
+                             (out - atof(pval)) / iodiff[0]);
+                    _lnxproc_results_add(results, buf, "%s-s", reskey);
+                    _LNXPROC_DEBUG("%d,%d:Curr %s-s = %s\n", i, j, reskey, buf);
+#ifdef DEBUG
+                    if (atof(buf) < 0.0) {
+                        _LNXPROC_DEBUG("WARN: diff < 0 (=%s)\n", buf);
+                    }
+#endif
                 }
             }
-            if (writetime > 0.0) {
-                if ((j == 7) || // 'writes'
-                    (j == 8) || // 'merge_write'
-                    (j == 9)) { // 's_write'
+            if (iodiff[1] > 0.0) {
+                if ((j == WRITESCOL) ||
+                    (j == MERGE_WRITECOL) || (j == S_WRITECOL)) {
 
-                    diff = atoi(values[i][j]) - atoi(prev[i][j]);
-                    rate = (scale[j] * diff) / writetime;
-                    snprintf(buf, sizeof buf, "%f", rate);
-                    _lnxproc_results_add(results, buf, "/%s/%s-s",
-                                         key, cols[j]);
+                    _lnxproc_results_fetch(presults, &pval, "%s", reskey);
+                    _LNXPROC_DEBUG("%d,%d:Prev %s = %s\n", i, j, reskey, pval);
+                    if (!pval)
+                        continue;
+
+                    snprintf(buf, sizeof buf, "%f",
+                             (out - atof(pval)) / iodiff[1]);
+                    _lnxproc_results_add(results, buf, "%s-s", reskey);
+                    _LNXPROC_DEBUG("%d,%d:Curr %s-s = %s\n", i, j, reskey, buf);
+#ifdef DEBUG
+                    if (atof(buf) < 0.0) {
+                        _LNXPROC_DEBUG("WARN: diff < 0 (=%s)\n", buf);
+                    }
+#endif
                 }
             }
             if (tdiff > 0.0) {
-                if ((j == 6) || // 'ms_read'
-                    (j == 10) ||        // 'ms_write'
-                    (j == 12) ||        // 'ms_io'
-                    (j == 13)) {        // 'ms_weighted'
+                if ((j == MS_IOCOL) || (j == MS_WEIGHTEDCOL)) {
 
-                    diff = atoi(values[i][j]) - atoi(prev[i][j]);
-                    rate = (scale[j] * diff) / tdiff;
-                    snprintf(buf, sizeof buf, "%.1f", rate);
-                    _lnxproc_results_add(results, buf, "/%s/%s%%",
-                                         key, cols[j]);
+                    _lnxproc_results_fetch(presults, &pval, "%s", reskey);
+                    _LNXPROC_DEBUG("%d,%d:Prev %s = %s\n", i, j, reskey, pval);
+                    if (!pval)
+                        continue;
+
+                    snprintf(buf, sizeof buf, "%f", (out - atof(pval)) / tdiff);
+                    _lnxproc_results_add(results, buf, "%s-s", reskey);
+                    _LNXPROC_DEBUG("%d,%d:Curr %s-s = %s\n", i, j, reskey, buf);
+#ifdef DEBUG
+                    if (atof(buf) < 0.0) {
+                        _LNXPROC_DEBUG("WARN: diff < 0 (=%s)\n", buf);
+                    }
+#endif
                 }
             }
         }
