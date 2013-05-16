@@ -87,6 +87,7 @@ extern "C" {
         char *fileprefix;
         char *fileglob;
         char *filesuffix;
+        unsigned long count;
         LNXPROC_BASE_TYPE_T type;
         LNXPROC_BASE_DATA_T *current;
         LNXPROC_BASE_DATA_T *previous;

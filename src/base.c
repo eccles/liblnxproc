@@ -69,7 +69,7 @@ _lnxproc_base_print(LNXPROC_BASE_T *base)
         char buf[64];
 
         printf("Base %p\n", base);
-        printf("Atribute %s\n",
+        printf("Attribute %s\n",
                lnxproc_base_typestr(base->type, buf, sizeof buf));
         printf("Rawread %p\n", base->rawread);
         printf("Normalize %p\n", base->normalize);
@@ -83,6 +83,8 @@ _lnxproc_base_print(LNXPROC_BASE_T *base)
         for (i = 0; i < base->nfiles; i++) {
             printf("Filename %s\n", base->filenames[i]);
         }
+        printf("No. of reads %lu\n", base->count);
+
         LNXPROC_BASE_DATA_T *data = base->current;
 
         printf("CURRENT at %p(%d)\n", data, data->id);
@@ -510,8 +512,19 @@ _lnxproc_base_read(LNXPROC_BASE_T *base)
         return LNXPROC_ERROR_BASE_NULL;
     }
 
-    _LNXPROC_DEBUG("Execute default read method\n");
     LNXPROC_ERROR_T ret;
+
+    if (base->type == LNXPROC_BASE_TYPE_PREVIOUS) {
+        if (base->count > 0) {
+            ret = _lnxproc_base_store_previous(base);
+            if (ret) {
+                _LNXPROC_ERROR_DEBUG(ret, "\n");
+                return ret;
+            }
+        }
+    }
+
+    _LNXPROC_DEBUG("Execute default read method\n");
     LNXPROC_BASE_DATA_T *data = base->current;
 
     do {
@@ -549,13 +562,6 @@ _lnxproc_base_read(LNXPROC_BASE_T *base)
         _LNXPROC_ERROR_DEBUG(ret, "\n");
         return ret;
     }
-    if (base->type == LNXPROC_BASE_TYPE_PREVIOUS) {
-        ret = _lnxproc_base_store_previous(base);
-        if (ret) {
-            _LNXPROC_ERROR_DEBUG(ret, "\n");
-            return ret;
-        }
-    }
     else if (base->type == LNXPROC_BASE_TYPE_MEMOIZE) {
         ret = _lnxproc_base_memoize(base);
         if (ret) {
@@ -563,6 +569,9 @@ _lnxproc_base_read(LNXPROC_BASE_T *base)
             return ret;
         }
     }
+    base->count++;
+    if (base->count == 0)
+        base->count = 1;
     return LNXPROC_OK;
 }
 
@@ -779,6 +788,7 @@ _lnxproc_base_new(LNXPROC_BASE_T **base,
         p->rawread = rawread;
     }
     p->type = type;
+    p->count = 0;
     *base = p;
     _LNXPROC_DEBUG("Successful\n");
     return LNXPROC_OK;
