@@ -21,7 +21,7 @@ This file is part of liblnxproc.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//#include <unistd.h>             // sleep()
+#include <unistd.h>             // sleep()
 
 #include "error_private.h"
 #include "util_private.h"
@@ -590,7 +590,7 @@ execute_base(LNXPROC_BASE_T *base)
             else {
                 _lnxproc_base_print(base);
             }
-            //sleep(20);
+            sleep(20);
         }
         _LNXPROC_BASE_FREE(base);
     }

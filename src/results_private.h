@@ -21,8 +21,8 @@
 #ifndef LIBLNXPROC_RESULTS_PRIVATE_H
 #define LIBLNXPROC_RESULTS_PRIVATE_H 1
 
-#include "error_private.h"
 #include "util_private.h"
+#include "error_private.h"
 
 #ifdef DEBUG
 #define HASH_DEBUG 1
@@ -68,7 +68,8 @@ extern "C" {
                                            char **value, char *fmt, ...);
 
     LNXPROC_ERROR_T _lnxproc_results_add(_LNXPROC_RESULTS_T * results,
-                                         const char *value, char *fmt, ...);
+                                         const char *value, char *fmt,
+                                         ...) WARN_FORMAT(3, 4);
 
     typedef int (*_LNXPROC_RESULTS_ITERATE_FUNC) (char *key, char *value,
                                                   void *data);

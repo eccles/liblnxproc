@@ -98,8 +98,8 @@ LNXPROC_ERROR_T
 _lnxproc_vector_new(_LNXPROC_VECTOR_T ** vector, size_t size, int recursive)
 {
 
-    _LNXPROC_DEBUG("sizeof ptr %d\n", sizeof(void *));
-    _LNXPROC_DEBUG("sizeof _LNXPROC_VECTOR_T %d\n", sizeof(_LNXPROC_VECTOR_T));
+    _LNXPROC_DEBUG("sizeof ptr %lu\n", sizeof(void *));
+    _LNXPROC_DEBUG("sizeof _LNXPROC_VECTOR_T %lu\n", sizeof(_LNXPROC_VECTOR_T));
     _LNXPROC_DEBUG("Size %zd Recursive %d\n", size, recursive);
 
     if (!vector) {
@@ -359,7 +359,7 @@ _lnxproc_vector_set_child(_LNXPROC_VECTOR_T * vector, size_t idx,
     }
     _LNXPROC_DEBUG("Set Vector %p child %zd to %p\n", vector, idx, child);
     vector->children[idx] = child;
-    _LNXPROC_DEBUG("Set parent of %p to %p(%d)\n", child, vector, idx);
+    _LNXPROC_DEBUG("Set parent of %p to %p(%zd)\n", child, vector, idx);
     child->parent = vector;
     child->idx = idx;
     _LNXPROC_DEBUG("Set Vector %p value %zd to %p\n", vector, idx,

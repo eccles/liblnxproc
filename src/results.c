@@ -67,8 +67,8 @@ _lnxproc_results_print(_LNXPROC_RESULTS_T * results)
 LNXPROC_ERROR_T
 _lnxproc_results_new(_LNXPROC_RESULTS_T ** results)
 {
-    _LNXPROC_DEBUG("sizeof ptr %d\n", sizeof(void *));
-    _LNXPROC_DEBUG("sizeof _LNXPROC_RESULTS_T %d\n",
+    _LNXPROC_DEBUG("sizeof ptr %lu\n", sizeof(void *));
+    _LNXPROC_DEBUG("sizeof _LNXPROC_RESULTS_T %lu\n",
                    sizeof(_LNXPROC_RESULTS_T));
     if (!results) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_ADDRESS_NULL, "\n");
@@ -142,7 +142,7 @@ realloc_results_table(_LNXPROC_RESULTS_T * results, size_t nentries)
     for (i = results->size; i < (nentries + results->size); i++) {
         _LNXPROC_RESULTS_TABLE_T *entry = t + i;
 
-        _LNXPROC_DEBUG("Clear %d bytes at %p\n",
+        _LNXPROC_DEBUG("Clear %lu bytes at %p\n",
                        sizeof(_LNXPROC_RESULTS_TABLE_T), entry);
         memset(entry, 0, sizeof(_LNXPROC_RESULTS_TABLE_T));
     }
@@ -321,7 +321,7 @@ _lnxproc_results_add(_LNXPROC_RESULTS_T * results, const char *value,
     }
     va_end(ap);
 
-    _LNXPROC_DEBUG("Key %d : '%s'\n", ksize, entry->key);
+    _LNXPROC_DEBUG("Key %zd : '%s'\n", ksize, entry->key);
 
     size_t dsize = 1 + strlen(value);
 
@@ -332,7 +332,7 @@ _lnxproc_results_add(_LNXPROC_RESULTS_T * results, const char *value,
     }
     memcpy(entry->value, value, dsize);
 
-    _LNXPROC_DEBUG("Value %d : '%s'\n", dsize, entry->value);
+    _LNXPROC_DEBUG("Value %zd : '%s'\n", dsize, entry->value);
 
     results->length++;
 

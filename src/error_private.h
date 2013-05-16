@@ -21,6 +21,7 @@
 #ifndef LIBLNXPROC_ERROR_PRIVATE_H
 #define LIBLNXPROC_ERROR_PRIVATE_H 1
 
+#include "util_private.h"
 #include <lnxproc/error.h>
 
 #ifdef __cplusplus
@@ -37,7 +38,7 @@ extern "C" {
 
     void _lnxproc_debug(const char *filename,
                         int lineno, const char *funcname, char *fmt, ...
-        );
+    ) WARN_FORMAT(4, 5);
 
 #define _LNXPROC_DEBUG(fmt, args...) \
                           _lnxproc_debug(__FILE__,__LINE__,__func__, fmt, ##args)

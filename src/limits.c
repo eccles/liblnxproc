@@ -126,8 +126,8 @@ LNXPROC_ERROR_T
 _lnxproc_limits_dup(_LNXPROC_LIMITS_T ** newlimits,
                     _LNXPROC_LIMITS_T limits[], size_t dim)
 {
-    _LNXPROC_DEBUG("sizeof ptr %d\n", sizeof(void *));
-    _LNXPROC_DEBUG("sizeof _LNXPROC_LIMITS_T %d\n", sizeof(_LNXPROC_LIMITS_T));
+    _LNXPROC_DEBUG("sizeof ptr %lu\n", sizeof(void *));
+    _LNXPROC_DEBUG("sizeof _LNXPROC_LIMITS_T %lu\n", sizeof(_LNXPROC_LIMITS_T));
 
     if (!newlimits) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_ADDRESS_NULL, "\n");
@@ -165,7 +165,7 @@ _lnxproc_limits_dup(_LNXPROC_LIMITS_T ** newlimits,
 
         _lnxproc_limit_print(limits + i, buf, sizeof buf);
 
-        _LNXPROC_DEBUG("Malloc old limit %zd :%s:\n", i, buf);
+        _LNXPROC_DEBUG("Malloc old limit %d :%s:\n", i, buf);
 #endif
         nlimits[i].chars = malloc(limits[i].len * sizeof(char));
         if (!nlimits[i].chars) {
@@ -185,7 +185,7 @@ _lnxproc_limits_dup(_LNXPROC_LIMITS_T ** newlimits,
 
 #ifdef DEBUG
         _lnxproc_limit_print(nlimits + i, buf, sizeof buf);
-        _LNXPROC_DEBUG("Malloc new limit %zd :%s:\n", i, buf);
+        _LNXPROC_DEBUG("Malloc new limit %d :%s:\n", i, buf);
 #endif
     }
     *newlimits = nlimits;

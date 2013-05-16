@@ -5,7 +5,7 @@ CC=gcc
 CCFLAGSD=-DDEBUG=1 -g
 CCFLAGSP=-pg -g
 CCFLAGSO=-O2
-CCFLAGS1=-I../src -Wall -Winline
+CCFLAGS1=-I../src -Wall -Winline -Werror
 CCFLAGS2=$(CCFLAGS1) -fpic
 #CCFLAGS=-g -fpic -I. -Wall
 LDFLAGS1=-L. -llnxproc

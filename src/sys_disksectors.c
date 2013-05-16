@@ -38,7 +38,7 @@ struct env_t {
 static LNXPROC_ERROR_T
 iter_func(char *val, void *data, size_t idx[], size_t dim)
 {
-    _LNXPROC_DEBUG("Val %s, Data %p, idx[%d]=%d idx[%d]=%d\n", val, data, 0,
+    _LNXPROC_DEBUG("Val %s, Data %p, idx[%d]=%zd idx[%d]=%zd\n", val, data, 0,
                    idx[0], 1, idx[1]);
     struct env_t *env = data;
 

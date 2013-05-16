@@ -34,7 +34,7 @@ static _LNXPROC_VECTOR_T *
 array_create(_LNXPROC_LIMITS_T limits[], size_t dim, int depth)
 {
     _LNXPROC_DEBUG("limits %p\n", limits);
-    _LNXPROC_DEBUG("dim %d\n", dim);
+    _LNXPROC_DEBUG("dim %zd\n", dim);
     _LNXPROC_DEBUG("depth %d\n", depth);
 
     _LNXPROC_LIMITS_T *limit = limits + depth;
@@ -87,9 +87,9 @@ _lnxproc_array_new(_LNXPROC_ARRAY_T ** array, _LNXPROC_LIMITS_T limits[],
                    size_t dim)
 {
 
-    _LNXPROC_DEBUG("Array * %p Limits %p Dim %d\n", array, limits, dim);
-    _LNXPROC_DEBUG("sizeof ptr %d\n", sizeof(void *));
-    _LNXPROC_DEBUG("sizeof _LNXPROC_ARRAY_T %d\n", sizeof(_LNXPROC_ARRAY_T));
+    _LNXPROC_DEBUG("Array * %p Limits %p Dim %zd\n", array, limits, dim);
+    _LNXPROC_DEBUG("sizeof ptr %lu\n", sizeof(void *));
+    _LNXPROC_DEBUG("sizeof _LNXPROC_ARRAY_T %lu\n", sizeof(_LNXPROC_ARRAY_T));
 
     if (!array) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ARRAY_ADDRESS_NULL,
@@ -489,7 +489,7 @@ array_vector_iterate_func(_LNXPROC_VECTOR_T * vector, int idx, int depth,
 
     if (vector->parent && (depth > 0)) {
         aidx[depth - 1] = idx;
-        _LNXPROC_DEBUG("parent aidx[%d] = %d\n", depth - 1, aidx[depth - 1]);
+        _LNXPROC_DEBUG("parent aidx[%d] = %zd\n", depth - 1, aidx[depth - 1]);
     }
     if (!vector->recursive && vector->values && vector->length > 0) {
         int i;
