@@ -121,6 +121,8 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
         "s_read", "ms_read", "writes", "merge_write", "s_write",
         "ms_write", "ios", "ms_io", "ms_weighted",
     };
+    static size_t numcols = sizeof(cols) / sizeof(cols[0]);
+
 /*
  * TODO - get sector size from other LNXPROC module.
  * For now fix it at 512 bytes.
@@ -137,13 +139,18 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
 
     _lnxproc_base_timeval_diff(base, &tdiff);
 
+    _LNXPROC_DEBUG("Time difference = %f\n", tdiff);
+
     int i;
 
     _lnxproc_results_init(results, nrows);
     for (i = 0; i < nrows; i++) {
         char *key = values[i][keycol];
 
-        _LNXPROC_DEBUG("%1$zd:Key %2$p '%2$s'\n", i, key);
+        if (!key)
+            continue;
+
+        _LNXPROC_DEBUG("%1$d:Key %2$p '%2$s'\n", i, key);
 
         float readtime = 0;
         float writetime = 0;
@@ -151,12 +158,16 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
         if (previous) {
             readtime = 1.e-6 * (atoi(values[i][6]) - atoi(prev[i][6]));
             writetime = 1.e-6 * (atoi(values[i][10]) - atoi(prev[i][10]));
+            _LNXPROC_DEBUG("%d:Readtime = %f\n", i, readtime);
+            _LNXPROC_DEBUG("%d:Writetime = %f\n", i, writetime);
         }
 
         int j;
 
         ncols = current->vector->children[i]->length;
-        for (j = 0; j < ncols; j++) {
+        int n = ncols > numcols ? numcols : ncols;
+
+        for (j = 0; j < n; j++) {
             if (j == keycol)
                 continue;
             int diff;
@@ -197,13 +208,14 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
 
                     diff = atoi(values[i][j]) - atoi(prev[i][j]);
                     rate = (scale[j] * diff) / tdiff;
-                    snprintf(buf, sizeof buf, "%5.1f", rate);
+                    snprintf(buf, sizeof buf, "%.1f", rate);
                     _lnxproc_results_add(results, buf, "/%s/%s%%",
                                          key, cols[j]);
                 }
             }
         }
     }
+    _lnxproc_results_hash(results);
     _lnxproc_base_store_previous(base);
     return LNXPROC_OK;
 }
