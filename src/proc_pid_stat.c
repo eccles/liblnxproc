@@ -118,23 +118,21 @@ Description::
 #include "results_private.h"
 #include "base_private.h"
 #include "proc_pid_stat.h"
+#include "uthash.h"
 
 static LNXPROC_ERROR_T
 proc_pid_stat_normalize(LNXPROC_BASE_T *base)
 {
-    _LNXPROC_RESULTS_T *results = base->current->results;
-    _LNXPROC_ARRAY_T *array = base->current->array;
+    LNXPROC_BASE_DATA_T *data = base->current;
+    _LNXPROC_RESULTS_T *results = data->results;
+    _LNXPROC_ARRAY_T *array = data->array;
 
     size_t nrows = array->vector->length;
 
+    _LNXPROC_DEBUG("Current data is %d at %p\n", data->id, data);
+    _LNXPROC_DEBUG("Current results is at %p\n", results);
     _LNXPROC_DEBUG("Nrows %zd\n", nrows);
     char ***values = (char ***) array->vector->values;
-
-    float tdiff = 0.0;
-
-    if (base->previous && base->previous->array) {
-        _lnxproc_base_timeval_diff(base, &tdiff);
-    }
 
     char *val;
     char *rowkey;
@@ -156,17 +154,26 @@ proc_pid_stat_normalize(LNXPROC_BASE_T *base)
         "guest_time", "cguest_time"
     };
     size_t ncolkeys = sizeof(colkey) / sizeof(colkey[0]);
+    size_t startkey = 22;
+
+    _LNXPROC_RESULTS_TABLE_T *hash = NULL;
 
     _lnxproc_results_init(results, nrows);
     for (i = 0; i < nrows; i++) {
+        rowkey = values[i][0];
+        if (!rowkey)
+            continue;
         size_t ncols = array->vector->children[i]->length;
         size_t ncols1 = ncols > ncolkeys ? ncolkeys : ncols;
 
-        rowkey = values[i][0];
-        for (j = 1; j < ncols1; j++) {
+        _LNXPROC_DEBUG("%d:first Rowkey value %s\n", i, rowkey);
+        for (j = 2; j < ncols1; j++) {
             char buf[32];
 
             val = values[i][j];
+            if (!val)
+                continue;
+
             if ((j == 23) ||    // vsize
                 (j == 25)) {    // rlim
                 snprintf(buf, sizeof buf, "%d", atoi(val) / 1024);
@@ -182,21 +189,35 @@ proc_pid_stat_normalize(LNXPROC_BASE_T *base)
             else if ((j == 14) ||       // utime
                      (j == 15) ||       // stime
                      (j == 16) ||       // cutime
-                     (j == 17)) {       // cstime
-                float fval = atoi(val) * results->secs_per_jiffy;
-
-                snprintf(buf, sizeof buf, "%f", fval);
+                     (j == 17) ||       // cstime
+                     (j == 22)) {       // starttime
+                snprintf(buf, sizeof buf, "%f",
+                         atoi(val) * results->secs_per_jiffy);
+                _LNXPROC_DEBUG("%d,%d:/%s/%s value %s float %s\n", i, j, rowkey,
+                               colkey[j], val, buf);
                 _lnxproc_results_add(results, buf, "/%s/%s", rowkey, colkey[j]);
 
+                _LNXPROC_RESULTS_TABLE_T *entry =
+                    calloc(1, sizeof(_LNXPROC_RESULTS_TABLE_T));
+                if (entry) {
+                    strncpy(entry->value, buf, sizeof entry->value);
+                    snprintf(entry->key, sizeof entry->key, "/%s/%s", rowkey,
+                             colkey[j]);
+                    _LNXPROC_DEBUG("%d,%d:Store %s = %s\n", i, j, entry->key,
+                                   entry->value);
+                    HASH_ADD_STR(hash, key, entry);
+                }
             }
             else if ((j == 21) ||       // itrealvalue
-                     (j == 22) ||       // starttime
                      (j == 42) ||       // guest_time
                      (j == 43) ||       // cguest_time
                      (j == 44)) {       // delay_blkio_ticks
                 snprintf(buf, sizeof buf, "%f",
                          atoi(val) * results->secs_per_jiffy);
+                _LNXPROC_DEBUG("%d,%d:/%s/%s val %s float %s\n", i, j, rowkey,
+                               colkey[j], val, buf);
                 _lnxproc_results_add(results, buf, "/%s/%s", rowkey, colkey[j]);
+
             }
             else {
                 _lnxproc_results_add(results, val, "/%s/%s", rowkey, colkey[j]);
@@ -204,33 +225,108 @@ proc_pid_stat_normalize(LNXPROC_BASE_T *base)
         }
     }
 /*
- * different pids may appear at different positions in the array - so we have to 
+ * different pids may appear at different positions in the array - so we have to
  * remember the locations of each pid entry in order to calculate usage etc.
  */
+    LNXPROC_BASE_DATA_T *pdata = base->previous;
+    _LNXPROC_RESULTS_T *presults = NULL;
+
+    float tdiff = 0.0;
+
+    if (pdata && pdata->array) {
+        _lnxproc_base_timeval_diff(base, &tdiff);
+        presults = pdata->results;
+        _LNXPROC_DEBUG("Previous data is %d at %p\n", pdata->id, pdata);
+        _LNXPROC_DEBUG("Previous results is at %p\n", presults);
+    }
+
+    _LNXPROC_DEBUG("Time difference = %f secs\n", tdiff);
     if (tdiff > 0.0) {
+        _LNXPROC_DEBUG("Current timestamp is %f\n",
+                       lnxproc_timeval_secs(&data->tv));
+        _LNXPROC_DEBUG("Previous timestamp is %f\n",
+                       lnxproc_timeval_secs(&pdata->tv));
         char *pval = NULL;
 
         for (i = 0; i < nrows; i++) {
             rowkey = values[i][0];
-            for (j = 14; j < 18; j++) {
-                _lnxproc_results_fetch(base->previous->results, &pval, "/%s/%s",
-                                       rowkey, colkey[j]);
-                if (pval) {
-                    _lnxproc_results_fetch(results, &val, "/%s/%s", rowkey,
-                                           colkey[j]);
-                    if (val) {
-                        char buf[32];
-                        float usage =
-                            ((atof(val) - atof(pval)) * 100.0) / tdiff;
+            if (!rowkey)
+                continue;
+            char key[32];
 
-                        snprintf(buf, sizeof buf, "%5.1f", usage);
-                        _lnxproc_results_add(results, buf, "/%s/%s%%",
-                                             rowkey, colkey[j]);
+            _LNXPROC_DEBUG("%d:second Rowkey value %s\n", i, rowkey);
+            snprintf(key, sizeof key, "/%s/%s", rowkey, colkey[startkey]);
+
+            _LNXPROC_RESULTS_TABLE_T *startentry = NULL;
+
+            HASH_FIND_STR(hash, key, startentry);
+            if (startentry) {
+                _LNXPROC_DEBUG("%d:current starttime for %s is %s\n", i, rowkey,
+                               startentry->value);
+                _lnxproc_results_fetch(presults, &pval, "/%s/%s",
+                                       rowkey, colkey[startkey]);
+                if (!pval)
+                    continue;
+                _LNXPROC_DEBUG("%d:previous starttime for %s is %s\n", i,
+                               rowkey, pval);
+                if (strcmp(pval, startentry->value))
+                    continue;
+            }
+
+            for (j = 14; j < 18; j++) {
+                _lnxproc_results_fetch(presults, &pval, "/%s/%s",
+                                       rowkey, colkey[j]);
+                _LNXPROC_DEBUG("%d,%d:Prev value /%s/%s = %s\n", i, j, rowkey,
+                               colkey[j], pval);
+                if (!pval)
+                    continue;
+                _LNXPROC_RESULTS_TABLE_T *entry = NULL;
+
+                snprintf(key, sizeof key, "/%s/%s", rowkey, colkey[j]);
+                //_lnxproc_results_fetch(results, &val, "%s", key);
+                //_LNXPROC_DEBUG("%d,%d:Curr value /%s/%s = %s\n", i,j,rowkey, colkey[j], val);
+                HASH_FIND_STR(hash, key, entry);
+                if (entry) {
+                    if (strcmp(entry->value, val)) {
+                        _LNXPROC_DEBUG("%d,%d:WARN Curr value /%s/%s = %s\n", i,
+                                       j, rowkey, colkey[j], val);
                     }
+                    val = entry->value;
                 }
+                else {
+                    val = NULL;
+                    _LNXPROC_DEBUG("%d,%d:WARN Curr value /%s/%s = %s\n", i, j,
+                                   rowkey, colkey[j], val);
+                }
+                if (!val)
+                    continue;
+                char buf[32];
+                float usage = ((atof(val) - atof(pval)) * 100.0) / tdiff;
+
+                snprintf(buf, sizeof buf, "%.1f", usage);
+                if (usage < 0.0) {
+                    _LNXPROC_DEBUG("%d,%d:WARN Usage /%s/%s%% = %s\n", i, j,
+                                   rowkey, colkey[j], buf);
+                }
+                else {
+                    _LNXPROC_DEBUG("%d,%d:Usage /%s/%s%% = %s\n", i, j, rowkey,
+                                   colkey[j], buf);
+                }
+
+                _lnxproc_results_add(results, buf, "/%s/%s%%", rowkey,
+                                     colkey[j]);
             }
         }
     }
+    if (hash) {
+        _LNXPROC_RESULTS_TABLE_T *entry, *tmp;
+
+        HASH_ITER(hh, hash, entry, tmp) {
+            HASH_DEL(hash, entry);
+            free(entry);
+        }
+    }
+    _lnxproc_results_hash(results);
 
     _lnxproc_base_store_previous(base);
     return LNXPROC_OK;
@@ -251,6 +347,7 @@ lnxproc_proc_pid_stat_new(LNXPROC_BASE_T **base)
 
     char *fileprefix = "/proc";
     char *fileglob = "[1-9]*";
+
     char *filesuffix = "stat";
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
