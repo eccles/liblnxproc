@@ -23,7 +23,7 @@ fi
 #exit 0
 OPT=$1
 shift
-VALOPTS="--leak-check=full --show-reachable=yes --read-var-info=yes --track-origins=yes"
+VALOPTS="--track-fds=yes --leak-check=full --show-reachable=yes --read-var-info=yes --track-origins=yes"
 if [ "${OPT}" = "leak" ]
 then
     valgrind -v ${VALOPTS} ${BIN} $*

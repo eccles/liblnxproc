@@ -8,9 +8,9 @@ then
 fi
 ulimit -c unlimited
 BIN=${0%*.sh}
-export LNXPROC_TESTROOT=`pwd`
 if [ "${0}" = "./testing.sh" ]
 then
+    export LNXPROC_TESTROOT=`pwd`
     rm -f testing
     ln timing testing
     rm -f testing-dbg
