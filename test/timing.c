@@ -31,10 +31,16 @@ static void
 time_module(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type, char *str)
 {
     if (modules) {
-
-        lnxproc_read(modules, type);
-        lnxproc_read(modules, type);
-        lnxproc_read(modules, type);
+        char buf[96];
+        LNXPROC_ERROR_T ret = lnxproc_read(modules, type);
+        ret = lnxproc_read(modules, type);
+        if( ret ) {
+            printf("Error %s\n",lnxproc_strerror(ret,buf,sizeof buf));
+        }
+        ret = lnxproc_read(modules, type);
+        if( ret ) {
+            printf("Error %s\n",lnxproc_strerror(ret,buf,sizeof buf));
+        }
 
         if (testtype == 0) {
             long rawread_time;
@@ -48,7 +54,10 @@ time_module(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type, char *str)
             int i;
 
             for (i = 0; i < ntimes; i++) {
-                lnxproc_read(modules, type);
+                ret = lnxproc_read(modules, type);
+        if( ret ) {
+            printf("Error %s\n",lnxproc_strerror(ret,buf,sizeof buf));
+        }
                 lnxproc_performance(modules, type, &rawread_time, &map_time,
                                     &normalize_time);
                 sum_rawread_time += rawread_time;
@@ -64,13 +73,13 @@ time_module(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type, char *str)
                    sum_map_time / ntimes, sum_normalize_time / ntimes);
         }
         else if (testtype == 1) {
-            lnxproc_read(modules, type);
-            printf("%d:%s:Results 1\n", type, str);
-            lnxproc_print(modules, type);
-
-            lnxproc_read(modules, type);
-            printf("%d:%s:Results 2\n", type, str);
-            lnxproc_print(modules, type);
+                lnxproc_read(modules, type);
+                printf("%d:%s:Results 1\n", type, str);
+                lnxproc_print(modules, type);
+    
+                lnxproc_read(modules, type);
+                printf("%d:%s:Results 2\n", type, str);
+                lnxproc_print(modules, type);
         }
     }
 }
