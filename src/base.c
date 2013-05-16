@@ -29,6 +29,11 @@
 #include <glob.h>
 #include <regex.h>
 
+#include <sys/types.h>          //closedir,opendir,stat,lstat
+#include <dirent.h>             //closedir,readdir,opendir
+#include <sys/stat.h>           // stat,lstat
+#include <unistd.h>             // stat,lstat
+
 #include "util_private.h"
 #include "error_private.h"
 #include "limits_private.h"
@@ -55,33 +60,36 @@ _lnxproc_base_print(LNXPROC_BASE_T *base)
         for (i = 0; i < base->nfiles; i++) {
             printf("Filename %s\n", base->filenames[i]);
         }
+        LNXPROC_BASE_DATA_T *data = base->current;
+
+        printf("CURRENT at %p(%d)\n", data, data->id);
         printf("Timestamp %lu.%06lu\n",
-               (unsigned long) base->current->tv.tv_sec,
-               (unsigned long) base->current->tv.tv_usec);
-        printf("Rawread duration %ld usecs\n", base->current->rawread_time);
-        printf("Map duration %ld usecs\n", base->current->map_time);
-        printf("Normalize duration %ld usecs\n", base->current->normalize_time);
-        printf("Lines %p\n", base->current->lines);
-        printf("Buflen %zd\n", base->current->buflen);
-        printf("Nbytes %d\n", base->current->nbytes);
-        _lnxproc_array_print(base->current->array, 0);
-        _lnxproc_results_print(base->current->results);
+               (unsigned long) data->tv.tv_sec,
+               (unsigned long) data->tv.tv_usec);
+        printf("Rawread duration %ld usecs\n", data->rawread_time);
+        printf("Map duration %ld usecs\n", data->map_time);
+        printf("Normalize duration %ld usecs\n", data->normalize_time);
+        printf("Lines %p\n", data->lines);
+        printf("Buflen %zd\n", data->buflen);
+        printf("Nbytes %d\n", data->nbytes);
+        _lnxproc_array_print(data->array, 0);
+        _lnxproc_results_print(data->results);
 
         if (base->previous) {
+            data = base->previous;
+            printf("PREVIOUS at %p(%d)\n", data, data->id);
             printf("Previous Timestamp %lu.%06lu\n",
-                   (unsigned long) base->previous->tv.tv_sec,
-                   (unsigned long) base->previous->tv.tv_usec);
-            printf("Previous Rawread duration %ld usecs\n",
-                   base->previous->rawread_time);
-            printf("Previous Map duration %ld usecs\n",
-                   base->previous->map_time);
+                   (unsigned long) data->tv.tv_sec,
+                   (unsigned long) data->tv.tv_usec);
+            printf("Previous Rawread duration %ld usecs\n", data->rawread_time);
+            printf("Previous Map duration %ld usecs\n", data->map_time);
             printf("Previous Normalize duration %ld usecs\n",
-                   base->previous->normalize_time);
-            printf("Previous Lines %p\n", base->previous->lines);
-            printf("Previous Buflen %zd\n", base->previous->buflen);
-            printf("Previous Nbytes %d\n", base->previous->nbytes);
-            _lnxproc_array_print(base->previous->array, 0);
-            _lnxproc_results_print(base->previous->results);
+                   data->normalize_time);
+            printf("Previous Lines %p\n", data->lines);
+            printf("Previous Buflen %zd\n", data->buflen);
+            printf("Previous Nbytes %d\n", data->nbytes);
+            _lnxproc_array_print(data->array, 0);
+            _lnxproc_results_print(data->results);
         }
         return LNXPROC_OK;
     }
@@ -128,6 +136,7 @@ base_rawread(char *filename, char **readbuf, int *nbytes)
 
         return myerrno;
     }
+    close(fd);
 
     _LNXPROC_DEBUG("Nbytes %d read\n", inbytes);
 
@@ -151,7 +160,8 @@ base_read_glob_files(LNXPROC_BASE_T *base, char **readbuf, int *nbytes)
     char globpat[FILENAME_MAX];
     char regpat[FILENAME_MAX];
 
-    _LNXPROC_ARRAY_T *array = base->current->array;
+    LNXPROC_BASE_DATA_T *data = base->current;
+    _LNXPROC_ARRAY_T *array = data->array;
     size_t dim = array->dim;
     _LNXPROC_LIMITS_T *limits = array->limits;
     char separator = limits[dim - 1].chars[0];
@@ -177,71 +187,87 @@ base_read_glob_files(LNXPROC_BASE_T *base, char **readbuf, int *nbytes)
                      base->filesuffix);
         }
     }
-    _LNXPROC_DEBUG("Glob pattern '%s'\n", globpat);
-    _LNXPROC_DEBUG("Regex pattern '%s'\n", regpat);
 #ifdef DEBUG
     char errbuf[128];
 #endif
 
+    _LNXPROC_DEBUG("Glob pattern '%s'\n", globpat);
     glob_t globbuf;
 
-    globbuf.gl_offs = 0;
+    memset(&globbuf, 0, sizeof(globbuf));
 
+    int ret =
+        glob(globpat, GLOB_MARK | GLOB_NOSORT | GLOB_BRACE, NULL, &globbuf);
+    if (ret) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_GLOB_FAILURE, " errno = %d\n",
+                             ret);
+        return LNXPROC_ERROR_BASE_GLOB_FAILURE;
+    }
+
+    _LNXPROC_DEBUG("Regex pattern '%s'\n", regpat);
     regex_t reg;
+
+    memset(&reg, 0, sizeof(regex_t));
+
     regmatch_t pmatch[3];
     size_t pmlen = sizeof(pmatch) / sizeof(pmatch[0]);
 
-    int ret = regcomp(&reg, regpat, REG_EXTENDED);
+    ret = regcomp(&reg, regpat, REG_EXTENDED);
 
-#ifdef DEBUG
-    regerror(ret, &reg, errbuf, sizeof errbuf);
-    _LNXPROC_DEBUG("Regex compilation returns %s\n", errbuf);
-#endif
     if (ret) {
-        return ret;
+#ifdef DEBUG
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_REGEX_FAILURE, "%s\n", regpat);
+        regerror(ret, &reg, errbuf, sizeof errbuf);
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_REGEX_FAILURE, " errno = %s\n",
+                             errbuf);
+#endif
+        globfree(&globbuf);
+        return LNXPROC_ERROR_BASE_REGEX_FAILURE;
     }
-
-    ret = glob(globpat, GLOB_MARK | GLOB_NOSORT, NULL, &globbuf);
-    _LNXPROC_DEBUG("Glob returns %d\n", ret);
 
     int i, j;
 
     for (i = 0; i < globbuf.gl_pathc; i++) {
         _LNXPROC_DEBUG("%d:File %s\n", i, globbuf.gl_pathv[i]);
         ret = regexec(&reg, globbuf.gl_pathv[i], pmlen, pmatch, 0);
+        if (ret) {
 #ifdef DEBUG
-        regerror(ret, &reg, errbuf, sizeof errbuf);
-        _LNXPROC_DEBUG("Regex exec returns %s\n", errbuf);
+            regerror(ret, &reg, errbuf, sizeof errbuf);
+            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_REGEX_FAILURE,
+                                 " errno = %s\n", errbuf);
 #endif
-        if (ret == 0) {
-            j = 1;
-            if (pmatch[j].rm_so > -1) {
-                char *s = globbuf.gl_pathv[i] + (int) pmatch[j].rm_so;
-                int len = (int) pmatch[j].rm_eo - (int) pmatch[j].rm_so;
+            globfree(&globbuf);
+            regfree(&reg);
+            return LNXPROC_ERROR_BASE_REGEX_FAILURE;
+        }
+        j = 1;                  // $0 is the whole string, $1 is the first regex parameter
+        if (pmatch[j].rm_so > -1) {
+            char *s = globbuf.gl_pathv[i] + (int) pmatch[j].rm_so;
+            int len = (int) pmatch[j].rm_eo - (int) pmatch[j].rm_so;
 
-                _LNXPROC_DEBUG("%d:%d:Match from %d to %d '%.*s'\n", i, j,
-                               (int) pmatch[j].rm_so, (int) pmatch[j].rm_eo,
-                               len, s);
-                int n =
-                    snprintf(*readbuf, *nbytes, "%.*s%c", len, s, separator);
+            _LNXPROC_DEBUG("%d:%d:Match from %d to %d '%.*s'\n", i, j,
+                           (int) pmatch[j].rm_so, (int) pmatch[j].rm_eo, len,
+                           s);
+            int n = snprintf(*readbuf, *nbytes, "%.*s%c", len, s, separator);
 
-                if (n > (*nbytes) - 1) {
-                    n = (*nbytes) - 1;
+            if (n >= *nbytes) {
+                globfree(&globbuf);
+                regfree(&reg);
+                return LNXPROC_ERROR_BASE_READ_OVERFLOW;
+            }
+
+            *readbuf += n;
+            *nbytes -= n;
+            _LNXPROC_DEBUG("Readbuf %p Nbytes %d\n", *readbuf, *nbytes);
+            ret = base_rawread(globbuf.gl_pathv[i], readbuf, nbytes);
+            if (ret) {
+                if (ret == LNXPROC_ERROR_BASE_READ_OVERFLOW) {
+                    globfree(&globbuf);
+                    regfree(&reg);
+                    return ret;
                 }
-
-                *readbuf += n;
-                *nbytes -= n;
-                _LNXPROC_DEBUG("Readbuf %p Nbytes %d\n", *readbuf, *nbytes);
-                ret = base_rawread(globbuf.gl_pathv[i], readbuf, nbytes);
-                if (ret) {
-                    if (ret == LNXPROC_ERROR_BASE_READ_OVERFLOW) {
-                        globfree(&globbuf);
-                        regfree(&reg);
-                        return ret;
-                    }
-                    *readbuf -= n;
-                    *nbytes += n;
-                }
+                *readbuf -= n;
+                *nbytes += n;
             }
         }
     }
@@ -262,8 +288,9 @@ _lnxproc_base_rawread(LNXPROC_BASE_T *base)
 
     _LNXPROC_DEBUG("Execute default rawread method\n");
     int i;
-    char *readbuf = base->current->lines;
-    int nbytes = base->current->buflen;
+    LNXPROC_BASE_DATA_T *data = base->current;
+    char *readbuf = data->lines;
+    int nbytes = data->buflen;
     LNXPROC_ERROR_T ret;
 
     for (i = 0; i < base->nfiles; i++) {
@@ -279,7 +306,7 @@ _lnxproc_base_rawread(LNXPROC_BASE_T *base)
             return ret;
         }
     }
-    base->current->nbytes = base->current->buflen - nbytes;
+    data->nbytes = data->buflen - nbytes;
 
     _LNXPROC_DEBUG("Successful\n");
     return LNXPROC_OK;
@@ -300,16 +327,16 @@ _lnxproc_base_normalize(LNXPROC_BASE_T *base)
 }
 
 static int
-base_map(LNXPROC_BASE_T *base)
+base_map(LNXPROC_BASE_DATA_T * data)
 {
-    _LNXPROC_DEBUG("Base %p\n", base);
+    _LNXPROC_DEBUG("Data %p\n", data);
 
-    _LNXPROC_ARRAY_T *array = base->current->array;
+    _LNXPROC_ARRAY_T *array = data->array;
 
     _LNXPROC_DEBUG("Array %p\n", array);
 
-    char *lines = base->current->lines;
-    int nbytes = base->current->nbytes;
+    char *lines = data->lines;
+    int nbytes = data->nbytes;
 
     _LNXPROC_DEBUG("Lines %p Nbytes %d\n", lines, nbytes);
 
@@ -330,8 +357,8 @@ base_map(LNXPROC_BASE_T *base)
 
         if (array) {
 
-            _LNXPROC_LIMITS_T *limits = base->current->array->limits;
-            int dim = base->current->array->dim;
+            _LNXPROC_LIMITS_T *limits = data->array->limits;
+            int dim = data->array->dim;
 
             _LNXPROC_DEBUG("Limits %p Dim %d\n", limits, dim);
 
@@ -424,11 +451,10 @@ base_new_rawread_buffer(LNXPROC_BASE_DATA_T * data, size_t newlen)
 }
 
 static LNXPROC_ERROR_T
-base_resize_rawread_buffer(LNXPROC_BASE_T *base)
+base_resize_rawread_buffer(LNXPROC_BASE_DATA_T * data)
 {
-    _LNXPROC_DEBUG("Resize lines buffer from %d bytes\n",
-                   base->current->buflen);
-    return base_new_rawread_buffer(base->current, base->current->buflen * 2);
+    _LNXPROC_DEBUG("Resize lines buffer from %d bytes\n", data->buflen);
+    return base_new_rawread_buffer(data, data->buflen * 2);
 }
 
 static LNXPROC_ERROR_T
@@ -463,40 +489,39 @@ _lnxproc_base_read(LNXPROC_BASE_T *base)
 
     _LNXPROC_DEBUG("Execute default read method\n");
     LNXPROC_ERROR_T ret;
+    LNXPROC_BASE_DATA_T *data = base->current;
 
     do {
         ret = base->rawread(base);
         if (ret == LNXPROC_ERROR_BASE_READ_OVERFLOW) {
-            base_resize_rawread_buffer(base);
+            base_resize_rawread_buffer(data);
         }
     } while (ret == LNXPROC_ERROR_BASE_READ_OVERFLOW);
-
-    base->current->tv = lnxproc_timeval();
-    base->current->rawread_time =
-        lnxproc_timeval_diff(&start, &base->current->tv);
-#ifdef DEBUG
-    char buf[32];
-
-    _LNXPROC_DEBUG("Current timestamp %s\n",
-                   lnxproc_timeval_print(&base->current->tv, buf, sizeof buf));
-#endif
-
     if (ret) {
         _LNXPROC_ERROR_DEBUG(ret, "\n");
         return ret;
     }
 
+    data->tv = lnxproc_timeval();
+    data->rawread_time = lnxproc_timeval_diff(&start, &data->tv);
+#ifdef DEBUG
+    char buf[32];
+
+    _LNXPROC_DEBUG("Current timestamp %s\n",
+                   lnxproc_timeval_print(&data->tv, buf, sizeof buf));
+#endif
+
     start = lnxproc_timeval();
-    base_map(base);
+    base_map(data);
     struct timeval end = lnxproc_timeval();
 
-    base->current->map_time = lnxproc_timeval_diff(&start, &end);
+    data->map_time = lnxproc_timeval_diff(&start, &end);
 
     start = lnxproc_timeval();
     _LNXPROC_DEBUG("Execute normalize method\n");
     ret = base->normalize(base);
+    data->normalize_time = lnxproc_timeval_diff(&start, &end);
     end = lnxproc_timeval();
-    base->current->normalize_time = lnxproc_timeval_diff(&start, &end);
     if (ret) {
         _LNXPROC_ERROR_DEBUG(ret, "\n");
         return ret;
@@ -506,9 +531,11 @@ _lnxproc_base_read(LNXPROC_BASE_T *base)
 }
 
 static LNXPROC_ERROR_T
-_base_data_new(LNXPROC_BASE_DATA_T * data,
+_base_data_new(LNXPROC_BASE_DATA_T * data, int id,
                size_t buflen, _LNXPROC_LIMITS_T limits[], size_t dim)
 {
+    _LNXPROC_DEBUG("New base data at %p index %d\n", data, id);
+    data->id = id;
     data->tv = lnxproc_timeval();
 #ifdef DEBUG
     char buf[32];
@@ -544,7 +571,7 @@ _lnxproc_base_store_previous(LNXPROC_BASE_T *base)
 {
     if (base) {
         if (!base->previous) {
-            LNXPROC_ERROR_T ret = _base_data_new(base->data + 1,
+            LNXPROC_ERROR_T ret = _base_data_new(base->data + 1, 1,
                                                  base->current->buflen,
                                                  base->current->array->limits,
                                                  base->current->array->dim);
@@ -608,7 +635,7 @@ _lnxproc_base_new(LNXPROC_BASE_T **base,
     }
 
     _LNXPROC_DEBUG("Malloc data area\n");
-    ret = _base_data_new(p->data + 0, buflen, limits, dim);
+    ret = _base_data_new(p->data + 0, 0, buflen, limits, dim);
     if (ret) {
         _LNXPROC_BASE_FREE(p);
         return ret;
