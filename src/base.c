@@ -644,6 +644,8 @@ _lnxproc_base_new(LNXPROC_BASE_T **base,
     p->current = p->data + 0;
     p->previous = NULL;
 
+    char *testroot = getenv("LNXPROC_TESTROOT");
+
     p->nfiles = 0;
     if (filenames) {
         p->filenames = calloc(nfiles, sizeof(char *));
@@ -654,8 +656,6 @@ _lnxproc_base_new(LNXPROC_BASE_T **base,
             return LNXPROC_ERROR_BASE_MALLOC_FILENAME;
         }
         int i;
-
-        char *testroot = getenv("LNXPROC_TESTROOT");
 
         for (i = 0; i < nfiles; i++) {
             if (testroot) {
@@ -680,7 +680,15 @@ _lnxproc_base_new(LNXPROC_BASE_T **base,
         p->filenames = NULL;
     }
     if (fileprefix) {
-        p->fileprefix = strdup(fileprefix);
+        if (testroot) {
+            char fname[FILENAME_MAX];
+
+            snprintf(fname, sizeof fname, "%s%s", testroot, fileprefix);
+            p->fileprefix = strdup(fname);
+        }
+        else {
+            p->fileprefix = strdup(fileprefix);
+        }
         if (!p->fileprefix) {
             _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_FILEPREFIX,
                                  "Malloc fileprefix\n");
