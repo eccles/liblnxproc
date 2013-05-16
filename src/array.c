@@ -308,7 +308,8 @@ _lnxproc_array_set_last(_LNXPROC_ARRAY_T * array, size_t idx[], size_t dim,
     }
 
     if (dim == 0) {
-        LNXPROC_ERROR_T ret = _lnxproc_vector_set_value(array->vector, 0, val);
+        LNXPROC_ERROR_T ret =
+            _lnxproc_vector_set_last_value(array->vector, 0, val);
 
         if (ret) {
             _LNXPROC_ERROR_DEBUG(ret, "\n");
@@ -351,6 +352,9 @@ _lnxproc_array_set_last(_LNXPROC_ARRAY_T * array, size_t idx[], size_t dim,
                 _LNXPROC_ERROR_DEBUG(ret, "\n");
                 return ret;
             }
+        }
+        else {
+            _lnxproc_vector_set_length(saved[i], idx[i]);
         }
         saved[j] = f;
         _LNXPROC_DEBUG("Saved[%d] = %p\n", j, saved[j]);
