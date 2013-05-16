@@ -758,12 +758,14 @@ base_data_free(LNXPROC_BASE_DATA_T * data)
     }
 }
 
-LNXPROC_BASE_T *
-_lnxproc_base_free(LNXPROC_BASE_T *base)
+LNXPROC_ERROR_T
+_lnxproc_base_free(LNXPROC_BASE_T **baseptr)
 {
-    _LNXPROC_DEBUG("Base %p\n", base);
+    _LNXPROC_DEBUG("Base %p\n", baseptr);
 
-    if (base) {
+    if (baseptr && *baseptr) {
+        LNXPROC_BASE_T *base = *baseptr;
+
         base_data_free(base->current);
         base_data_free(base->previous);
         if (base->filenames) {
@@ -798,7 +800,7 @@ _lnxproc_base_free(LNXPROC_BASE_T *base)
         base = NULL;
     }
 
-    return base;
+    return LNXPROC_OK;
 }
 
 static LNXPROC_ERROR_T

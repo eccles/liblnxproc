@@ -43,10 +43,10 @@ extern "C" {
 
     typedef LNXPROC_ERROR_T (*LNXPROC_BASE_METHOD) (LNXPROC_BASE_T *base);
 
-    LNXPROC_BASE_T *_lnxproc_base_free(LNXPROC_BASE_T *base) WARN_UNUSED;
+    LNXPROC_ERROR_T _lnxproc_base_free(LNXPROC_BASE_T **baseptr);
 
 #define _LNXPROC_BASE_FREE(b) {\
-    b = _lnxproc_base_free(b);\
+    _lnxproc_base_free(&b);\
 }
 
     LNXPROC_ERROR_T _lnxproc_base_read(LNXPROC_BASE_T *base);

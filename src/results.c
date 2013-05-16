@@ -97,12 +97,14 @@ _lnxproc_results_new(_LNXPROC_RESULTS_T ** results)
     return LNXPROC_OK;
 }
 
-_LNXPROC_RESULTS_T *
-_lnxproc_results_free(_LNXPROC_RESULTS_T * results)
+LNXPROC_ERROR_T
+_lnxproc_results_free(_LNXPROC_RESULTS_T ** resultsptr)
 {
-    _LNXPROC_DEBUG("Results %p\n", results);
+    _LNXPROC_DEBUG("Results %p\n", resultsptr);
 
-    if (results) {
+    if (resultsptr && *resultsptr) {
+        _LNXPROC_RESULTS_T *results = *resultsptr;
+
         _LNXPROC_DEBUG("Free Results\n");
         HASH_CLEAR(hh, results->hash);
         _LNXPROC_DEBUG("Table hash freed to %p\n", results->hash);
@@ -114,7 +116,7 @@ _lnxproc_results_free(_LNXPROC_RESULTS_T * results)
         results = NULL;
     }
 
-    return results;
+    return LNXPROC_OK;
 }
 
 static LNXPROC_ERROR_T

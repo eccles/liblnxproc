@@ -53,10 +53,9 @@ extern "C" {
 
     LNXPROC_ERROR_T _lnxproc_results_new(_LNXPROC_RESULTS_T ** newresults);
 
-    _LNXPROC_RESULTS_T *_lnxproc_results_free(_LNXPROC_RESULTS_T *
-                                              results) WARN_UNUSED;
+    LNXPROC_ERROR_T _lnxproc_results_free(_LNXPROC_RESULTS_T ** resultsptr);
 #define _LNXPROC_RESULTS_FREE(r) {\
-    r =  _lnxproc_results_free(r);\
+    _lnxproc_results_free(&r);\
 }
 
     LNXPROC_ERROR_T _lnxproc_results_print(_LNXPROC_RESULTS_T * results);

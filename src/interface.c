@@ -60,10 +60,11 @@ lnxproc_init(LNXPROC_MODULE_T ** modules)
     return LNXPROC_OK;
 }
 
-LNXPROC_MODULE_T *
-lnxproc_free(LNXPROC_MODULE_T * modules)
+LNXPROC_ERROR_T
+lnxproc_free(LNXPROC_MODULE_T ** modulesptr)
 {
-    if (modules) {
+    if (modulesptr && *modulesptr) {
+        LNXPROC_MODULE_T *modules = *modulesptr;
         int i;
 
         for (i = 0; i < nmodules; i++) {
@@ -71,7 +72,7 @@ lnxproc_free(LNXPROC_MODULE_T * modules)
         }
         free(modules);
     }
-    return NULL;
+    return LNXPROC_OK;
 }
 
 LNXPROC_ERROR_T

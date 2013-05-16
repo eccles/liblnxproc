@@ -159,12 +159,14 @@ _lnxproc_array_new(_LNXPROC_ARRAY_T ** array, _LNXPROC_LIMITS_T limits[],
     return LNXPROC_OK;
 }
 
-_LNXPROC_ARRAY_T *
-_lnxproc_array_free(_LNXPROC_ARRAY_T * array)
+LNXPROC_ERROR_T
+_lnxproc_array_free(_LNXPROC_ARRAY_T ** arrayptr)
 {
-    _LNXPROC_DEBUG("Array %p\n", array);
+    _LNXPROC_DEBUG("Array %p\n", arrayptr);
 
-    if (array) {
+    if (arrayptr && *arrayptr) {
+        _LNXPROC_ARRAY_T *array = *arrayptr;
+
         if (array->limits) {
             _LNXPROC_LIMITS_FREE(array->limits,
                                  array->dim < 1 ? 1 : array->dim);
@@ -179,7 +181,7 @@ _lnxproc_array_free(_LNXPROC_ARRAY_T * array)
     }
 
     _LNXPROC_DEBUG("Success\n");
-    return array;
+    return LNXPROC_OK;
 }
 
 #ifdef DEBUG

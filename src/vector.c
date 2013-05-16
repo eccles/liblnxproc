@@ -158,12 +158,14 @@ _lnxproc_vector_new(_LNXPROC_VECTOR_T ** vector, size_t size, int recursive)
     return LNXPROC_OK;
 }
 
-_LNXPROC_VECTOR_T *
-_lnxproc_vector_free(_LNXPROC_VECTOR_T * vector)
+LNXPROC_ERROR_T
+_lnxproc_vector_free(_LNXPROC_VECTOR_T ** vectorptr)
 {
-    _LNXPROC_DEBUG("Vector %p\n", vector);
+    _LNXPROC_DEBUG("Vector %p\n", vectorptr);
 
-    if (vector) {
+    if (vectorptr && *vectorptr) {
+        _LNXPROC_VECTOR_T *vector = *vectorptr;
+
         if (vector->children) {
             int i;
 
@@ -183,7 +185,7 @@ _lnxproc_vector_free(_LNXPROC_VECTOR_T * vector)
     }
 
     _LNXPROC_DEBUG("Success\n");
-    return vector;
+    return LNXPROC_OK;
 }
 
 LNXPROC_ERROR_T

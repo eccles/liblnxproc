@@ -43,10 +43,10 @@ extern "C" {
     LNXPROC_ERROR_T _lnxproc_array_new(_LNXPROC_ARRAY_T ** array,
                                        _LNXPROC_LIMITS_T limits[], size_t dim);
 
-    _LNXPROC_ARRAY_T *_lnxproc_array_free(_LNXPROC_ARRAY_T * array) WARN_UNUSED;
+    LNXPROC_ERROR_T _lnxproc_array_free(_LNXPROC_ARRAY_T ** arrayptr);
 
 #define _LNXPROC_ARRAY_FREE(a) {\
-    a = _lnxproc_array_free(a);\
+    _lnxproc_array_free(&a);\
 }
 
     LNXPROC_ERROR_T _lnxproc_array_set(_LNXPROC_ARRAY_T * array, size_t idx[],

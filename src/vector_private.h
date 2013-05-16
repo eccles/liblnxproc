@@ -49,11 +49,10 @@ extern "C" {
     LNXPROC_ERROR_T _lnxproc_vector_new(_LNXPROC_VECTOR_T ** vec,
                                         size_t size, int recursive);
 
-    _LNXPROC_VECTOR_T *_lnxproc_vector_free(_LNXPROC_VECTOR_T *
-                                            vector) WARN_UNUSED;
+    LNXPROC_ERROR_T _lnxproc_vector_free(_LNXPROC_VECTOR_T ** vectorptr);
 
 #define _LNXPROC_VECTOR_FREE(v) {\
-    v =  _lnxproc_vector_free(v);\
+    _lnxproc_vector_free(&v);\
 }
 
     LNXPROC_ERROR_T _lnxproc_vector_resize(_LNXPROC_VECTOR_T * vector,
