@@ -32,6 +32,17 @@ static void *memdup(void *old, size_t len) {
     return ret;
 }
 */
+float
+lnxproc_timeval_secs(struct timeval *tv)
+{
+    float res = 0.0;
+
+    if (tv) {
+        res = (1.e-6 * tv->tv_usec) + tv->tv_usec;
+    }
+    return res;
+}
+
 long
 lnxproc_timeval_diff(struct timeval *start, struct timeval *end)
 {
