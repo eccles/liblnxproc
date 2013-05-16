@@ -8,9 +8,9 @@ then
 fi
 ulimit -c unlimited
 BIN=${0%*.sh}
+export LNXPROC_TESTROOT=`pwd`
 if [ "${0}" = "./testing.sh" ]
 then
-    export LNXPROC_TESTROOT=`pwd`
     rm -f testing
     ln timing testing
     rm -f testing-dbg
@@ -23,7 +23,7 @@ fi
 #exit 0
 OPT=$1
 shift
-VALOPTS="--leak-check=full --show-reachable=yes --read-var-info=yes --track-origins=yes"
+VALOPTS="--track-fds=yes --leak-check=full --show-reachable=yes --read-var-info=yes --track-origins=yes"
 if [ "${OPT}" = "leak" ]
 then
     valgrind -v ${VALOPTS} ${BIN} $*

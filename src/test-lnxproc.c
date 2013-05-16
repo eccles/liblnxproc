@@ -21,6 +21,7 @@ This file is part of liblnxproc.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+//#include <unistd.h>             // sleep()
 
 #include "error_private.h"
 #include "util_private.h"
@@ -577,23 +578,19 @@ execute_base(LNXPROC_BASE_T *base)
     if (base) {
         int i;
 
-        for (i = 0; i < 5; i++) {
+        for (i = 0; i < 30; i++) {
             printf("Execute %d\n", i + 1);
             LNXPROC_ERROR_T ret = base->read(base);
 
             if (ret) {
-                printf("Failure reading base\n");
+                char buf[64];
+
+                printf("Failure %s\n", lnxproc_strerror(ret, buf, sizeof buf));
             }
             else {
-                if (base->filenames) {
-                    printf("Filename : %s\n", base->filenames[0]);
-                }
-                if (base->previous) {
-                    printf("Data : %1$d %2$*1$s\n", base->previous->nbytes,
-                           base->previous->lines);
-                }
                 _lnxproc_base_print(base);
             }
+            //sleep(20);
         }
         _LNXPROC_BASE_FREE(base);
     }
