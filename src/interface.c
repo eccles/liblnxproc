@@ -132,14 +132,22 @@ lnxproc_performance(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type,
             if (module->base) {
                 LNXPROC_BASE_T *base = module->base;
 
+                LNXPROC_BASE_DATA_T *base_data;
+
+                if (module->base->previous) {
+                    base_data = base->previous;
+                }
+                else {
+                    base_data = base->current;
+                }
                 if (rawread_time) {
-                    *rawread_time = base->current->rawread_time;
+                    *rawread_time = base_data->rawread_time;
                 }
                 if (map_time) {
-                    *map_time = base->current->map_time;
+                    *map_time = base_data->map_time;
                 }
                 if (normalize_time) {
-                    *normalize_time = base->current->normalize_time;
+                    *normalize_time = base_data->normalize_time;
                 }
                 return LNXPROC_OK;
             }
@@ -171,8 +179,16 @@ lnxproc_print(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type)
             if (!module->base) {
                 return LNXPROC_ERROR_INTERFACE_NULL_BASE;
             }
+            LNXPROC_BASE_DATA_T *base_data;
 
-            return _lnxproc_results_print(module->base->current->results);
+            if (module->base->previous) {
+                base_data = module->base->previous;
+            }
+            else {
+                base_data = module->base->current;
+            }
+
+            return _lnxproc_results_print(base_data->results);
         }
     }
     return LNXPROC_ERROR_INTERFACE_NULL;
