@@ -64,6 +64,17 @@ extern "C" {
         _LNXPROC_RESULTS_T *results;
     };
 
+    enum lnxproc_base_type_t {
+        LNXPROC_BASE_TYPE_VANILLA = 0,
+        LNXPROC_BASE_TYPE_PREVIOUS,
+        LNXPROC_BASE_TYPE_MEMOIZE,
+        LNXPROC_BASE_TYPE_SIZE, // must be last
+    };
+
+    typedef enum lnxproc_base_type_t LNXPROC_BASE_TYPE_T;
+
+    char *lnxproc_base_typestr(LNXPROC_BASE_TYPE_T type, char *buf, size_t len);
+
     struct lnxproc_base_t {
         LNXPROC_BASE_METHOD rawread;
         LNXPROC_BASE_METHOD normalize;
@@ -76,12 +87,14 @@ extern "C" {
         char *fileprefix;
         char *fileglob;
         char *filesuffix;
+        LNXPROC_BASE_TYPE_T type;
         LNXPROC_BASE_DATA_T *current;
         LNXPROC_BASE_DATA_T *previous;
         LNXPROC_BASE_DATA_T data[2];
     };
 
     LNXPROC_ERROR_T _lnxproc_base_new(LNXPROC_BASE_T **base,
+                                      LNXPROC_BASE_TYPE_T type,
                                       char **filenames,
                                       size_t nfiles,
                                       char *fileprefix,

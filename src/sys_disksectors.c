@@ -66,7 +66,6 @@ sys_disksectors_normalize(LNXPROC_BASE_T *base)
     _lnxproc_results_init(results, 2);
     _lnxproc_array_iterate(array, &env, 0, iter_func);
     _lnxproc_results_hash(results);
-//    _lnxproc_base_memoize(base);
 
     return LNXPROC_OK;
 }
@@ -86,7 +85,7 @@ lnxproc_sys_disksectors_new(LNXPROC_BASE_T **base)
 
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
-    return _lnxproc_base_new(base,
+    return _lnxproc_base_new(base, LNXPROC_BASE_TYPE_MEMOIZE,
                              NULL, 0, fileprefix, fileglob, filesuffix,
                              NULL, sys_disksectors_normalize, NULL,
                              256, limits, dim);

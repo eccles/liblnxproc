@@ -328,7 +328,6 @@ proc_pid_stat_normalize(LNXPROC_BASE_T *base)
     }
     _lnxproc_results_hash(results);
 
-    _lnxproc_base_store_previous(base);
     return LNXPROC_OK;
 }
 
@@ -351,7 +350,7 @@ lnxproc_proc_pid_stat_new(LNXPROC_BASE_T **base)
     char *filesuffix = "stat";
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
-    return _lnxproc_base_new(base,
+    return _lnxproc_base_new(base, LNXPROC_BASE_TYPE_PREVIOUS,
                              NULL, 0, fileprefix, fileglob, filesuffix,
                              NULL, proc_pid_stat_normalize, NULL, 256,
                              limits, dim);

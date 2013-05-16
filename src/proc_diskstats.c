@@ -216,7 +216,6 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
         }
     }
     _lnxproc_results_hash(results);
-    _lnxproc_base_store_previous(base);
     return LNXPROC_OK;
 }
 
@@ -235,7 +234,7 @@ lnxproc_proc_diskstats_new(LNXPROC_BASE_T **base)
     };
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
-    return _lnxproc_base_new(base,
+    return _lnxproc_base_new(base, LNXPROC_BASE_TYPE_PREVIOUS,
                              filenames, 1, NULL, NULL, NULL,
                              NULL,
                              proc_diskstats_normalize, NULL, 256, limits, dim);

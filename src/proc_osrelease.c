@@ -35,7 +35,6 @@ proc_osrelease_normalize(LNXPROC_BASE_T *base)
     _lnxproc_results_init(base->current->results, 1);
     _lnxproc_results_add(base->current->results, base->current->lines,
                          "/value");
-    _lnxproc_base_memoize(base);
 
     return LNXPROC_OK;
 }
@@ -45,7 +44,7 @@ lnxproc_proc_osrelease_new(LNXPROC_BASE_T **base)
 {
 
     char *filenames[] = { "/proc/sys/kernel/osrelease", };
-    return _lnxproc_base_new(base,
+    return _lnxproc_base_new(base, LNXPROC_BASE_TYPE_MEMOIZE,
                              filenames, 1, NULL, NULL, NULL,
                              NULL, proc_osrelease_normalize, NULL, 32, NULL, 0);
 }

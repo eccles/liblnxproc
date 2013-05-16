@@ -89,7 +89,7 @@ lnxproc_proc_cgroups_new(LNXPROC_BASE_T **base)
     char *filenames[] = { "/proc/cgroups" };
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
-    return _lnxproc_base_new(base,
+    return _lnxproc_base_new(base, LNXPROC_BASE_TYPE_VANILLA,
                              filenames, 1, NULL, NULL, NULL,
                              NULL, proc_cgroups_normalize, NULL, 256,
                              limits, dim);

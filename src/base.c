@@ -42,12 +42,35 @@
 #include "base_private.h"
 #include "limit_chr.h"
 
+char *
+lnxproc_base_typestr(LNXPROC_BASE_TYPE_T type, char *buf, size_t len)
+{
+    static const char *typestr[LNXPROC_BASE_TYPE_SIZE] = {
+        "Base type : No attributes",
+        "Base type : Previous results are stored",
+        "Base type : Results are memoized",
+    };
+
+    if (type >= 0 || type < LNXPROC_BASE_TYPE_SIZE) {
+        snprintf(buf, len, "%d:%s", type, typestr[type]);
+    }
+    else {
+        snprintf(buf, len, "%d:Unknown error", type);
+    }
+    return buf;
+}
+
 LNXPROC_ERROR_T
 _lnxproc_base_print(LNXPROC_BASE_T *base)
 {
     _LNXPROC_DEBUG("Base %p\n", base);
 
     if (base) {
+        char buf[64];
+
+        printf("Base %p\n", base);
+        printf("Atribute %s\n",
+               lnxproc_base_typestr(base->type, buf, sizeof buf));
         printf("Rawread %p\n", base->rawread);
         printf("Normalize %p\n", base->normalize);
         printf("Read %p\n", base->read);
@@ -526,7 +549,20 @@ _lnxproc_base_read(LNXPROC_BASE_T *base)
         _LNXPROC_ERROR_DEBUG(ret, "\n");
         return ret;
     }
-
+    if (base->type == LNXPROC_BASE_TYPE_PREVIOUS) {
+        ret = _lnxproc_base_store_previous(base);
+        if (ret) {
+            _LNXPROC_ERROR_DEBUG(ret, "\n");
+            return ret;
+        }
+    }
+    else if (base->type == LNXPROC_BASE_TYPE_MEMOIZE) {
+        ret = _lnxproc_base_memoize(base);
+        if (ret) {
+            _LNXPROC_ERROR_DEBUG(ret, "\n");
+            return ret;
+        }
+    }
     return LNXPROC_OK;
 }
 
@@ -591,6 +627,7 @@ _lnxproc_base_store_previous(LNXPROC_BASE_T *base)
 
 LNXPROC_ERROR_T
 _lnxproc_base_new(LNXPROC_BASE_T **base,
+                  LNXPROC_BASE_TYPE_T type,
                   char **filenames,
                   size_t nfiles,
                   char *fileprefix,
@@ -741,6 +778,7 @@ _lnxproc_base_new(LNXPROC_BASE_T **base,
     else {
         p->rawread = rawread;
     }
+    p->type = type;
     *base = p;
     _LNXPROC_DEBUG("Successful\n");
     return LNXPROC_OK;

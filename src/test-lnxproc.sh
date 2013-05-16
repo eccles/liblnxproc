@@ -36,6 +36,9 @@ then
 elif [ "${OPT}" = "ddddbg" ]
 then
     ddd ${BIN}-dbg
+elif [ "${OPT}" = "dddprf" ]
+then
+    ddd ${BIN}-prf
 elif [ "${OPT}" = "dbg" ]
 then
     ${BIN}-dbg $*
