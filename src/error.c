@@ -102,6 +102,8 @@ static const char *errstr[] = {
     "Vector values is null",
 /*66*/ "Vector address is null",
     "Vector address contents is not null",
+    "Base regex failure",
+    "Base glob failure",
 };
 
 #define ERRSTR_SIZE sizeof(errstr)/sizeof(errstr[0])
