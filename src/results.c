@@ -53,8 +53,9 @@ _lnxproc_results_print(_LNXPROC_RESULTS_T * results)
     printf("Table size = %zd\n", results->size);
     printf("Table length = %zd\n", results->length);
     printf("Hash = %p\n", results->hash);
-    if(results->hash) {
+    if (results->hash) {
         _LNXPROC_RESULTS_TABLE_T *entry, *tmp;
+
         HASH_ITER(hh, results->hash, entry, tmp) {
             printf("Hash Key: %s = %s\n", entry->key, entry->value);
         }
@@ -87,11 +88,6 @@ _lnxproc_results_new(_LNXPROC_RESULTS_T ** results)
         return LNXPROC_ERROR_RESULTS_NULL;
     }
 
-    p->size = 0;
-    p->length = 0;
-    p->table = NULL;
-    p->hash = NULL;
-
     p->jiffies_per_sec = sysconf(_SC_CLK_TCK);
     p->secs_per_jiffy = 1.0 / p->jiffies_per_sec;
     p->page_size = sysconf(_SC_PAGE_SIZE) / 1024;
@@ -108,11 +104,12 @@ _lnxproc_results_free(_LNXPROC_RESULTS_T * results)
 
     if (results) {
         _LNXPROC_DEBUG("Free Results\n");
+        HASH_CLEAR(hh, results->hash);
+        _LNXPROC_DEBUG("Table hash freed to %p\n", results->hash);
         if (results->table) {
             free(results->table);
             results->table = NULL;
         }
-        HASH_CLEAR(hh,results->hash);
         free(results);
         results = NULL;
     }
@@ -127,8 +124,6 @@ realloc_results_table(_LNXPROC_RESULTS_T * results, size_t nentries)
     _LNXPROC_DEBUG("Sizeof table entry %zd\n",
                    sizeof(_LNXPROC_RESULTS_TABLE_T));
 
-    HASH_CLEAR(hh,results->hash);
-
     size_t nsize =
         (nentries + results->size) * sizeof(_LNXPROC_RESULTS_TABLE_T);
     _LNXPROC_DEBUG("Nsize %zd\n", nsize);
@@ -141,16 +136,13 @@ realloc_results_table(_LNXPROC_RESULTS_T * results, size_t nentries)
     int i;
 
     _LNXPROC_DEBUG("New Table %p\n", t);
-    for (i = 0; i < results->length; i++) {
-        _LNXPROC_RESULTS_TABLE_T *entry = t+i;
-        HASH_ADD_STR(results->hash,key,entry);
-    }
 
     for (i = results->size; i < (nentries + results->size); i++) {
-        _LNXPROC_RESULTS_TABLE_T *entry = t+i;
+        _LNXPROC_RESULTS_TABLE_T *entry = t + i;
+
         _LNXPROC_DEBUG("Clear %d bytes at %p\n",
                        sizeof(_LNXPROC_RESULTS_TABLE_T), entry);
-        memset(entry,0,sizeof(_LNXPROC_RESULTS_TABLE_T));
+        memset(entry, 0, sizeof(_LNXPROC_RESULTS_TABLE_T));
     }
     results->table = t;
     results->size += nentries;
@@ -167,6 +159,9 @@ _lnxproc_results_init(_LNXPROC_RESULTS_T * results, size_t nentries)
         return LNXPROC_ERROR_RESULTS_NULL;
     }
 
+    HASH_CLEAR(hh, results->hash);
+    _LNXPROC_DEBUG("Table hash freed to %p\n", results->hash);
+
     _LNXPROC_DEBUG("Table %p nentries %zd\n", results->table, nentries);
     if (nentries > results->size) {
         LNXPROC_ERROR_T ret =
@@ -177,8 +172,31 @@ _lnxproc_results_init(_LNXPROC_RESULTS_T * results, size_t nentries)
             return ret;
         }
     }
-    HASH_CLEAR(hh,results->hash);
+    memset(results->table, 0, results->size * sizeof(_LNXPROC_RESULTS_TABLE_T));
     results->length = 0;
+    return LNXPROC_OK;
+}
+
+LNXPROC_ERROR_T
+_lnxproc_results_hash(_LNXPROC_RESULTS_T * results)
+{
+    if (results) {
+        HASH_CLEAR(hh, results->hash);
+        _LNXPROC_RESULTS_TABLE_T *table = results->table;
+
+        _LNXPROC_DEBUG("Table %p\n", table);
+        if (table) {
+            int i;
+
+            for (i = 0; i < results->length; i++) {
+                _LNXPROC_RESULTS_TABLE_T *entry = table + i;
+
+                _LNXPROC_DEBUG("%d key %s\n", i, entry->key);
+                HASH_ADD_STR(results->hash, key, entry);
+            }
+        }
+    }
+
     return LNXPROC_OK;
 }
 
@@ -209,41 +227,48 @@ _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results, char **value,
                              "Fetch results\n");
         return LNXPROC_ERROR_RESULTS_TABLE_NULL;
     }
+    _LNXPROC_DEBUG("Table %p\n", results->table);
 
     char key[32];
     va_list ap;
 
     va_start(ap, fmt);
-    size_t ksize = 1 + vsnprintf(key, sizeof key, fmt, ap);
+    size_t ksize = vsnprintf(key, sizeof key, fmt, ap);
 
-    if (ksize > sizeof key) {
+    if (ksize >= sizeof key) {
         _LNXPROC_DEBUG("WARNING: Key length %zd exceeds %zd bytes\n", ksize,
                        sizeof key);
-        ksize = sizeof key;
+        ksize = sizeof key - 1;
     }
     va_end(ap);
 
     _LNXPROC_DEBUG("Key %s\n", key);
-    if( results->hash) {
+
+    //_lnxproc_results_hash(results);
+
+    if (results->hash) {
         _LNXPROC_RESULTS_TABLE_T *entry;
-        HASH_FIND(hh,results->hash,key,ksize,entry);
-        if( entry ) {
+
+        HASH_FIND(hh, results->hash, key, ksize, entry);
+        if (entry) {
             *value = entry->value;
             _LNXPROC_DEBUG("Value %s\n", entry->value);
         }
     }
     else {
-    int i;
-    _LNXPROC_RESULTS_TABLE_T *table = results->table;
+        int i;
+        _LNXPROC_RESULTS_TABLE_T *table = results->table;
 
-    for (i = 0; i < results->length; i++) {
-        _LNXPROC_DEBUG("%d key %s\n", i, table[i].key);
-        if (!strcmp(table[i].key, key)) {
-            *value = table[i].value;
-            _LNXPROC_DEBUG("Value %s\n", table[i].value);
-            return LNXPROC_OK;
+        _LNXPROC_DEBUG("Table %p\n", table);
+
+        for (i = 0; i < results->length; i++) {
+            _LNXPROC_DEBUG("%d key %s\n", i, table[i].key);
+            if (!strcmp(table[i].key, key)) {
+                *value = table[i].value;
+                _LNXPROC_DEBUG("Value %s\n", table[i].value);
+                return LNXPROC_OK;
+            }
         }
-    }
     }
     return LNXPROC_OK;
 }
@@ -266,8 +291,10 @@ _lnxproc_results_add(_LNXPROC_RESULTS_T * results, const char *value,
     if (!results->table) {
         results->length = 0;
         results->size = 0;
-        HASH_CLEAR(hh,results->hash);
+        HASH_CLEAR(hh, results->hash);
+        _LNXPROC_DEBUG("Table hash freed to %p\n", results->hash);
     }
+    _LNXPROC_DEBUG("Table %p\n", results->table);
 
     if (results->length >= results->size) {
         LNXPROC_ERROR_T ret = realloc_results_table(results, 1);
@@ -277,6 +304,7 @@ _lnxproc_results_add(_LNXPROC_RESULTS_T * results, const char *value,
             return ret;
         }
     }
+    _LNXPROC_DEBUG("Table %p\n", results->table);
     va_list ap;
 
     _LNXPROC_RESULTS_TABLE_T *entry = results->table + results->length;
@@ -304,7 +332,6 @@ _lnxproc_results_add(_LNXPROC_RESULTS_T * results, const char *value,
 
     _LNXPROC_DEBUG("Value %d : '%s'\n", dsize, entry->value);
 
-    HASH_ADD(hh,results->hash,key,ksize-1,entry);
     results->length++;
 
     return LNXPROC_OK;
@@ -323,6 +350,8 @@ _lnxproc_results_iterate(_LNXPROC_RESULTS_T * results,
     if (results->table) {
         int i;
         _LNXPROC_RESULTS_TABLE_T *table = results->table;
+
+        _LNXPROC_DEBUG("Table %p\n", table);
 
         for (i = 0; i < results->length; i++) {
             func(table[i].key, table[i].value, data);

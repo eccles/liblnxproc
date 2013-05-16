@@ -24,6 +24,11 @@
 #include "error_private.h"
 #include "util_private.h"
 
+#ifdef DEBUG
+#define HASH_DEBUG 1
+#endif
+#include "uthash.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -31,6 +36,7 @@ extern "C" {
     struct _lnxproc_results_table_t {
         char key[32];
         char value[32];
+        UT_hash_handle hh;
     };
     typedef struct _lnxproc_results_table_t _LNXPROC_RESULTS_TABLE_T;
 
@@ -41,6 +47,7 @@ extern "C" {
         size_t size;
         size_t length;
         _LNXPROC_RESULTS_TABLE_T *table;
+        _LNXPROC_RESULTS_TABLE_T *hash;
     };
     typedef struct _lnxproc_results_t _LNXPROC_RESULTS_T;
 
@@ -53,6 +60,7 @@ extern "C" {
 }
 
     LNXPROC_ERROR_T _lnxproc_results_print(_LNXPROC_RESULTS_T * results);
+    LNXPROC_ERROR_T _lnxproc_results_hash(_LNXPROC_RESULTS_T * results);
 
     LNXPROC_ERROR_T _lnxproc_results_init(_LNXPROC_RESULTS_T * results,
                                           size_t nentries);
