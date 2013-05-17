@@ -33,30 +33,39 @@
 #include "proc_pid_stat.h"
 
 static LNXPROC_MODULE_T mymodules[] = {
-    {.new = lnxproc_proc_cgroups_new,.base = NULL,},
-    {.new = lnxproc_proc_diskstats_new,.base = NULL,},
-    {.new = lnxproc_proc_domainname_new,.base = NULL,},
-    {.new = lnxproc_proc_hostname_new,.base = NULL,},
-    {.new = lnxproc_proc_osrelease_new,.base = NULL,},
-    {.new = lnxproc_sys_cpufreq_new,.base = NULL,},
-    {.new = lnxproc_sys_disksectors_new,.base = NULL,},
-    {.new = lnxproc_proc_pid_stat_new,.base = NULL,},
+    {.new = lnxproc_proc_cgroups_new,.base = NULL,.optional = NULL,},
+    {.new = lnxproc_proc_diskstats_new,.base = NULL,.optional = NULL,},
+    {.new = lnxproc_proc_domainname_new,.base = NULL,.optional = NULL,},
+    {.new = lnxproc_proc_hostname_new,.base = NULL,.optional = NULL,},
+    {.new = lnxproc_proc_osrelease_new,.base = NULL,.optional = NULL,},
+    {.new = lnxproc_sys_cpufreq_new,.base = NULL,.optional = NULL,},
+    {.new = lnxproc_sys_disksectors_new,.base = NULL,.optional = NULL,},
+    {.new = lnxproc_proc_pid_stat_new,.base = NULL,.optional = NULL,},
 };
 
 static size_t nmodules = sizeof(mymodules) / sizeof(mymodules[0]);
 
 LNXPROC_ERROR_T
-lnxproc_init(LNXPROC_MODULE_T ** modules)
+lnxproc_init(LNXPROC_MODULE_T ** modulesptr, LNXPROC_MODULE_TYPE_T type,
+             void *optional)
 {
-    LNXPROC_MODULE_T *p = calloc(1, sizeof(mymodules));
+    int n;
+
+    if (type == LNXPROC_ALL) {
+        n = nmodules;
+    }
+    else {
+        n = 1;
+    }
+    LNXPROC_MODULE_T *p = calloc(n, sizeof(LNXPROC_MODULE_T));
 
     if (!p) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_INTERFACE_MALLOC_INTERFACE,
                              "Malloc interface\n");
         return LNXPROC_ERROR_INTERFACE_MALLOC_INTERFACE;
     }
-    memcpy(p, mymodules, sizeof mymodules);
-    *modules = p;
+    memcpy(p, mymodules, n * sizeof(LNXPROC_MODULE_T));
+    *modulesptr = p;
     return LNXPROC_OK;
 }
 

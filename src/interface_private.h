@@ -31,6 +31,7 @@ extern "C" {
     struct lnxproc_module_t {
         LNXPROC_METHOD new;
         LNXPROC_BASE_T *base;
+        void *optional;
     };
 
 #ifdef __cplusplus
