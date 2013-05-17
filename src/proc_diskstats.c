@@ -104,19 +104,20 @@ derived_values(int i, int j, _LNXPROC_RESULTS_T * results,
         strcpy(pentry.key, entry->key);
         LNXPROC_ERROR_T ret = _lnxproc_results_fetch(presults, &pentry);
 
-        _LNXPROC_DEBUG("%d,%d:Prev %s = %s\n", i, j, pentry.key, pentry.value);
+        _LNXPROC_DEBUG("%d,%d:Prev %s = %f\n", i, j, pentry.key,
+                       pentry.value.f);
         if (ret)
             return;
 
         snprintf(dentry.key, sizeof dentry.key, "%s-s", entry->key);
-        snprintf(dentry.value, sizeof dentry.value, "%f",
-                 (out - atof(pentry.value)) / tdiff);
+        dentry.valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_FLOAT;
+        dentry.value.f = (out - pentry.value.f) / tdiff;
         _lnxproc_results_add(results, &dentry);
-        _LNXPROC_DEBUG("%d,%d:Curr %s-s = %s\n", i, j, dentry.key,
-                       dentry.value);
+        _LNXPROC_DEBUG("%d,%d:Curr %s-s = %f\n", i, j, dentry.key,
+                       dentry.value.f);
 #ifdef DEBUG
-        if (atof(dentry.value) < 0.0) {
-            _LNXPROC_DEBUG("WARN: diff < 0 (=%s)\n", dentry.value);
+        if (dentry.value.f < 0.0) {
+            _LNXPROC_DEBUG("WARN: diff < 0 (=%f)\n", dentry.value.f);
         }
 #endif
     }
@@ -222,9 +223,10 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
 
                 snprintf(entry.key, sizeof entry.key, "/%s/%s", key,
                          pars[k].name);
-                snprintf(entry.value, sizeof entry.value, "%f", secs);
-                _LNXPROC_DEBUG("%d,%d:Curr %s = %s\n", i, k, entry.key,
-                               entry.value);
+                entry.valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_FLOAT;
+                entry.value.f = secs;
+                _LNXPROC_DEBUG("%d,%d:Curr %s = %f\n", i, k, entry.key,
+                               entry.value.f);
                 _lnxproc_results_add(results, &entry);
                 if (!presults)
                     continue;
@@ -233,12 +235,12 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
                 strcpy(pentry.key, entry.key);
                 LNXPROC_ERROR_T ret = _lnxproc_results_fetch(presults, &pentry);
 
-                _LNXPROC_DEBUG("%d,%d:Prev %s = %s\n", i, k, pentry.key,
-                               pentry.value);
                 if (!ret)
                     continue;
 
-                iodiff[j] = secs - atof(pentry.value);
+                _LNXPROC_DEBUG("%d,%d:Prev %s = %f\n", i, k, pentry.key,
+                               pentry.value.f);
+                iodiff[j] = secs - pentry.value.f;
                 _LNXPROC_DEBUG("%d:iodiff %s = %f\n", i, entry.key, iodiff[j]);
             }
         }
@@ -263,16 +265,22 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
 
             if (j > NAMECOL) {
                 out = pars[j].scale * atoi(val);
-                snprintf(entry.value, sizeof entry.value, "%f", out);
+                entry.valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_FLOAT;
+                entry.value.f = out;
                 _lnxproc_results_add(results, &entry);
             }
             else {
-                strcpy(entry.value, val);
+                entry.valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_STR;
+                strcpy(entry.value.s, val);
                 _lnxproc_results_add(results, &entry);
             }
-            _LNXPROC_DEBUG("%d,%d:Curr %s = %s\n", i, j, entry.key,
-                           entry.value);
+#ifdef DEBUG
+            char buf[64];
 
+            _LNXPROC_DEBUG("%d,%d:Curr %s = %s\n", i, j, entry.key,
+                           _lnxproc_results_table_valuestr(&entry, buf,
+                                                           sizeof buf));
+#endif
             if (!presults)
                 continue;
 

@@ -40,7 +40,8 @@ sys_cpufreq_normalize(LNXPROC_BASE_T *base)
     _LNXPROC_RESULTS_TABLE_T entry;
 
     strcpy(entry.key, "/value");
-    strcpy(entry.value, base->current->lines);
+    entry.valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_STR;
+    strncpy(entry.value.s, base->current->lines, sizeof entry.value);
     _lnxproc_results_add(base->current->results, &entry);
     return LNXPROC_OK;
 }

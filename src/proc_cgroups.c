@@ -74,7 +74,8 @@ proc_cgroups_normalize(LNXPROC_BASE_T *base)
             if (!val)
                 continue;
             snprintf(entry.key, sizeof entry.key, "/%s/%s", rowkey, colkey);
-            strcpy(entry.value, val);
+            entry.valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_INT;
+            entry.value.i = atoi(val);
             _lnxproc_results_add(results, &entry);
         }
     }

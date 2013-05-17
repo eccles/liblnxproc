@@ -36,12 +36,43 @@ extern "C" {
 #define _LNXPROC_RESULTS_TABLE_KEYLEN 32
 #define _LNXPROC_RESULTS_TABLE_VALLEN 32
 
+    union _lnxproc_results_table_value_t {
+        int i;
+        unsigned int ui;
+        long l;
+        unsigned long ul;
+        float f;
+        char s[_LNXPROC_RESULTS_TABLE_VALLEN];
+        void *p;
+    };
+
+    typedef union _lnxproc_results_table_value_t _LNXPROC_RESULTS_TABLE_VALUE_T;
+
+    enum _lnxproc_results_table_valuetype_t {
+        _LNXPROC_RESULTS_TABLE_VALUETYPE_INT = 0,
+        _LNXPROC_RESULTS_TABLE_VALUETYPE_UNSIGNEDINT,
+        _LNXPROC_RESULTS_TABLE_VALUETYPE_LONG,
+        _LNXPROC_RESULTS_TABLE_VALUETYPE_UNSIGNED_LONG,
+        _LNXPROC_RESULTS_TABLE_VALUETYPE_FLOAT,
+        _LNXPROC_RESULTS_TABLE_VALUETYPE_STR,
+        _LNXPROC_RESULTS_TABLE_VALUETYPE_PTR,
+    };
+    typedef enum _lnxproc_results_table_valuetype_t
+     _LNXPROC_RESULTS_TABLE_VALUETYPE_T;
+
     struct _lnxproc_results_table_t {
         char key[_LNXPROC_RESULTS_TABLE_KEYLEN];
-        char value[_LNXPROC_RESULTS_TABLE_VALLEN];
+        _LNXPROC_RESULTS_TABLE_VALUETYPE_T valuetype;
+        _LNXPROC_RESULTS_TABLE_VALUE_T value;
         UT_hash_handle hh;
     };
     typedef struct _lnxproc_results_table_t _LNXPROC_RESULTS_TABLE_T;
+
+    char *_lnxproc_results_table_valuestr(_LNXPROC_RESULTS_TABLE_T * entry,
+                                          char *buf, size_t len);
+
+    LNXPROC_ERROR_T _lnxproc_results_table_copy(_LNXPROC_RESULTS_TABLE_T * dest,
+                                                _LNXPROC_RESULTS_TABLE_T * src);
 
     struct _lnxproc_results_t {
         long jiffies_per_sec;
@@ -73,8 +104,8 @@ extern "C" {
     LNXPROC_ERROR_T _lnxproc_results_add(_LNXPROC_RESULTS_T * results,
                                          _LNXPROC_RESULTS_TABLE_T * entry);
 
-    typedef int (*_LNXPROC_RESULTS_ITERATE_FUNC) (char *key, char *value,
-                                                  void *data);
+    typedef int (*_LNXPROC_RESULTS_ITERATE_FUNC) (_LNXPROC_RESULTS_TABLE_T *
+                                                  entry, void *data);
     LNXPROC_ERROR_T _lnxproc_results_iterate(_LNXPROC_RESULTS_T * results,
                                              _LNXPROC_RESULTS_ITERATE_FUNC func,
                                              void *data);

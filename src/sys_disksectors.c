@@ -48,7 +48,8 @@ iter_func(char *val, void *data, size_t idx[], size_t dim)
         strncpy(entry->key, val, sizeof entry->key);
     }
     else {
-        strncpy(entry->value, val, sizeof entry->value);
+        entry->valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_INT;
+        entry->value.i = atoi(val);
         _lnxproc_results_add(env->results, &env->entry);
     }
     return LNXPROC_OK;

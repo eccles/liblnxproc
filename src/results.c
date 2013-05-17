@@ -30,10 +30,84 @@
 #include "error_private.h"
 #include "results_private.h"
 
-static int
-internal_print_func(char *key, char *value, void *data)
+char *
+_lnxproc_results_table_valuestr(_LNXPROC_RESULTS_TABLE_T * entry, char *buf,
+                                size_t len)
 {
-    printf("Key %s = %s\n", key, value);
+    if (entry && buf) {
+        switch (entry->valuetype) {
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_INT:
+            snprintf(buf, len, "%d", entry->value.i);
+            break;
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_UNSIGNEDINT:
+            snprintf(buf, len, "%u", entry->value.ui);
+            break;
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_LONG:
+            snprintf(buf, len, "%ld", entry->value.l);
+            break;
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_UNSIGNED_LONG:
+            snprintf(buf, len, "%lu", entry->value.ul);
+            break;
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_FLOAT:
+            snprintf(buf, len, "%f", entry->value.f);
+            break;
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_STR:
+            snprintf(buf, len, "%s", entry->value.s);
+            break;
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_PTR:
+            snprintf(buf, len, "%p", entry->value.p);
+            break;
+        }
+    }
+    return buf;
+}
+
+LNXPROC_ERROR_T
+_lnxproc_results_table_copy(_LNXPROC_RESULTS_TABLE_T * dest,
+                            _LNXPROC_RESULTS_TABLE_T * src)
+{
+    if (src && dest) {
+        switch (src->valuetype) {
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_INT:
+            dest->valuetype = src->valuetype;
+            dest->value.i = src->value.i;
+            break;
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_UNSIGNEDINT:
+            dest->valuetype = src->valuetype;
+            dest->value.ui = src->value.ui;
+            break;
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_LONG:
+            dest->valuetype = src->valuetype;
+            dest->value.l = src->value.l;
+            break;
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_UNSIGNED_LONG:
+            dest->valuetype = src->valuetype;
+            dest->value.ul = src->value.ul;
+            break;
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_FLOAT:
+            dest->valuetype = src->valuetype;
+            dest->value.f = src->value.f;
+            break;
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_STR:
+            dest->valuetype = src->valuetype;
+            strcpy(dest->value.s, src->value.s);
+            break;
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_PTR:
+            dest->valuetype = src->valuetype;
+            dest->value.p = src->value.p;
+            break;
+        }
+    }
+    return LNXPROC_OK;
+}
+
+static int
+internal_print_func(_LNXPROC_RESULTS_TABLE_T * entry, void *data)
+{
+    char buf[64];
+
+    printf("Key %s = %s\n", entry->key,
+           _lnxproc_results_table_valuestr(entry, buf, sizeof buf));
     return LNXPROC_OK;
 }
 
@@ -54,10 +128,12 @@ _lnxproc_results_print(_LNXPROC_RESULTS_T * results)
     printf("Table length = %zd\n", results->length);
     printf("Hash = %p\n", results->hash);
     if (results->hash) {
+        char buf[64];
         _LNXPROC_RESULTS_TABLE_T *entry, *tmp;
 
         HASH_ITER(hh, results->hash, entry, tmp) {
-            printf("Hash Key: %s = %s\n", entry->key, entry->value);
+            printf("Hash Key: %s = %s\n", entry->key,
+                   _lnxproc_results_table_valuestr(entry, buf, sizeof buf));
         }
     }
     return _lnxproc_results_iterate(results, internal_print_func, NULL);
@@ -230,8 +306,14 @@ _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results,
 
         HASH_FIND_STR(results->hash, entry->key, tentry);
         if (tentry) {
-            strcpy(entry->value, tentry->value);
-            _LNXPROC_DEBUG("Value %s\n", entry->value);
+            _lnxproc_results_table_copy(entry, tentry);
+#ifdef DEBUG
+            char buf[64];
+
+            _LNXPROC_DEBUG("Value %s\n",
+                           _lnxproc_results_table_valuestr(entry, buf,
+                                                           sizeof buf));
+#endif
         }
     }
     else {
@@ -243,8 +325,14 @@ _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results,
         for (i = 0; i < results->length; i++) {
             _LNXPROC_DEBUG("%d key %s\n", i, table[i].key);
             if (!strcmp(table[i].key, entry->key)) {
-                strcpy(entry->value, table[i].value);
-                _LNXPROC_DEBUG("Value %s\n", table[i].value);
+                _lnxproc_results_table_copy(entry, table + i);
+#ifdef DEBUG
+                char buf[64];
+
+                _LNXPROC_DEBUG("Value %s\n",
+                               _lnxproc_results_table_valuestr(entry, buf,
+                                                               sizeof buf));
+#endif
                 return LNXPROC_OK;
             }
         }
@@ -265,8 +353,13 @@ _lnxproc_results_add(_LNXPROC_RESULTS_T * results,
         return LNXPROC_ERROR_RESULTS_VAL_ADDRESS_NULL;
     }
 
+#ifdef DEBUG
+    char buf[64];
+
     _LNXPROC_DEBUG("Results %1$p Entry Key %2$p '%2$s' Value %3$p '%3$s'\n",
-                   results, entry->key, entry->value);
+                   results, entry->key,
+                   _lnxproc_results_table_valuestr(entry, buf, sizeof buf));
+#endif
 
     if (!results->table) {
         results->length = 0;
@@ -311,7 +404,7 @@ _lnxproc_results_iterate(_LNXPROC_RESULTS_T * results,
         _LNXPROC_DEBUG("Table %p\n", table);
 
         for (i = 0; i < results->length; i++) {
-            func(table[i].key, table[i].value, data);
+            func(table + i, data);
         }
     }
     return LNXPROC_OK;
