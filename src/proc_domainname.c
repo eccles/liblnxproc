@@ -40,8 +40,11 @@ static LNXPROC_ERROR_T
 proc_domainname_normalize(LNXPROC_BASE_T *base)
 {
     _lnxproc_results_init(base->current->results, 1);
-    _lnxproc_results_add(base->current->results, base->current->lines,
-                         "/value");
+    _LNXPROC_RESULTS_TABLE_T entry;
+
+    strcpy(entry.key, "/value");
+    strcpy(entry.value, base->current->lines);
+    _lnxproc_results_add(base->current->results, &entry);
 
     return LNXPROC_OK;
 }

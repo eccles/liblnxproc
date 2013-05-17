@@ -203,23 +203,17 @@ _lnxproc_results_hash(_LNXPROC_RESULTS_T * results)
 }
 
 LNXPROC_ERROR_T
-_lnxproc_results_fetch(_LNXPROC_RESULTS_T * results, char **value,
-                       char *fmt, ...)
+_lnxproc_results_fetch(_LNXPROC_RESULTS_T * results,
+                       _LNXPROC_RESULTS_TABLE_T * entry)
 {
     _LNXPROC_DEBUG("Results %p\n", results);
 
-    *value = NULL;
     if (!results) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_NULL;
     }
 
-    if (!fmt) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_KEY_NULL, "\n");
-        return LNXPROC_ERROR_RESULTS_KEY_NULL;
-    }
-
-    if (!value) {
+    if (!entry) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_VAL_ADDRESS_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_VAL_ADDRESS_NULL;
     }
@@ -231,29 +225,12 @@ _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results, char **value,
     }
     _LNXPROC_DEBUG("Table %p\n", results->table);
 
-    char key[32];
-    va_list ap;
-
-    va_start(ap, fmt);
-    size_t ksize = vsnprintf(key, sizeof key, fmt, ap);
-
-    if (ksize >= sizeof key) {
-        _LNXPROC_DEBUG("WARNING: Key length %zd exceeds %zd bytes\n", ksize,
-                       sizeof key);
-        ksize = sizeof key - 1;
-    }
-    va_end(ap);
-
-    _LNXPROC_DEBUG("Key %s\n", key);
-
-    //_lnxproc_results_hash(results);
-
     if (results->hash) {
-        _LNXPROC_RESULTS_TABLE_T *entry;
+        _LNXPROC_RESULTS_TABLE_T *tentry;
 
-        HASH_FIND(hh, results->hash, key, ksize, entry);
-        if (entry) {
-            *value = entry->value;
+        HASH_FIND_STR(results->hash, entry->key, tentry);
+        if (tentry) {
+            strcpy(entry->value, tentry->value);
             _LNXPROC_DEBUG("Value %s\n", entry->value);
         }
     }
@@ -265,8 +242,8 @@ _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results, char **value,
 
         for (i = 0; i < results->length; i++) {
             _LNXPROC_DEBUG("%d key %s\n", i, table[i].key);
-            if (!strcmp(table[i].key, key)) {
-                *value = table[i].value;
+            if (!strcmp(table[i].key, entry->key)) {
+                strcpy(entry->value, table[i].value);
                 _LNXPROC_DEBUG("Value %s\n", table[i].value);
                 return LNXPROC_OK;
             }
@@ -276,19 +253,20 @@ _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results, char **value,
 }
 
 LNXPROC_ERROR_T
-_lnxproc_results_add(_LNXPROC_RESULTS_T * results, const char *value,
-                     char *fmt, ...)
+_lnxproc_results_add(_LNXPROC_RESULTS_T * results,
+                     _LNXPROC_RESULTS_TABLE_T * entry)
 {
     if (!results) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_NULL;
     }
-    if (!value) {
+    if (!entry) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_VAL_ADDRESS_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_VAL_ADDRESS_NULL;
     }
 
-    _LNXPROC_DEBUG("Results %1$p Value %2$p '%2$s'\n", results, value);
+    _LNXPROC_DEBUG("Results %1$p Entry Key %2$p '%2$s' Value %3$p '%3$s'\n",
+                   results, entry->key, entry->value);
 
     if (!results->table) {
         results->length = 0;
@@ -307,33 +285,10 @@ _lnxproc_results_add(_LNXPROC_RESULTS_T * results, const char *value,
         }
     }
     _LNXPROC_DEBUG("Table %p\n", results->table);
-    va_list ap;
 
-    _LNXPROC_RESULTS_TABLE_T *entry = results->table + results->length;
+    _LNXPROC_RESULTS_TABLE_T *tentry = results->table + results->length;
 
-    va_start(ap, fmt);
-    size_t ksize = 1 + vsnprintf(entry->key, sizeof entry->key, fmt, ap);
-
-    if (ksize > sizeof entry->key) {
-        _LNXPROC_DEBUG("WARNING: Key length %zd exceeds %zd bytes\n", ksize,
-                       sizeof entry->key);
-        ksize = sizeof entry->key;
-    }
-    va_end(ap);
-
-    _LNXPROC_DEBUG("Key %zd : '%s'\n", ksize, entry->key);
-
-    size_t dsize = 1 + strlen(value);
-
-    if (dsize > sizeof entry->value) {
-        _LNXPROC_DEBUG("WARNING: Value length %zd exceeds %zd bytes\n", dsize,
-                       sizeof entry->value);
-        dsize = sizeof entry->value;
-    }
-    memcpy(entry->value, value, dsize);
-
-    _LNXPROC_DEBUG("Value %zd : '%s'\n", dsize, entry->value);
-
+    memcpy(tentry, entry, sizeof(*tentry));
     results->length++;
 
     return LNXPROC_OK;

@@ -24,18 +24,21 @@
 #include "util_private.h"
 #include "error_private.h"
 
-#ifdef DEBUG
-#define HASH_DEBUG 1
-#endif
+//#ifdef DEBUG
+//#define HASH_DEBUG 1
+//#endif
 #include "uthash.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#define _LNXPROC_RESULTS_TABLE_KEYLEN 32
+#define _LNXPROC_RESULTS_TABLE_VALLEN 32
+
     struct _lnxproc_results_table_t {
-        char key[32];
-        char value[32];
+        char key[_LNXPROC_RESULTS_TABLE_KEYLEN];
+        char value[_LNXPROC_RESULTS_TABLE_VALLEN];
         UT_hash_handle hh;
     };
     typedef struct _lnxproc_results_table_t _LNXPROC_RESULTS_TABLE_T;
@@ -65,11 +68,10 @@ extern "C" {
                                           size_t nentries);
 
     LNXPROC_ERROR_T _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results,
-                                           char **value, char *fmt, ...);
+                                           _LNXPROC_RESULTS_TABLE_T * entry);
 
     LNXPROC_ERROR_T _lnxproc_results_add(_LNXPROC_RESULTS_T * results,
-                                         const char *value, char *fmt,
-                                         ...) WARN_FORMAT(3, 4);
+                                         _LNXPROC_RESULTS_TABLE_T * entry);
 
     typedef int (*_LNXPROC_RESULTS_ITERATE_FUNC) (char *key, char *value,
                                                   void *data);

@@ -31,6 +31,7 @@ typical contents of /proc/cgroups file::
 */
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "error_private.h"
@@ -53,6 +54,7 @@ proc_cgroups_normalize(LNXPROC_BASE_T *base)
     char *val;
     char *colkey;
     char *rowkey;
+    _LNXPROC_RESULTS_TABLE_T entry;
 
     int i, j;
 
@@ -61,12 +63,19 @@ proc_cgroups_normalize(LNXPROC_BASE_T *base)
         size_t ncols = array->vector->children[i]->length;
 
         rowkey = values[i][0];
+        if (!rowkey)
+            continue;
+
         for (j = 1; j < ncols; j++) {
             colkey = values[0][j];
-            if (colkey) {
-                val = values[i][j];
-                _lnxproc_results_add(results, val, "/%s/%s", rowkey, colkey);
-            }
+            if (!colkey)
+                continue;
+            val = values[i][j];
+            if (!val)
+                continue;
+            snprintf(entry.key, sizeof entry.key, "/%s/%s", rowkey, colkey);
+            strcpy(entry.value, val);
+            _lnxproc_results_add(results, &entry);
         }
     }
     _lnxproc_results_hash(results);
