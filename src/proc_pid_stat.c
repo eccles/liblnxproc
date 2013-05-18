@@ -348,7 +348,6 @@ proc_pid_stat_normalize(LNXPROC_BASE_T *base)
             free(entry);
         }
     }
-    _lnxproc_results_hash(results);
 
     return LNXPROC_OK;
 }

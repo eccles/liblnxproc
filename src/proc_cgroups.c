@@ -79,7 +79,6 @@ proc_cgroups_normalize(LNXPROC_BASE_T *base)
             _lnxproc_results_add(results, &entry);
         }
     }
-    _lnxproc_results_hash(results);
     return LNXPROC_OK;
 }
 

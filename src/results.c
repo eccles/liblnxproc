@@ -264,13 +264,15 @@ _lnxproc_results_hash(_LNXPROC_RESULTS_T * results)
 
         _LNXPROC_DEBUG("Table %p\n", table);
         if (table) {
-            int i;
+            if (results->length > 10) {
+                int i;
 
-            for (i = 0; i < results->length; i++) {
-                _LNXPROC_RESULTS_TABLE_T *entry = table + i;
+                for (i = 0; i < results->length; i++) {
+                    _LNXPROC_RESULTS_TABLE_T *entry = table + i;
 
-                _LNXPROC_DEBUG("%d key %s\n", i, entry->key);
-                HASH_ADD_STR(results->hash, key, entry);
+                    _LNXPROC_DEBUG("%d key %s\n", i, entry->key);
+                    HASH_ADD_STR(results->hash, key, entry);
+                }
             }
         }
     }

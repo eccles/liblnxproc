@@ -69,7 +69,6 @@ sys_disksectors_normalize(LNXPROC_BASE_T *base)
 
     _lnxproc_results_init(results, 2);
     _lnxproc_array_iterate(array, &env, 0, iter_func);
-    _lnxproc_results_hash(results);
 
     return LNXPROC_OK;
 }

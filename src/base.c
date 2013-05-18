@@ -557,6 +557,7 @@ _lnxproc_base_read(LNXPROC_BASE_T *base)
     start = lnxproc_timeval();
     _LNXPROC_DEBUG("Execute normalize method\n");
     ret = base->normalize(base);
+    _lnxproc_results_hash(data->results);
     end = lnxproc_timeval();
     data->normalize_time = lnxproc_timeval_diff(&start, &end);
     if (ret) {

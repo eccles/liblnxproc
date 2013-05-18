@@ -296,7 +296,6 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
             }
         }
     }
-    _lnxproc_results_hash(results);
     return LNXPROC_OK;
 }
 
