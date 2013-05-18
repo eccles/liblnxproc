@@ -37,12 +37,9 @@ static LNXPROC_ERROR_T
 sys_cpufreq_normalize(LNXPROC_BASE_T *base)
 {
     _lnxproc_results_init(base->current->results, 1);
-    _LNXPROC_RESULTS_TABLE_T entry;
+    _lnxproc_results_add_string(base->current->results, "/value",
+                                base->current->lines);
 
-    strcpy(entry.key, "/value");
-    entry.valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_STR;
-    strncpy(entry.value.s, base->current->lines, sizeof entry.value);
-    _lnxproc_results_add(base->current->results, &entry);
     return LNXPROC_OK;
 }
 

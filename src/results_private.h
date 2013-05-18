@@ -101,8 +101,19 @@ extern "C" {
     LNXPROC_ERROR_T _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results,
                                            _LNXPROC_RESULTS_TABLE_T * entry);
 
-    LNXPROC_ERROR_T _lnxproc_results_add(_LNXPROC_RESULTS_T * results,
-                                         _LNXPROC_RESULTS_TABLE_T * entry);
+    LNXPROC_ERROR_T _lnxproc_results_add_int(_LNXPROC_RESULTS_T * results,
+                                             const char *key, const int value);
+    LNXPROC_ERROR_T _lnxproc_results_add_long(_LNXPROC_RESULTS_T * results,
+                                              const char *key,
+                                              const long value);
+    LNXPROC_ERROR_T _lnxproc_results_add_float(_LNXPROC_RESULTS_T * results,
+                                               const char *key,
+                                               const float value);
+    LNXPROC_ERROR_T _lnxproc_results_add_string(_LNXPROC_RESULTS_T * results,
+                                                const char *key,
+                                                const char *value);
+    //LNXPROC_ERROR_T _lnxproc_results_add(_LNXPROC_RESULTS_T * results,
+    //                                     _LNXPROC_RESULTS_TABLE_T * entry);
 
     typedef int (*_LNXPROC_RESULTS_ITERATE_FUNC) (_LNXPROC_RESULTS_TABLE_T *
                                                   entry, void *data);

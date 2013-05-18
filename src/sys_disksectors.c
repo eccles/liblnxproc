@@ -32,7 +32,7 @@ This file is part of liblnxproc.
 
 struct env_t {
     _LNXPROC_RESULTS_T *results;
-    _LNXPROC_RESULTS_TABLE_T entry;
+    char *key;
 };
 
 static LNXPROC_ERROR_T
@@ -42,15 +42,11 @@ iter_func(char *val, void *data, size_t idx[], size_t dim)
                    idx[0], 1, idx[1]);
     struct env_t *env = data;
 
-    _LNXPROC_RESULTS_TABLE_T *entry = &env->entry;
-
     if (idx[1] == 0) {
-        strncpy(entry->key, val, sizeof entry->key);
+        env->key = val;
     }
     else {
-        entry->valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_INT;
-        entry->value.i = atoi(val);
-        _lnxproc_results_add(env->results, &env->entry);
+        _lnxproc_results_add_int(env->results, env->key, atoi(val));
     }
     return LNXPROC_OK;
 }
@@ -64,8 +60,8 @@ sys_disksectors_normalize(LNXPROC_BASE_T *base)
 
     struct env_t env = {
         .results = results,
+        .key = NULL,
     };
-    memset(&env.entry, 0, sizeof(env.entry));
 
     _lnxproc_results_init(results, 2);
     _lnxproc_array_iterate(array, &env, 0, iter_func);

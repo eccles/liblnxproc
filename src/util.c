@@ -18,20 +18,38 @@
  *
  */
 
-#include <sys/time.h>
-#include <stddef.h>
-#include <stdio.h>
+#include <sys/time.h>           //gettimeofday
+#include <stdio.h>              //snprintf
+#include <stdlib.h>             //calloc
+#include <string.h>             //memcpy
 
-/*
-static void *memdup(void *old, size_t len) {
-    void * ret =NULL;
-    ret = calloc(1,len);
-    if( ret ) {
-        memcpy(ret,old,len);
+void *
+strlcpy(void *dest, const void *src, size_t len)
+{
+    int i = 0;
+    char *d = dest;
+    char *s = (char *) src;
+
+    while (*s && i < len - 1) {
+        *d++ = *s++;
+        i++;
+    }
+    *d++ = '\0';
+    return d;
+}
+
+void *
+memdup(void *old, size_t len)
+{
+    void *ret = NULL;
+
+    ret = calloc(1, len);
+    if (ret) {
+        memcpy(ret, old, len);
     }
     return ret;
 }
-*/
+
 float
 lnxproc_timeval_secs(struct timeval *tv)
 {

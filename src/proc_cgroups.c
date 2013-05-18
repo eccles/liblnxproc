@@ -54,7 +54,6 @@ proc_cgroups_normalize(LNXPROC_BASE_T *base)
     char *val;
     char *colkey;
     char *rowkey;
-    _LNXPROC_RESULTS_TABLE_T entry;
 
     int i, j;
 
@@ -73,10 +72,10 @@ proc_cgroups_normalize(LNXPROC_BASE_T *base)
             val = values[i][j];
             if (!val)
                 continue;
-            snprintf(entry.key, sizeof entry.key, "/%s/%s", rowkey, colkey);
-            entry.valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_INT;
-            entry.value.i = atoi(val);
-            _lnxproc_results_add(results, &entry);
+            char buf[64];
+
+            snprintf(buf, sizeof buf, "/%s/%s", rowkey, colkey);
+            _lnxproc_results_add_int(results, buf, atoi(val));
         }
     }
     return LNXPROC_OK;

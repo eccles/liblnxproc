@@ -106,7 +106,7 @@ internal_print_func(_LNXPROC_RESULTS_TABLE_T * entry, void *data)
 {
     char buf[64];
 
-    printf("Key %s = %s\n", entry->key,
+    printf("%s Key %s = %s\n", (char *) data, entry->key,
            _lnxproc_results_table_valuestr(entry, buf, sizeof buf));
     return LNXPROC_OK;
 }
@@ -128,15 +128,13 @@ _lnxproc_results_print(_LNXPROC_RESULTS_T * results)
     printf("Table length = %zd\n", results->length);
     printf("Hash = %p\n", results->hash);
     if (results->hash) {
-        char buf[64];
         _LNXPROC_RESULTS_TABLE_T *entry, *tmp;
 
         HASH_ITER(hh, results->hash, entry, tmp) {
-            printf("Hash Key: %s = %s\n", entry->key,
-                   _lnxproc_results_table_valuestr(entry, buf, sizeof buf));
+            internal_print_func(entry, "Hash");
         }
     }
-    return _lnxproc_results_iterate(results, internal_print_func, NULL);
+    return _lnxproc_results_iterate(results, internal_print_func, "Line");
 
 }
 
@@ -342,26 +340,13 @@ _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results,
     return LNXPROC_OK;
 }
 
-LNXPROC_ERROR_T
-_lnxproc_results_add(_LNXPROC_RESULTS_T * results,
-                     _LNXPROC_RESULTS_TABLE_T * entry)
+static LNXPROC_ERROR_T
+results_add_entry(_LNXPROC_RESULTS_T * results)
 {
     if (!results) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
         return LNXPROC_ERROR_RESULTS_NULL;
     }
-    if (!entry) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_VAL_ADDRESS_NULL, "\n");
-        return LNXPROC_ERROR_RESULTS_VAL_ADDRESS_NULL;
-    }
-
-#ifdef DEBUG
-    char buf[64];
-
-    _LNXPROC_DEBUG("Results %1$p Entry Key %2$p '%2$s' Value %3$p '%3$s'\n",
-                   results, entry->key,
-                   _lnxproc_results_table_valuestr(entry, buf, sizeof buf));
-#endif
 
     if (!results->table) {
         results->length = 0;
@@ -380,6 +365,101 @@ _lnxproc_results_add(_LNXPROC_RESULTS_T * results,
         }
     }
     _LNXPROC_DEBUG("Table %p\n", results->table);
+    results->length++;
+
+    return LNXPROC_OK;
+}
+
+LNXPROC_ERROR_T
+_lnxproc_results_add_float(_LNXPROC_RESULTS_T * results, const char *key,
+                           const float value)
+{
+    LNXPROC_ERROR_T ret = results_add_entry(results);
+
+    if (ret) {
+        return ret;
+    }
+    _LNXPROC_RESULTS_TABLE_T *tentry = results->table + results->length - 1;
+
+    strlcpy(tentry->key, key, sizeof tentry->key);
+    tentry->valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_FLOAT;
+    tentry->value.f = value;
+    return LNXPROC_OK;
+}
+
+LNXPROC_ERROR_T
+_lnxproc_results_add_string(_LNXPROC_RESULTS_T * results, const char *key,
+                            const char *value)
+{
+    LNXPROC_ERROR_T ret = results_add_entry(results);
+
+    if (ret) {
+        return ret;
+    }
+    _LNXPROC_RESULTS_TABLE_T *tentry = results->table + results->length - 1;
+
+    strlcpy(tentry->key, key, sizeof tentry->key);
+    tentry->valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_STR;
+    strlcpy(tentry->value.s, value, sizeof tentry->value.s);
+    return LNXPROC_OK;
+}
+
+LNXPROC_ERROR_T
+_lnxproc_results_add_int(_LNXPROC_RESULTS_T * results, const char *key,
+                         const int value)
+{
+    LNXPROC_ERROR_T ret = results_add_entry(results);
+
+    if (ret) {
+        return ret;
+    }
+    _LNXPROC_RESULTS_TABLE_T *tentry = results->table + results->length - 1;
+
+    strlcpy(tentry->key, key, sizeof tentry->key);
+    tentry->valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_INT;
+    tentry->value.i = value;
+    return LNXPROC_OK;
+}
+
+LNXPROC_ERROR_T
+_lnxproc_results_add_long(_LNXPROC_RESULTS_T * results, const char *key,
+                          const long value)
+{
+    LNXPROC_ERROR_T ret = results_add_entry(results);
+
+    if (ret) {
+        return ret;
+    }
+    _LNXPROC_RESULTS_TABLE_T *tentry = results->table + results->length - 1;
+
+    strlcpy(tentry->key, key, sizeof tentry->key);
+    tentry->valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_LONG;
+    tentry->value.l = value;
+    return LNXPROC_OK;
+}
+
+#ifdef UNUSED
+LNXPROC_ERROR_T
+_lnxproc_results_add(_LNXPROC_RESULTS_T * results,
+                     _LNXPROC_RESULTS_TABLE_T * entry)
+{
+    LNXPROC_ERROR_T ret = results_add_entry(results);
+
+    if (ret) {
+        return ret;
+    }
+    if (!entry) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_VAL_ADDRESS_NULL, "\n");
+        return LNXPROC_ERROR_RESULTS_VAL_ADDRESS_NULL;
+    }
+
+#ifdef DEBUG
+    char buf[64];
+
+    _LNXPROC_DEBUG("Results %1$p Entry Key %2$p '%2$s' Value %3$p '%3$s'\n",
+                   results, entry->key,
+                   _lnxproc_results_table_valuestr(entry, buf, sizeof buf));
+#endif
 
     _LNXPROC_RESULTS_TABLE_T *tentry = results->table + results->length;
 
@@ -388,6 +468,7 @@ _lnxproc_results_add(_LNXPROC_RESULTS_T * results,
 
     return LNXPROC_OK;
 }
+#endif
 
 LNXPROC_ERROR_T
 _lnxproc_results_iterate(_LNXPROC_RESULTS_T * results,

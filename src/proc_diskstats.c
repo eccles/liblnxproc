@@ -94,30 +94,35 @@ Typical contents of /proc/diskstats::
 
 static void
 derived_values(int i, int j, _LNXPROC_RESULTS_T * results,
-               _LNXPROC_RESULTS_T * presults, _LNXPROC_RESULTS_TABLE_T * entry,
+               _LNXPROC_RESULTS_T * presults, char *pkey,
                float out, float tdiff)
 {
     if (tdiff > 0.0) {
-        _LNXPROC_RESULTS_TABLE_T dentry;
         _LNXPROC_RESULTS_TABLE_T pentry;
 
-        strcpy(pentry.key, entry->key);
+        strcpy(pentry.key, pkey);
         LNXPROC_ERROR_T ret = _lnxproc_results_fetch(presults, &pentry);
 
-        _LNXPROC_DEBUG("%d,%d:Prev %s = %f\n", i, j, pentry.key,
-                       pentry.value.f);
+#ifdef DEBUG
+        char buf[64];
+
+        _LNXPROC_DEBUG("%d,%d:Prev %s = %s\n", i, j, pkey,
+                       _lnxproc_results_table_valuestr(&pentry, buf,
+                                                       sizeof buf));
+#endif
         if (ret)
             return;
 
-        snprintf(dentry.key, sizeof dentry.key, "%s-s", entry->key);
-        dentry.valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_FLOAT;
-        dentry.value.f = (out - pentry.value.f) / tdiff;
-        _lnxproc_results_add(results, &dentry);
-        _LNXPROC_DEBUG("%d,%d:Curr %s-s = %f\n", i, j, dentry.key,
-                       dentry.value.f);
+        char dkey[64];
+
+        snprintf(dkey, sizeof dkey, "%s-s", pkey);
+        float value = (out - pentry.value.f) / tdiff;
+
+        _lnxproc_results_add_float(results, dkey, value);
 #ifdef DEBUG
-        if (dentry.value.f < 0.0) {
-            _LNXPROC_DEBUG("WARN: diff < 0 (=%f)\n", dentry.value.f);
+        _LNXPROC_DEBUG("%d,%d:Curr %s = %f\n", i, j, dkey, value);
+        if (value < 0.0) {
+            _LNXPROC_DEBUG("WARN: diff < 0 (=%f)\n", value);
         }
 #endif
     }
@@ -219,20 +224,16 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
 
             if (val) {
                 float secs = pars[k].scale * atoi(val);
-                _LNXPROC_RESULTS_TABLE_T entry;
+                char pkey[64];
 
-                snprintf(entry.key, sizeof entry.key, "/%s/%s", key,
-                         pars[k].name);
-                entry.valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_FLOAT;
-                entry.value.f = secs;
-                _LNXPROC_DEBUG("%d,%d:Curr %s = %f\n", i, k, entry.key,
-                               entry.value.f);
-                _lnxproc_results_add(results, &entry);
+                snprintf(pkey, sizeof pkey, "/%s/%s", key, pars[k].name);
+                _LNXPROC_DEBUG("%d,%d:Curr %s = %f\n", i, k, pkey, secs);
+                _lnxproc_results_add_float(results, pkey, secs);
                 if (!presults)
                     continue;
                 _LNXPROC_RESULTS_TABLE_T pentry;
 
-                strcpy(pentry.key, entry.key);
+                strcpy(pentry.key, pkey);
                 LNXPROC_ERROR_T ret = _lnxproc_results_fetch(presults, &pentry);
 
                 if (!ret)
@@ -241,7 +242,7 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
                 _LNXPROC_DEBUG("%d,%d:Prev %s = %f\n", i, k, pentry.key,
                                pentry.value.f);
                 iodiff[j] = secs - pentry.value.f;
-                _LNXPROC_DEBUG("%d:iodiff %s = %f\n", i, entry.key, iodiff[j]);
+                _LNXPROC_DEBUG("%d:iodiff %s = %f\n", i, pkey, iodiff[j]);
             }
         }
 
@@ -252,47 +253,37 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
             if (j == KEYCOL || j == MS_READCOL || j == MS_WRITECOL)
                 continue;
             float out = 0.0;
+            char pkey[64];
 
-            _LNXPROC_RESULTS_TABLE_T entry;
-
-            snprintf(entry.key, sizeof entry.key, "/%s/%s", key, pars[j].name);
+            snprintf(pkey, sizeof pkey, "/%s/%s", key, pars[j].name);
 
             char *val = values[i][j];
 
-            _LNXPROC_DEBUG("%d,%d:Curr value %s = %s\n", i, j, entry.key, val);
+            _LNXPROC_DEBUG("%d,%d:Curr value %s = %s\n", i, j, pkey, val);
             if (!val)
                 continue;
 
             if (j > NAMECOL) {
                 out = pars[j].scale * atoi(val);
-                entry.valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_FLOAT;
-                entry.value.f = out;
-                _lnxproc_results_add(results, &entry);
+                _lnxproc_results_add_float(results, pkey, out);
+                _LNXPROC_DEBUG("%d,%d:Curr %s = %f\n", i, j, pkey, out);
             }
             else {
-                entry.valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_STR;
-                strcpy(entry.value.s, val);
-                _lnxproc_results_add(results, &entry);
+                _lnxproc_results_add_string(results, pkey, val);
+                _LNXPROC_DEBUG("%d,%d:Curr %s = %s\n", i, j, pkey, val);
             }
-#ifdef DEBUG
-            char buf[64];
-
-            _LNXPROC_DEBUG("%d,%d:Curr %s = %s\n", i, j, entry.key,
-                           _lnxproc_results_table_valuestr(&entry, buf,
-                                                           sizeof buf));
-#endif
             if (!presults)
                 continue;
 
             if ((j == READSCOL) || (j == MERGE_READCOL) || (j == S_READCOL)) {
 
-                derived_values(i, j, results, presults, &entry, out, iodiff[0]);
+                derived_values(i, j, results, presults, pkey, out, iodiff[0]);
             }
             if ((j == WRITESCOL) || (j == MERGE_WRITECOL) || (j == S_WRITECOL)) {
-                derived_values(i, j, results, presults, &entry, out, iodiff[1]);
+                derived_values(i, j, results, presults, pkey, out, iodiff[1]);
             }
             if ((j == MS_IOCOL) || (j == MS_WEIGHTEDCOL)) {
-                derived_values(i, j, results, presults, &entry, out, tdiff);
+                derived_values(i, j, results, presults, pkey, out, tdiff);
             }
         }
     }

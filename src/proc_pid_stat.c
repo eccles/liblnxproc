@@ -189,56 +189,56 @@ proc_pid_stat_normalize(LNXPROC_BASE_T *base)
             if (!val)
                 continue;
 
-            _LNXPROC_RESULTS_TABLE_T entry;
+            char key[64];
 
-            snprintf(entry.key, sizeof entry.key, "/%s/%s", rowkey, colkey[j]);
+            snprintf(key, sizeof key, "/%s/%s", rowkey, colkey[j]);
             if ((j == VSIZECOL) || (j == RLIMCOL)) {
-                entry.valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_INT;
-                entry.value.i = atoi(val) / 1024;
-                _LNXPROC_DEBUG("%d,%d:%s value %s int %d\n", i, j, entry.key,
-                               val, entry.value.i);
-                _lnxproc_results_add(results, &entry);
+                int value = atoi(val) / 1024;
+
+                _LNXPROC_DEBUG("%d,%d:%s value %s int %d\n", i, j, key,
+                               val, value);
+                _lnxproc_results_add_int(results, key, value);
             }
             else if ((j == RSSCOL) || (j == NSWAPCOL) || (j == CNSWAPCOL)) {
-                entry.valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_LONG;
-                entry.value.l = atoi(val) * results->page_size;
-                _LNXPROC_DEBUG("%d,%d:%s value %s long %ld\n", i, j, entry.key,
-                               val, entry.value.l);
-                _lnxproc_results_add(results, &entry);
+                long value = atoi(val) * results->page_size;
+
+                _LNXPROC_DEBUG("%d,%d:%s value %s long %ld\n", i, j, key,
+                               val, value);
+                _lnxproc_results_add_long(results, key, value);
             }
             else if ((j == UTIMECOL) ||
                      (j == STIMECOL) ||
                      (j == CUTIMECOL) ||
                      (j == CSTIMECOL) || (j == STARTTIMECOL)) {
-                entry.valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_FLOAT;
-                entry.value.f = atoi(val) * results->secs_per_jiffy;
-                _LNXPROC_DEBUG("%d,%d:%s value %s float %f\n", i, j, entry.key,
-                               val, entry.value.f);
-                _lnxproc_results_add(results, &entry);
+                float value = atoi(val) * results->secs_per_jiffy;
+
+                _LNXPROC_DEBUG("%d,%d:%s value %s float %f\n", i, j, key,
+                               val, value);
+                _lnxproc_results_add_float(results, key, value);
 
                 _LNXPROC_RESULTS_TABLE_T *hentry =
                     calloc(1, sizeof(_LNXPROC_RESULTS_TABLE_T));
                 if (!hentry)
                     continue;
-                memcpy(hentry, &entry, sizeof *hentry);
+                strcpy(hentry->key, key);
+                hentry->valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_FLOAT;
+                hentry->value.f = value;
                 _LNXPROC_DEBUG("%d,%d:Store %s = %f\n", i, j, hentry->key,
-                               hentry->value.f);
+                               value);
                 HASH_ADD_STR(hash, key, hentry);
             }
             else if ((j == ITREALVALUECOL) ||
                      (j == GUEST_TIMECOL) ||
                      (j == CGUEST_TIMECOL) || (j == DELAY_BLKIO_TICKSCOL)) {
-                entry.valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_FLOAT;
-                entry.value.f = atoi(val) * results->secs_per_jiffy;
-                _LNXPROC_DEBUG("%d,%d:%s value %s float %f\n", i, j, entry.key,
-                               val, entry.value.f);
-                _lnxproc_results_add(results, &entry);
+                float value = atoi(val) * results->secs_per_jiffy;
+
+                _LNXPROC_DEBUG("%d,%d:%s value %s float %f\n", i, j, key,
+                               val, value);
+                _lnxproc_results_add_float(results, key, value);
 
             }
             else {
-                entry.valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_STR;
-                strncpy(entry.value.s, val, sizeof entry.value.s);
-                _lnxproc_results_add(results, &entry);
+                _lnxproc_results_add_string(results, key, val);
             }
         }
     }
@@ -273,24 +273,23 @@ proc_pid_stat_normalize(LNXPROC_BASE_T *base)
 
             _LNXPROC_DEBUG("%d:second Rowkey value %s\n", i, rowkey);
 
-            _LNXPROC_RESULTS_TABLE_T entry;
+            char key[64];
 
-            snprintf(entry.key, sizeof entry.key, "/%s/%s", rowkey,
-                     colkey[STARTTIMECOL]);
+            snprintf(key, sizeof key, "/%s/%s", rowkey, colkey[STARTTIMECOL]);
 
             _LNXPROC_RESULTS_TABLE_T *startentry = NULL;
 
-            HASH_FIND_STR(hash, entry.key, startentry);
+            HASH_FIND_STR(hash, key, startentry);
 
 /*
- * Ignore previaous entries with a different starttime
+ * Ignore previous entries with a different starttime
  */
             if (startentry) {
                 _LNXPROC_DEBUG("%d:current starttime for %s is %f\n", i, rowkey,
                                startentry->value.f);
                 _LNXPROC_RESULTS_TABLE_T pentry;
 
-                strcpy(pentry.key, entry.key);
+                strcpy(pentry.key, key);
                 LNXPROC_ERROR_T ret = _lnxproc_results_fetch(presults, &pentry);
 
                 if (ret)
@@ -303,11 +302,10 @@ proc_pid_stat_normalize(LNXPROC_BASE_T *base)
             }
 
             for (j = UTIMECOL; j <= CSTIMECOL; j++) {
-                snprintf(entry.key, sizeof entry.key, "/%s/%s", rowkey,
-                         colkey[j]);
+                snprintf(key, sizeof key, "/%s/%s", rowkey, colkey[j]);
                 _LNXPROC_RESULTS_TABLE_T pentry;
 
-                strcpy(pentry.key, entry.key);
+                strcpy(pentry.key, key);
                 LNXPROC_ERROR_T ret = _lnxproc_results_fetch(presults, &pentry);
 
                 _LNXPROC_DEBUG("%d,%d:Prev value %s = %f\n", i, j, pentry.key,
@@ -317,26 +315,25 @@ proc_pid_stat_normalize(LNXPROC_BASE_T *base)
 
                 _LNXPROC_RESULTS_TABLE_T *hentry = NULL;
 
-                HASH_FIND_STR(hash, entry.key, hentry);
+                HASH_FIND_STR(hash, key, hentry);
                 if (!hentry)
                     continue;
 
-                _LNXPROC_RESULTS_TABLE_T dentry;
+                char dkey[64];
 
-                snprintf(dentry.key, sizeof dentry.key, "%s%%", entry.key);
-                dentry.value.f = ((hentry->value.f - pentry.value.f) * 100.0)
+                snprintf(dkey, sizeof dkey, "%s%%", key);
+                float value = ((hentry->value.f - pentry.value.f) * 100.0)
                     / tdiff;
 
-                if (dentry.value.f < 0.0) {
+                if (value < 0.0) {
                     _LNXPROC_DEBUG("%d,%d:WARN Usage %s = %f\n", i, j,
-                                   dentry.key, dentry.value.f);
+                                   dkey, value);
                 }
                 else {
-                    _LNXPROC_DEBUG("%d,%d:Usage %s = %f\n", i, j,
-                                   dentry.key, dentry.value.f);
+                    _LNXPROC_DEBUG("%d,%d:Usage %s = %f\n", i, j, dkey, value);
                 }
 
-                _lnxproc_results_add(results, &dentry);
+                _lnxproc_results_add_float(results, dkey, value);
             }
         }
     }
