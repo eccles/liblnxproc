@@ -24,21 +24,6 @@
 #include <string.h>             //memcpy
 
 void *
-strlcpy(void *dest, const void *src, size_t len)
-{
-    int i = 0;
-    char *d = dest;
-    char *s = (char *) src;
-
-    while (*s && i < len - 1) {
-        *d++ = *s++;
-        i++;
-    }
-    *d++ = '\0';
-    return d;
-}
-
-void *
 memdup(void *old, size_t len)
 {
     void *ret = NULL;

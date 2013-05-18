@@ -27,6 +27,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "strlcpy.h"
 #include "error_private.h"
 #include "results_private.h"
 
@@ -52,7 +53,7 @@ _lnxproc_results_table_valuestr(_LNXPROC_RESULTS_TABLE_T * entry, char *buf,
             snprintf(buf, len, "%f", entry->value.f);
             break;
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_STR:
-            snprintf(buf, len, "%s", entry->value.s);
+            strlcpy(buf, entry->value.s, len);
             break;
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_PTR:
             snprintf(buf, len, "%p", entry->value.p);

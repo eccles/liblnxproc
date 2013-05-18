@@ -39,7 +39,6 @@ extern "C" {
 #define WARN_FORMAT(mmm,nnn) __attribute__((format(printf,mmm,nnn)))
 #endif
 
-    void *strlcpy(void *dest, const void *src, size_t len);
     void *memdup(void *old, size_t len);
     float lnxproc_timeval_secs(struct timeval *tv);
     long lnxproc_timeval_diff(struct timeval *start, struct timeval *end);

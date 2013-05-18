@@ -18,38 +18,35 @@
  *
  */
 
-#ifndef LIBLNXPROC_LIMITS_CHR_H
-#define LIBLNXPROC_LIMITS_CHR_H 1
-
-#include "limits_private.h"
+#ifndef LIBLNXPROC_STRLCPY_H
+#define LIBLNXPROC_STRLCPY_H 1
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 /*
- * replaces
- * char *ret = strchr(limit->chars, c); 
- *
- * because we want to include the trailing NUL char if required
+ * Replaces strncpy() - more efficient and always returns a string in dest.
+ * Also returns a pointer to the terminating NULL character of the destination
+ * string so catenation can be implemented efficiently
  */
+    static inline void *strlcpy(void *dest, const void *src, size_t len) {
+        int i = 0;
+        char *d = dest;
+        char *s = (char *) src;
 
-    static inline char *limit_chr(_LNXPROC_LIMITS_T * limit, char c) {
-        if (limit) {
-            int i;
-
-            for (i = 0; i < limit->len; i++) {
-                if (c == limit->chars[i]) {
-                    return limit->chars + i;
-                }
-            }
+        while (*s && i < len - 1) {
+            *d++ = *s++;
+            i++;
         }
-        return NULL;
+        *d = '\0';
+
+        return d;
     }
 
 #ifdef __cplusplus
 }                               // extern "C"
 #endif
-#endif                          // LIBLNXPROC_LIMITS_CHR_H
+#endif                          // LIBLNXPROC_STRLCPY_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
  */
