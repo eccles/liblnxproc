@@ -559,14 +559,14 @@ test_interface(void)
     LNXPROC_MODULE_T *modules = NULL;
 
     lnxproc_init(&modules, LNXPROC_ALL, NULL);
-    lnxproc_read(modules, LNXPROC_PROC_CGROUPS);
-    lnxproc_read(modules, LNXPROC_PROC_DISKSTATS);
-    lnxproc_read(modules, LNXPROC_PROC_DOMAINNAME);
-    lnxproc_read(modules, LNXPROC_PROC_HOSTNAME);
-    lnxproc_read(modules, LNXPROC_PROC_OSRELEASE);
-    lnxproc_read(modules, LNXPROC_SYS_CPUFREQ);
-    lnxproc_read(modules, LNXPROC_SYS_DISKSECTORS);
-    lnxproc_read(modules, LNXPROC_ALL);
+    lnxproc_read(modules);
+    lnxproc_read(modules);
+    lnxproc_read(modules);
+    lnxproc_read(modules);
+    lnxproc_read(modules);
+    lnxproc_read(modules);
+    lnxproc_read(modules);
+    lnxproc_read(modules);
     LNXPROC_FREE(modules);
 
 }
@@ -580,7 +580,7 @@ execute_base(LNXPROC_BASE_T *base)
 
         for (i = 0; i < 30; i++) {
             printf("Execute %d\n", i + 1);
-            LNXPROC_ERROR_T ret = base->read(base);
+            LNXPROC_ERROR_T ret = _lnxproc_base_read(base);
 
             if (ret) {
                 char buf[64];

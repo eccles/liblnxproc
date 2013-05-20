@@ -36,25 +36,15 @@ extern "C" {
 #include "limits_private.h"
 #include "results_private.h"
 #include "array_private.h"
-#include <lnxproc/base.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-    typedef LNXPROC_ERROR_T (*LNXPROC_BASE_METHOD) (LNXPROC_BASE_T *base);
-
-    LNXPROC_ERROR_T _lnxproc_base_free(LNXPROC_BASE_T **baseptr);
-
-#define _LNXPROC_BASE_FREE(b) {\
-    _lnxproc_base_free(&b);\
-}
-
-    LNXPROC_ERROR_T _lnxproc_base_read(LNXPROC_BASE_T *base);
 
     struct lnxproc_base_data_t {
         int id;
         long rawread_time;
         long map_time;
+        long hash_time;
         long normalize_time;
         struct timeval tv;
         char *lines;
@@ -63,6 +53,7 @@ extern "C" {
         _LNXPROC_ARRAY_T *array;
         _LNXPROC_RESULTS_T *results;
     };
+    typedef struct lnxproc_base_data_t LNXPROC_BASE_DATA_T;
 
     enum lnxproc_base_type_t {
         LNXPROC_BASE_TYPE_VANILLA = 0,
@@ -74,6 +65,9 @@ extern "C" {
     typedef enum lnxproc_base_type_t LNXPROC_BASE_TYPE_T;
 
     char *lnxproc_base_typestr(LNXPROC_BASE_TYPE_T type, char *buf, size_t len);
+
+    typedef struct lnxproc_base_t LNXPROC_BASE_T;
+    typedef LNXPROC_ERROR_T (*LNXPROC_BASE_METHOD) (LNXPROC_BASE_T *base);
 
     struct lnxproc_base_t {
         LNXPROC_BASE_METHOD rawread;
@@ -107,9 +101,15 @@ extern "C" {
                                       size_t buflen,
                                       _LNXPROC_LIMITS_T limits[], size_t dim);
 
+    LNXPROC_ERROR_T _lnxproc_base_free(LNXPROC_BASE_T **baseptr);
+
+#define _LNXPROC_BASE_FREE(b) {\
+    _lnxproc_base_free(&b);\
+}
+
+    LNXPROC_ERROR_T _lnxproc_base_read(LNXPROC_BASE_T *base);
     LNXPROC_ERROR_T _lnxproc_base_rawread(LNXPROC_BASE_T *base);
     LNXPROC_ERROR_T _lnxproc_base_normalize(LNXPROC_BASE_T *base);
-
     LNXPROC_ERROR_T _lnxproc_base_print(LNXPROC_BASE_T *base);
 
 #ifdef LNXPROC_UNUSED

@@ -30,6 +30,16 @@
 extern "C" {
 #endif
 
+#ifndef WARN_UNUSED
+#define WARN_UNUSED __attribute__((warn_unused_result))
+#endif
+
+#ifndef WARN_FORMAT
+#define WARN_FORMAT(mmm,nnn) __attribute__((format(printf,mmm,nnn)))
+#endif
+
+    void *memdup(void *old, size_t len);
+
 #ifdef __cplusplus
 }                               // extern "C"
 #endif

@@ -24,22 +24,13 @@
 #ifndef LIBLNXPROC_UTIL_H
 #define LIBLNXPROC_UTIL_H 1
 
-#include <sys/time.h>
-#include <stddef.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#ifndef WARN_UNUSED
-#define WARN_UNUSED __attribute__((warn_unused_result))
-#endif
+#include <sys/time.h>
+#include <stddef.h>
 
-#ifndef WARN_FORMAT
-#define WARN_FORMAT(mmm,nnn) __attribute__((format(printf,mmm,nnn)))
-#endif
-
-    void *memdup(void *old, size_t len);
     float lnxproc_timeval_secs(struct timeval *tv);
     long lnxproc_timeval_diff(struct timeval *start, struct timeval *end);
     char *lnxproc_timeval_print(struct timeval *tv, char *buf, size_t len);

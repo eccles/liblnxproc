@@ -23,7 +23,6 @@ This file is part of liblnxproc.
 
 #include <lnxproc/util.h>
 #include <lnxproc/error.h>
-#include <lnxproc/base.h>
 #include <lnxproc/interface.h>
 
 #ifdef __cplusplus

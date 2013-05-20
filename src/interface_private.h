@@ -28,6 +28,8 @@
 extern "C" {
 #endif
 
+    typedef LNXPROC_ERROR_T (*LNXPROC_METHOD) (LNXPROC_BASE_T **base);
+
     struct lnxproc_module_t {
         LNXPROC_METHOD new;
         LNXPROC_BASE_T *base;

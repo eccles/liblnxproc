@@ -23,7 +23,6 @@
 
 #include <lnxproc/util.h>
 #include <lnxproc/error.h>
-#include <lnxproc/base.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,8 +41,6 @@ extern "C" {
     };
     typedef enum lnxproc_module_type_t LNXPROC_MODULE_TYPE_T;
 
-    typedef LNXPROC_ERROR_T (*LNXPROC_METHOD) (LNXPROC_BASE_T **base);
-
     typedef struct lnxproc_module_t LNXPROC_MODULE_T;
 
     LNXPROC_ERROR_T lnxproc_init(LNXPROC_MODULE_T ** modulesptr,
@@ -55,16 +52,14 @@ extern "C" {
     lnxproc_free(&b);\
 }
 
-    LNXPROC_ERROR_T lnxproc_read(LNXPROC_MODULE_T * modules,
-                                 LNXPROC_MODULE_TYPE_T type);
+    LNXPROC_ERROR_T lnxproc_read(LNXPROC_MODULE_T * modules);
 
-    LNXPROC_ERROR_T lnxproc_print(LNXPROC_MODULE_T * modules,
-                                  LNXPROC_MODULE_TYPE_T type);
+    LNXPROC_ERROR_T lnxproc_print(LNXPROC_MODULE_T * modules);
 
     LNXPROC_ERROR_T lnxproc_performance(LNXPROC_MODULE_T * modules,
-                                        LNXPROC_MODULE_TYPE_T type,
                                         long *rawread_time,
-                                        long *map_time, long *normalize_time);
+                                        long *map_time, long *hash_time,
+                                        long *normalize_time);
 
 #ifdef __cplusplus
 }                               // extern "C"

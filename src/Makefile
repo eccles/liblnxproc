@@ -1,7 +1,7 @@
 RELDIR=..
 PUBHDIR=../src/lnxproc
 FUNCHDRS=limit_chr.h strlcpy.h
-PUBBASEHDRS=lnxproc.h util.h base.h error.h interface.h
+PUBBASEHDRS=lnxproc.h util.h error.h interface.h
 PROCHDRS=proc_cgroups.h proc_diskstats.h proc_domainname.h proc_hostname.h proc_osrelease.h
 PROCPIDHDRS=proc_pid_stat.h
 SYSHDRS=sys_cpufreq.h sys_disksectors.h

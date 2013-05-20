@@ -41,6 +41,7 @@ static LNXPROC_MODULE_T mymodules[] = {
     {.new = lnxproc_sys_cpufreq_new,.base = NULL,.optional = NULL,},
     {.new = lnxproc_sys_disksectors_new,.base = NULL,.optional = NULL,},
     {.new = lnxproc_proc_pid_stat_new,.base = NULL,.optional = NULL,},
+    {.new = NULL,.base = NULL,.optional = NULL,},
 };
 
 static size_t nmodules = sizeof(mymodules) / sizeof(mymodules[0]);
@@ -55,7 +56,7 @@ lnxproc_init(LNXPROC_MODULE_T ** modulesptr, LNXPROC_MODULE_TYPE_T type,
         n = nmodules;
     }
     else {
-        n = 1;
+        n = 2;
     }
     LNXPROC_MODULE_T *p = calloc(n, sizeof(LNXPROC_MODULE_T));
 
@@ -64,7 +65,13 @@ lnxproc_init(LNXPROC_MODULE_T ** modulesptr, LNXPROC_MODULE_TYPE_T type,
                              "Malloc interface\n");
         return LNXPROC_ERROR_INTERFACE_MALLOC_INTERFACE;
     }
-    memcpy(p, mymodules, n * sizeof(LNXPROC_MODULE_T));
+    if (type == LNXPROC_ALL) {
+        memcpy(p, mymodules, n * sizeof(LNXPROC_MODULE_T));
+    }
+    else {
+        memcpy(p, mymodules + type - 1, sizeof(LNXPROC_MODULE_T));
+        memcpy(p + 1, mymodules + nmodules - 1, sizeof(LNXPROC_MODULE_T));
+    }
     *modulesptr = p;
     return LNXPROC_OK;
 }
@@ -74,10 +81,11 @@ lnxproc_free(LNXPROC_MODULE_T ** modulesptr)
 {
     if (modulesptr && *modulesptr) {
         LNXPROC_MODULE_T *modules = *modulesptr;
-        int i;
+        LNXPROC_MODULE_T *module = modules;
 
-        for (i = 0; i < nmodules; i++) {
-            _LNXPROC_BASE_FREE(modules[i].base);
+        while (module->new) {
+            _LNXPROC_BASE_FREE(module->base);
+            module++;
         }
         free(modules);
     }
@@ -85,26 +93,15 @@ lnxproc_free(LNXPROC_MODULE_T ** modulesptr)
 }
 
 LNXPROC_ERROR_T
-lnxproc_read(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type)
+lnxproc_read(LNXPROC_MODULE_T * modules)
 {
 
+    LNXPROC_ERROR_T ret = LNXPROC_ERROR_INTERFACE_NULL;
+
     if (modules) {
-        LNXPROC_ERROR_T ret;
+        LNXPROC_MODULE_T *module = modules;
 
-        if (type == LNXPROC_ALL) {
-            int i;
-
-            for (i = 1; i <= nmodules; i++) {
-                ret = lnxproc_read(modules, i);
-                if (ret) {
-                    return ret;
-                }
-            }
-            return ret;
-        }
-        else {
-            LNXPROC_MODULE_T *module = modules + type - 1;
-
+        while (module->new) {
             if (!module->base) {
                 ret = module->new(&module->base);
 
@@ -112,88 +109,74 @@ lnxproc_read(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type)
                     return ret;
                 }
             }
-
-            return module->base->read(module->base);
-        }
-    }
-    return LNXPROC_ERROR_INTERFACE_NULL;
-}
-
-LNXPROC_ERROR_T
-lnxproc_performance(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type,
-                    long *rawread_time, long *map_time, long *normalize_time)
-{
-
-    if (modules) {
-        if (type == LNXPROC_ALL) {
-            if (rawread_time) {
-                *rawread_time = 0;
-            }
-            if (map_time) {
-                *map_time = 0;
-            }
-            if (normalize_time) {
-                *normalize_time = 0;
-            }
-        }
-        else {
-            LNXPROC_MODULE_T *module = modules + type - 1;
-
-            if (!module->base) {
-                return LNXPROC_ERROR_INTERFACE_NULL_BASE;
-            }
             LNXPROC_BASE_T *base = module->base;
 
-            LNXPROC_BASE_DATA_T *base_data = base->current;
-
-            if (!base_data) {
-                return LNXPROC_ERROR_INTERFACE_NULL_BASE;
+            ret = _lnxproc_base_rawread(base);
+            if (ret) {
+                return ret;
             }
-
-            if (rawread_time) {
-                *rawread_time = base_data->rawread_time;
+            ret = _lnxproc_base_normalize(base);
+            if (ret) {
+                return ret;
             }
-            if (map_time) {
-                *map_time = base_data->map_time;
-            }
-            if (normalize_time) {
-                *normalize_time = base_data->normalize_time;
-            }
-
-            return LNXPROC_OK;
+            module++;
         }
     }
-    return LNXPROC_ERROR_INTERFACE_NULL;
+    return ret;
 }
 
 LNXPROC_ERROR_T
-lnxproc_print(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type)
+lnxproc_performance(LNXPROC_MODULE_T * modules,
+                    long *rawread_time, long *map_time, long *hash_time,
+                    long *normalize_time)
 {
+
+    *rawread_time = 0;
+    *map_time = 0;
+    *hash_time = 0;
+    *normalize_time = 0;
     if (modules) {
-        if (type == LNXPROC_ALL) {
-            int i;
+        LNXPROC_MODULE_T *module = modules;
 
-            for (i = 1; i <= nmodules; i++) {
-                lnxproc_print(modules, i);
+        while (module->new) {
+            LNXPROC_BASE_T *base = module->base;
+
+            if (base) {
+                LNXPROC_BASE_DATA_T *base_data = base->current;
+
+                if (base_data) {
+                    *rawread_time += base_data->rawread_time;
+                    *map_time += base_data->map_time;
+                    *hash_time += base_data->hash_time;
+                    *normalize_time += base_data->normalize_time;
+                }
             }
-            return LNXPROC_OK;
-        }
-        else {
-            LNXPROC_MODULE_T *module = modules + type - 1;
-
-            if (!module->base) {
-                return LNXPROC_ERROR_INTERFACE_NULL_BASE;
-            }
-            LNXPROC_BASE_DATA_T *base_data = module->base->current;
-
-            if (!base_data) {
-                return LNXPROC_ERROR_INTERFACE_NULL_BASE;
-            }
-
-            return _lnxproc_results_print(base_data->results);
+            module++;
         }
     }
-    return LNXPROC_ERROR_INTERFACE_NULL;
+    return LNXPROC_OK;
+}
+
+LNXPROC_ERROR_T
+lnxproc_print(LNXPROC_MODULE_T * modules)
+{
+    if (modules) {
+        LNXPROC_MODULE_T *module = modules;
+
+        while (module->new) {
+            LNXPROC_BASE_T *base = module->base;
+
+            if (base) {
+                LNXPROC_BASE_DATA_T *base_data = module->base->current;
+
+                if (base_data) {
+                    _lnxproc_results_print(base_data->results);
+                }
+            }
+            module++;
+        }
+    }
+    return LNXPROC_OK;
 }
 
 /*
