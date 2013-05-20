@@ -4,9 +4,9 @@ TSKS=timing timing-dbg timing-prf
 SRCS=timing.c
 
 CC=gcc
-CCFLAGS=-O2 -I../src -Wall -Winline -Werror
-CCFLAGSDBG=-g -I../src -Wall -Winline -Werror
-CCFLAGSPRF=-pg -g -I../src -Wall -Winline -Werror
+CCFLAGS=-O2 -I../include -Wall -Winline -Werror
+CCFLAGSDBG=-g -I../include -Wall -Winline -Werror
+CCFLAGSPRF=-pg -g -I../include -Wall -Winline -Werror
 LDFLAGS=-L../src -llnxproc
 LDFLAGSDBG=-L../src -llnxproc-dbg
 LDFLAGSPRF=../src/liblnxproc-prf.a -pg
