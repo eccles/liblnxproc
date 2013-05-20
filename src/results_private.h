@@ -75,6 +75,7 @@ extern "C" {
                                                 _LNXPROC_RESULTS_TABLE_T * src);
 
     struct _lnxproc_results_t {
+        char *tag;
         long jiffies_per_sec;
         float secs_per_jiffy;
         long page_size;
@@ -85,7 +86,8 @@ extern "C" {
     };
     typedef struct _lnxproc_results_t _LNXPROC_RESULTS_T;
 
-    LNXPROC_ERROR_T _lnxproc_results_new(_LNXPROC_RESULTS_T ** newresults);
+    LNXPROC_ERROR_T _lnxproc_results_new(_LNXPROC_RESULTS_T ** newresults,
+                                         char *tag);
 
     LNXPROC_ERROR_T _lnxproc_results_free(_LNXPROC_RESULTS_T ** resultsptr);
 #define _LNXPROC_RESULTS_FREE(r) {\

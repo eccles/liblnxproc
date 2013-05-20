@@ -74,7 +74,7 @@ test_results(void)
 {
     _LNXPROC_RESULTS_T *results = NULL;
 
-    _lnxproc_results_new(&results);
+    _lnxproc_results_new(&results, "Test");
 
     _lnxproc_results_print(results);
     _LNXPROC_RESULTS_FREE(results);

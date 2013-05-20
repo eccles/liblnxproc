@@ -84,10 +84,10 @@ _lnxproc_sys_disksectors_new(_LNXPROC_BASE_T ** base)
 
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
-    return _lnxproc_base_new(base, _LNXPROC_BASE_TYPE_MEMOIZE,
-                             NULL, 0, fileprefix, fileglob, filesuffix,
-                             NULL, sys_disksectors_normalize, NULL,
-                             256, limits, dim);
+    return _lnxproc_base_new(base, "sys_disksectors",
+                             _LNXPROC_BASE_TYPE_MEMOIZE, NULL, 0, fileprefix,
+                             fileglob, filesuffix, NULL,
+                             sys_disksectors_normalize, NULL, 256, limits, dim);
 }
 
 /*

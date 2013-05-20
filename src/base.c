@@ -641,7 +641,7 @@ _lnxproc_base_read(_LNXPROC_BASE_T * base)
 }
 
 static LNXPROC_ERROR_T
-_base_data_new(_LNXPROC_BASE_DATA_T * data, int id,
+_base_data_new(_LNXPROC_BASE_DATA_T * data, int id, char *tag,
                size_t buflen, _LNXPROC_LIMITS_T limits[], size_t dim)
 {
     _LNXPROC_DEBUG("New base data at %p index %d\n", data, id);
@@ -667,7 +667,7 @@ _base_data_new(_LNXPROC_BASE_DATA_T * data, int id,
     }
 
     data->results = NULL;
-    ret = _lnxproc_results_new(&data->results);
+    ret = _lnxproc_results_new(&data->results, tag);
     if (ret) {
         _LNXPROC_ERROR_DEBUG(ret, "Malloc results\n");
         return ret;
@@ -682,6 +682,7 @@ _lnxproc_base_store_previous(_LNXPROC_BASE_T * base)
     if (base) {
         if (!base->previous) {
             LNXPROC_ERROR_T ret = _base_data_new(base->data + 1, 1,
+                                                 base->current->results->tag,
                                                  base->current->buflen,
                                                  base->current->array->limits,
                                                  base->current->array->dim);
@@ -701,6 +702,7 @@ _lnxproc_base_store_previous(_LNXPROC_BASE_T * base)
 
 LNXPROC_ERROR_T
 _lnxproc_base_new(_LNXPROC_BASE_T ** base,
+                  char *tag,
                   _LNXPROC_BASE_TYPE_T type,
                   char **filenames,
                   size_t nfiles,
@@ -714,6 +716,7 @@ _lnxproc_base_new(_LNXPROC_BASE_T ** base,
 {
     LNXPROC_ERROR_T ret;
 
+    _LNXPROC_DEBUG("tag %s\n", tag);
     _LNXPROC_DEBUG("nfiles %zd\n", nfiles);
     _LNXPROC_DEBUG("filenames %p\n", filenames);
     _LNXPROC_DEBUG("fileprefix %1$p '%1$s'\n", fileprefix);
@@ -746,7 +749,7 @@ _lnxproc_base_new(_LNXPROC_BASE_T ** base,
     }
 
     _LNXPROC_DEBUG("Malloc data area\n");
-    ret = _base_data_new(p->data + 0, 0, buflen, limits, dim);
+    ret = _base_data_new(p->data + 0, 0, tag, buflen, limits, dim);
     if (ret) {
         _LNXPROC_BASE_FREE(p);
         return ret;
@@ -834,6 +837,7 @@ _lnxproc_base_new(_LNXPROC_BASE_T ** base,
     else {
         p->filesuffix = NULL;
     }
+
     p->normalize = normalize;
     if (!read) {
         p->read = _lnxproc_base_read;

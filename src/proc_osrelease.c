@@ -44,7 +44,7 @@ _lnxproc_proc_osrelease_new(_LNXPROC_BASE_T ** base)
 {
 
     char *filenames[] = { "/proc/sys/kernel/osrelease", };
-    return _lnxproc_base_new(base, _LNXPROC_BASE_TYPE_MEMOIZE,
+    return _lnxproc_base_new(base, "proc_osrelease", _LNXPROC_BASE_TYPE_MEMOIZE,
                              filenames, 1, NULL, NULL, NULL,
                              NULL, proc_osrelease_normalize, NULL, 32, NULL, 0);
 }

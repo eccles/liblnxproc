@@ -368,7 +368,7 @@ _lnxproc_proc_pid_stat_new(_LNXPROC_BASE_T ** base)
     char *filesuffix = "stat";
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
-    return _lnxproc_base_new(base, _LNXPROC_BASE_TYPE_PREVIOUS,
+    return _lnxproc_base_new(base, "proc_pid_stat", _LNXPROC_BASE_TYPE_PREVIOUS,
                              NULL, 0, fileprefix, fileglob, filesuffix,
                              NULL, proc_pid_stat_normalize, NULL, 256,
                              limits, dim);

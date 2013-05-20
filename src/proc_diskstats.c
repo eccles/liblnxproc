@@ -305,10 +305,10 @@ _lnxproc_proc_diskstats_new(_LNXPROC_BASE_T ** base)
     };
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
-    return _lnxproc_base_new(base, _LNXPROC_BASE_TYPE_PREVIOUS,
-                             filenames, 1, NULL, NULL, NULL,
-                             NULL,
-                             proc_diskstats_normalize, NULL, 256, limits, dim);
+    return _lnxproc_base_new(base, "proc_diskstats",
+                             _LNXPROC_BASE_TYPE_PREVIOUS, filenames, 1, NULL,
+                             NULL, NULL, NULL, proc_diskstats_normalize, NULL,
+                             256, limits, dim);
 }
 
 /*

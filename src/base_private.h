@@ -90,6 +90,7 @@ extern "C" {
     };
 
     LNXPROC_ERROR_T _lnxproc_base_new(_LNXPROC_BASE_T ** base,
+                                      char *tag,
                                       _LNXPROC_BASE_TYPE_T type,
                                       char **filenames,
                                       size_t nfiles,

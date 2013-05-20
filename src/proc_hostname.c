@@ -45,7 +45,7 @@ _lnxproc_proc_hostname_new(_LNXPROC_BASE_T ** base)
 {
 
     char *filenames[] = { "/proc/sys/kernel/hostname", };
-    return _lnxproc_base_new(base, _LNXPROC_BASE_TYPE_MEMOIZE,
+    return _lnxproc_base_new(base, "proc_hostname", _LNXPROC_BASE_TYPE_MEMOIZE,
                              filenames, 1, NULL, NULL, NULL,
                              NULL, proc_hostname_normalize, NULL, 64, NULL, 0);
 }

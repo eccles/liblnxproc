@@ -122,25 +122,30 @@ _lnxproc_results_print(_LNXPROC_RESULTS_T * results)
         return LNXPROC_ERROR_RESULTS_NULL;
     }
 
+    printf("Tag = %s\n", results->tag);
     printf("Jiffies per second = %ld\n", results->jiffies_per_sec);
     printf("Seconds per jiffy = %f\n", results->secs_per_jiffy);
     printf("Page size = %ld\n", results->page_size);
     printf("Table size = %zd\n", results->size);
     printf("Table length = %zd\n", results->length);
     printf("Hash = %p\n", results->hash);
+    char buf[32];
+
     if (results->hash) {
+        snprintf(buf, sizeof buf, "%s Hash", results->tag);
         _LNXPROC_RESULTS_TABLE_T *entry, *tmp;
 
         HASH_ITER(hh, results->hash, entry, tmp) {
-            internal_print_func(entry, "Hash");
+            internal_print_func(entry, buf);
         }
     }
-    return _lnxproc_results_iterate(results, internal_print_func, "Line");
+    snprintf(buf, sizeof buf, "%s Line", results->tag);
+    return _lnxproc_results_iterate(results, internal_print_func, buf);
 
 }
 
 LNXPROC_ERROR_T
-_lnxproc_results_new(_LNXPROC_RESULTS_T ** results)
+_lnxproc_results_new(_LNXPROC_RESULTS_T ** results, char *tag)
 {
     _LNXPROC_DEBUG("sizeof ptr %lu\n", sizeof(void *));
     _LNXPROC_DEBUG("sizeof _LNXPROC_RESULTS_T %lu\n",
@@ -163,6 +168,12 @@ _lnxproc_results_new(_LNXPROC_RESULTS_T ** results)
         return LNXPROC_ERROR_RESULTS_NULL;
     }
 
+    if (tag) {
+        p->tag = strdup(tag);
+    }
+    else {
+        p->tag = NULL;
+    }
     p->jiffies_per_sec = sysconf(_SC_CLK_TCK);
     p->secs_per_jiffy = 1.0 / p->jiffies_per_sec;
     p->page_size = sysconf(_SC_PAGE_SIZE) / 1024;
@@ -178,9 +189,13 @@ _lnxproc_results_free(_LNXPROC_RESULTS_T ** resultsptr)
     _LNXPROC_DEBUG("Results %p\n", resultsptr);
 
     if (resultsptr && *resultsptr) {
+        _LNXPROC_DEBUG("Free Results\n");
         _LNXPROC_RESULTS_T *results = *resultsptr;
 
-        _LNXPROC_DEBUG("Free Results\n");
+        if (results->tag) {
+            free(results->tag);
+            results->tag = NULL;
+        }
         HASH_CLEAR(hh, results->hash);
         _LNXPROC_DEBUG("Table hash freed to %p\n", results->hash);
         if (results->table) {
