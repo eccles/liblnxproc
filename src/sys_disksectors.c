@@ -52,7 +52,7 @@ iter_func(char *val, void *data, size_t idx[], size_t dim)
 }
 
 static LNXPROC_ERROR_T
-sys_disksectors_normalize(LNXPROC_BASE_T *base)
+sys_disksectors_normalize(_LNXPROC_BASE_T * base)
 {
 
     _LNXPROC_RESULTS_T *results = base->current->results;
@@ -70,7 +70,7 @@ sys_disksectors_normalize(LNXPROC_BASE_T *base)
 }
 
 LNXPROC_ERROR_T
-lnxproc_sys_disksectors_new(LNXPROC_BASE_T **base)
+_lnxproc_sys_disksectors_new(_LNXPROC_BASE_T ** base)
 {
 
     char *fileprefix = "/sys/block";
@@ -84,7 +84,7 @@ lnxproc_sys_disksectors_new(LNXPROC_BASE_T **base)
 
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
-    return _lnxproc_base_new(base, LNXPROC_BASE_TYPE_MEMOIZE,
+    return _lnxproc_base_new(base, _LNXPROC_BASE_TYPE_MEMOIZE,
                              NULL, 0, fileprefix, fileglob, filesuffix,
                              NULL, sys_disksectors_normalize, NULL,
                              256, limits, dim);

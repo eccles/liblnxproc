@@ -33,14 +33,14 @@
 #include "proc_pid_stat.h"
 
 static LNXPROC_MODULE_T mymodules[] = {
-    {.new = lnxproc_proc_cgroups_new,.base = NULL,.optional = NULL,},
-    {.new = lnxproc_proc_diskstats_new,.base = NULL,.optional = NULL,},
-    {.new = lnxproc_proc_domainname_new,.base = NULL,.optional = NULL,},
-    {.new = lnxproc_proc_hostname_new,.base = NULL,.optional = NULL,},
-    {.new = lnxproc_proc_osrelease_new,.base = NULL,.optional = NULL,},
-    {.new = lnxproc_sys_cpufreq_new,.base = NULL,.optional = NULL,},
-    {.new = lnxproc_sys_disksectors_new,.base = NULL,.optional = NULL,},
-    {.new = lnxproc_proc_pid_stat_new,.base = NULL,.optional = NULL,},
+    {.new = _lnxproc_proc_cgroups_new,.base = NULL,.optional = NULL,},
+    {.new = _lnxproc_proc_diskstats_new,.base = NULL,.optional = NULL,},
+    {.new = _lnxproc_proc_domainname_new,.base = NULL,.optional = NULL,},
+    {.new = _lnxproc_proc_hostname_new,.base = NULL,.optional = NULL,},
+    {.new = _lnxproc_proc_osrelease_new,.base = NULL,.optional = NULL,},
+    {.new = _lnxproc_sys_cpufreq_new,.base = NULL,.optional = NULL,},
+    {.new = _lnxproc_sys_disksectors_new,.base = NULL,.optional = NULL,},
+    {.new = _lnxproc_proc_pid_stat_new,.base = NULL,.optional = NULL,},
     {.new = NULL,.base = NULL,.optional = NULL,},
 };
 
@@ -109,7 +109,7 @@ lnxproc_read(LNXPROC_MODULE_T * modules)
                     return ret;
                 }
             }
-            LNXPROC_BASE_T *base = module->base;
+            _LNXPROC_BASE_T *base = module->base;
 
             ret = _lnxproc_base_rawread(base);
             if (ret) {
@@ -139,10 +139,10 @@ lnxproc_performance(LNXPROC_MODULE_T * modules,
         LNXPROC_MODULE_T *module = modules;
 
         while (module->new) {
-            LNXPROC_BASE_T *base = module->base;
+            _LNXPROC_BASE_T *base = module->base;
 
             if (base) {
-                LNXPROC_BASE_DATA_T *base_data = base->current;
+                _LNXPROC_BASE_DATA_T *base_data = base->current;
 
                 if (base_data) {
                     *rawread_time += base_data->rawread_time;
@@ -164,10 +164,10 @@ lnxproc_print(LNXPROC_MODULE_T * modules)
         LNXPROC_MODULE_T *module = modules;
 
         while (module->new) {
-            LNXPROC_BASE_T *base = module->base;
+            _LNXPROC_BASE_T *base = module->base;
 
             if (base) {
-                LNXPROC_BASE_DATA_T *base_data = module->base->current;
+                _LNXPROC_BASE_DATA_T *base_data = module->base->current;
 
                 if (base_data) {
                     _lnxproc_results_print(base_data->results);

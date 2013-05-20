@@ -42,7 +42,7 @@ typical contents of /proc/cgroups file::
 #include "proc_cgroups.h"
 
 static LNXPROC_ERROR_T
-proc_cgroups_normalize(LNXPROC_BASE_T *base)
+proc_cgroups_normalize(_LNXPROC_BASE_T * base)
 {
     _LNXPROC_RESULTS_T *results = base->current->results;
     _LNXPROC_ARRAY_T *array = base->current->array;
@@ -82,7 +82,7 @@ proc_cgroups_normalize(LNXPROC_BASE_T *base)
 }
 
 LNXPROC_ERROR_T
-lnxproc_proc_cgroups_new(LNXPROC_BASE_T **base)
+_lnxproc_proc_cgroups_new(_LNXPROC_BASE_T ** base)
 {
 
     _LNXPROC_LIMITS_T limits[] = {
@@ -97,7 +97,7 @@ lnxproc_proc_cgroups_new(LNXPROC_BASE_T **base)
     char *filenames[] = { "/proc/cgroups" };
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
-    return _lnxproc_base_new(base, LNXPROC_BASE_TYPE_VANILLA,
+    return _lnxproc_base_new(base, _LNXPROC_BASE_TYPE_VANILLA,
                              filenames, 1, NULL, NULL, NULL,
                              NULL, proc_cgroups_normalize, NULL, 256,
                              limits, dim);

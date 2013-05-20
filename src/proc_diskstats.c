@@ -129,9 +129,9 @@ derived_values(int i, int j, _LNXPROC_RESULTS_T * results,
 }
 
 static LNXPROC_ERROR_T
-proc_diskstats_normalize(LNXPROC_BASE_T *base)
+proc_diskstats_normalize(_LNXPROC_BASE_T * base)
 {
-    LNXPROC_BASE_DATA_T *data = base->current;
+    _LNXPROC_BASE_DATA_T *data = base->current;
     _LNXPROC_RESULTS_T *results = data->results;
     _LNXPROC_ARRAY_T *current = data->array;
 
@@ -139,7 +139,7 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
     _LNXPROC_DEBUG("Current results is at %p\n", results);
 
     float tdiff = 0.0;
-    LNXPROC_BASE_DATA_T *pdata = base->previous;
+    _LNXPROC_BASE_DATA_T *pdata = base->previous;
     _LNXPROC_RESULTS_T *presults = NULL;
 
     if (pdata) {
@@ -291,7 +291,7 @@ proc_diskstats_normalize(LNXPROC_BASE_T *base)
 }
 
 LNXPROC_ERROR_T
-lnxproc_proc_diskstats_new(LNXPROC_BASE_T **base)
+_lnxproc_proc_diskstats_new(_LNXPROC_BASE_T ** base)
 {
 
     _LNXPROC_LIMITS_T limits[] = {
@@ -305,7 +305,7 @@ lnxproc_proc_diskstats_new(LNXPROC_BASE_T **base)
     };
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
-    return _lnxproc_base_new(base, LNXPROC_BASE_TYPE_PREVIOUS,
+    return _lnxproc_base_new(base, _LNXPROC_BASE_TYPE_PREVIOUS,
                              filenames, 1, NULL, NULL, NULL,
                              NULL,
                              proc_diskstats_normalize, NULL, 256, limits, dim);

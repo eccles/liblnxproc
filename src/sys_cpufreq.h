@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-    LNXPROC_ERROR_T lnxproc_sys_cpufreq_new(LNXPROC_BASE_T **base);
+    LNXPROC_ERROR_T _lnxproc_sys_cpufreq_new(_LNXPROC_BASE_T ** base);
 
 #ifdef __cplusplus
 }                               // extern "C"

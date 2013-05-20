@@ -121,9 +121,9 @@ Description::
 #include "uthash.h"
 
 static LNXPROC_ERROR_T
-proc_pid_stat_normalize(LNXPROC_BASE_T *base)
+proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
 {
-    LNXPROC_BASE_DATA_T *data = base->current;
+    _LNXPROC_BASE_DATA_T *data = base->current;
     _LNXPROC_RESULTS_T *results = data->results;
     _LNXPROC_ARRAY_T *array = data->array;
 
@@ -246,7 +246,7 @@ proc_pid_stat_normalize(LNXPROC_BASE_T *base)
  * different pids may appear at different positions in the array - so we have to
  * remember the locations of each pid entry in order to calculate usage etc.
  */
-    LNXPROC_BASE_DATA_T *pdata = base->previous;
+    _LNXPROC_BASE_DATA_T *pdata = base->previous;
     _LNXPROC_RESULTS_T *presults = NULL;
 
     float tdiff = 0.0;
@@ -350,7 +350,7 @@ proc_pid_stat_normalize(LNXPROC_BASE_T *base)
 }
 
 LNXPROC_ERROR_T
-lnxproc_proc_pid_stat_new(LNXPROC_BASE_T **base)
+_lnxproc_proc_pid_stat_new(_LNXPROC_BASE_T ** base)
 {
 
     _LNXPROC_LIMITS_T limits[] = {
@@ -368,7 +368,7 @@ lnxproc_proc_pid_stat_new(LNXPROC_BASE_T **base)
     char *filesuffix = "stat";
     size_t dim = sizeof(limits) / sizeof(limits[0]);
 
-    return _lnxproc_base_new(base, LNXPROC_BASE_TYPE_PREVIOUS,
+    return _lnxproc_base_new(base, _LNXPROC_BASE_TYPE_PREVIOUS,
                              NULL, 0, fileprefix, fileglob, filesuffix,
                              NULL, proc_pid_stat_normalize, NULL, 256,
                              limits, dim);

@@ -43,15 +43,15 @@
 #include "limit_chr.h"
 
 char *
-lnxproc_base_typestr(LNXPROC_BASE_TYPE_T type, char *buf, size_t len)
+_lnxproc_base_typestr(_LNXPROC_BASE_TYPE_T type, char *buf, size_t len)
 {
-    static const char *typestr[LNXPROC_BASE_TYPE_SIZE] = {
+    static const char *typestr[_LNXPROC_BASE_TYPE_SIZE] = {
         "Base type : No attributes",
         "Base type : Previous results are stored",
         "Base type : Results are memoized",
     };
 
-    if (type >= 0 || type < LNXPROC_BASE_TYPE_SIZE) {
+    if (type >= 0 || type < _LNXPROC_BASE_TYPE_SIZE) {
         snprintf(buf, len, "%d:%s", type, typestr[type]);
     }
     else {
@@ -61,7 +61,7 @@ lnxproc_base_typestr(LNXPROC_BASE_TYPE_T type, char *buf, size_t len)
 }
 
 LNXPROC_ERROR_T
-_lnxproc_base_print(LNXPROC_BASE_T *base)
+_lnxproc_base_print(_LNXPROC_BASE_T * base)
 {
     _LNXPROC_DEBUG("Base %p\n", base);
 
@@ -70,7 +70,7 @@ _lnxproc_base_print(LNXPROC_BASE_T *base)
 
         printf("Base %p\n", base);
         printf("Attribute %s\n",
-               lnxproc_base_typestr(base->type, buf, sizeof buf));
+               _lnxproc_base_typestr(base->type, buf, sizeof buf));
         printf("Rawread %p\n", base->rawread);
         printf("Normalize %p\n", base->normalize);
         printf("Read %p\n", base->read);
@@ -85,7 +85,7 @@ _lnxproc_base_print(LNXPROC_BASE_T *base)
         }
         printf("No. of reads %lu\n", base->count);
 
-        LNXPROC_BASE_DATA_T *data = base->current;
+        _LNXPROC_BASE_DATA_T *data = base->current;
 
         printf("CURRENT at %p(%d)\n", data, data->id);
         printf("Timestamp %lu.%06lu\n",
@@ -178,7 +178,7 @@ base_rawread(char *filename, char **readbuf, int *nbytes)
 }
 
 static LNXPROC_ERROR_T
-base_read_glob_files(LNXPROC_BASE_T *base, char **readbuf, int *nbytes)
+base_read_glob_files(_LNXPROC_BASE_T * base, char **readbuf, int *nbytes)
 {
 
     const char *globwild = base->fileglob;
@@ -186,7 +186,7 @@ base_read_glob_files(LNXPROC_BASE_T *base, char **readbuf, int *nbytes)
     char globpat[FILENAME_MAX];
     char regpat[FILENAME_MAX];
 
-    LNXPROC_BASE_DATA_T *data = base->current;
+    _LNXPROC_BASE_DATA_T *data = base->current;
     _LNXPROC_ARRAY_T *array = data->array;
     size_t dim = array->dim;
     _LNXPROC_LIMITS_T *limits = array->limits;
@@ -303,9 +303,9 @@ base_read_glob_files(LNXPROC_BASE_T *base, char **readbuf, int *nbytes)
 }
 
 static LNXPROC_ERROR_T
-base_read_files(LNXPROC_BASE_T *base)
+base_read_files(_LNXPROC_BASE_T * base)
 {
-    LNXPROC_BASE_DATA_T *data = base->current;
+    _LNXPROC_BASE_DATA_T *data = base->current;
     int i;
     char *readbuf = data->lines;
     int nbytes = data->buflen;
@@ -331,7 +331,7 @@ base_read_files(LNXPROC_BASE_T *base)
 }
 
 static LNXPROC_ERROR_T
-base_new_rawread_buffer(LNXPROC_BASE_DATA_T * data, size_t newlen)
+base_new_rawread_buffer(_LNXPROC_BASE_DATA_T * data, size_t newlen)
 {
     _LNXPROC_DEBUG("Malloc lines buffer to %zd bytes\n", newlen);
     char *p = realloc(data->lines, newlen + 1);
@@ -349,19 +349,19 @@ base_new_rawread_buffer(LNXPROC_BASE_DATA_T * data, size_t newlen)
 }
 
 static LNXPROC_ERROR_T
-base_resize_rawread_buffer(LNXPROC_BASE_DATA_T * data)
+base_resize_rawread_buffer(_LNXPROC_BASE_DATA_T * data)
 {
     _LNXPROC_DEBUG("Resize lines buffer from %zd bytes\n", data->buflen);
     return base_new_rawread_buffer(data, data->buflen * 2);
 }
 
 static LNXPROC_ERROR_T
-base_rawread_default(LNXPROC_BASE_T *base)
+base_rawread_default(_LNXPROC_BASE_T * base)
 {
     _LNXPROC_DEBUG("Execute default rawread method\n");
 
     LNXPROC_ERROR_T ret;
-    LNXPROC_BASE_DATA_T *data = base->current;
+    _LNXPROC_BASE_DATA_T *data = base->current;
 
     do {
         ret = base_read_files(base);
@@ -378,19 +378,19 @@ base_rawread_default(LNXPROC_BASE_T *base)
 }
 
 LNXPROC_ERROR_T
-_lnxproc_base_rawread(LNXPROC_BASE_T *base)
+_lnxproc_base_rawread(_LNXPROC_BASE_T * base)
 {
     if (!base) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_NULL, "\n");
         return LNXPROC_ERROR_BASE_NULL;
     }
 
-    LNXPROC_BASE_DATA_T *data = base->current;
+    _LNXPROC_BASE_DATA_T *data = base->current;
 
     if (base->rawread) {
         LNXPROC_ERROR_T ret;
 
-        if (base->type == LNXPROC_BASE_TYPE_PREVIOUS) {
+        if (base->type == _LNXPROC_BASE_TYPE_PREVIOUS) {
             if (base->count > 0) {
                 ret = _lnxproc_base_store_previous(base);
                 if (ret) {
@@ -424,9 +424,9 @@ _lnxproc_base_rawread(LNXPROC_BASE_T *base)
 }
 
 LNXPROC_ERROR_T
-base_map(LNXPROC_BASE_T *base)
+base_map(_LNXPROC_BASE_T * base)
 {
-    LNXPROC_BASE_DATA_T *data = base->current;
+    _LNXPROC_BASE_DATA_T *data = base->current;
 
     struct timeval start = lnxproc_timeval();
 
@@ -538,7 +538,7 @@ base_map(LNXPROC_BASE_T *base)
 }
 
 static LNXPROC_ERROR_T
-array_new(LNXPROC_BASE_DATA_T * data, _LNXPROC_LIMITS_T limits[], size_t dim)
+array_new(_LNXPROC_BASE_DATA_T * data, _LNXPROC_LIMITS_T limits[], size_t dim)
 {
     if (limits && dim > 0) {
         LNXPROC_ERROR_T ret = _lnxproc_array_new(&data->array, limits, dim);
@@ -556,13 +556,13 @@ array_new(LNXPROC_BASE_DATA_T * data, _LNXPROC_LIMITS_T limits[], size_t dim)
 }
 
 static LNXPROC_ERROR_T
-base_null_method(LNXPROC_BASE_T *base)
+base_null_method(_LNXPROC_BASE_T * base)
 {
     return LNXPROC_OK;
 }
 
 LNXPROC_ERROR_T
-_lnxproc_base_normalize(LNXPROC_BASE_T *base)
+_lnxproc_base_normalize(_LNXPROC_BASE_T * base)
 {
 
     _LNXPROC_DEBUG("Base %p\n", base);
@@ -574,7 +574,7 @@ _lnxproc_base_normalize(LNXPROC_BASE_T *base)
 
     LNXPROC_ERROR_T ret;
 
-    LNXPROC_BASE_DATA_T *data = base->current;
+    _LNXPROC_BASE_DATA_T *data = base->current;
 
     if (base->normalize) {
 
@@ -595,7 +595,7 @@ _lnxproc_base_normalize(LNXPROC_BASE_T *base)
         _lnxproc_results_hash(data->results);
         end = lnxproc_timeval();
         data->hash_time = lnxproc_timeval_diff(&start, &end);
-        if (base->type == LNXPROC_BASE_TYPE_MEMOIZE) {
+        if (base->type == _LNXPROC_BASE_TYPE_MEMOIZE) {
             ret = _lnxproc_base_memoize(base);
             if (ret) {
                 _LNXPROC_ERROR_DEBUG(ret, "\n");
@@ -608,13 +608,14 @@ _lnxproc_base_normalize(LNXPROC_BASE_T *base)
     }
     else {
         data->map_time = 0.0;
+        data->hash_time = 0.0;
         data->normalize_time = 0.0;
     }
     return LNXPROC_OK;
 }
 
 LNXPROC_ERROR_T
-_lnxproc_base_read(LNXPROC_BASE_T *base)
+_lnxproc_base_read(_LNXPROC_BASE_T * base)
 {
 
     _LNXPROC_DEBUG("Base %p\n", base);
@@ -640,7 +641,7 @@ _lnxproc_base_read(LNXPROC_BASE_T *base)
 }
 
 static LNXPROC_ERROR_T
-_base_data_new(LNXPROC_BASE_DATA_T * data, int id,
+_base_data_new(_LNXPROC_BASE_DATA_T * data, int id,
                size_t buflen, _LNXPROC_LIMITS_T limits[], size_t dim)
 {
     _LNXPROC_DEBUG("New base data at %p index %d\n", data, id);
@@ -676,7 +677,7 @@ _base_data_new(LNXPROC_BASE_DATA_T * data, int id,
 }
 
 LNXPROC_ERROR_T
-_lnxproc_base_store_previous(LNXPROC_BASE_T *base)
+_lnxproc_base_store_previous(_LNXPROC_BASE_T * base)
 {
     if (base) {
         if (!base->previous) {
@@ -690,7 +691,7 @@ _lnxproc_base_store_previous(LNXPROC_BASE_T *base)
             }
             base->previous = base->data + 1;
         }
-        LNXPROC_BASE_DATA_T *tmp = base->current;
+        _LNXPROC_BASE_DATA_T *tmp = base->current;
 
         base->current = base->previous;
         base->previous = tmp;
@@ -699,16 +700,16 @@ _lnxproc_base_store_previous(LNXPROC_BASE_T *base)
 }
 
 LNXPROC_ERROR_T
-_lnxproc_base_new(LNXPROC_BASE_T **base,
-                  LNXPROC_BASE_TYPE_T type,
+_lnxproc_base_new(_LNXPROC_BASE_T ** base,
+                  _LNXPROC_BASE_TYPE_T type,
                   char **filenames,
                   size_t nfiles,
                   char *fileprefix,
                   char *fileglob,
                   char *filesuffix,
-                  LNXPROC_BASE_METHOD rawread,
-                  LNXPROC_BASE_METHOD normalize,
-                  LNXPROC_BASE_METHOD read,
+                  _LNXPROC_BASE_METHOD rawread,
+                  _LNXPROC_BASE_METHOD normalize,
+                  _LNXPROC_BASE_METHOD read,
                   size_t buflen, _LNXPROC_LIMITS_T limits[], size_t dim)
 {
     LNXPROC_ERROR_T ret;
@@ -723,7 +724,7 @@ _lnxproc_base_new(LNXPROC_BASE_T **base,
     _LNXPROC_DEBUG("buflen %zd\n", buflen);
     _LNXPROC_DEBUG("limits %p dim %zd\n", limits, dim);
     _LNXPROC_DEBUG("sizeof ptr %lu\n", sizeof(void *));
-    _LNXPROC_DEBUG("sizeof LNXPROC_BASE_T %lu\n", sizeof(LNXPROC_BASE_T));
+    _LNXPROC_DEBUG("sizeof LNXPROC_BASE_T %lu\n", sizeof(_LNXPROC_BASE_T));
 
     if ((filenames && (nfiles < 1)) || (!filenames && (nfiles > 0))) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_BAD_FILENAME,
@@ -737,7 +738,7 @@ _lnxproc_base_new(LNXPROC_BASE_T **base,
         return LNXPROC_ERROR_BASE_BAD_FILENAME;
     }
 
-    LNXPROC_BASE_T *p = calloc(1, sizeof(LNXPROC_BASE_T));
+    _LNXPROC_BASE_T *p = calloc(1, sizeof(_LNXPROC_BASE_T));
 
     if (!p) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_BASE, "Malloc base\n");
@@ -854,7 +855,7 @@ _lnxproc_base_new(LNXPROC_BASE_T **base,
 }
 
 static void
-base_data_free(LNXPROC_BASE_DATA_T * data)
+base_data_free(_LNXPROC_BASE_DATA_T * data)
 {
     if (data) {
         if (data->array) {
@@ -874,12 +875,12 @@ base_data_free(LNXPROC_BASE_DATA_T * data)
 }
 
 LNXPROC_ERROR_T
-_lnxproc_base_free(LNXPROC_BASE_T **baseptr)
+_lnxproc_base_free(_LNXPROC_BASE_T ** baseptr)
 {
     _LNXPROC_DEBUG("Base %p\n", baseptr);
 
     if (baseptr && *baseptr) {
-        LNXPROC_BASE_T *base = *baseptr;
+        _LNXPROC_BASE_T *base = *baseptr;
 
         base_data_free(base->current);
         base_data_free(base->previous);
@@ -919,7 +920,7 @@ _lnxproc_base_free(LNXPROC_BASE_T **baseptr)
 }
 
 LNXPROC_ERROR_T
-_lnxproc_base_memoize(LNXPROC_BASE_T *base)
+_lnxproc_base_memoize(_LNXPROC_BASE_T * base)
 {
     if (!base) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_NULL, "\n");
@@ -942,7 +943,7 @@ _lnxproc_base_memoize(LNXPROC_BASE_T *base)
 }
 
 LNXPROC_ERROR_T
-_lnxproc_base_unmemoize(LNXPROC_BASE_T *base)
+_lnxproc_base_unmemoize(_LNXPROC_BASE_T * base)
 {
     if (!base) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_NULL, "\n");
@@ -966,7 +967,7 @@ _lnxproc_base_unmemoize(LNXPROC_BASE_T *base)
 
 #ifdef LNXPROC_UNUSED
 static LNXPROC_ERROR_T
-base_variable_rate(LNXPROC_BASE_T *base,
+base_variable_rate(_LNXPROC_BASE_T * base,
                    size_t idx[], size_t dim, long tdiff, float scale, char *buf,
                    size_t len)
 {
@@ -989,7 +990,7 @@ base_variable_rate(LNXPROC_BASE_T *base,
 }
 
 LNXPROC_ERROR_T
-_lnxproc_base_variable_rate(LNXPROC_BASE_T *base,
+_lnxproc_base_variable_rate(_LNXPROC_BASE_T * base,
                             size_t idx[], size_t dim, long tdiff, float scale,
                             char *buf, size_t len)
 {
@@ -1016,7 +1017,7 @@ _lnxproc_base_variable_rate(LNXPROC_BASE_T *base,
 #endif
 
 LNXPROC_ERROR_T
-_lnxproc_base_timeval_diff(LNXPROC_BASE_T *base, float *tdiff)
+_lnxproc_base_timeval_diff(_LNXPROC_BASE_T * base, float *tdiff)
 {
     *tdiff = 0.0;
     if (!base) {
@@ -1041,7 +1042,7 @@ _lnxproc_base_timeval_diff(LNXPROC_BASE_T *base, float *tdiff)
 
 #ifdef LNXPROC_UNUSED
 LNXPROC_ERROR_T
-_lnxproc_base_variable_sample_rate(LNXPROC_BASE_T *base,
+_lnxproc_base_variable_sample_rate(_LNXPROC_BASE_T * base,
                                    size_t idx[], size_t dim, float scale,
                                    char *buf, size_t len)
 {
@@ -1069,7 +1070,7 @@ _lnxproc_base_variable_sample_rate(LNXPROC_BASE_T *base,
 }
 
 LNXPROC_ERROR_T
-_lnxproc_base_variable_usage(LNXPROC_BASE_T *base,
+_lnxproc_base_variable_usage(_LNXPROC_BASE_T * base,
                              size_t idx[], size_t dim, float scale, char *buf,
                              size_t len)
 {

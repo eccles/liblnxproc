@@ -19,7 +19,7 @@
  */
 
 #ifndef LIBLNXPROC_PROC_PID_STAT_H
-#define LIBLNXPROC_PROC_PID_STAT 1_H
+#define LIBLNXPROC_PROC_PID_STAT_H 1
 
 #include <lnxproc/error.h>
 #include "base_private.h"
@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-    LNXPROC_ERROR_T lnxproc_proc_pid_stat_new(LNXPROC_BASE_T **base);
+    LNXPROC_ERROR_T _lnxproc_proc_pid_stat_new(_LNXPROC_BASE_T ** base);
 
 #ifdef __cplusplus
 }                               // extern "C"
