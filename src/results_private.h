@@ -24,9 +24,9 @@
 #include "util_private.h"
 #include "error_private.h"
 
-//#ifdef DEBUG
-//#define HASH_DEBUG 1
-//#endif
+#ifdef DEBUG
+#define HASH_DEBUG 1
+#endif
 #include "uthash.h"
 
 #ifdef __cplusplus
