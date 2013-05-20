@@ -993,7 +993,7 @@ _lnxproc_base_timeval_diff(_LNXPROC_BASE_T * base, float *tdiff)
     }
 
     *tdiff =
-        1.e-6 * lnxproc_timeval_diff(&base->previous->tv, &base->current->tv);
+        1.e-6 * lnxproc_timeval_diff(&base->current->tv, &base->previous->tv);
     return LNXPROC_OK;
 }
 
