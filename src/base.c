@@ -917,7 +917,7 @@ _lnxproc_base_free(_LNXPROC_BASE_T ** baseptr)
 
         _LNXPROC_DEBUG("Free Base\n");
         free(base);
-        base = NULL;
+        *baseptr = NULL;
     }
 
     return LNXPROC_OK;

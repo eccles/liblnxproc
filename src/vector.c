@@ -181,7 +181,7 @@ _lnxproc_vector_free(_LNXPROC_VECTOR_T ** vectorptr)
         }
         _LNXPROC_DEBUG("Free vector %p\n", vector);
         free(vector);
-        vector = NULL;
+        *vectorptr = NULL;
     }
 
     _LNXPROC_DEBUG("Success\n");

@@ -203,7 +203,7 @@ _lnxproc_results_free(_LNXPROC_RESULTS_T ** resultsptr)
             results->table = NULL;
         }
         free(results);
-        results = NULL;
+        *resultsptr = NULL;
     }
 
     return LNXPROC_OK;

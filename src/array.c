@@ -178,6 +178,7 @@ _lnxproc_array_free(_LNXPROC_ARRAY_T ** arrayptr)
         _LNXPROC_DEBUG("Free array %p\n", array);
         free(array);
         array = NULL;
+        *arrayptr = NULL;
     }
 
     _LNXPROC_DEBUG("Success\n");
