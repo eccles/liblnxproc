@@ -965,57 +965,6 @@ _lnxproc_base_unmemoize(_LNXPROC_BASE_T * base)
     return LNXPROC_OK;
 }
 
-#ifdef LNXPROC_UNUSED
-static LNXPROC_ERROR_T
-base_variable_rate(_LNXPROC_BASE_T * base,
-                   size_t idx[], size_t dim, long tdiff, float scale, char *buf,
-                   size_t len)
-{
-
-    int diff;
-
-    LNXPROC_ERROR_T ret =
-        _lnxproc_array_diff(base->previous->array, base->current->array, idx,
-                            dim,
-                            &diff);
-
-    if (ret) {
-        return ret;
-    }
-    float rate = (scale * diff) / (tdiff * 1.e-6);
-
-    snprintf(buf, len, "%f", rate);
-
-    return LNXPROC_OK;
-}
-
-LNXPROC_ERROR_T
-_lnxproc_base_variable_rate(_LNXPROC_BASE_T * base,
-                            size_t idx[], size_t dim, long tdiff, float scale,
-                            char *buf, size_t len)
-{
-    *buf = '\0';
-    snprintf(buf, len, "0");
-
-    if (!base) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_NULL, "\n");
-        return LNXPROC_ERROR_BASE_NULL;
-    }
-
-    if (!base->previous) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_PREVIOUS_NULL, "\n");
-        return LNXPROC_ERROR_BASE_PREVIOUS_NULL;
-    }
-
-    if (!base->current->array || !base->previous->array) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_ARRAY_NULL, "\n");
-        return LNXPROC_ERROR_BASE_ARRAY_NULL;
-    }
-
-    return base_variable_rate(base, idx, dim, tdiff, scale, buf, len);
-}
-#endif
-
 LNXPROC_ERROR_T
 _lnxproc_base_timeval_diff(_LNXPROC_BASE_T * base, float *tdiff)
 {
@@ -1039,78 +988,6 @@ _lnxproc_base_timeval_diff(_LNXPROC_BASE_T * base, float *tdiff)
         1.e-6 * lnxproc_timeval_diff(&base->previous->tv, &base->current->tv);
     return LNXPROC_OK;
 }
-
-#ifdef LNXPROC_UNUSED
-LNXPROC_ERROR_T
-_lnxproc_base_variable_sample_rate(_LNXPROC_BASE_T * base,
-                                   size_t idx[], size_t dim, float scale,
-                                   char *buf, size_t len)
-{
-    *buf = '\0';
-    snprintf(buf, len, "0");
-
-    if (!base) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_NULL, "\n");
-        return LNXPROC_ERROR_BASE_NULL;
-    }
-
-    if (!base->previous) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_PREVIOUS_NULL, "\n");
-        return LNXPROC_ERROR_BASE_PREVIOUS_NULL;
-    }
-
-    if (!base->current->array || !base->previous->array) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_ARRAY_NULL, "\n");
-        return LNXPROC_ERROR_BASE_ARRAY_NULL;
-    }
-
-    long tdiff = lnxproc_timeval_diff(&base->previous->tv, &base->current->tv);
-
-    return base_variable_rate(base, idx, dim, tdiff, scale, buf, len);
-}
-
-LNXPROC_ERROR_T
-_lnxproc_base_variable_usage(_LNXPROC_BASE_T * base,
-                             size_t idx[], size_t dim, float scale, char *buf,
-                             size_t len)
-{
-    *buf = '\0';
-    snprintf(buf, len, "0");
-
-    if (!base) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_NULL, "\n");
-        return LNXPROC_ERROR_BASE_NULL;
-    }
-
-    if (!base->previous) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_PREVIOUS_NULL, "\n");
-        return LNXPROC_ERROR_BASE_PREVIOUS_NULL;
-    }
-
-    if (!base->current->array || !base->previous->array) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_ARRAY_NULL, "\n");
-        return LNXPROC_ERROR_BASE_ARRAY_NULL;
-    }
-
-    int diff;
-
-    LNXPROC_ERROR_T ret =
-        _lnxproc_array_diff(base->previous->array, base->current->array, idx,
-                            dim,
-                            &diff);
-
-    if (ret) {
-        return ret;
-    }
-
-    long tdiff = lnxproc_timeval_diff(&base->previous->tv, &base->current->tv);
-
-    float percent = (100.0 * scale * diff) / (tdiff * 1.e-6);
-
-    snprintf(buf, len, "%f", percent);
-    return LNXPROC_OK;
-}
-#endif
 
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab

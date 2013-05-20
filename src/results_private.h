@@ -112,8 +112,6 @@ extern "C" {
     LNXPROC_ERROR_T _lnxproc_results_add_string(_LNXPROC_RESULTS_T * results,
                                                 const char *key,
                                                 const char *value);
-    //LNXPROC_ERROR_T _lnxproc_results_add(_LNXPROC_RESULTS_T * results,
-    //                                     _LNXPROC_RESULTS_TABLE_T * entry);
 
     typedef int (*_LNXPROC_RESULTS_ITERATE_FUNC) (_LNXPROC_RESULTS_TABLE_T *
                                                   entry, void *data);

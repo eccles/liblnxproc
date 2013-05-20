@@ -112,26 +112,7 @@ extern "C" {
     LNXPROC_ERROR_T _lnxproc_base_rawread(_LNXPROC_BASE_T * base);
     LNXPROC_ERROR_T _lnxproc_base_normalize(_LNXPROC_BASE_T * base);
     LNXPROC_ERROR_T _lnxproc_base_print(_LNXPROC_BASE_T * base);
-
-#ifdef LNXPROC_UNUSED
-    LNXPROC_ERROR_T _lnxproc_base_variable_usage(_LNXPROC_BASE_T * base,
-                                                 size_t idx[], size_t dim,
-                                                 float scale, char *buf,
-                                                 size_t len);
-
-    LNXPROC_ERROR_T _lnxproc_base_variable_rate(_LNXPROC_BASE_T * base,
-                                                size_t idx[], size_t dim,
-                                                long tdiff, float scale,
-                                                char *buf, size_t len);
-
-    LNXPROC_ERROR_T _lnxproc_base_variable_sample_rate(_LNXPROC_BASE_T * base,
-                                                       size_t idx[], size_t dim,
-                                                       float scale, char *buf,
-                                                       size_t len);
-#endif
-
     LNXPROC_ERROR_T _lnxproc_base_store_previous(_LNXPROC_BASE_T * base);
-
     LNXPROC_ERROR_T _lnxproc_base_memoize(_LNXPROC_BASE_T * base);
     LNXPROC_ERROR_T _lnxproc_base_unmemoize(_LNXPROC_BASE_T * base);
     LNXPROC_ERROR_T _lnxproc_base_timeval_diff(_LNXPROC_BASE_T * base,

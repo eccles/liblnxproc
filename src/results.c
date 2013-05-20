@@ -439,38 +439,6 @@ _lnxproc_results_add_long(_LNXPROC_RESULTS_T * results, const char *key,
     return LNXPROC_OK;
 }
 
-#ifdef UNUSED
-LNXPROC_ERROR_T
-_lnxproc_results_add(_LNXPROC_RESULTS_T * results,
-                     _LNXPROC_RESULTS_TABLE_T * entry)
-{
-    LNXPROC_ERROR_T ret = results_add_entry(results);
-
-    if (ret) {
-        return ret;
-    }
-    if (!entry) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_VAL_ADDRESS_NULL, "\n");
-        return LNXPROC_ERROR_RESULTS_VAL_ADDRESS_NULL;
-    }
-
-#ifdef DEBUG
-    char buf[64];
-
-    _LNXPROC_DEBUG("Results %1$p Entry Key %2$p '%2$s' Value %3$p '%3$s'\n",
-                   results, entry->key,
-                   _lnxproc_results_table_valuestr(entry, buf, sizeof buf));
-#endif
-
-    _LNXPROC_RESULTS_TABLE_T *tentry = results->table + results->length;
-
-    memcpy(tentry, entry, sizeof(*tentry));
-    results->length++;
-
-    return LNXPROC_OK;
-}
-#endif
-
 LNXPROC_ERROR_T
 _lnxproc_results_iterate(_LNXPROC_RESULTS_T * results,
                          _LNXPROC_RESULTS_ITERATE_FUNC func, void *data)
