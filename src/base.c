@@ -729,6 +729,10 @@ _lnxproc_base_new(_LNXPROC_BASE_T ** base,
     _LNXPROC_DEBUG("sizeof ptr %lu\n", sizeof(void *));
     _LNXPROC_DEBUG("sizeof LNXPROC_BASE_T %lu\n", sizeof(_LNXPROC_BASE_T));
 
+    if (!base) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_ADDRESS_NULL, "Malloc base\n");
+        return LNXPROC_ERROR_BASE_ADDRESS_NULL;
+    }
     if ((filenames && (nfiles < 1)) || (!filenames && (nfiles > 0))) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_BAD_FILENAME,
                              "Filenames %p Nfiles %zd\n", filenames, nfiles);

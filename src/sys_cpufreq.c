@@ -44,7 +44,7 @@ sys_cpufreq_normalize(_LNXPROC_BASE_T * base)
 }
 
 LNXPROC_ERROR_T
-_lnxproc_sys_cpufreq_new(_LNXPROC_BASE_T ** base)
+_lnxproc_sys_cpufreq_new(_LNXPROC_BASE_T ** base, void *optional)
 {
 
     char *filenames[] =

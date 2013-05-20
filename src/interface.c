@@ -47,32 +47,50 @@ static LNXPROC_MODULE_T mymodules[] = {
 static size_t nmodules = sizeof(mymodules) / sizeof(mymodules[0]);
 
 LNXPROC_ERROR_T
-lnxproc_init(LNXPROC_MODULE_T ** modulesptr, LNXPROC_MODULE_TYPE_T type,
-             void *optional)
+lnxproc_new(LNXPROC_MODULE_T ** moduleptr, size_t nmodule)
 {
-    int n;
+    if (!moduleptr) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_INTERFACE_ADDRESS_NULL,
+                             "Malloc interface\n");
+        return LNXPROC_ERROR_INTERFACE_ADDRESS_NULL;
+    }
 
-    if (type == LNXPROC_ALL) {
-        n = nmodules;
+    LNXPROC_MODULE_T *p;
+
+    if (nmodule == 0) {
+        p = calloc(nmodules, sizeof(LNXPROC_MODULE_T));
     }
     else {
-        n = 2;
+        p = calloc(nmodule + 1, sizeof(LNXPROC_MODULE_T));
     }
-    LNXPROC_MODULE_T *p = calloc(n, sizeof(LNXPROC_MODULE_T));
 
     if (!p) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_INTERFACE_MALLOC_INTERFACE,
                              "Malloc interface\n");
         return LNXPROC_ERROR_INTERFACE_MALLOC_INTERFACE;
     }
-    if (type == LNXPROC_ALL) {
-        memcpy(p, mymodules, n * sizeof(LNXPROC_MODULE_T));
+    if (nmodule == 0) {
+        memcpy(p, mymodules, nmodules * sizeof(LNXPROC_MODULE_T));
     }
     else {
-        memcpy(p, mymodules + type - 1, sizeof(LNXPROC_MODULE_T));
-        memcpy(p + 1, mymodules + nmodules - 1, sizeof(LNXPROC_MODULE_T));
+        memcpy(p + nmodule, mymodules + nmodules - 1, sizeof(LNXPROC_MODULE_T));
     }
-    *modulesptr = p;
+    *moduleptr = p;
+    return LNXPROC_OK;
+}
+
+LNXPROC_ERROR_T
+lnxproc_set(LNXPROC_MODULE_T * module, size_t pos, LNXPROC_MODULE_TYPE_T type,
+            void *optional, size_t optlen)
+{
+    if (!module) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_INTERFACE_NULL, "\n");
+        return LNXPROC_ERROR_INTERFACE_NULL;
+    }
+    memcpy(module + pos, mymodules + type - 1, sizeof(LNXPROC_MODULE_T));
+    if (optional && optlen > 0) {
+        module[pos].optional = memdup(optional, optlen);
+    }
     return LNXPROC_OK;
 }
 
@@ -85,9 +103,12 @@ lnxproc_free(LNXPROC_MODULE_T ** modulesptr)
 
         while (module->new) {
             _LNXPROC_BASE_FREE(module->base);
+            if (module->optional)
+                free(module->optional);
             module++;
         }
         free(modules);
+        *modulesptr = NULL;
     }
     return LNXPROC_OK;
 }
@@ -103,7 +124,7 @@ lnxproc_read(LNXPROC_MODULE_T * modules)
 
         while (module->new) {
             if (!module->base) {
-                ret = module->new(&module->base);
+                ret = module->new(&module->base, module->optional);
 
                 if (ret) {
                     return ret;

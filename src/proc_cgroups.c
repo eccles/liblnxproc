@@ -82,7 +82,7 @@ proc_cgroups_normalize(_LNXPROC_BASE_T * base)
 }
 
 LNXPROC_ERROR_T
-_lnxproc_proc_cgroups_new(_LNXPROC_BASE_T ** base)
+_lnxproc_proc_cgroups_new(_LNXPROC_BASE_T ** base, void *optional)
 {
 
     _LNXPROC_LIMITS_T limits[] = {

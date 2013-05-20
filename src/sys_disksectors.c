@@ -70,11 +70,18 @@ sys_disksectors_normalize(_LNXPROC_BASE_T * base)
 }
 
 LNXPROC_ERROR_T
-_lnxproc_sys_disksectors_new(_LNXPROC_BASE_T ** base)
+_lnxproc_sys_disksectors_new(_LNXPROC_BASE_T ** base, void *optional)
 {
 
     char *fileprefix = "/sys/block";
-    char *fileglob = "*";
+    char *fileglob;
+
+    if (optional) {
+        fileglob = optional;
+    }
+    else {
+        fileglob = "*";
+    }
     char *filesuffix = "queue/hw_sector_size";
 
     _LNXPROC_LIMITS_T limits[] = {

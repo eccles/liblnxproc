@@ -28,9 +28,11 @@ memdup(void *old, size_t len)
 {
     void *ret = NULL;
 
-    ret = calloc(1, len);
-    if (ret) {
-        memcpy(ret, old, len);
+    if (old && len > 0) {
+        ret = calloc(1, len);
+        if (ret) {
+            memcpy(ret, old, len);
+        }
     }
     return ret;
 }

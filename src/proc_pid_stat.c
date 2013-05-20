@@ -350,7 +350,7 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
 }
 
 LNXPROC_ERROR_T
-_lnxproc_proc_pid_stat_new(_LNXPROC_BASE_T ** base)
+_lnxproc_proc_pid_stat_new(_LNXPROC_BASE_T ** base, void *optional)
 {
 
     _LNXPROC_LIMITS_T limits[] = {
@@ -363,7 +363,14 @@ _lnxproc_proc_pid_stat_new(_LNXPROC_BASE_T ** base)
     };
 
     char *fileprefix = "/proc";
-    char *fileglob = "[1-9]*";
+    char *fileglob;
+
+    if (optional) {
+        fileglob = optional;
+    }
+    else {
+        fileglob = "[1-9]*";
+    }
 
     char *filesuffix = "stat";
     size_t dim = sizeof(limits) / sizeof(limits[0]);

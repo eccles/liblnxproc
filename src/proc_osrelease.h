@@ -28,7 +28,8 @@
 extern "C" {
 #endif
 
-    LNXPROC_ERROR_T _lnxproc_proc_osrelease_new(_LNXPROC_BASE_T ** base);
+    LNXPROC_ERROR_T _lnxproc_proc_osrelease_new(_LNXPROC_BASE_T ** base,
+                                                void *optional);
 
 #ifdef __cplusplus
 }                               // extern "C"

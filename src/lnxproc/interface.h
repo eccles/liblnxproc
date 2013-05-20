@@ -43,9 +43,10 @@ extern "C" {
 
     typedef struct lnxproc_module_t LNXPROC_MODULE_T;
 
-    LNXPROC_ERROR_T lnxproc_init(LNXPROC_MODULE_T ** modulesptr,
-                                 LNXPROC_MODULE_TYPE_T type, void *optional);
-
+    LNXPROC_ERROR_T lnxproc_new(LNXPROC_MODULE_T ** moduleptr, size_t nmodule);
+    LNXPROC_ERROR_T lnxproc_set(LNXPROC_MODULE_T * module, size_t pos,
+                                LNXPROC_MODULE_TYPE_T type, void *optional,
+                                size_t optlen);
     LNXPROC_ERROR_T lnxproc_free(LNXPROC_MODULE_T ** modulesptr);
 
 #define LNXPROC_FREE(b) {\

@@ -40,7 +40,7 @@ proc_osrelease_normalize(_LNXPROC_BASE_T * base)
 }
 
 LNXPROC_ERROR_T
-_lnxproc_proc_osrelease_new(_LNXPROC_BASE_T ** base)
+_lnxproc_proc_osrelease_new(_LNXPROC_BASE_T ** base, void *optional)
 {
 
     char *filenames[] = { "/proc/sys/kernel/osrelease", };

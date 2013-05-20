@@ -236,7 +236,7 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
                 strcpy(pentry.key, pkey);
                 LNXPROC_ERROR_T ret = _lnxproc_results_fetch(presults, &pentry);
 
-                if (!ret)
+                if (ret)
                     continue;
 
                 _LNXPROC_DEBUG("%d,%d:Prev %s = %f\n", i, k, pentry.key,
@@ -291,7 +291,7 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
 }
 
 LNXPROC_ERROR_T
-_lnxproc_proc_diskstats_new(_LNXPROC_BASE_T ** base)
+_lnxproc_proc_diskstats_new(_LNXPROC_BASE_T ** base, void *optional)
 {
 
     _LNXPROC_LIMITS_T limits[] = {
