@@ -31,10 +31,16 @@ extern "C" {
     typedef LNXPROC_ERROR_T (*_LNXPROC_METHOD) (_LNXPROC_BASE_T ** base,
                                                 void *optional);
 
-    struct lnxproc_module_t {
+    struct _lnxproc_module_row_t {
         _LNXPROC_METHOD new;
         _LNXPROC_BASE_T *base;
         void *optional;
+    };
+    typedef struct _lnxproc_module_row_t _LNXPROC_MODULE_ROW_T;
+
+    struct lnxproc_module_t {
+        size_t nmodules;
+        _LNXPROC_MODULE_ROW_T row[];
     };
 
 #ifdef __cplusplus
