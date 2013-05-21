@@ -85,22 +85,29 @@ LNXPROC_ERROR_T
 _lnxproc_proc_cgroups_new(_LNXPROC_BASE_T ** base, void *optional)
 {
 
-    _LNXPROC_LIMITS_T limits[] = {
-        {.expected = 9,
-         .chars = "\n",
-         .len = 1},             /* row delimiters */
-        {.expected = 4,
-         .chars = "\t",
-         .len = 1}              /* column delimiters */
-    };
+    _LNXPROC_LIMITS_T *limits = NULL;
+    LNXPROC_ERROR_T ret = _lnxproc_limits_new(&limits, 2);
+
+    if (ret) {
+        return ret;
+    }
+    ret = _lnxproc_limits_set(limits, 0, 9, "\n", 1);   /* row delimiters */
+    if (ret) {
+        _LNXPROC_LIMITS_FREE(limits);
+        return ret;
+    }
+    ret = _lnxproc_limits_set(limits, 1, 4, "\t", 1);   /* column delimiters */
+    if (ret) {
+        _LNXPROC_LIMITS_FREE(limits);
+        return ret;
+    }
 
     char *filenames[] = { "/proc/cgroups" };
-    size_t dim = sizeof(limits) / sizeof(limits[0]);
-
-    return _lnxproc_base_new(base, "proc_cgroups", _LNXPROC_BASE_TYPE_VANILLA,
-                             filenames, 1, NULL, NULL, NULL,
-                             NULL, proc_cgroups_normalize, NULL, 256,
-                             limits, dim);
+    ret = _lnxproc_base_new(base, "proc_cgroups", _LNXPROC_BASE_TYPE_VANILLA,
+                            filenames, 1, NULL, NULL, NULL,
+                            NULL, proc_cgroups_normalize, NULL, 256, limits);
+    _LNXPROC_LIMITS_FREE(limits);
+    return ret;
 }
 
 /*

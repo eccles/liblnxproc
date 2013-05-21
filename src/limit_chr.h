@@ -33,7 +33,7 @@ extern "C" {
  * because we want to include the trailing NUL char if required
  */
 
-    static inline char *limit_chr(_LNXPROC_LIMITS_T * limit, char c) {
+    static inline char *limit_chr(_LNXPROC_LIMITS_ROW_T * limit, char c) {
         if (limit) {
             int i;
 

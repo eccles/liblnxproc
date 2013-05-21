@@ -34,14 +34,13 @@ extern "C" {
 
     struct _lnxproc_array_t {
         _LNXPROC_LIMITS_T *limits;
-        size_t dim;
         _LNXPROC_VECTOR_T *vector;
         char *data;
     };
     typedef struct _lnxproc_array_t _LNXPROC_ARRAY_T;
 
     LNXPROC_ERROR_T _lnxproc_array_new(_LNXPROC_ARRAY_T ** array,
-                                       _LNXPROC_LIMITS_T limits[], size_t dim);
+                                       _LNXPROC_LIMITS_T * limits);
 
     LNXPROC_ERROR_T _lnxproc_array_free(_LNXPROC_ARRAY_T ** arrayptr);
 

@@ -31,19 +31,20 @@
 #include "limits_private.h"
 
 LNXPROC_ERROR_T
-_lnxproc_limits_print(_LNXPROC_LIMITS_T limits[], int dim)
+_lnxproc_limits_print(_LNXPROC_LIMITS_T * limits)
 {
     if (!limits) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_NULL, "\n");
         return LNXPROC_ERROR_LIMITS_NULL;
     }
 
+    printf("Dim %zd\n", limits->dim);
     int i;
 
-    for (i = 0; i < dim; i++) {
+    for (i = 0; i < limits->dim; i++) {
         char buf[64];
 
-        _lnxproc_limit_print(limits + i, buf, sizeof buf);
+        _lnxproc_limit_print(limits->row + i, buf, sizeof buf);
 
         printf("Limit %d :%s:\n", i, buf);
     }
@@ -102,11 +103,11 @@ _lnxproc_chars_print(char *chars, size_t nchars, char *buf, size_t buflen)
 }
 
 LNXPROC_ERROR_T
-_lnxproc_limit_print(_LNXPROC_LIMITS_T * limit, char *buf, size_t buflen)
+_lnxproc_limit_print(_LNXPROC_LIMITS_ROW_T * row, char *buf, size_t buflen)
 {
     buf[0] = '\0';
 
-    if (!limit) {
+    if (!row) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_NULL, "\n");
         return LNXPROC_ERROR_LIMIT_NULL;
     }
@@ -115,16 +116,72 @@ _lnxproc_limit_print(_LNXPROC_LIMITS_T * limit, char *buf, size_t buflen)
     char *b = buf;
     int len = buflen - 1;
 
-    m = snprintf(b, len, "Exp %zd: Len %d: ", limit->expected, limit->len);
+    m = snprintf(b, len, "Exp %zd: Len %d: ", row->expected, row->len);
     b += m;
     len -= m;
 
-    return _lnxproc_chars_print(limit->chars, limit->len, b, len);
+    return _lnxproc_chars_print(row->chars, row->len, b, len);
 }
 
 LNXPROC_ERROR_T
-_lnxproc_limits_dup(_LNXPROC_LIMITS_T ** newlimits,
-                    _LNXPROC_LIMITS_T limits[], size_t dim)
+_lnxproc_limits_new(_LNXPROC_LIMITS_T ** newlimits, size_t dim)
+{
+    if (!newlimits) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_ADDRESS_NULL, "\n");
+        return LNXPROC_ERROR_LIMITS_ADDRESS_NULL;
+    }
+    if (*newlimits) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_ADDRESS_CONTENTS_NOT_NULL,
+                             "\n");
+        return LNXPROC_ERROR_LIMITS_ADDRESS_CONTENTS_NOT_NULL;
+    }
+    _LNXPROC_DEBUG("Malloc limits %zd\n", dim);
+    _LNXPROC_LIMITS_T *nlimits = calloc(1,
+                                        sizeof(_LNXPROC_LIMITS_T) +
+                                        (dim * sizeof(_LNXPROC_LIMITS_ROW_T)));
+    if (!nlimits) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_MALLOC, "Malloc limits\n");
+        return LNXPROC_ERROR_LIMITS_MALLOC;
+    }
+    nlimits->dim = dim;
+    *newlimits = nlimits;
+    return LNXPROC_OK;
+}
+
+LNXPROC_ERROR_T
+_lnxproc_limits_set(_LNXPROC_LIMITS_T * limits, int pos, size_t expected,
+                    char *chars, int len)
+{
+    if (!limits) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_NULL, "\n");
+        return LNXPROC_ERROR_LIMITS_NULL;
+    }
+    if (pos < 0 || pos >= limits->dim) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_ILLEGAL_DIMENSION,
+                             "pos = %d\n", pos);
+        return LNXPROC_ERROR_LIMITS_ILLEGAL_DIMENSION;
+    }
+
+    char *c = strdup(chars);
+
+    if (!c) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_CHARS_MALLOC,
+                             "Malloc chars\n");
+        return LNXPROC_ERROR_LIMITS_CHARS_MALLOC;
+    }
+
+    _LNXPROC_LIMITS_ROW_T *row = limits->row + pos;
+
+    row->expected = expected;
+    if (row->chars)
+        free(row->chars);
+    row->chars = c;
+    row->len = len;
+    return LNXPROC_OK;
+}
+
+LNXPROC_ERROR_T
+_lnxproc_limits_dup(_LNXPROC_LIMITS_T ** newlimits, _LNXPROC_LIMITS_T * limits)
 {
     _LNXPROC_DEBUG("sizeof ptr %lu\n", sizeof(void *));
     _LNXPROC_DEBUG("sizeof _LNXPROC_LIMITS_T %lu\n", sizeof(_LNXPROC_LIMITS_T));
@@ -138,78 +195,58 @@ _lnxproc_limits_dup(_LNXPROC_LIMITS_T ** newlimits,
                              "\n");
         return LNXPROC_ERROR_LIMITS_ADDRESS_CONTENTS_NOT_NULL;
     }
-    if (dim < 1) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_ILLEGAL_DIMENSION, "\n");
-        return LNXPROC_ERROR_LIMITS_ILLEGAL_DIMENSION;
-    }
     if (!limits) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_NULL, "\n");
         return LNXPROC_ERROR_LIMITS_NULL;
     }
 
-    _LNXPROC_DEBUG("Malloc limits %zd\n", dim);
-    _LNXPROC_LIMITS_T *nlimits = calloc(dim, sizeof(_LNXPROC_LIMITS_T));
+    LNXPROC_ERROR_T ret = _lnxproc_limits_new(newlimits, limits->dim);
 
-    if (!nlimits) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_MALLOC, "Malloc limits\n");
-        return LNXPROC_ERROR_LIMITS_MALLOC;
+    if (ret) {
+        return ret;
     }
 
-    _LNXPROC_DEBUG("Malloc limits %p\n", nlimits);
+    _LNXPROC_DEBUG("Malloc limits %p\n", *newlimits);
     int i;
 
-    for (i = 0; i < dim; i++) {
+    for (i = 0; i < limits->dim; i++) {
+        _LNXPROC_LIMITS_ROW_T *row = limits->row + i;
 
+        _lnxproc_limits_set(*newlimits, i, row->expected, row->chars, row->len);
 #ifdef DEBUG
         char buf[64];
 
-        _lnxproc_limit_print(limits + i, buf, sizeof buf);
-
-        _LNXPROC_DEBUG("Malloc old limit %d :%s:\n", i, buf);
-#endif
-        nlimits[i].chars = malloc(limits[i].len * sizeof(char));
-        if (!nlimits[i].chars) {
-            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_MALLOC_ENTRY,
-                                 "Malloc limits entry\n");
-            int j;
-
-            for (j = i - 1; j >= 0; j--) {
-                free(nlimits[j].chars);
-            }
-            free(nlimits);
-            return LNXPROC_ERROR_LIMITS_MALLOC_ENTRY;
-        }
-        memcpy(nlimits[i].chars, limits[i].chars, limits[i].len);
-        nlimits[i].expected = limits[i].expected;
-        nlimits[i].len = limits[i].len;
-
-#ifdef DEBUG
-        _lnxproc_limit_print(nlimits + i, buf, sizeof buf);
-        _LNXPROC_DEBUG("Malloc new limit %d :%s:\n", i, buf);
+        _lnxproc_limit_print(row, buf, sizeof buf);
 #endif
     }
-    *newlimits = nlimits;
     return LNXPROC_OK;
 }
 
-_LNXPROC_LIMITS_T *
-_lnxproc_limits_free(_LNXPROC_LIMITS_T limits[], size_t dim)
+LNXPROC_ERROR_T
+_lnxproc_limits_free(_LNXPROC_LIMITS_T ** limits)
 {
-    if (dim > 0 && limits) {
-        _LNXPROC_DEBUG("Free Limits buffer %zd\n", dim);
+    if (limits && *limits) {
+        _LNXPROC_LIMITS_T *mylimits = *limits;
+
+        _LNXPROC_DEBUG("Free Limits buffer %zd\n", mylimits->dim);
 
         int i;
 
-        for (i = 0; i < dim; i++) {
+        for (i = 0; i < mylimits->dim; i++) {
             _LNXPROC_DEBUG("Free Limit buffer %d\n", i);
-            free(limits[i].chars);
-            limits[i].chars = NULL;
+            _LNXPROC_LIMITS_ROW_T *row = mylimits->row + i;
+
+            if (row->chars) {
+                free(row->chars);
+                row->chars = NULL;
+            }
         }
 
-        _LNXPROC_DEBUG("Free Limits buffer %p\n", limits);
-        free(limits);
+        _LNXPROC_DEBUG("Free Limits buffer %p\n", mylimits);
+        free(mylimits);
+        *limits = NULL;
     }
-    return NULL;
+    return LNXPROC_OK;
 }
 
 /*

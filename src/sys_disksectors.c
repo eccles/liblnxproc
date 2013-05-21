@@ -73,6 +73,23 @@ LNXPROC_ERROR_T
 _lnxproc_sys_disksectors_new(_LNXPROC_BASE_T ** base, void *optional)
 {
 
+    _LNXPROC_LIMITS_T *limits = NULL;
+    LNXPROC_ERROR_T ret = _lnxproc_limits_new(&limits, 2);
+
+    if (ret) {
+        return ret;
+    }
+    ret = _lnxproc_limits_set(limits, 0, 9, "\n", 1);   /* row delimiters */
+    if (ret) {
+        _LNXPROC_LIMITS_FREE(limits);
+        return ret;
+    }
+    ret = _lnxproc_limits_set(limits, 1, 1, "\t", 1);   /* column delimiters */
+    if (ret) {
+        _LNXPROC_LIMITS_FREE(limits);
+        return ret;
+    }
+
     char *fileprefix = "/sys/block";
     char *fileglob;
 
@@ -84,17 +101,12 @@ _lnxproc_sys_disksectors_new(_LNXPROC_BASE_T ** base, void *optional)
     }
     char *filesuffix = "queue/hw_sector_size";
 
-    _LNXPROC_LIMITS_T limits[] = {
-        {.expected = 9,.chars = "\n",.len = 1}, /* row delimiters */
-        {.expected = 1,.chars = "\t",.len = 1}  /* column delimiters */
-    };
-
-    size_t dim = sizeof(limits) / sizeof(limits[0]);
-
-    return _lnxproc_base_new(base, "sys_disksectors",
-                             _LNXPROC_BASE_TYPE_MEMOIZE, NULL, 0, fileprefix,
-                             fileglob, filesuffix, NULL,
-                             sys_disksectors_normalize, NULL, 256, limits, dim);
+    ret = _lnxproc_base_new(base, "sys_disksectors",
+                            _LNXPROC_BASE_TYPE_MEMOIZE, NULL, 0, fileprefix,
+                            fileglob, filesuffix, NULL,
+                            sys_disksectors_normalize, NULL, 256, limits);
+    _LNXPROC_LIMITS_FREE(limits);
+    return ret;
 }
 
 /*

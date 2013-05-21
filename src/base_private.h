@@ -101,7 +101,7 @@ extern "C" {
                                       _LNXPROC_BASE_METHOD normalize,
                                       _LNXPROC_BASE_METHOD read,
                                       size_t buflen,
-                                      _LNXPROC_LIMITS_T limits[], size_t dim);
+                                      _LNXPROC_LIMITS_T * limits);
 
     LNXPROC_ERROR_T _lnxproc_base_free(_LNXPROC_BASE_T ** baseptr);
 

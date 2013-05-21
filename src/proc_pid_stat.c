@@ -353,14 +353,22 @@ LNXPROC_ERROR_T
 _lnxproc_proc_pid_stat_new(_LNXPROC_BASE_T ** base, void *optional)
 {
 
-    _LNXPROC_LIMITS_T limits[] = {
-        {.expected = 9,
-         .chars = "\n",
-         .len = 1},             /* row delimiters */
-        {.expected = 4,
-         .chars = " ",
-         .len = 1}              /* column delimiters */
-    };
+    _LNXPROC_LIMITS_T *limits = NULL;
+    LNXPROC_ERROR_T ret = _lnxproc_limits_new(&limits, 2);
+
+    if (ret) {
+        return ret;
+    }
+    ret = _lnxproc_limits_set(limits, 0, 9, "\n", 1);   /* row delimiters */
+    if (ret) {
+        _LNXPROC_LIMITS_FREE(limits);
+        return ret;
+    }
+    ret = _lnxproc_limits_set(limits, 1, 4, " ", 1);    /* column delimiters */
+    if (ret) {
+        _LNXPROC_LIMITS_FREE(limits);
+        return ret;
+    }
 
     char *fileprefix = "/proc";
     char *fileglob;
@@ -373,12 +381,12 @@ _lnxproc_proc_pid_stat_new(_LNXPROC_BASE_T ** base, void *optional)
     }
 
     char *filesuffix = "stat";
-    size_t dim = sizeof(limits) / sizeof(limits[0]);
 
-    return _lnxproc_base_new(base, "proc_pid_stat", _LNXPROC_BASE_TYPE_PREVIOUS,
-                             NULL, 0, fileprefix, fileglob, filesuffix,
-                             NULL, proc_pid_stat_normalize, NULL, 256,
-                             limits, dim);
+    ret = _lnxproc_base_new(base, "proc_pid_stat", _LNXPROC_BASE_TYPE_PREVIOUS,
+                            NULL, 0, fileprefix, fileglob, filesuffix,
+                            NULL, proc_pid_stat_normalize, NULL, 256, limits);
+    _LNXPROC_LIMITS_FREE(limits);
+    return ret;
 }
 
 /*

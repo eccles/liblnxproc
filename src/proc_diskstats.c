@@ -294,21 +294,31 @@ LNXPROC_ERROR_T
 _lnxproc_proc_diskstats_new(_LNXPROC_BASE_T ** base, void *optional)
 {
 
-    _LNXPROC_LIMITS_T limits[] = {
-        {
-         .expected = 9,.chars = "\n",.len = 1}, /* row delimiters */
-        {
-         .expected = 14,.chars = " ",.len = 1}  /* column delimiters */
-    };
-    char *filenames[] = {
-        "/proc/diskstats"
-    };
-    size_t dim = sizeof(limits) / sizeof(limits[0]);
+    _LNXPROC_LIMITS_T *limits = NULL;
+    LNXPROC_ERROR_T ret = _lnxproc_limits_new(&limits, 2);
 
-    return _lnxproc_base_new(base, "proc_diskstats",
-                             _LNXPROC_BASE_TYPE_PREVIOUS, filenames, 1, NULL,
-                             NULL, NULL, NULL, proc_diskstats_normalize, NULL,
-                             256, limits, dim);
+    if (ret) {
+        return ret;
+    }
+    ret = _lnxproc_limits_set(limits, 0, 9, "\n", 1);   /* row delimiters */
+    if (ret) {
+        _LNXPROC_LIMITS_FREE(limits);
+        return ret;
+    }
+    ret = _lnxproc_limits_set(limits, 1, 14, " ", 1);   /* column delimiters */
+    if (ret) {
+        _LNXPROC_LIMITS_FREE(limits);
+        return ret;
+    }
+
+    char *filenames[] = { "/proc/diskstats" };
+
+    ret = _lnxproc_base_new(base, "proc_diskstats",
+                            _LNXPROC_BASE_TYPE_PREVIOUS, filenames, 1, NULL,
+                            NULL, NULL, NULL, proc_diskstats_normalize, NULL,
+                            256, limits);
+    _LNXPROC_LIMITS_FREE(limits);
+    return ret;
 }
 
 /*

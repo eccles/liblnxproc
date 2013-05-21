@@ -101,10 +101,24 @@ lnxproc_set(LNXPROC_MODULE_T * module, size_t pos, LNXPROC_MODULE_TYPE_T type,
                              "Pos = %zd\n", pos);
         return LNXPROC_ERROR_INTERFACE_INDEX_OUT_OF_RANGE;
     }
-    memcpy(module->row + pos, mymodules + type - 1, sizeof(LNXPROC_MODULE_T));
+    _LNXPROC_MODULE_ROW_T *row = module->row + pos;
+
+    void *p = NULL;
+
     if (optional && optlen > 0) {
-        module->row[pos].optional = memdup(optional, optlen);
+        p = memdup(optional, optlen);
+
+        if (!p) {
+            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_INTERFACE_MALLOC_OPTIONAL, "\n");
+            return LNXPROC_ERROR_INTERFACE_MALLOC_OPTIONAL;
+        }
     }
+    if (row->optional)
+        free(row->optional);
+
+    memcpy(row, mymodules + type - 1, sizeof(_LNXPROC_MODULE_ROW_T));
+
+    row->optional = p;
     return LNXPROC_OK;
 }
 

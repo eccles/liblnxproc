@@ -188,9 +188,9 @@ base_read_glob_files(_LNXPROC_BASE_T * base, char **readbuf, int *nbytes)
 
     _LNXPROC_BASE_DATA_T *data = base->current;
     _LNXPROC_ARRAY_T *array = data->array;
-    size_t dim = array->dim;
     _LNXPROC_LIMITS_T *limits = array->limits;
-    char separator = limits[dim - 1].chars[0];
+    size_t dim = limits->dim;
+    char separator = limits->row[dim - 1].chars[0];
 
     if (base->fileprefix) {
         if (base->filesuffix) {
@@ -459,7 +459,7 @@ base_map(_LNXPROC_BASE_T * base)
         if (array) {
 
             _LNXPROC_LIMITS_T *limits = data->array->limits;
-            int dim = data->array->dim;
+            int dim = limits->dim;
 
             _LNXPROC_DEBUG("Limits %p Dim %d\n", limits, dim);
 
@@ -472,7 +472,7 @@ base_map(_LNXPROC_BASE_T * base)
 
             for (i = 0; i < dim && c < d; i++) {
                 _LNXPROC_DEBUG("At Char %p '%c'\n", c, *c);
-                while (limit_chr(limits + i, *c) && (++c < d));
+                while (limit_chr(limits->row + i, *c) && (++c < d));
             }
 
             char *saveptr = c;
@@ -482,7 +482,7 @@ base_map(_LNXPROC_BASE_T * base)
 
                 for (i = 0; i < dim && c < d; i++) {
                     _LNXPROC_DEBUG("Depth : %zd: At Char %p '%c'\n", i, c, *c);
-                    if (limit_chr(limits + i, *c)) {
+                    if (limit_chr(limits->row + i, *c)) {
                         *c = '\0';
 
                         _LNXPROC_DEBUG("Saveptr %1$p '%1$s'\n", saveptr);
@@ -493,7 +493,7 @@ base_map(_LNXPROC_BASE_T * base)
                             return ret;
                         }
 
-                        while ((++c < d) && limit_chr(limits + i, *c));
+                        while ((++c < d) && limit_chr(limits->row + i, *c));
 
                         if (c < d) {
                             idx[i]++;
@@ -504,7 +504,7 @@ base_map(_LNXPROC_BASE_T * base)
 
                             for (j = i + 1; j < dim; j++) {
                                 idx[j] = 0;
-                                while (limit_chr(limits + j, *c)
+                                while (limit_chr(limits->row + j, *c)
                                        && (++c < d));
                             }
                             saveptr = c;
@@ -538,10 +538,10 @@ base_map(_LNXPROC_BASE_T * base)
 }
 
 static LNXPROC_ERROR_T
-array_new(_LNXPROC_BASE_DATA_T * data, _LNXPROC_LIMITS_T limits[], size_t dim)
+array_new(_LNXPROC_BASE_DATA_T * data, _LNXPROC_LIMITS_T * limits)
 {
-    if (limits && dim > 0) {
-        LNXPROC_ERROR_T ret = _lnxproc_array_new(&data->array, limits, dim);
+    if (limits) {
+        LNXPROC_ERROR_T ret = _lnxproc_array_new(&data->array, limits);
 
         if (ret) {
             _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_ARRAY,
@@ -642,7 +642,7 @@ _lnxproc_base_read(_LNXPROC_BASE_T * base)
 
 static LNXPROC_ERROR_T
 _base_data_new(_LNXPROC_BASE_DATA_T * data, int id, char *tag,
-               size_t buflen, _LNXPROC_LIMITS_T limits[], size_t dim)
+               size_t buflen, _LNXPROC_LIMITS_T * limits)
 {
     _LNXPROC_DEBUG("New base data at %p index %d\n", data, id);
     data->id = id;
@@ -660,7 +660,7 @@ _base_data_new(_LNXPROC_BASE_DATA_T * data, int id, char *tag,
         return ret;
     }
 
-    ret = array_new(data, limits, dim);
+    ret = array_new(data, limits);
     if (ret) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_ARRAY, "Malloc array\n");
         return LNXPROC_ERROR_BASE_MALLOC_ARRAY;
@@ -684,8 +684,7 @@ _lnxproc_base_store_previous(_LNXPROC_BASE_T * base)
             LNXPROC_ERROR_T ret = _base_data_new(base->data + 1, 1,
                                                  base->current->results->tag,
                                                  base->current->buflen,
-                                                 base->current->array->limits,
-                                                 base->current->array->dim);
+                                                 base->current->array->limits);
 
             if (ret) {
                 return ret;
@@ -712,7 +711,7 @@ _lnxproc_base_new(_LNXPROC_BASE_T ** base,
                   _LNXPROC_BASE_METHOD rawread,
                   _LNXPROC_BASE_METHOD normalize,
                   _LNXPROC_BASE_METHOD read,
-                  size_t buflen, _LNXPROC_LIMITS_T limits[], size_t dim)
+                  size_t buflen, _LNXPROC_LIMITS_T * limits)
 {
     LNXPROC_ERROR_T ret;
 
@@ -725,7 +724,7 @@ _lnxproc_base_new(_LNXPROC_BASE_T ** base,
     _LNXPROC_DEBUG("rawread %p, normalize %p, read %p\n", rawread,
                    normalize, read);
     _LNXPROC_DEBUG("buflen %zd\n", buflen);
-    _LNXPROC_DEBUG("limits %p dim %zd\n", limits, dim);
+    _LNXPROC_DEBUG("limits %p\n", limits);
     _LNXPROC_DEBUG("sizeof ptr %lu\n", sizeof(void *));
     _LNXPROC_DEBUG("sizeof LNXPROC_BASE_T %lu\n", sizeof(_LNXPROC_BASE_T));
 
@@ -753,7 +752,7 @@ _lnxproc_base_new(_LNXPROC_BASE_T ** base,
     }
 
     _LNXPROC_DEBUG("Malloc data area\n");
-    ret = _base_data_new(p->data + 0, 0, tag, buflen, limits, dim);
+    ret = _base_data_new(p->data + 0, 0, tag, buflen, limits);
     if (ret) {
         _LNXPROC_BASE_FREE(p);
         return ret;
