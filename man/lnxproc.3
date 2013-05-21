@@ -1,0 +1,460 @@
+.\" Copyright (c) 2023 Paul Hewlett <phewlett76@gmail.com>
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one.
+.\"
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\"
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.TH LNXPROC 3 2013-05-16 "Linux" "/proc & /sys access"
+.SH NAME
+.nf
+lnxproc_new \- create a new lnxproc module
+lnxproc_set \- set parameters of new module 
+lnxproc_free \- deallocate memory created by lnxproc_new/set
+LNXPROC_FREE \- macro version of lnxproc_free()
+lnxproc_read \- read data from all modules 
+lnxproc_print \- print data collected by last read
+lnxproc_performance \- print duration of the various phases of data collection
+lnxproc_strerror \- Format error as a string returned from any lnxproc routine
+.fi
+.SH SYNOPSIS
+.nf
+.BI #include " "<lnxproc/lnxproc.h>
+
+.BI "int lnxproc_new(LNXPROC_MODULE_T **" moduleptr ", size_t " nmodule);
+
+.BI "int lnxproc_set(LNXPROC_MODULE_T *" module , 
+.BI "                size_t " pos , 
+.BI "                LNXPROC_MODULE_TYPE_T " type , 
+.BI "                void *" optional , 
+.BI "                size_t " optlen "); "
+
+The type field is an enumerated field with the following values:
+
+.BI "       "  LNXPROC_ALL
+.BI "       "  LNXPROC_PROC_CGROUPS
+.BI "       "  LNXPROC_PROC_DISKSTATS
+.BI "       "  LNXPROC_PROC_DOMAINNAME
+.BI "       "  LNXPROC_PROC_HOSTNAME
+.BI "       "  LNXPROC_PROC_OSRELEASE
+.BI "       "  LNXPROC_SYS_CPUFREQ
+.BI "       "  LNXPROC_SYS_DISKSECTORS
+.BI "       "  LNXPROC_PROC_PID_STAT
+
+.BI "int lnxproc_free(LNXPROC_MODULE_T **" modulesptr ");"
+
+.BI "LNXPROC_FREE(" b ")"
+
+.BI "int lnxproc_read(LNXPROC_MODULE_T *" modules ");"
+
+.BI "int lnxproc_print(LNXPROC_MODULE_T *" modules ");"
+
+.BI "int lnxproc_performance(LNXPROC_MODULE_T *" modules ,
+.BI "                        long *" rawread_time ,
+.BI "                        long *" map_time , 
+.BI "                        long *" hash_time ,
+.BI "                        long *" normalize_time ");"
+
+.BI "const char *lnxproc_strerror(int " err, 
+.BI "                             char *" buf, 
+.BI "                             size_t " buflen ");"
+
+.fi
+.sp
+Compile and link with \fI\-llnxproc\fP.
+.SH DESCRIPTION
+.P
+.BR lnxproc_new ()
+creates a module containing
+.B nmodule 
+entries. 
+If 
+.B nmodule
+is 0 then all modules are loaded and no subsequent calls to
+.B lnxproc_set()
+are required.
+If
+.B nmodule
+is positive then
+.B nmodule
+calls to
+.B lnxproc_set()
+must be executed for each entry in the 
+.B modules
+argument.
+.P
+.BR lnxproc_set()
+sets the values of an entry in the 
+.B modules
+argument. 
+.B pos
+indicates the index of the entry,
+.B type
+indicates which module and corresponds to a particular file or files to be read from
+the /proc or /sys filesystems,
+.B optional
+is an optional argument for the module (not all modules accept an
+.B optional
+argument ) and
+.B optlen
+is the length of the 
+.B optional
+argument. 
+Note that 
+.B optlen
+must contain the terminating
+.B NUL
+character of the optional argument e.g. 
+.B optlen = 1 + strlen(optional)
+if optional is a string.
+.B optional
+is a void pointer because some modules may accept 
+.B optional
+as a pointer to an arbitrary structure.
+.P
+.BR lnxproc_read()
+reads all files corresponding to all
+.B modules
+in the 
+.B modules
+argument.
+The first call to
+.B lnxproc_read()
+may be slow as the internal buffers are 
+.B grown
+to accommodate the data read. Also any time-derived values such as % usage
+and/or rates are only calculated from the second call onwards. 
+.P
+.BR lnxproc_free()
+frees all allocated memory for
+.B modules
+and nullifies the 
+.B modules 
+pointer
+.P
+.BR LNXPROC_FREE()
+macro version of
+.B lnxproc_free()
+.P
+.BR lnxproc_print()
+print to stdout all data collected on the last call to
+.B lnxproc_read()
+.P
+.BR lnxproc_performance()
+prints to stdout the time taken to read and process the data in read, map, normalize and hash 
+phases.
+.P
+.BR lnxproc_strerror()
+formats any return values as a string.
+.SH RETURN VALUE
+On success, all routines return zero.
+Negative return values correspond to system error i.e. -errno.
+Positive return values are described in <lnxproc/error.h.
+.SH ERRORS
+.TP
+.B LNXPROC_OK = 0
+.TP
+.B LNXPROC_ERROR_MISMATCHED_STRINGS
+.TP
+.B LNXPROC_ERROR_SYSTEM
+.TP
+.B LNXPROC_ERROR_ARRAY_MALLOC_HEADER
+.TP
+.B LNXPROC_ERROR_ARRAY_MALLOC_DATA
+.TP
+.B LNXPROC_ERROR_ARRAY_NULL
+.TP
+.B LNXPROC_ERROR_ARRAY_REALLOC_DATA
+.TP
+.B LNXPROC_ERROR_ARRAY_INDEX_OUT_OF_RANGE
+.TP
+.B LNXPROC_ERROR_ARRAY_VECTOR_NULL
+.TP
+.B LNXPROC_ERROR_ARRAY_VECTOR_MALLOC
+.TP
+.B LNXPROC_ERROR_ARRAY_SAVED_MALLOC
+.TP
+.B LNXPROC_ERROR_ARRAY_SAVED_NULL
+.TP
+.B LNXPROC_ERROR_ARRAY_ADDRESS_NULL
+.TP
+.B LNXPROC_ERROR_ARRAY_ADDRESS_CONTENTS_NOT_NULL
+.TP
+.B LNXPROC_ERROR_ARRAY_LIMITS_NULL
+.TP
+.B LNXPROC_ERROR_ARRAY_ILLEGAL_DIMENSION
+.TP
+.B LNXPROC_ERROR_BASE_NULL
+.TP
+.B LNXPROC_ERROR_BASE_ADDRESS_NULL
+.TP
+.B LNXPROC_ERROR_BASE_BAD_FILENAME
+.TP
+.B LNXPROC_ERROR_BASE_MALLOC_BASE
+.TP
+.B LNXPROC_ERROR_BASE_MALLOC_BUFFER
+.TP
+.B LNXPROC_ERROR_BASE_MALLOC_FILENAME
+.TP
+.B LNXPROC_ERROR_BASE_MALLOC_FILEPREFIX
+.TP
+.B LNXPROC_ERROR_BASE_MALLOC_FILEGLOB
+.TP
+.B LNXPROC_ERROR_BASE_MALLOC_FILESUFFIX
+.TP
+.B LNXPROC_ERROR_BASE_MALLOC_ARRAY
+.TP
+.B LNXPROC_ERROR_BASE_MALLOC_RESULTS
+.TP
+.B LNXPROC_ERROR_BASE_READ_OVERFLOW
+.TP
+.B LNXPROC_ERROR_BASE_ARRAY_NULL
+.TP
+.B LNXPROC_ERROR_BASE_PREVIOUS_NULL
+.TP
+.B LNXPROC_ERROR_INTERFACE_MALLOC_INTERFACE
+.TP
+.B LNXPROC_ERROR_INTERFACE_ADDRESS_NULL
+.TP
+.B LNXPROC_ERROR_INTERFACE_NULL
+.TP
+.B LNXPROC_ERROR_INTERFACE_NULL_BASE
+.TP
+.B LNXPROC_ERROR_INTERFACE_NULL_DATA
+.TP
+.B LNXPROC_ERROR_INTERFACE_INDEX_OUT_OF_RANGE
+.TP
+.B LNXPROC_ERROR_INTERFACE_MALLOC_OPTIONAL
+.TP
+.B LNXPROC_ERROR_LIMITS_MALLOC
+.TP
+.B LNXPROC_ERROR_LIMITS_CHARS_MALLOC
+.TP
+.B LNXPROC_ERROR_LIMITS_NULL
+.TP
+.B LNXPROC_ERROR_LIMIT_NULL
+.TP
+.B LNXPROC_ERROR_LIMITS_MALLOC_ENTRY
+.TP
+.B LNXPROC_ERROR_LIMITS_ADDRESS_NULL
+.TP
+.B LNXPROC_ERROR_LIMITS_ADDRESS_CONTENTS_NOT_NULL
+.TP
+.B LNXPROC_ERROR_LIMITS_ILLEGAL_DIMENSION
+.TP
+.B LNXPROC_ERROR_RESULTS_DB_NULL
+.TP
+.B LNXPROC_ERROR_RESULTS_DB_NOT_OPEN
+.TP
+.B LNXPROC_ERROR_RESULTS_DB_OPEN
+.TP
+.B LNXPROC_ERROR_RESULTS_DB_CLOSE
+.TP
+.B LNXPROC_ERROR_RESULTS_DB_FETCH
+.TP
+.B LNXPROC_ERROR_RESULTS_DB_STORE
+.TP
+.B LNXPROC_ERROR_RESULTS_DB_ITERATE
+.TP
+.B LNXPROC_ERROR_RESULTS_NULL
+.TP
+.B LNXPROC_ERROR_RESULTS_BUF_NULL
+.TP
+.B LNXPROC_ERROR_RESULTS_BUFLEN_ZERO
+.TP
+.B LNXPROC_ERROR_RESULTS_TV_NULL
+.TP
+.B LNXPROC_ERROR_RESULTS_ADDRESS_NULL
+.TP
+.B LNXPROC_ERROR_RESULTS_ADDRESS_CONTENTS_NOT_NULL
+.TP
+.B LNXPROC_ERROR_RESULTS_MALLOC
+.TP
+.B LNXPROC_ERROR_RESULTS_KEY_NULL
+.TP
+.B LNXPROC_ERROR_RESULTS_KEYLEN_ZERO
+.TP
+.B LNXPROC_ERROR_RESULTS_VAL_ADDRESS_NULL
+.TP
+.B LNXPROC_ERROR_RESULTS_TABLE_NULL
+.TP
+.B LNXPROC_ERROR_RESULTS_TABLE_MALLOC
+.TP
+.B LNXPROC_ERROR_VECTOR_MALLOC_HEADER
+.TP
+.B LNXPROC_ERROR_VECTOR_MALLOC_DATA
+.TP
+.B LNXPROC_ERROR_VECTOR_NULL
+.TP
+.B LNXPROC_ERROR_VECTOR_REALLOC_DATA
+.TP
+.B LNXPROC_ERROR_VECTOR_INDEX_OUT_OF_RANGE
+.TP
+.B LNXPROC_ERROR_VECTOR_NULL_DATA
+.TP
+.B LNXPROC_ERROR_VECTOR_NULL_CHILDREN
+.TP
+.B LNXPROC_ERROR_VECTOR_NULL_VALUES
+.TP
+.B LNXPROC_ERROR_VECTOR_ADDRESS_NULL
+.TP
+.B LNXPROC_ERROR_VECTOR_ADDRESS_CONTENTS_NOT_NULL
+.TP
+.B LNXPROC_ERROR_BASE_REGEX_FAILURE
+.TP
+.B LNXPROC_ERROR_BASE_GLOB_FAILURE
+.SH CONFORMING TO
+.TP
+TBD
+.SH NOTES
+TBD
+.SH BUGS
+TBD
+.SH EXAMPLE
+The program below demonstrates the use of
+.BR lnxproc_new (),
+as well as a number of other functions in the lnxproc API.
+
+.fi
+.in
+.SS Program source
+\&
+.nf
+
+#include <stdio.h>
+#include <string.h>             // strrchr()
+#include <sys/time.h>
+#include <sys/types.h>          // getpid()
+#include <unistd.h>             // getpid()
+
+#include <lnxproc/lnxproc.h>
+
+static const int ntimes = 1000;
+
+static void
+test_module(LNXPROC_MODULE_T * modules, char *str)
+{
+    if (modules) {
+        char buf[96];
+        LNXPROC_ERROR_T ret = lnxproc_read(modules);
+
+        ret = lnxproc_read(modules);
+        if (ret) {
+            printf("Error %s\\n", lnxproc_strerror(ret, buf, sizeof buf));
+        }
+        ret = lnxproc_read(modules);
+        if (ret) {
+            printf("Error %s\\n", lnxproc_strerror(ret, buf, sizeof buf));
+        }
+
+        long rawread_time;
+        long map_time;
+        long hash_time;
+        long normalize_time;
+        float sum_rawread_time = 0;
+        float sum_map_time = 0;
+        float sum_hash_time = 0;
+        float sum_normalize_time = 0;
+        struct timeval start = lnxproc_timeval();
+
+        int i;
+
+        for (i = 0; i < ntimes; i++) {
+            ret = lnxproc_read(modules);
+            if (ret) {
+                printf("%s:Error %s\\n", str,
+                       lnxproc_strerror(ret, buf, sizeof buf));
+                break;
+            }
+            lnxproc_performance(modules, &rawread_time, &map_time,
+                                &hash_time, &normalize_time);
+            sum_rawread_time += rawread_time;
+            sum_map_time += map_time;
+            sum_hash_time += hash_time;
+            sum_normalize_time += normalize_time;
+        }
+
+        struct timeval end = lnxproc_timeval();
+        long timediff = lnxproc_timeval_diff(&start, &end);
+
+        printf("%s:Elapsed time = %.1f usecs (%.1f,%.1f,%.1f,%.1f)\\n", str,
+               (timediff * 1.0) / ntimes, sum_rawread_time / ntimes,
+               sum_map_time / ntimes, sum_hash_time / ntimes,
+               sum_normalize_time / ntimes);
+    }
+}
+
+/*----------------------------------------------------------------------------*/
+int
+main(int argc, char *argv[])
+{
+
+    lnxproc_new(&modules, 0); // load all modules
+    test_module(modules, "All");
+    LNXPROC_FREE(modules);
+
+    lnxproc_new(&modules, 1); // only read /proc/cgroups
+    lnxproc_set(modules, 0, LNXPROC_PROC_CGROUPS, NULL, 0);
+    test_module(modules, "proc_cgroups");
+    LNXPROC_FREE(modules);
+
+    lnxproc_new(&modules, 2); // read /proc/groups and /proc/diskstats simultaneously
+    lnxproc_set(modules, 0, LNXPROC_PROC_CGROUPS, NULL, 0);
+    lnxproc_set(modules, 1, LNXPROC_PROC_DISKSTATS, NULL, 0);
+    test_module(modules, "proc_diskstats");
+    LNXPROC_FREE(modules);
+
+    lnxproc_new(&modules, 1); // Domainname - thei value is memoized
+    lnxproc_set(modules, 0, LNXPROC_PROC_DOMAINNAME, NULL, 0);
+    test_module(modules, "proc_domainname");
+    LNXPROC_FREE(modules);
+
+    lnxproc_new(&modules, 1); // Get sector size for every disk on the system - memoized
+    lnxproc_set(modules, 0, LNXPROC_SYS_DISKSECTORS, NULL, 0);
+    test_module(modules, "sys_disksectors");
+    LNXPROC_FREE(modules);
+
+    lnxproc_new(&modules, 1); // get sector size for esata disks
+    lnxproc_set(modules, 0, LNXPROC_SYS_DISKSECTORS, "sd*", 4);
+    test_module(modules, "sys_sd_disksectors");
+    LNXPROC_FREE(modules);
+
+    lnxproc_new(&modules, 1); // Read /proc/<pid>/stat file for every process
+    lnxproc_set(modules, 0, LNXPROC_PROC_PID_STAT, NULL, 0);
+    test_module(modules, "proc_pid_stat");
+    LNXPROC_FREE(modules);
+
+    char buf[32];
+
+    snprintf(buf, sizeof buf, "%d", getpid());
+    lnxproc_new(&modules, 1); // Read /proc/<pid>/stat file for this process
+    lnxproc_set(modules, 0, LNXPROC_PROC_PID_STAT, buf, 1 + strlen(buf));
+    snprintf(buf, sizeof buf, "proc_%d_stat", getpid());
+    test_module(modules, buf);
+    LNXPROC_FREE(modules);
+
+    return 0;
+}
+.fi
+.SH SEE ALSO
+TBD
+.SH COLOPHON
+A description of the project,
+and information about reporting bugs,
+can be found at
+http://www.github.com/eccles/liblnxproc/.
