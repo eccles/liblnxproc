@@ -1,5 +1,5 @@
 RELDIR=..
-PUBHDIR=../src/lnxproc
+PUBHDIR=$(RELDIR)/include/lnxproc
 FUNCHDRS=limit_chr.h strlcpy.h
 PUBBASEHDRS=lnxproc.h util.h error.h interface.h
 PROCHDRS=proc_cgroups.h proc_diskstats.h proc_domainname.h proc_hostname.h proc_osrelease.h
