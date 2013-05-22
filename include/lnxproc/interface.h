@@ -43,24 +43,23 @@ extern "C" {
 
     typedef struct lnxproc_module_t LNXPROC_MODULE_T;
 
-    LNXPROC_ERROR_T lnxproc_new(LNXPROC_MODULE_T ** moduleptr, size_t nmodule);
-    LNXPROC_ERROR_T lnxproc_set(LNXPROC_MODULE_T * module, size_t pos,
-                                LNXPROC_MODULE_TYPE_T type, void *optional,
-                                size_t optlen);
-    LNXPROC_ERROR_T lnxproc_free(LNXPROC_MODULE_T ** modulesptr);
+    int lnxproc_new(LNXPROC_MODULE_T ** moduleptr, size_t nmodule);
+    int lnxproc_set(LNXPROC_MODULE_T * module, size_t pos,
+                    LNXPROC_MODULE_TYPE_T type, void *optional, size_t optlen);
+    int lnxproc_free(LNXPROC_MODULE_T ** modulesptr);
 
 #define LNXPROC_FREE(b) {\
     lnxproc_free(&b);\
 }
 
-    LNXPROC_ERROR_T lnxproc_read(LNXPROC_MODULE_T * modules);
+    int lnxproc_read(LNXPROC_MODULE_T * modules);
 
-    LNXPROC_ERROR_T lnxproc_print(LNXPROC_MODULE_T * modules);
+    int lnxproc_print(LNXPROC_MODULE_T * modules);
 
-    LNXPROC_ERROR_T lnxproc_performance(LNXPROC_MODULE_T * modules,
-                                        long *rawread_time,
-                                        long *map_time, long *hash_time,
-                                        long *normalize_time);
+    int lnxproc_performance(LNXPROC_MODULE_T * modules,
+                            long *rawread_time,
+                            long *map_time, long *hash_time,
+                            long *normalize_time);
 
 #ifdef __cplusplus
 }                               // extern "C"

@@ -104,7 +104,7 @@ extern "C" {
         LNXPROC_ERROR_BASE_GLOB_FAILURE,
         LNXPROC_ERROR_SIZE
     };
-    typedef int LNXPROC_ERROR_T;
+    typedef int int;
 
     const char *lnxproc_strerror(int err, char *buf, size_t buflen);
 
