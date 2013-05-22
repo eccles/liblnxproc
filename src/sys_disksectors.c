@@ -35,7 +35,7 @@ struct env_t {
     char *key;
 };
 
-static LNXPROC_ERROR_T
+static int
 iter_func(char *val, void *data, size_t idx[], size_t dim)
 {
     _LNXPROC_DEBUG("Val %s, Data %p, idx[%d]=%zd idx[%d]=%zd\n", val, data, 0,
@@ -51,7 +51,7 @@ iter_func(char *val, void *data, size_t idx[], size_t dim)
     return LNXPROC_OK;
 }
 
-static LNXPROC_ERROR_T
+static int
 sys_disksectors_normalize(_LNXPROC_BASE_T * base)
 {
 
@@ -69,12 +69,12 @@ sys_disksectors_normalize(_LNXPROC_BASE_T * base)
     return LNXPROC_OK;
 }
 
-LNXPROC_ERROR_T
+int
 _lnxproc_sys_disksectors_new(_LNXPROC_BASE_T ** base, void *optional)
 {
 
     _LNXPROC_LIMITS_T *limits = NULL;
-    LNXPROC_ERROR_T ret = _lnxproc_limits_new(&limits, 2);
+    int ret = _lnxproc_limits_new(&limits, 2);
 
     if (ret) {
         return ret;

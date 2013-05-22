@@ -29,7 +29,7 @@ Typical contents of file /proc/sys/kernel/osrelease::
 #include "base_private.h"
 #include "proc_osrelease.h"
 
-static LNXPROC_ERROR_T
+static int
 proc_osrelease_normalize(_LNXPROC_BASE_T * base)
 {
     _lnxproc_results_init(base->current->results, 1);
@@ -39,7 +39,7 @@ proc_osrelease_normalize(_LNXPROC_BASE_T * base)
     return LNXPROC_OK;
 }
 
-LNXPROC_ERROR_T
+int
 _lnxproc_proc_osrelease_new(_LNXPROC_BASE_T ** base, void *optional)
 {
 

@@ -71,8 +71,8 @@ extern "C" {
     char *_lnxproc_results_table_valuestr(_LNXPROC_RESULTS_TABLE_T * entry,
                                           char *buf, size_t len);
 
-    LNXPROC_ERROR_T _lnxproc_results_table_copy(_LNXPROC_RESULTS_TABLE_T * dest,
-                                                _LNXPROC_RESULTS_TABLE_T * src);
+    int _lnxproc_results_table_copy(_LNXPROC_RESULTS_TABLE_T * dest,
+                                    _LNXPROC_RESULTS_TABLE_T * src);
 
     struct _lnxproc_results_t {
         char *tag;
@@ -86,40 +86,35 @@ extern "C" {
     };
     typedef struct _lnxproc_results_t _LNXPROC_RESULTS_T;
 
-    LNXPROC_ERROR_T _lnxproc_results_new(_LNXPROC_RESULTS_T ** newresults,
-                                         char *tag);
+    int _lnxproc_results_new(_LNXPROC_RESULTS_T ** newresults, char *tag);
 
-    LNXPROC_ERROR_T _lnxproc_results_free(_LNXPROC_RESULTS_T ** resultsptr);
+    int _lnxproc_results_free(_LNXPROC_RESULTS_T ** resultsptr);
 #define _LNXPROC_RESULTS_FREE(r) {\
     _lnxproc_results_free(&r);\
 }
 
-    LNXPROC_ERROR_T _lnxproc_results_print(_LNXPROC_RESULTS_T * results);
-    LNXPROC_ERROR_T _lnxproc_results_hash(_LNXPROC_RESULTS_T * results);
+    int _lnxproc_results_print(_LNXPROC_RESULTS_T * results);
+    int _lnxproc_results_hash(_LNXPROC_RESULTS_T * results);
 
-    LNXPROC_ERROR_T _lnxproc_results_init(_LNXPROC_RESULTS_T * results,
-                                          size_t nentries);
+    int _lnxproc_results_init(_LNXPROC_RESULTS_T * results, size_t nentries);
 
-    LNXPROC_ERROR_T _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results,
-                                           _LNXPROC_RESULTS_TABLE_T * entry);
+    int _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results,
+                               _LNXPROC_RESULTS_TABLE_T * entry);
 
-    LNXPROC_ERROR_T _lnxproc_results_add_int(_LNXPROC_RESULTS_T * results,
-                                             const char *key, const int value);
-    LNXPROC_ERROR_T _lnxproc_results_add_long(_LNXPROC_RESULTS_T * results,
-                                              const char *key,
-                                              const long value);
-    LNXPROC_ERROR_T _lnxproc_results_add_float(_LNXPROC_RESULTS_T * results,
-                                               const char *key,
-                                               const float value);
-    LNXPROC_ERROR_T _lnxproc_results_add_string(_LNXPROC_RESULTS_T * results,
-                                                const char *key,
-                                                const char *value);
+    int _lnxproc_results_add_int(_LNXPROC_RESULTS_T * results,
+                                 const char *key, const int value);
+    int _lnxproc_results_add_long(_LNXPROC_RESULTS_T * results,
+                                  const char *key, const long value);
+    int _lnxproc_results_add_float(_LNXPROC_RESULTS_T * results,
+                                   const char *key, const float value);
+    int _lnxproc_results_add_string(_LNXPROC_RESULTS_T * results,
+                                    const char *key, const char *value);
 
     typedef int (*_LNXPROC_RESULTS_ITERATE_FUNC) (_LNXPROC_RESULTS_TABLE_T *
                                                   entry, void *data);
-    LNXPROC_ERROR_T _lnxproc_results_iterate(_LNXPROC_RESULTS_T * results,
-                                             _LNXPROC_RESULTS_ITERATE_FUNC func,
-                                             void *data);
+    int _lnxproc_results_iterate(_LNXPROC_RESULTS_T * results,
+                                 _LNXPROC_RESULTS_ITERATE_FUNC func,
+                                 void *data);
 
 #ifdef __cplusplus
 }                               // extern "C"

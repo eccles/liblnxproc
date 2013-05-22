@@ -30,7 +30,7 @@
 #include "error_private.h"
 #include "limits_private.h"
 
-LNXPROC_ERROR_T
+int
 _lnxproc_limits_print(_LNXPROC_LIMITS_T * limits)
 {
     if (!limits) {
@@ -51,7 +51,7 @@ _lnxproc_limits_print(_LNXPROC_LIMITS_T * limits)
     return LNXPROC_OK;
 }
 
-LNXPROC_ERROR_T
+int
 _lnxproc_chars_print(char *chars, size_t nchars, char *buf, size_t buflen)
 {
 
@@ -102,7 +102,7 @@ _lnxproc_chars_print(char *chars, size_t nchars, char *buf, size_t buflen)
     return LNXPROC_OK;
 }
 
-LNXPROC_ERROR_T
+int
 _lnxproc_limit_print(_LNXPROC_LIMITS_ROW_T * row, char *buf, size_t buflen)
 {
     buf[0] = '\0';
@@ -123,7 +123,7 @@ _lnxproc_limit_print(_LNXPROC_LIMITS_ROW_T * row, char *buf, size_t buflen)
     return _lnxproc_chars_print(row->chars, row->len, b, len);
 }
 
-LNXPROC_ERROR_T
+int
 _lnxproc_limits_new(_LNXPROC_LIMITS_T ** newlimits, size_t dim)
 {
     if (!newlimits) {
@@ -148,7 +148,7 @@ _lnxproc_limits_new(_LNXPROC_LIMITS_T ** newlimits, size_t dim)
     return LNXPROC_OK;
 }
 
-LNXPROC_ERROR_T
+int
 _lnxproc_limits_set(_LNXPROC_LIMITS_T * limits, int pos, size_t expected,
                     char *chars, int len)
 {
@@ -180,7 +180,7 @@ _lnxproc_limits_set(_LNXPROC_LIMITS_T * limits, int pos, size_t expected,
     return LNXPROC_OK;
 }
 
-LNXPROC_ERROR_T
+int
 _lnxproc_limits_dup(_LNXPROC_LIMITS_T ** newlimits, _LNXPROC_LIMITS_T * limits)
 {
     _LNXPROC_DEBUG("sizeof ptr %lu\n", sizeof(void *));
@@ -200,7 +200,7 @@ _lnxproc_limits_dup(_LNXPROC_LIMITS_T ** newlimits, _LNXPROC_LIMITS_T * limits)
         return LNXPROC_ERROR_LIMITS_NULL;
     }
 
-    LNXPROC_ERROR_T ret = _lnxproc_limits_new(newlimits, limits->dim);
+    int ret = _lnxproc_limits_new(newlimits, limits->dim);
 
     if (ret) {
         return ret;
@@ -222,7 +222,7 @@ _lnxproc_limits_dup(_LNXPROC_LIMITS_T ** newlimits, _LNXPROC_LIMITS_T * limits)
     return LNXPROC_OK;
 }
 
-LNXPROC_ERROR_T
+int
 _lnxproc_limits_free(_LNXPROC_LIMITS_T ** limits)
 {
     if (limits && *limits) {

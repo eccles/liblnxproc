@@ -45,7 +45,7 @@ static _LNXPROC_MODULE_ROW_T mymodules[] = {
 
 static size_t nmodules = sizeof(mymodules) / sizeof(mymodules[0]);
 
-LNXPROC_ERROR_T
+int
 lnxproc_new(LNXPROC_MODULE_T ** moduleptr, size_t nmodule)
 {
     if (!moduleptr) {
@@ -88,7 +88,7 @@ lnxproc_new(LNXPROC_MODULE_T ** moduleptr, size_t nmodule)
     return LNXPROC_OK;
 }
 
-LNXPROC_ERROR_T
+int
 lnxproc_set(LNXPROC_MODULE_T * module, size_t pos, LNXPROC_MODULE_TYPE_T type,
             void *optional, size_t optlen)
 {
@@ -122,7 +122,7 @@ lnxproc_set(LNXPROC_MODULE_T * module, size_t pos, LNXPROC_MODULE_TYPE_T type,
     return LNXPROC_OK;
 }
 
-LNXPROC_ERROR_T
+int
 lnxproc_free(LNXPROC_MODULE_T ** modulesptr)
 {
     if (modulesptr && *modulesptr) {
@@ -143,11 +143,11 @@ lnxproc_free(LNXPROC_MODULE_T ** modulesptr)
     return LNXPROC_OK;
 }
 
-LNXPROC_ERROR_T
+int
 lnxproc_read(LNXPROC_MODULE_T * modules)
 {
 
-    LNXPROC_ERROR_T ret = LNXPROC_ERROR_INTERFACE_NULL;
+    int ret = LNXPROC_ERROR_INTERFACE_NULL;
 
     if (modules) {
 
@@ -178,7 +178,7 @@ lnxproc_read(LNXPROC_MODULE_T * modules)
     return ret;
 }
 
-LNXPROC_ERROR_T
+int
 lnxproc_performance(LNXPROC_MODULE_T * modules,
                     long *rawread_time, long *map_time, long *hash_time,
                     long *normalize_time)
@@ -211,7 +211,7 @@ lnxproc_performance(LNXPROC_MODULE_T * modules,
     return LNXPROC_OK;
 }
 
-LNXPROC_ERROR_T
+int
 lnxproc_print(LNXPROC_MODULE_T * modules)
 {
     if (modules) {

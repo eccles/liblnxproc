@@ -173,7 +173,7 @@ test_limits(void)
 }
 
 /*----------------------------------------------------------------------------*/
-static LNXPROC_ERROR_T
+static int
 myvector_print(_LNXPROC_VECTOR_T * vector, int idx, int depth, void *data)
 {
     printf("Vector %p Idx %d Depth %d\n", vector, idx, depth);
@@ -324,7 +324,7 @@ test_vector(void)
 static void
 test_array(void)
 {
-    LNXPROC_ERROR_T ret;
+    int ret;
     char buf[64];
 
     printf("Array 1\n");
@@ -552,7 +552,7 @@ execute_base(_LNXPROC_BASE_T * base)
 
         for (i = 0; i < 5; i++) {
             printf("Execute %d\n", i + 1);
-            LNXPROC_ERROR_T ret = _lnxproc_base_read(base);
+            int ret = _lnxproc_base_read(base);
 
             if (ret) {
                 char buf[64];
@@ -573,7 +573,7 @@ static void
 test_proc_cgroups(void)
 {
     _LNXPROC_BASE_T *proc_cgroups = NULL;
-    LNXPROC_ERROR_T ret = _lnxproc_proc_cgroups_new(&proc_cgroups, NULL);
+    int ret = _lnxproc_proc_cgroups_new(&proc_cgroups, NULL);
 
     if (ret == LNXPROC_OK) {
         execute_base(proc_cgroups);
@@ -585,7 +585,7 @@ static void
 test_proc_diskstats(void)
 {
     _LNXPROC_BASE_T *proc_diskstats = NULL;
-    LNXPROC_ERROR_T ret = _lnxproc_proc_diskstats_new(&proc_diskstats, NULL);
+    int ret = _lnxproc_proc_diskstats_new(&proc_diskstats, NULL);
 
     if (ret == LNXPROC_OK) {
         execute_base(proc_diskstats);
@@ -597,7 +597,7 @@ static void
 test_proc_domainname(void)
 {
     _LNXPROC_BASE_T *proc_domainname = NULL;
-    LNXPROC_ERROR_T ret = _lnxproc_proc_domainname_new(&proc_domainname, NULL);
+    int ret = _lnxproc_proc_domainname_new(&proc_domainname, NULL);
 
     if (ret == LNXPROC_OK) {
         execute_base(proc_domainname);
@@ -609,7 +609,7 @@ static void
 test_proc_hostname(void)
 {
     _LNXPROC_BASE_T *proc_hostname = NULL;
-    LNXPROC_ERROR_T ret = _lnxproc_proc_hostname_new(&proc_hostname, NULL);
+    int ret = _lnxproc_proc_hostname_new(&proc_hostname, NULL);
 
     if (ret == LNXPROC_OK) {
         execute_base(proc_hostname);
@@ -621,7 +621,7 @@ static void
 test_proc_osrelease(void)
 {
     _LNXPROC_BASE_T *proc_osrelease = NULL;
-    LNXPROC_ERROR_T ret = _lnxproc_proc_osrelease_new(&proc_osrelease, NULL);
+    int ret = _lnxproc_proc_osrelease_new(&proc_osrelease, NULL);
 
     if (ret == LNXPROC_OK) {
         execute_base(proc_osrelease);
@@ -633,7 +633,7 @@ static void
 test_sys_cpufreq(void)
 {
     _LNXPROC_BASE_T *sys_cpufreq = NULL;
-    LNXPROC_ERROR_T ret = _lnxproc_sys_cpufreq_new(&sys_cpufreq, NULL);
+    int ret = _lnxproc_sys_cpufreq_new(&sys_cpufreq, NULL);
 
     if (ret == LNXPROC_OK) {
         execute_base(sys_cpufreq);
@@ -645,7 +645,7 @@ static void
 test_sys_disksectors(void)
 {
     _LNXPROC_BASE_T *sys_disksectors = NULL;
-    LNXPROC_ERROR_T ret = _lnxproc_sys_disksectors_new(&sys_disksectors, NULL);
+    int ret = _lnxproc_sys_disksectors_new(&sys_disksectors, NULL);
 
     if (ret == LNXPROC_OK) {
         execute_base(sys_disksectors);
@@ -657,7 +657,7 @@ static void
 test_proc_pid_stat(void)
 {
     _LNXPROC_BASE_T *proc_pid_stat = NULL;
-    LNXPROC_ERROR_T ret = _lnxproc_proc_pid_stat_new(&proc_pid_stat, NULL);
+    int ret = _lnxproc_proc_pid_stat_new(&proc_pid_stat, NULL);
 
     if (ret == LNXPROC_OK) {
         execute_base(proc_pid_stat);

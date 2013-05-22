@@ -30,7 +30,7 @@ Typical contents of file /proc/sys/kernel/hostname::
 #include "base_private.h"
 #include "proc_hostname.h"
 
-static LNXPROC_ERROR_T
+static int
 proc_hostname_normalize(_LNXPROC_BASE_T * base)
 {
     _lnxproc_results_init(base->current->results, 1);
@@ -40,7 +40,7 @@ proc_hostname_normalize(_LNXPROC_BASE_T * base)
     return LNXPROC_OK;
 }
 
-LNXPROC_ERROR_T
+int
 _lnxproc_proc_hostname_new(_LNXPROC_BASE_T ** base, void *optional)
 {
 

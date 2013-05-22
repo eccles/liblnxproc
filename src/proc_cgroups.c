@@ -41,7 +41,7 @@ typical contents of /proc/cgroups file::
 #include "base_private.h"
 #include "proc_cgroups.h"
 
-static LNXPROC_ERROR_T
+static int
 proc_cgroups_normalize(_LNXPROC_BASE_T * base)
 {
     _LNXPROC_RESULTS_T *results = base->current->results;
@@ -81,12 +81,12 @@ proc_cgroups_normalize(_LNXPROC_BASE_T * base)
     return LNXPROC_OK;
 }
 
-LNXPROC_ERROR_T
+int
 _lnxproc_proc_cgroups_new(_LNXPROC_BASE_T ** base, void *optional)
 {
 
     _LNXPROC_LIMITS_T *limits = NULL;
-    LNXPROC_ERROR_T ret = _lnxproc_limits_new(&limits, 2);
+    int ret = _lnxproc_limits_new(&limits, 2);
 
     if (ret) {
         return ret;

@@ -101,7 +101,7 @@ derived_values(int i, int j, _LNXPROC_RESULTS_T * results,
         _LNXPROC_RESULTS_TABLE_T pentry;
 
         strcpy(pentry.key, pkey);
-        LNXPROC_ERROR_T ret = _lnxproc_results_fetch(presults, &pentry);
+        int ret = _lnxproc_results_fetch(presults, &pentry);
 
 #ifdef DEBUG
         char buf[64];
@@ -128,7 +128,7 @@ derived_values(int i, int j, _LNXPROC_RESULTS_T * results,
     }
 }
 
-static LNXPROC_ERROR_T
+static int
 proc_diskstats_normalize(_LNXPROC_BASE_T * base)
 {
     _LNXPROC_BASE_DATA_T *data = base->current;
@@ -234,7 +234,7 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
                 _LNXPROC_RESULTS_TABLE_T pentry;
 
                 strcpy(pentry.key, pkey);
-                LNXPROC_ERROR_T ret = _lnxproc_results_fetch(presults, &pentry);
+                int ret = _lnxproc_results_fetch(presults, &pentry);
 
                 if (ret)
                     continue;
@@ -290,12 +290,12 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
     return LNXPROC_OK;
 }
 
-LNXPROC_ERROR_T
+int
 _lnxproc_proc_diskstats_new(_LNXPROC_BASE_T ** base, void *optional)
 {
 
     _LNXPROC_LIMITS_T *limits = NULL;
-    LNXPROC_ERROR_T ret = _lnxproc_limits_new(&limits, 2);
+    int ret = _lnxproc_limits_new(&limits, 2);
 
     if (ret) {
         return ret;

@@ -33,7 +33,7 @@ This file is part of liblnxproc.
 #include "results_private.h"
 #include "sys_cpufreq.h"
 
-static LNXPROC_ERROR_T
+static int
 sys_cpufreq_normalize(_LNXPROC_BASE_T * base)
 {
     _lnxproc_results_init(base->current->results, 1);
@@ -43,7 +43,7 @@ sys_cpufreq_normalize(_LNXPROC_BASE_T * base)
     return LNXPROC_OK;
 }
 
-LNXPROC_ERROR_T
+int
 _lnxproc_sys_cpufreq_new(_LNXPROC_BASE_T ** base, void *optional)
 {
 

@@ -63,7 +63,7 @@ _lnxproc_results_table_valuestr(_LNXPROC_RESULTS_TABLE_T * entry, char *buf,
     return buf;
 }
 
-LNXPROC_ERROR_T
+int
 _lnxproc_results_table_copy(_LNXPROC_RESULTS_TABLE_T * dest,
                             _LNXPROC_RESULTS_TABLE_T * src)
 {
@@ -112,7 +112,7 @@ internal_print_func(_LNXPROC_RESULTS_TABLE_T * entry, void *data)
     return LNXPROC_OK;
 }
 
-LNXPROC_ERROR_T
+int
 _lnxproc_results_print(_LNXPROC_RESULTS_T * results)
 {
     _LNXPROC_DEBUG("Results %p\n", results);
@@ -144,7 +144,7 @@ _lnxproc_results_print(_LNXPROC_RESULTS_T * results)
 
 }
 
-LNXPROC_ERROR_T
+int
 _lnxproc_results_new(_LNXPROC_RESULTS_T ** results, char *tag)
 {
     _LNXPROC_DEBUG("sizeof ptr %lu\n", sizeof(void *));
@@ -183,7 +183,7 @@ _lnxproc_results_new(_LNXPROC_RESULTS_T ** results, char *tag)
     return LNXPROC_OK;
 }
 
-LNXPROC_ERROR_T
+int
 _lnxproc_results_free(_LNXPROC_RESULTS_T ** resultsptr)
 {
     _LNXPROC_DEBUG("Results %p\n", resultsptr);
@@ -209,7 +209,7 @@ _lnxproc_results_free(_LNXPROC_RESULTS_T ** resultsptr)
     return LNXPROC_OK;
 }
 
-static LNXPROC_ERROR_T
+static int
 realloc_results_table(_LNXPROC_RESULTS_T * results, size_t nentries)
 {
     _LNXPROC_DEBUG("Table %p nentries %zd\n", results->table, nentries);
@@ -243,7 +243,7 @@ realloc_results_table(_LNXPROC_RESULTS_T * results, size_t nentries)
     return LNXPROC_OK;
 }
 
-LNXPROC_ERROR_T
+int
 _lnxproc_results_init(_LNXPROC_RESULTS_T * results, size_t nentries)
 {
     if (!results) {
@@ -256,8 +256,7 @@ _lnxproc_results_init(_LNXPROC_RESULTS_T * results, size_t nentries)
 
     _LNXPROC_DEBUG("Table %p nentries %zd\n", results->table, nentries);
     if (nentries > results->size) {
-        LNXPROC_ERROR_T ret =
-            realloc_results_table(results, nentries - results->size);
+        int ret = realloc_results_table(results, nentries - results->size);
 
         if (ret) {
             _LNXPROC_ERROR_DEBUG(ret, "\n");
@@ -269,7 +268,7 @@ _lnxproc_results_init(_LNXPROC_RESULTS_T * results, size_t nentries)
     return LNXPROC_OK;
 }
 
-LNXPROC_ERROR_T
+int
 _lnxproc_results_hash(_LNXPROC_RESULTS_T * results)
 {
     if (results) {
@@ -294,7 +293,7 @@ _lnxproc_results_hash(_LNXPROC_RESULTS_T * results)
     return LNXPROC_OK;
 }
 
-LNXPROC_ERROR_T
+int
 _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results,
                        _LNXPROC_RESULTS_TABLE_T * entry)
 {
@@ -356,7 +355,7 @@ _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results,
     return LNXPROC_OK;
 }
 
-static LNXPROC_ERROR_T
+static int
 results_add_entry(_LNXPROC_RESULTS_T * results)
 {
     if (!results) {
@@ -373,7 +372,7 @@ results_add_entry(_LNXPROC_RESULTS_T * results)
     _LNXPROC_DEBUG("Table %p\n", results->table);
 
     if (results->length >= results->size) {
-        LNXPROC_ERROR_T ret = realloc_results_table(results, 1);
+        int ret = realloc_results_table(results, 1);
 
         if (ret) {
             _LNXPROC_ERROR_DEBUG(ret, "Add results\n");
@@ -386,11 +385,11 @@ results_add_entry(_LNXPROC_RESULTS_T * results)
     return LNXPROC_OK;
 }
 
-LNXPROC_ERROR_T
+int
 _lnxproc_results_add_float(_LNXPROC_RESULTS_T * results, const char *key,
                            const float value)
 {
-    LNXPROC_ERROR_T ret = results_add_entry(results);
+    int ret = results_add_entry(results);
 
     if (ret) {
         return ret;
@@ -403,11 +402,11 @@ _lnxproc_results_add_float(_LNXPROC_RESULTS_T * results, const char *key,
     return LNXPROC_OK;
 }
 
-LNXPROC_ERROR_T
+int
 _lnxproc_results_add_string(_LNXPROC_RESULTS_T * results, const char *key,
                             const char *value)
 {
-    LNXPROC_ERROR_T ret = results_add_entry(results);
+    int ret = results_add_entry(results);
 
     if (ret) {
         return ret;
@@ -420,11 +419,11 @@ _lnxproc_results_add_string(_LNXPROC_RESULTS_T * results, const char *key,
     return LNXPROC_OK;
 }
 
-LNXPROC_ERROR_T
+int
 _lnxproc_results_add_int(_LNXPROC_RESULTS_T * results, const char *key,
                          const int value)
 {
-    LNXPROC_ERROR_T ret = results_add_entry(results);
+    int ret = results_add_entry(results);
 
     if (ret) {
         return ret;
@@ -437,11 +436,11 @@ _lnxproc_results_add_int(_LNXPROC_RESULTS_T * results, const char *key,
     return LNXPROC_OK;
 }
 
-LNXPROC_ERROR_T
+int
 _lnxproc_results_add_long(_LNXPROC_RESULTS_T * results, const char *key,
                           const long value)
 {
-    LNXPROC_ERROR_T ret = results_add_entry(results);
+    int ret = results_add_entry(results);
 
     if (ret) {
         return ret;
@@ -454,7 +453,7 @@ _lnxproc_results_add_long(_LNXPROC_RESULTS_T * results, const char *key,
     return LNXPROC_OK;
 }
 
-LNXPROC_ERROR_T
+int
 _lnxproc_results_iterate(_LNXPROC_RESULTS_T * results,
                          _LNXPROC_RESULTS_ITERATE_FUNC func, void *data)
 {

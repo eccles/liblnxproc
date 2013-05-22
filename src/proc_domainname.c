@@ -36,7 +36,7 @@ Typical contents of file /proc/sys/kernel/domainname::
 #include "base_private.h"
 #include "proc_domainname.h"
 
-static LNXPROC_ERROR_T
+static int
 proc_domainname_normalize(_LNXPROC_BASE_T * base)
 {
     _lnxproc_results_init(base->current->results, 1);
@@ -46,7 +46,7 @@ proc_domainname_normalize(_LNXPROC_BASE_T * base)
     return LNXPROC_OK;
 }
 
-LNXPROC_ERROR_T
+int
 _lnxproc_proc_domainname_new(_LNXPROC_BASE_T ** base, void *optional)
 {
 

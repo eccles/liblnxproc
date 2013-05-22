@@ -120,7 +120,7 @@ Description::
 #include "proc_pid_stat.h"
 #include "uthash.h"
 
-static LNXPROC_ERROR_T
+static int
 proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
 {
     _LNXPROC_BASE_DATA_T *data = base->current;
@@ -290,7 +290,7 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
                 _LNXPROC_RESULTS_TABLE_T pentry;
 
                 strcpy(pentry.key, key);
-                LNXPROC_ERROR_T ret = _lnxproc_results_fetch(presults, &pentry);
+                int ret = _lnxproc_results_fetch(presults, &pentry);
 
                 if (ret)
                     continue;
@@ -306,7 +306,7 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
                 _LNXPROC_RESULTS_TABLE_T pentry;
 
                 strcpy(pentry.key, key);
-                LNXPROC_ERROR_T ret = _lnxproc_results_fetch(presults, &pentry);
+                int ret = _lnxproc_results_fetch(presults, &pentry);
 
                 _LNXPROC_DEBUG("%d,%d:Prev value %s = %f\n", i, j, pentry.key,
                                pentry.value.f);
@@ -349,12 +349,12 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
     return LNXPROC_OK;
 }
 
-LNXPROC_ERROR_T
+int
 _lnxproc_proc_pid_stat_new(_LNXPROC_BASE_T ** base, void *optional)
 {
 
     _LNXPROC_LIMITS_T *limits = NULL;
-    LNXPROC_ERROR_T ret = _lnxproc_limits_new(&limits, 2);
+    int ret = _lnxproc_limits_new(&limits, 2);
 
     if (ret) {
         return ret;

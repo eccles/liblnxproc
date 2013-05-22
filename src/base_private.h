@@ -68,7 +68,7 @@ extern "C" {
                                 size_t len);
 
     typedef struct _lnxproc_base_t _LNXPROC_BASE_T;
-    typedef LNXPROC_ERROR_T (*_LNXPROC_BASE_METHOD) (_LNXPROC_BASE_T * base);
+    typedef int (*_LNXPROC_BASE_METHOD) (_LNXPROC_BASE_T * base);
 
     struct _lnxproc_base_t {
         _LNXPROC_BASE_METHOD rawread;
@@ -89,35 +89,33 @@ extern "C" {
         _LNXPROC_BASE_DATA_T data[2];
     };
 
-    LNXPROC_ERROR_T _lnxproc_base_new(_LNXPROC_BASE_T ** base,
-                                      char *tag,
-                                      _LNXPROC_BASE_TYPE_T type,
-                                      char **filenames,
-                                      size_t nfiles,
-                                      char *fileprefix,
-                                      char *fileglob,
-                                      char *filesuffix,
-                                      _LNXPROC_BASE_METHOD rawread,
-                                      _LNXPROC_BASE_METHOD normalize,
-                                      _LNXPROC_BASE_METHOD read,
-                                      size_t buflen,
-                                      _LNXPROC_LIMITS_T * limits);
+    int _lnxproc_base_new(_LNXPROC_BASE_T ** base,
+                          char *tag,
+                          _LNXPROC_BASE_TYPE_T type,
+                          char **filenames,
+                          size_t nfiles,
+                          char *fileprefix,
+                          char *fileglob,
+                          char *filesuffix,
+                          _LNXPROC_BASE_METHOD rawread,
+                          _LNXPROC_BASE_METHOD normalize,
+                          _LNXPROC_BASE_METHOD read,
+                          size_t buflen, _LNXPROC_LIMITS_T * limits);
 
-    LNXPROC_ERROR_T _lnxproc_base_free(_LNXPROC_BASE_T ** baseptr);
+    int _lnxproc_base_free(_LNXPROC_BASE_T ** baseptr);
 
 #define _LNXPROC_BASE_FREE(b) {\
     _lnxproc_base_free(&b);\
 }
 
-    LNXPROC_ERROR_T _lnxproc_base_read(_LNXPROC_BASE_T * base);
-    LNXPROC_ERROR_T _lnxproc_base_rawread(_LNXPROC_BASE_T * base);
-    LNXPROC_ERROR_T _lnxproc_base_normalize(_LNXPROC_BASE_T * base);
-    LNXPROC_ERROR_T _lnxproc_base_print(_LNXPROC_BASE_T * base);
-    LNXPROC_ERROR_T _lnxproc_base_store_previous(_LNXPROC_BASE_T * base);
-    LNXPROC_ERROR_T _lnxproc_base_memoize(_LNXPROC_BASE_T * base);
-    LNXPROC_ERROR_T _lnxproc_base_unmemoize(_LNXPROC_BASE_T * base);
-    LNXPROC_ERROR_T _lnxproc_base_timeval_diff(_LNXPROC_BASE_T * base,
-                                               float *tdiff);
+    int _lnxproc_base_read(_LNXPROC_BASE_T * base);
+    int _lnxproc_base_rawread(_LNXPROC_BASE_T * base);
+    int _lnxproc_base_normalize(_LNXPROC_BASE_T * base);
+    int _lnxproc_base_print(_LNXPROC_BASE_T * base);
+    int _lnxproc_base_store_previous(_LNXPROC_BASE_T * base);
+    int _lnxproc_base_memoize(_LNXPROC_BASE_T * base);
+    int _lnxproc_base_unmemoize(_LNXPROC_BASE_T * base);
+    int _lnxproc_base_timeval_diff(_LNXPROC_BASE_T * base, float *tdiff);
 
 #ifdef __cplusplus
 }                               // extern "C"
