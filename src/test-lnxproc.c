@@ -511,6 +511,13 @@ test_array(void)
 }
 
 /*----------------------------------------------------------------------------*/
+static int
+interface_func(char *mod, char *key, char *value, void *data)
+{
+    printf("Mod %s key %s value %s data %s\n", mod, key, value, (char *) data);
+    return LNXPROC_OK;
+}
+
 static void
 test_interface(void)
 {
@@ -521,6 +528,8 @@ test_interface(void)
     lnxproc_read(modules);
     lnxproc_read(modules);
     lnxproc_read(modules);
+    lnxproc_print(modules);
+    lnxproc_iterate(modules, interface_func, "All");
     LNXPROC_FREE(modules);
 
     char buf[32];
@@ -532,6 +541,8 @@ test_interface(void)
     lnxproc_read(modules);
     lnxproc_read(modules);
     lnxproc_read(modules);
+    lnxproc_print(modules);
+    lnxproc_iterate(modules, interface_func, "PID_STAT");
     LNXPROC_FREE(modules);
 
     snprintf(buf, sizeof buf, "%s", "sd*");
@@ -540,6 +551,8 @@ test_interface(void)
     lnxproc_read(modules);
     lnxproc_read(modules);
     lnxproc_read(modules);
+    lnxproc_print(modules);
+    lnxproc_iterate(modules, interface_func, "SYS_DISKSECTORS");
     LNXPROC_FREE(modules);
 }
 

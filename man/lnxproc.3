@@ -51,6 +51,15 @@ lnxproc \- interface to reading the /proc/ & /sys filesystems
 .BI "                        long *" hash_time ,
 .BI "                        long *" normalize_time ");"
 
+.BI "typedef (*LNXPROC_INTERFACE_METHOD)(char *" module , 
+.BI "                                    char *" key ,
+.BI "                                    char *" value ,
+.BI "                                    void *" data ");"
+
+.BI "int lnxproc_iterate(LNXPROC_MODULE_T *" modules ,
+.BI "                    LNXPROC_INTERFACE_METHOD " func ,
+.BI "                    void *" data ");"
+
 .BI "const char *lnxproc_strerror(int " err, 
 .BI "                             char *" buf, 
 .BI "                             size_t " buflen ");"
@@ -182,8 +191,12 @@ print to stdout all data collected on the last call to
 .B lnxproc_read()
 .P
 .BR lnxproc_performance()
-prints to stdout the time taken to read and process the data in read, map, normalize and hash 
-phases.
+prints to stdout the time taken to read and process the data in read, map,
+normalize and hash phases.
+.P
+.BR lnxproc_iterate()
+iterates over the whole datatset, executing the supplied function on every data
+point found.
 .P
 .BR lnxproc_strerror()
 formats any return values as a string.
@@ -207,13 +220,13 @@ A function argument is illegal. This includes cases where an argument
 may have subfields that are illegal.
 .TP
 .B LNXPROC_ERROR_BASE_READ_OVERFLOW
-Internal error to indicate when to grow buffers to accommodate the quantity read.
-This error is never returned to the original call.
+Internal error to indicate when to grow buffers to accommodate the quantity
+read.
+This error is never returned to the user.
 .TP
 .B LNXPROC_ERROR_BASE_REGEX_FAILURE
 The regular expression matcher has failed and is unable to extract the 
-field 
-data. Only some modules (
+field data. Only some modules (
 .B LNXPROC_SYS_DISKSECTORS & LNXPROC_PID_STAT
 at time of writing ) use file globbing.
 .TP
@@ -323,6 +336,7 @@ test_module(LNXPROC_MODULE_T * modules, char *str)
 int
 main(int argc, char *argv[])
 {
+    /* NB Omit return values for clarity */
 
     lnxproc_new(&modules, 0); // load all modules
     test_module(modules, "All");

@@ -110,7 +110,8 @@ extern "C" {
     int _lnxproc_results_add_string(_LNXPROC_RESULTS_T * results,
                                     const char *key, const char *value);
 
-    typedef int (*_LNXPROC_RESULTS_ITERATE_FUNC) (_LNXPROC_RESULTS_TABLE_T *
+    typedef int (*_LNXPROC_RESULTS_ITERATE_FUNC) (_LNXPROC_RESULTS_T * results,
+                                                  _LNXPROC_RESULTS_TABLE_T *
                                                   entry, void *data);
     int _lnxproc_results_iterate(_LNXPROC_RESULTS_T * results,
                                  _LNXPROC_RESULTS_ITERATE_FUNC func,

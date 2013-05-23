@@ -98,7 +98,8 @@ lnxproc_set(LNXPROC_MODULE_T * module, size_t pos, LNXPROC_MODULE_TYPE_T type,
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
     _LNXPROC_MODULE_ROW_T *row = module->row + pos;
-    if (row) {
+
+    if (row->base) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Module already used");
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
@@ -159,22 +160,24 @@ lnxproc_read(LNXPROC_MODULE_T * modules)
     for (i = 0; i < modules->nmodules; i++) {
         _LNXPROC_MODULE_ROW_T *row = modules->row + i;
 
-        if (!row->base) {
-            ret = row->new(&row->base, row->optional);
+        if (row->new) {
+            if (!row->base) {
+                ret = row->new(&row->base, row->optional);
 
+                if (ret) {
+                    return ret;
+                }
+            }
+            _LNXPROC_BASE_T *base = row->base;
+
+            ret = _lnxproc_base_rawread(base);
             if (ret) {
                 return ret;
             }
-        }
-        _LNXPROC_BASE_T *base = row->base;
-
-        ret = _lnxproc_base_rawread(base);
-        if (ret) {
-            return ret;
-        }
-        ret = _lnxproc_base_normalize(base);
-        if (ret) {
-            return ret;
+            ret = _lnxproc_base_normalize(base);
+            if (ret) {
+                return ret;
+            }
         }
     }
     return LNXPROC_OK;
@@ -200,16 +203,69 @@ lnxproc_performance(LNXPROC_MODULE_T * modules,
 
     for (i = 0; i < modules->nmodules; i++) {
         _LNXPROC_MODULE_ROW_T *row = modules->row + i;
-        _LNXPROC_BASE_T *base = row->base;
 
-        if (base) {
-            _LNXPROC_BASE_DATA_T *base_data = base->current;
+        if (row->new) {
+            _LNXPROC_BASE_T *base = row->base;
 
-            if (base_data) {
-                *rawread_time += base_data->rawread_time;
-                *map_time += base_data->map_time;
-                *hash_time += base_data->hash_time;
-                *normalize_time += base_data->normalize_time;
+            if (base) {
+                _LNXPROC_BASE_DATA_T *base_data = base->current;
+
+                if (base_data) {
+                    *rawread_time += base_data->rawread_time;
+                    *map_time += base_data->map_time;
+                    *hash_time += base_data->hash_time;
+                    *normalize_time += base_data->normalize_time;
+                }
+            }
+        }
+    }
+    return LNXPROC_OK;
+}
+
+struct interface_env_t {
+    LNXPROC_INTERFACE_METHOD func;
+    void *data;
+};
+static int
+results_iterate(_LNXPROC_RESULTS_T * results, _LNXPROC_RESULTS_TABLE_T * entry,
+                void *data)
+{
+    struct interface_env_t *env = data;
+    LNXPROC_INTERFACE_METHOD func = env->func;
+    char buf[32];
+
+    _lnxproc_results_table_valuestr(entry, buf, sizeof buf);
+    func(results->tag, entry->key, buf, env->data);
+    return LNXPROC_OK;
+}
+
+int
+lnxproc_iterate(LNXPROC_MODULE_T * modules, LNXPROC_INTERFACE_METHOD func,
+                void *data)
+{
+    if (!modules) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Modules");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+    int i;
+
+    for (i = 0; i < modules->nmodules; i++) {
+        _LNXPROC_MODULE_ROW_T *row = modules->row + i;
+
+        if (row->new) {
+            _LNXPROC_BASE_T *base = row->base;
+
+            if (base) {
+                _LNXPROC_BASE_DATA_T *base_data = base->current;
+
+                struct interface_env_t env = {
+                    .func = func,
+                    .data = data,
+                };
+                if (base_data) {
+                    _lnxproc_results_iterate(base_data->results,
+                                             results_iterate, &env);
+                }
             }
         }
     }
@@ -227,13 +283,16 @@ lnxproc_print(LNXPROC_MODULE_T * modules)
 
     for (i = 0; i < modules->nmodules; i++) {
         _LNXPROC_MODULE_ROW_T *row = modules->row + i;
-        _LNXPROC_BASE_T *base = row->base;
 
-        if (base) {
-            _LNXPROC_BASE_DATA_T *base_data = base->current;
+        if (row->new) {
+            _LNXPROC_BASE_T *base = row->base;
 
-            if (base_data) {
-                _lnxproc_results_print(base_data->results);
+            if (base) {
+                _LNXPROC_BASE_DATA_T *base_data = base->current;
+
+                if (base_data) {
+                    _lnxproc_results_print(base_data->results);
+                }
             }
         }
     }

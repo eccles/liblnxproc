@@ -61,6 +61,10 @@ extern "C" {
                             long *map_time, long *hash_time,
                             long *normalize_time);
 
+    typedef int (*LNXPROC_INTERFACE_METHOD) (char *mod, char *key, char *value,
+                                             void *data);
+    int lnxproc_iterate(LNXPROC_MODULE_T * modules,
+                        LNXPROC_INTERFACE_METHOD func, void *data);
 #ifdef __cplusplus
 }                               // extern "C"
 #endif

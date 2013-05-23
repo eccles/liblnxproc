@@ -61,6 +61,7 @@ _lnxproc_results_table_valuestr(_LNXPROC_RESULTS_TABLE_T * entry, char *buf,
         default:
             _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "valuetype %d",
                                  entry->valuetype);
+            buf[0] = '\0';
             break;
         }
     }
@@ -111,11 +112,12 @@ _lnxproc_results_table_copy(_LNXPROC_RESULTS_TABLE_T * dest,
 }
 
 static int
-internal_print_func(_LNXPROC_RESULTS_TABLE_T * entry, void *data)
+internal_print_func(_LNXPROC_RESULTS_T * results,
+                    _LNXPROC_RESULTS_TABLE_T * entry, void *data)
 {
     char buf[64];
 
-    printf("%s Key %s = %s\n", (char *) data, entry->key,
+    printf("%s %s Key %s = %s\n", (char *) data, results->tag, entry->key,
            _lnxproc_results_table_valuestr(entry, buf, sizeof buf));
     return LNXPROC_OK;
 }
@@ -140,14 +142,14 @@ _lnxproc_results_print(_LNXPROC_RESULTS_T * results)
     char buf[32];
 
     if (results->hash) {
-        snprintf(buf, sizeof buf, "%s Hash", results->tag);
+        snprintf(buf, sizeof buf, "Hash");
         _LNXPROC_RESULTS_TABLE_T *entry, *tmp;
 
         HASH_ITER(hh, results->hash, entry, tmp) {
-            internal_print_func(entry, buf);
+            internal_print_func(results, entry, buf);
         }
     }
-    snprintf(buf, sizeof buf, "%s Line", results->tag);
+    snprintf(buf, sizeof buf, "Line");
     return _lnxproc_results_iterate(results, internal_print_func, buf);
 
 }
@@ -474,7 +476,7 @@ _lnxproc_results_iterate(_LNXPROC_RESULTS_T * results,
         _LNXPROC_DEBUG("Table %p\n", table);
 
         for (i = 0; i < results->length; i++) {
-            func(table + i, data);
+            func(results, table + i, data);
         }
     }
     return LNXPROC_OK;
