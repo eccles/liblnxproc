@@ -98,6 +98,10 @@ lnxproc_set(LNXPROC_MODULE_T * module, size_t pos, LNXPROC_MODULE_TYPE_T type,
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
     _LNXPROC_MODULE_ROW_T *row = module->row + pos;
+    if (row) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Module already used");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
 
     void *p = NULL;
 
