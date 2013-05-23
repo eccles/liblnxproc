@@ -327,16 +327,17 @@ _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results,
         _LNXPROC_RESULTS_TABLE_T *tentry;
 
         HASH_FIND_STR(results->hash, entry->key, tentry);
-        if (tentry) {
-            _lnxproc_results_table_copy(entry, tentry);
-#ifdef DEBUG
-            char buf[64];
-
-            _LNXPROC_DEBUG("Value %s\n",
-                           _lnxproc_results_table_valuestr(entry, buf,
-                                                           sizeof buf));
-#endif
+        if (!tentry) {
+            return LNXPROC_ERROR_NOT_FOUND;
         }
+        _lnxproc_results_table_copy(entry, tentry);
+#ifdef DEBUG
+        char buf[64];
+
+        _LNXPROC_DEBUG("Value %s\n",
+                       _lnxproc_results_table_valuestr(entry, buf, sizeof buf));
+#endif
+        return LNXPROC_OK;
     }
     else {
         int i;
@@ -359,7 +360,7 @@ _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results,
             }
         }
     }
-    return LNXPROC_OK;
+    return LNXPROC_ERROR_NOT_FOUND;
 }
 
 static int

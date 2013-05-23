@@ -522,17 +522,27 @@ static void
 test_interface(void)
 {
 
+    char errbuf[64];
+    char buf[32];
     LNXPROC_MODULE_T *modules = NULL;
 
     lnxproc_new(&modules, 0);
     lnxproc_read(modules);
     lnxproc_read(modules);
     lnxproc_read(modules);
+    int ret = lnxproc_fetch(modules, LNXPROC_PROC_CGROUPS, "hierarchy", buf,
+                            sizeof buf);
+
+    printf("PROC_CGROUPS key '%s' value '%s' Error '%s'\n", "hierarchy", buf,
+           lnxproc_strerror(ret, errbuf, sizeof errbuf));
+    ret =
+        lnxproc_fetch(modules, LNXPROC_PROC_CGROUPS, "/cpuset/hierarchy", buf,
+                      sizeof buf);
+    printf("PROC_CGROUPS key '%s' value '%s' Error '%s'\n", "/cpuset/hierarchy",
+           buf, lnxproc_strerror(ret, errbuf, sizeof errbuf));
     lnxproc_print(modules);
     lnxproc_iterate(modules, interface_func, "All");
     LNXPROC_FREE(modules);
-
-    char buf[32];
 
     snprintf(buf, sizeof buf, "%d", getpid());
 

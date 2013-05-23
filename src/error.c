@@ -41,6 +41,7 @@ static const char *errstr[] = {
     "Overflow of raw read buffer",
     "Base regex failure",
     "Base glob failure",
+    "Key not found",
 };
 
 #define ERRSTR_SIZE sizeof(errstr)/sizeof(errstr[0])

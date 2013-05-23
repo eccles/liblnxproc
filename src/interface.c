@@ -20,6 +20,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include "strlcpy.h"
 #include "error_private.h"
 #include "base_private.h"
 #include "interface_private.h"
@@ -33,14 +34,22 @@
 #include "proc_pid_stat.h"
 
 static _LNXPROC_MODULE_ROW_T mymodules[] = {
-    {.new = _lnxproc_proc_cgroups_new,.base = NULL,.optional = NULL,},
-    {.new = _lnxproc_proc_diskstats_new,.base = NULL,.optional = NULL,},
-    {.new = _lnxproc_proc_domainname_new,.base = NULL,.optional = NULL,},
-    {.new = _lnxproc_proc_hostname_new,.base = NULL,.optional = NULL,},
-    {.new = _lnxproc_proc_osrelease_new,.base = NULL,.optional = NULL,},
-    {.new = _lnxproc_sys_cpufreq_new,.base = NULL,.optional = NULL,},
-    {.new = _lnxproc_sys_disksectors_new,.base = NULL,.optional = NULL,},
-    {.new = _lnxproc_proc_pid_stat_new,.base = NULL,.optional = NULL,},
+    {.type = LNXPROC_PROC_CGROUPS,.new = _lnxproc_proc_cgroups_new,.base =
+     NULL,.optional = NULL,},
+    {.type = LNXPROC_PROC_DISKSTATS,.new = _lnxproc_proc_diskstats_new,.base =
+     NULL,.optional = NULL,},
+    {.type = LNXPROC_PROC_DOMAINNAME,.new = _lnxproc_proc_domainname_new,.base =
+     NULL,.optional = NULL,},
+    {.type = LNXPROC_PROC_HOSTNAME,.new = _lnxproc_proc_hostname_new,.base =
+     NULL,.optional = NULL,},
+    {.type = LNXPROC_PROC_OSRELEASE,.new = _lnxproc_proc_osrelease_new,.base =
+     NULL,.optional = NULL,},
+    {.type = LNXPROC_SYS_CPUFREQ,.new = _lnxproc_sys_cpufreq_new,.base =
+     NULL,.optional = NULL,},
+    {.type = LNXPROC_SYS_DISKSECTORS,.new = _lnxproc_sys_disksectors_new,.base =
+     NULL,.optional = NULL,},
+    {.type = LNXPROC_PROC_PID_STAT,.new = _lnxproc_proc_pid_stat_new,.base =
+     NULL,.optional = NULL,},
 };
 
 static size_t nmodules = sizeof(mymodules) / sizeof(mymodules[0]);
@@ -297,6 +306,48 @@ lnxproc_print(LNXPROC_MODULE_T * modules)
         }
     }
     return LNXPROC_OK;
+}
+
+int
+lnxproc_fetch(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type, char *key,
+              char *value, size_t valuelen)
+{
+    if (!modules) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Modules");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+    if (!value || valuelen < 2) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Fecth buffer");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+    int i;
+
+    for (i = 0; i < modules->nmodules; i++) {
+        _LNXPROC_MODULE_ROW_T *row = modules->row + i;
+
+        if (row->new && (row->type == type)) {
+            _LNXPROC_BASE_T *base = row->base;
+
+            if (base) {
+                _LNXPROC_BASE_DATA_T *base_data = base->current;
+
+                if (base_data) {
+                    _LNXPROC_RESULTS_TABLE_T entry;
+
+                    strlcpy(entry.key, key, sizeof entry.key);
+                    int ret =
+                        _lnxproc_results_fetch(base_data->results, &entry);
+                    if (!ret) {
+                        _lnxproc_results_table_valuestr(&entry, value,
+                                                        valuelen);
+                        return LNXPROC_OK;
+                    }
+                }
+            }
+        }
+    }
+    value[0] = '\0';
+    return LNXPROC_ERROR_NOT_FOUND;
 }
 
 /*

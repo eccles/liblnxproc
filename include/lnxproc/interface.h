@@ -65,6 +65,10 @@ extern "C" {
                                              void *data);
     int lnxproc_iterate(LNXPROC_MODULE_T * modules,
                         LNXPROC_INTERFACE_METHOD func, void *data);
+
+    int lnxproc_fetch(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type,
+                      char *key, char *value, size_t valuelen);
+
 #ifdef __cplusplus
 }                               // extern "C"
 #endif

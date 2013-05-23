@@ -60,6 +60,11 @@ lnxproc \- interface to reading the /proc/ & /sys filesystems
 .BI "                    LNXPROC_INTERFACE_METHOD " func ,
 .BI "                    void *" data ");"
 
+.BI "int lnxproc_fetch(LNXPROC_MODULE_T *" modules ,
+.BI "                  LNXPROC_MODULE_TYPE_T " type ,
+.BI "                  char *" value ,
+.BI "                  size_t " valuelen ");"
+
 .BI "const char *lnxproc_strerror(int " err, 
 .BI "                             char *" buf, 
 .BI "                             size_t " buflen ");"
@@ -198,6 +203,9 @@ normalize and hash phases.
 iterates over the whole datatset, executing the supplied function on every data
 point found.
 .P
+.BR lnxproc_fetch()
+fetches the data for the specified module and key.
+.P
 .BR lnxproc_strerror()
 formats any return values as a string.
 .SH RETURN VALUE
@@ -235,6 +243,10 @@ The globbing expression matcher has failed and has returned no files matched.
 Only some modules (
 .B LNXPROC_SYS_DISKSECTORS & LNXPROC_PID_STAT
 at time of writing ) use file globbing.
+.TP
+.B LNXPROC_ERROR_NOT_FOUND
+Requested group/key does not exist in the data read from the /proc and/or
+/sys filesystems.
 .SH ENVIRONMENT
 The environment variable 
 .B LNXPROC_TESTROOT
