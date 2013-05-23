@@ -58,6 +58,10 @@ _lnxproc_results_table_valuestr(_LNXPROC_RESULTS_TABLE_T * entry, char *buf,
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_PTR:
             snprintf(buf, len, "%p", entry->value.p);
             break;
+        default:
+            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "valuetype %d",
+                                 entry->valuetype);
+            break;
         }
     }
     return buf;
@@ -97,6 +101,10 @@ _lnxproc_results_table_copy(_LNXPROC_RESULTS_TABLE_T * dest,
             dest->valuetype = src->valuetype;
             dest->value.p = src->value.p;
             break;
+        default:
+            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "valuetype %d",
+                                 src->valuetype);
+            break;
         }
     }
     return LNXPROC_OK;
@@ -118,8 +126,8 @@ _lnxproc_results_print(_LNXPROC_RESULTS_T * results)
     _LNXPROC_DEBUG("Results %p\n", results);
 
     if (!results) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
-        return LNXPROC_ERROR_RESULTS_NULL;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Results");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
     printf("Tag = %s\n", results->tag);
@@ -151,21 +159,20 @@ _lnxproc_results_new(_LNXPROC_RESULTS_T ** results, char *tag)
     _LNXPROC_DEBUG("sizeof _LNXPROC_RESULTS_T %lu\n",
                    sizeof(_LNXPROC_RESULTS_T));
     if (!results) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_ADDRESS_NULL, "\n");
-        return LNXPROC_ERROR_RESULTS_ADDRESS_NULL;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Results address");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
     if (*results) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_ADDRESS_CONTENTS_NOT_NULL,
-                             "\n");
-        return LNXPROC_ERROR_RESULTS_ADDRESS_CONTENTS_NOT_NULL;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Results not null");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
     _LNXPROC_RESULTS_T *p = calloc(1, sizeof(_LNXPROC_RESULTS_T));
 
     if (!p) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
-        return LNXPROC_ERROR_RESULTS_NULL;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Results");
+        return LNXPROC_ERROR_MALLOC;
     }
 
     if (tag) {
@@ -222,8 +229,8 @@ realloc_results_table(_LNXPROC_RESULTS_T * results, size_t nentries)
     _LNXPROC_RESULTS_TABLE_T *t = realloc(results->table, nsize);
 
     if (!t) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_TABLE_MALLOC, "\n");
-        return LNXPROC_ERROR_RESULTS_TABLE_MALLOC;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Results table");
+        return LNXPROC_ERROR_MALLOC;
     }
     int i;
 
@@ -247,8 +254,8 @@ int
 _lnxproc_results_init(_LNXPROC_RESULTS_T * results, size_t nentries)
 {
     if (!results) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
-        return LNXPROC_ERROR_RESULTS_NULL;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Results");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
     HASH_CLEAR(hh, results->hash);
@@ -259,7 +266,6 @@ _lnxproc_results_init(_LNXPROC_RESULTS_T * results, size_t nentries)
         int ret = realloc_results_table(results, nentries - results->size);
 
         if (ret) {
-            _LNXPROC_ERROR_DEBUG(ret, "\n");
             return ret;
         }
     }
@@ -300,19 +306,18 @@ _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results,
     _LNXPROC_DEBUG("Results %p\n", results);
 
     if (!results) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
-        return LNXPROC_ERROR_RESULTS_NULL;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Results");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
     if (!entry) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_VAL_ADDRESS_NULL, "\n");
-        return LNXPROC_ERROR_RESULTS_VAL_ADDRESS_NULL;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Results entry");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
     if (!results->table) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_TABLE_NULL,
-                             "Fetch results\n");
-        return LNXPROC_ERROR_RESULTS_TABLE_NULL;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Results table");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
     _LNXPROC_DEBUG("Table %p\n", results->table);
 
@@ -359,8 +364,8 @@ static int
 results_add_entry(_LNXPROC_RESULTS_T * results)
 {
     if (!results) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
-        return LNXPROC_ERROR_RESULTS_NULL;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Results");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
     if (!results->table) {
@@ -375,7 +380,6 @@ results_add_entry(_LNXPROC_RESULTS_T * results)
         int ret = realloc_results_table(results, 1);
 
         if (ret) {
-            _LNXPROC_ERROR_DEBUG(ret, "Add results\n");
             return ret;
         }
     }
@@ -458,8 +462,8 @@ _lnxproc_results_iterate(_LNXPROC_RESULTS_T * results,
                          _LNXPROC_RESULTS_ITERATE_FUNC func, void *data)
 {
     if (!results) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_RESULTS_NULL, "\n");
-        return LNXPROC_ERROR_RESULTS_NULL;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Results");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
     _LNXPROC_DEBUG("Results %p\n", results);

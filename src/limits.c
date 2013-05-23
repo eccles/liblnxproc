@@ -34,8 +34,8 @@ int
 _lnxproc_limits_print(_LNXPROC_LIMITS_T * limits)
 {
     if (!limits) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_NULL, "\n");
-        return LNXPROC_ERROR_LIMITS_NULL;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Limits");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
     printf("Dim %zd\n", limits->dim);
@@ -108,8 +108,8 @@ _lnxproc_limit_print(_LNXPROC_LIMITS_ROW_T * row, char *buf, size_t buflen)
     buf[0] = '\0';
 
     if (!row) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_NULL, "\n");
-        return LNXPROC_ERROR_LIMIT_NULL;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Limits row");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
     int m = 0;
@@ -127,21 +127,20 @@ int
 _lnxproc_limits_new(_LNXPROC_LIMITS_T ** newlimits, size_t dim)
 {
     if (!newlimits) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_ADDRESS_NULL, "\n");
-        return LNXPROC_ERROR_LIMITS_ADDRESS_NULL;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Limits address");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
     if (*newlimits) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_ADDRESS_CONTENTS_NOT_NULL,
-                             "\n");
-        return LNXPROC_ERROR_LIMITS_ADDRESS_CONTENTS_NOT_NULL;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Limits is not null");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
     _LNXPROC_DEBUG("Malloc limits %zd\n", dim);
     _LNXPROC_LIMITS_T *nlimits = calloc(1,
                                         sizeof(_LNXPROC_LIMITS_T) +
                                         (dim * sizeof(_LNXPROC_LIMITS_ROW_T)));
     if (!nlimits) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_MALLOC, "Malloc limits\n");
-        return LNXPROC_ERROR_LIMITS_MALLOC;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Limits");
+        return LNXPROC_ERROR_MALLOC;
     }
     nlimits->dim = dim;
     *newlimits = nlimits;
@@ -153,21 +152,19 @@ _lnxproc_limits_set(_LNXPROC_LIMITS_T * limits, int pos, size_t expected,
                     char *chars, int len)
 {
     if (!limits) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_NULL, "\n");
-        return LNXPROC_ERROR_LIMITS_NULL;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Limits");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
     if (pos < 0 || pos >= limits->dim) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_ILLEGAL_DIMENSION,
-                             "pos = %d\n", pos);
-        return LNXPROC_ERROR_LIMITS_ILLEGAL_DIMENSION;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Limits pos = %d", pos);
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
     char *c = strdup(chars);
 
     if (!c) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_CHARS_MALLOC,
-                             "Malloc chars\n");
-        return LNXPROC_ERROR_LIMITS_CHARS_MALLOC;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Chars at position %d", pos);
+        return LNXPROC_ERROR_MALLOC;
     }
 
     _LNXPROC_LIMITS_ROW_T *row = limits->row + pos;
@@ -187,17 +184,16 @@ _lnxproc_limits_dup(_LNXPROC_LIMITS_T ** newlimits, _LNXPROC_LIMITS_T * limits)
     _LNXPROC_DEBUG("sizeof _LNXPROC_LIMITS_T %lu\n", sizeof(_LNXPROC_LIMITS_T));
 
     if (!newlimits) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_ADDRESS_NULL, "\n");
-        return LNXPROC_ERROR_LIMITS_ADDRESS_NULL;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Limits address");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
     if (*newlimits) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_ADDRESS_CONTENTS_NOT_NULL,
-                             "\n");
-        return LNXPROC_ERROR_LIMITS_ADDRESS_CONTENTS_NOT_NULL;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Limits");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
     if (!limits) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_LIMITS_NULL, "\n");
-        return LNXPROC_ERROR_LIMITS_NULL;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Limits");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
     int ret = _lnxproc_limits_new(newlimits, limits->dim);

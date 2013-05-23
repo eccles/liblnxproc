@@ -120,8 +120,8 @@ _lnxproc_base_print(_LNXPROC_BASE_T * base)
         return LNXPROC_OK;
     }
 
-    _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_NULL, "\n");
-    return LNXPROC_ERROR_BASE_NULL;
+    _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
+    return LNXPROC_ERROR_ILLEGAL_ARG;
 }
 
 static int
@@ -131,7 +131,7 @@ base_rawread(char *filename, char **readbuf, int *nbytes)
                    *nbytes);
 
     if (*nbytes < 1) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_READ_OVERFLOW, "Raw Read %s\n",
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_READ_OVERFLOW, "Raw Read %s",
                              filename);
         return LNXPROC_ERROR_BASE_READ_OVERFLOW;
     }
@@ -143,7 +143,7 @@ base_rawread(char *filename, char **readbuf, int *nbytes)
     if (fd < 0) {
         int myerrno = -errno;
 
-        _LNXPROC_ERROR_DEBUG(myerrno, "Open %s\n", filename);
+        _LNXPROC_ERROR_DEBUG(myerrno, "Open %s", filename);
         return myerrno;
     }
 
@@ -156,7 +156,7 @@ base_rawread(char *filename, char **readbuf, int *nbytes)
     if (inbytes < 0) {
         int myerrno = -errno;
 
-        _LNXPROC_ERROR_DEBUG(myerrno, "Read %s\n", filename);
+        _LNXPROC_ERROR_DEBUG(myerrno, "Read %s", filename);
         _LNXPROC_DEBUG("Close %s\n", filename);
         close(fd);
 
@@ -170,7 +170,7 @@ base_rawread(char *filename, char **readbuf, int *nbytes)
     *readbuf += inbytes;
     *nbytes -= inbytes;
     if (*nbytes < 1) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_READ_OVERFLOW, "Raw Read %s\n",
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_READ_OVERFLOW, "Raw Read %s",
                              filename);
         return LNXPROC_ERROR_BASE_READ_OVERFLOW;
     }
@@ -225,7 +225,7 @@ base_read_glob_files(_LNXPROC_BASE_T * base, char **readbuf, int *nbytes)
     int ret =
         glob(globpat, GLOB_MARK | GLOB_NOSORT | GLOB_BRACE, NULL, &globbuf);
     if (ret) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_GLOB_FAILURE, " errno = %d\n",
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_GLOB_FAILURE, " errno = %d",
                              ret);
         return LNXPROC_ERROR_BASE_GLOB_FAILURE;
     }
@@ -242,9 +242,9 @@ base_read_glob_files(_LNXPROC_BASE_T * base, char **readbuf, int *nbytes)
 
     if (ret) {
 #ifdef DEBUG
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_REGEX_FAILURE, "%s\n", regpat);
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_REGEX_FAILURE, "%s", regpat);
         regerror(ret, &reg, errbuf, sizeof errbuf);
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_REGEX_FAILURE, " errno = %s\n",
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_REGEX_FAILURE, " errno = %s",
                              errbuf);
 #endif
         globfree(&globbuf);
@@ -260,7 +260,7 @@ base_read_glob_files(_LNXPROC_BASE_T * base, char **readbuf, int *nbytes)
 #ifdef DEBUG
             regerror(ret, &reg, errbuf, sizeof errbuf);
             _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_REGEX_FAILURE,
-                                 " errno = %s\n", errbuf);
+                                 " errno = %s", errbuf);
 #endif
             globfree(&globbuf);
             regfree(&reg);
@@ -337,9 +337,8 @@ base_new_rawread_buffer(_LNXPROC_BASE_DATA_T * data, size_t newlen)
     char *p = realloc(data->lines, newlen + 1);
 
     if (!p) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_BUFFER,
-                             "Malloc buffer\n");
-        return LNXPROC_ERROR_BASE_MALLOC_BUFFER;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Base buffer");
+        return LNXPROC_ERROR_MALLOC;
     }
     memset(p, 0, newlen);
     p[newlen] = '\n';
@@ -370,7 +369,6 @@ base_rawread_default(_LNXPROC_BASE_T * base)
         }
     } while (ret == LNXPROC_ERROR_BASE_READ_OVERFLOW);
     if (ret) {
-        _LNXPROC_ERROR_DEBUG(ret, "\n");
         return ret;
     }
     _LNXPROC_DEBUG("Successful\n");
@@ -381,8 +379,8 @@ int
 _lnxproc_base_rawread(_LNXPROC_BASE_T * base)
 {
     if (!base) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_NULL, "\n");
-        return LNXPROC_ERROR_BASE_NULL;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
     _LNXPROC_BASE_DATA_T *data = base->current;
@@ -394,7 +392,6 @@ _lnxproc_base_rawread(_LNXPROC_BASE_T * base)
             if (base->count > 0) {
                 ret = _lnxproc_base_store_previous(base);
                 if (ret) {
-                    _LNXPROC_ERROR_DEBUG(ret, "\n");
                     return ret;
                 }
             }
@@ -404,7 +401,6 @@ _lnxproc_base_rawread(_LNXPROC_BASE_T * base)
 
         ret = base->rawread(base);
         if (ret) {
-            _LNXPROC_ERROR_DEBUG(ret, "\n");
             return ret;
         }
 
@@ -544,9 +540,7 @@ array_new(_LNXPROC_BASE_DATA_T * data, _LNXPROC_LIMITS_T * limits)
         int ret = _lnxproc_array_new(&data->array, limits);
 
         if (ret) {
-            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_ARRAY,
-                                 "Malloc array\n");
-            return LNXPROC_ERROR_BASE_MALLOC_ARRAY;
+            return ret;
         }
     }
     else {
@@ -568,8 +562,8 @@ _lnxproc_base_normalize(_LNXPROC_BASE_T * base)
     _LNXPROC_DEBUG("Base %p\n", base);
 
     if (!base) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_NULL, "\n");
-        return LNXPROC_ERROR_BASE_NULL;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
     int ret;
@@ -588,7 +582,6 @@ _lnxproc_base_normalize(_LNXPROC_BASE_T * base)
 
         data->normalize_time = lnxproc_timeval_diff(&start, &end);
         if (ret) {
-            _LNXPROC_ERROR_DEBUG(ret, "\n");
             return ret;
         }
         start = end;
@@ -598,7 +591,6 @@ _lnxproc_base_normalize(_LNXPROC_BASE_T * base)
         if (base->type == _LNXPROC_BASE_TYPE_MEMOIZE) {
             ret = _lnxproc_base_memoize(base);
             if (ret) {
-                _LNXPROC_ERROR_DEBUG(ret, "\n");
                 return ret;
             }
         }
@@ -621,19 +613,17 @@ _lnxproc_base_read(_LNXPROC_BASE_T * base)
     _LNXPROC_DEBUG("Base %p\n", base);
 
     if (!base) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_NULL, "\n");
-        return LNXPROC_ERROR_BASE_NULL;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
     int ret;
 
     ret = _lnxproc_base_rawread(base);
     if (ret) {
-        _LNXPROC_ERROR_DEBUG(ret, "\n");
         return ret;
     }
     ret = _lnxproc_base_normalize(base);
     if (ret) {
-        _LNXPROC_ERROR_DEBUG(ret, "\n");
         return ret;
     }
 
@@ -662,14 +652,13 @@ _base_data_new(_LNXPROC_BASE_DATA_T * data, int id, char *tag,
 
     ret = array_new(data, limits);
     if (ret) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_ARRAY, "Malloc array\n");
-        return LNXPROC_ERROR_BASE_MALLOC_ARRAY;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Array");
+        return LNXPROC_ERROR_MALLOC;
     }
 
     data->results = NULL;
     ret = _lnxproc_results_new(&data->results, tag);
     if (ret) {
-        _LNXPROC_ERROR_DEBUG(ret, "Malloc results\n");
         return ret;
     }
     return LNXPROC_OK;
@@ -729,26 +718,26 @@ _lnxproc_base_new(_LNXPROC_BASE_T ** base,
     _LNXPROC_DEBUG("sizeof LNXPROC_BASE_T %lu\n", sizeof(_LNXPROC_BASE_T));
 
     if (!base) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_ADDRESS_NULL, "Malloc base\n");
-        return LNXPROC_ERROR_BASE_ADDRESS_NULL;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
     if ((filenames && (nfiles < 1)) || (!filenames && (nfiles > 0))) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_BAD_FILENAME,
-                             "Filenames %p Nfiles %zd\n", filenames, nfiles);
-        return LNXPROC_ERROR_BASE_BAD_FILENAME;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG,
+                             "Filenames %p Nfiles %zd", filenames, nfiles);
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
     if (!filenames && !fileprefix && !filesuffix) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_BAD_FILENAME,
-                             "Filenames %p Fileprefix %p Filesuffix %p\n",
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG,
+                             "Filenames %p Fileprefix %p Filesuffix %p",
                              filenames, fileprefix, filesuffix);
-        return LNXPROC_ERROR_BASE_BAD_FILENAME;
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
     _LNXPROC_BASE_T *p = calloc(1, sizeof(_LNXPROC_BASE_T));
 
     if (!p) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_BASE, "Malloc base\n");
-        return LNXPROC_ERROR_BASE_MALLOC_BASE;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Base");
+        return LNXPROC_ERROR_MALLOC;
     }
 
     _LNXPROC_DEBUG("Malloc data area\n");
@@ -767,10 +756,9 @@ _lnxproc_base_new(_LNXPROC_BASE_T ** base,
     if (filenames) {
         p->filenames = calloc(nfiles, sizeof(char *));
         if (!p->filenames) {
-            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_FILENAME,
-                                 "Malloc filenames\n");
+            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Base filenames");
             _LNXPROC_BASE_FREE(p);
-            return LNXPROC_ERROR_BASE_MALLOC_FILENAME;
+            return LNXPROC_ERROR_MALLOC;
         }
         int i;
 
@@ -785,10 +773,10 @@ _lnxproc_base_new(_LNXPROC_BASE_T ** base,
                 p->filenames[i] = strdup(filenames[i]);
             }
             if (!p->filenames[i]) {
-                _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_FILENAME,
-                                     "Malloc filenames %d\n", i);
+                _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Base filenames %d",
+                                     i);
                 _LNXPROC_BASE_FREE(p);
-                return LNXPROC_ERROR_BASE_MALLOC_FILENAME;
+                return LNXPROC_ERROR_MALLOC;
             }
             p->nfiles++;
         }
@@ -807,10 +795,9 @@ _lnxproc_base_new(_LNXPROC_BASE_T ** base,
             p->fileprefix = strdup(fileprefix);
         }
         if (!p->fileprefix) {
-            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_FILEPREFIX,
-                                 "Malloc fileprefix\n");
+            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Base fileprefix");
             _LNXPROC_BASE_FREE(p);
-            return LNXPROC_ERROR_BASE_MALLOC_FILEPREFIX;
+            return LNXPROC_ERROR_MALLOC;
         }
     }
     else {
@@ -819,10 +806,9 @@ _lnxproc_base_new(_LNXPROC_BASE_T ** base,
     if (fileglob) {
         p->fileglob = strdup(fileglob);
         if (!p->fileglob) {
-            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_FILEGLOB,
-                                 "Malloc fileglob\n");
+            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Base fileglob");
             _LNXPROC_BASE_FREE(p);
-            return LNXPROC_ERROR_BASE_MALLOC_FILEGLOB;
+            return LNXPROC_ERROR_MALLOC;
         }
     }
     else {
@@ -831,10 +817,9 @@ _lnxproc_base_new(_LNXPROC_BASE_T ** base,
     if (filesuffix) {
         p->filesuffix = strdup(filesuffix);
         if (!p->filesuffix) {
-            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_MALLOC_FILESUFFIX,
-                                 "Malloc filesuffix\n");
+            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Base filesuffix");
             _LNXPROC_BASE_FREE(p);
-            return LNXPROC_ERROR_BASE_MALLOC_FILESUFFIX;
+            return LNXPROC_ERROR_MALLOC;
         }
     }
     else {
@@ -930,8 +915,8 @@ int
 _lnxproc_base_memoize(_LNXPROC_BASE_T * base)
 {
     if (!base) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_NULL, "\n");
-        return LNXPROC_ERROR_BASE_NULL;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
     if (!base->memoize_read) {
@@ -953,8 +938,8 @@ int
 _lnxproc_base_unmemoize(_LNXPROC_BASE_T * base)
 {
     if (!base) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_NULL, "\n");
-        return LNXPROC_ERROR_BASE_NULL;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
     if (base->memoize_read) {
@@ -975,20 +960,26 @@ _lnxproc_base_unmemoize(_LNXPROC_BASE_T * base)
 int
 _lnxproc_base_timeval_diff(_LNXPROC_BASE_T * base, float *tdiff)
 {
+    if (!tdiff) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Time difference");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
     *tdiff = 0.0;
     if (!base) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_NULL, "\n");
-        return LNXPROC_ERROR_BASE_NULL;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
-    if (!base->previous) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_PREVIOUS_NULL, "\n");
-        return LNXPROC_ERROR_BASE_PREVIOUS_NULL;
+    if (!base->previous || !base->current) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG,
+                             "Base current/previous");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
     if (!base->current->array || !base->previous->array) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_ARRAY_NULL, "\n");
-        return LNXPROC_ERROR_BASE_ARRAY_NULL;
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG,
+                             "Base current/previous array");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
     *tdiff =

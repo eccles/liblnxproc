@@ -562,7 +562,7 @@ execute_base(_LNXPROC_BASE_T * base)
             else {
                 _lnxproc_base_print(base);
             }
-            sleep(20);
+            //sleep(20);
         }
         _LNXPROC_BASE_FREE(base);
     }

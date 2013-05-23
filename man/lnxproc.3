@@ -20,17 +20,10 @@
 .\" Formatted or processed versions of this manual, if unaccompanied by
 .\" the source, must acknowledge the copyright and authors of this work.
 .\"
-.TH LNXPROC 3 2013-05-16 "Linux" "/proc & /sys access"
+.TH LNXPROC 3 2013-05-16 "Linux" "Linux Programmer's Manual"
 .SH NAME
 .nf
-lnxproc_new \- create a new lnxproc module
-lnxproc_set \- set parameters of new module 
-lnxproc_free \- deallocate memory created by lnxproc_new/set
-LNXPROC_FREE \- macro version of lnxproc_free()
-lnxproc_read \- read data from all modules 
-lnxproc_print \- print data collected by last read
-lnxproc_performance \- print duration of the various phases of data collection
-lnxproc_strerror \- Format error as a string returned from any lnxproc routine
+lnxproc \- interface to reading the /proc/ & /sys filesystems
 .fi
 .SH SYNOPSIS
 .nf
@@ -43,18 +36,6 @@ lnxproc_strerror \- Format error as a string returned from any lnxproc routine
 .BI "                LNXPROC_MODULE_TYPE_T " type , 
 .BI "                void *" optional , 
 .BI "                size_t " optlen "); "
-
-The type field is an enumerated field with the following values:
-
-.BI "       "  LNXPROC_ALL
-.BI "       "  LNXPROC_PROC_CGROUPS
-.BI "       "  LNXPROC_PROC_DISKSTATS
-.BI "       "  LNXPROC_PROC_DOMAINNAME
-.BI "       "  LNXPROC_PROC_HOSTNAME
-.BI "       "  LNXPROC_PROC_OSRELEASE
-.BI "       "  LNXPROC_SYS_CPUFREQ
-.BI "       "  LNXPROC_SYS_DISKSECTORS
-.BI "       "  LNXPROC_PROC_PID_STAT
 
 .BI "int lnxproc_free(LNXPROC_MODULE_T **" modulesptr ");"
 
@@ -106,26 +87,71 @@ argument.
 indicates the index of the entry,
 .B type
 indicates which module and corresponds to a particular file or files to be read from
-the /proc or /sys filesystems,
+the /proc or /sys filesystems.
+
+The type field is an enumerated field. The following table shows each module
+type together with other characteristics:
+
+.TP
+.B LNXPROC_ALL
+Loads all modules. This option is not normally used as specifying
+.B nmodules = 0
+to the 
+.B lnxproc_new()
+function achieves the same thing.
+.TP
+.B LNXPROC_PROC_CGROUPS    
+reads the /proc/cgroups file.
+.TP
+.B LNXPROC_PROC_DISKSTATS
+reads the /proc/diskstats file.
+.TP
+.B LNXPROC_PROC_DOMAINNAME 
+reads the /proc/sys/kernel/domainname file. This call is memoized \- second and
+subsequent reads always return the same value.
+.TP
+.B LNXPROC_PROC_HOSTNAME
+reads the /proc/sys/kernel/hostname file. This call is memoized \- second and
+subsequent reads always return the same value.
+.TP
+.B LNXPROC_PROC_OSRELEASE
+reads the /proc/sys/kernel/osrelease file. This call is memoized \- second and
+subsequent reads always return the same value.
+.TP
+.B LNXPROC_SYS_CPUFREQ
+reads the
+/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+file. This call is memoized \- second and
+subsequent reads always return the same value.
+.TP
+.B LNXPROC_SYS_DISKSECTORS
+reads the
+/sys/block/*/queue/hw_sector_size
+files. This call is memoized \- second and
+subsequent reads always return the same values.
+The 
 .B optional
-is an optional argument for the module (not all modules accept an
-.B optional
-argument ) and
+field is a glob pattern that can specify a subset of disks e.g. specifying
+.B 'sd*'
+will only return results for local hard disks. The
 .B optlen
-is the length of the 
+parameter must include the terminating NUL e.g. 
+.B 1 + strlen(optional)
+\.
+.TP
+.B LNXPROC_PROC_PID_STAT
+reads the
+/proc/[1-9]*/stat
+files. 
+The 
 .B optional
-argument. 
-Note that 
+field is a glob pattern that can specify a subset of pids e.g. specifying
+.B '12345'
+will only return results for the pid 12345.
 .B optlen
-must contain the terminating
-.B NUL
-character of the optional argument e.g. 
-.B optlen = 1 + strlen(optional)
-if optional is a string.
-.B optional
-is a void pointer because some modules may accept 
-.B optional
-as a pointer to an arbitrary structure.
+parameter must include the terminating NUL e.g. 
+.B 1 + strlen(optional)
+\.
 .P
 .BR lnxproc_read()
 reads all files corresponding to all
@@ -164,167 +190,60 @@ formats any return values as a string.
 .SH RETURN VALUE
 On success, all routines return zero.
 Negative return values correspond to system error i.e. -errno.
-Positive return values are described in <lnxproc/error.h.
+Positive return values are described below.
 .SH ERRORS
 .TP
-.B LNXPROC_OK = 0
+.B LNXPROC_OK
+No error
 .TP
 .B LNXPROC_ERROR_MISMATCHED_STRINGS
+Internal error - indicates an inconsistency in the error submodule
 .TP
-.B LNXPROC_ERROR_SYSTEM
+.B LNXPROC_ERROR_MALLOC
+A malloc,realloc,calloc call has returned NULL.
 .TP
-.B LNXPROC_ERROR_ARRAY_MALLOC_HEADER
-.TP
-.B LNXPROC_ERROR_ARRAY_MALLOC_DATA
-.TP
-.B LNXPROC_ERROR_ARRAY_NULL
-.TP
-.B LNXPROC_ERROR_ARRAY_REALLOC_DATA
-.TP
-.B LNXPROC_ERROR_ARRAY_INDEX_OUT_OF_RANGE
-.TP
-.B LNXPROC_ERROR_ARRAY_VECTOR_NULL
-.TP
-.B LNXPROC_ERROR_ARRAY_VECTOR_MALLOC
-.TP
-.B LNXPROC_ERROR_ARRAY_SAVED_MALLOC
-.TP
-.B LNXPROC_ERROR_ARRAY_SAVED_NULL
-.TP
-.B LNXPROC_ERROR_ARRAY_ADDRESS_NULL
-.TP
-.B LNXPROC_ERROR_ARRAY_ADDRESS_CONTENTS_NOT_NULL
-.TP
-.B LNXPROC_ERROR_ARRAY_LIMITS_NULL
-.TP
-.B LNXPROC_ERROR_ARRAY_ILLEGAL_DIMENSION
-.TP
-.B LNXPROC_ERROR_BASE_NULL
-.TP
-.B LNXPROC_ERROR_BASE_ADDRESS_NULL
-.TP
-.B LNXPROC_ERROR_BASE_BAD_FILENAME
-.TP
-.B LNXPROC_ERROR_BASE_MALLOC_BASE
-.TP
-.B LNXPROC_ERROR_BASE_MALLOC_BUFFER
-.TP
-.B LNXPROC_ERROR_BASE_MALLOC_FILENAME
-.TP
-.B LNXPROC_ERROR_BASE_MALLOC_FILEPREFIX
-.TP
-.B LNXPROC_ERROR_BASE_MALLOC_FILEGLOB
-.TP
-.B LNXPROC_ERROR_BASE_MALLOC_FILESUFFIX
-.TP
-.B LNXPROC_ERROR_BASE_MALLOC_ARRAY
-.TP
-.B LNXPROC_ERROR_BASE_MALLOC_RESULTS
+.B LNXPROC_ERROR_ILLEGAL_ARG
+A function argument is illegal. This includes cases where an argument
+may have subfields that are illegal.
 .TP
 .B LNXPROC_ERROR_BASE_READ_OVERFLOW
-.TP
-.B LNXPROC_ERROR_BASE_ARRAY_NULL
-.TP
-.B LNXPROC_ERROR_BASE_PREVIOUS_NULL
-.TP
-.B LNXPROC_ERROR_INTERFACE_MALLOC_INTERFACE
-.TP
-.B LNXPROC_ERROR_INTERFACE_ADDRESS_NULL
-.TP
-.B LNXPROC_ERROR_INTERFACE_NULL
-.TP
-.B LNXPROC_ERROR_INTERFACE_NULL_BASE
-.TP
-.B LNXPROC_ERROR_INTERFACE_NULL_DATA
-.TP
-.B LNXPROC_ERROR_INTERFACE_INDEX_OUT_OF_RANGE
-.TP
-.B LNXPROC_ERROR_INTERFACE_MALLOC_OPTIONAL
-.TP
-.B LNXPROC_ERROR_LIMITS_MALLOC
-.TP
-.B LNXPROC_ERROR_LIMITS_CHARS_MALLOC
-.TP
-.B LNXPROC_ERROR_LIMITS_NULL
-.TP
-.B LNXPROC_ERROR_LIMIT_NULL
-.TP
-.B LNXPROC_ERROR_LIMITS_MALLOC_ENTRY
-.TP
-.B LNXPROC_ERROR_LIMITS_ADDRESS_NULL
-.TP
-.B LNXPROC_ERROR_LIMITS_ADDRESS_CONTENTS_NOT_NULL
-.TP
-.B LNXPROC_ERROR_LIMITS_ILLEGAL_DIMENSION
-.TP
-.B LNXPROC_ERROR_RESULTS_DB_NULL
-.TP
-.B LNXPROC_ERROR_RESULTS_DB_NOT_OPEN
-.TP
-.B LNXPROC_ERROR_RESULTS_DB_OPEN
-.TP
-.B LNXPROC_ERROR_RESULTS_DB_CLOSE
-.TP
-.B LNXPROC_ERROR_RESULTS_DB_FETCH
-.TP
-.B LNXPROC_ERROR_RESULTS_DB_STORE
-.TP
-.B LNXPROC_ERROR_RESULTS_DB_ITERATE
-.TP
-.B LNXPROC_ERROR_RESULTS_NULL
-.TP
-.B LNXPROC_ERROR_RESULTS_BUF_NULL
-.TP
-.B LNXPROC_ERROR_RESULTS_BUFLEN_ZERO
-.TP
-.B LNXPROC_ERROR_RESULTS_TV_NULL
-.TP
-.B LNXPROC_ERROR_RESULTS_ADDRESS_NULL
-.TP
-.B LNXPROC_ERROR_RESULTS_ADDRESS_CONTENTS_NOT_NULL
-.TP
-.B LNXPROC_ERROR_RESULTS_MALLOC
-.TP
-.B LNXPROC_ERROR_RESULTS_KEY_NULL
-.TP
-.B LNXPROC_ERROR_RESULTS_KEYLEN_ZERO
-.TP
-.B LNXPROC_ERROR_RESULTS_VAL_ADDRESS_NULL
-.TP
-.B LNXPROC_ERROR_RESULTS_TABLE_NULL
-.TP
-.B LNXPROC_ERROR_RESULTS_TABLE_MALLOC
-.TP
-.B LNXPROC_ERROR_VECTOR_MALLOC_HEADER
-.TP
-.B LNXPROC_ERROR_VECTOR_MALLOC_DATA
-.TP
-.B LNXPROC_ERROR_VECTOR_NULL
-.TP
-.B LNXPROC_ERROR_VECTOR_REALLOC_DATA
-.TP
-.B LNXPROC_ERROR_VECTOR_INDEX_OUT_OF_RANGE
-.TP
-.B LNXPROC_ERROR_VECTOR_NULL_DATA
-.TP
-.B LNXPROC_ERROR_VECTOR_NULL_CHILDREN
-.TP
-.B LNXPROC_ERROR_VECTOR_NULL_VALUES
-.TP
-.B LNXPROC_ERROR_VECTOR_ADDRESS_NULL
-.TP
-.B LNXPROC_ERROR_VECTOR_ADDRESS_CONTENTS_NOT_NULL
+Internal error to indicate when to grow buffers to accommodate the quantity read.
+This error is never returned to the original call.
 .TP
 .B LNXPROC_ERROR_BASE_REGEX_FAILURE
+The regular expression matcher has failed and is unable to extract the 
+field 
+data. Only some modules (
+.B LNXPROC_SYS_DISKSECTORS & LNXPROC_PID_STAT
+at time of writing ) use file globbing.
 .TP
 .B LNXPROC_ERROR_BASE_GLOB_FAILURE
-.SH CONFORMING TO
+The globbing expression matcher has failed and has returned no files matched.
+Only some modules (
+.B LNXPROC_SYS_DISKSECTORS & LNXPROC_PID_STAT
+at time of writing ) use file globbing.
+.SH ENVIRONMENT
+The environment variable 
+.B LNXPROC_TESTROOT
+will be prepended to all files opened and closed by the
+.B lnxproc
+library. This environment variable is only set when testing the library against
+a fixed set of /proc and /sys files located on a normal filesystem.
+.SH FILES
+.TP
+TBD
+.SH VERSIONS
 .TP
 TBD
 .SH NOTES
+.TP
 TBD
 .SH BUGS
-TBD
+The 
+.B lnxproc
+library was tested on Ubuntu 12.04 and 13.04 using valgrind. 
+The code is designed to work on earlier versions of the kernel. 
+Some modules may not work and such cases should be reported to the author.
 .SH EXAMPLE
 The program below demonstrates the use of
 .BR lnxproc_new (),
@@ -392,14 +311,15 @@ test_module(LNXPROC_MODULE_T * modules, char *str)
         struct timeval end = lnxproc_timeval();
         long timediff = lnxproc_timeval_diff(&start, &end);
 
-        printf("%s:Elapsed time = %.1f usecs (%.1f,%.1f,%.1f,%.1f)\\n", str,
+        printf("%s:Elapsed time = %.1f usecs (%.1f,%.1f,%.1f,%.1f)\\n", 
+               str,
                (timediff * 1.0) / ntimes, sum_rawread_time / ntimes,
                sum_map_time / ntimes, sum_hash_time / ntimes,
                sum_normalize_time / ntimes);
     }
 }
 
-/*----------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------*/
 int
 main(int argc, char *argv[])
 {
@@ -413,18 +333,20 @@ main(int argc, char *argv[])
     test_module(modules, "proc_cgroups");
     LNXPROC_FREE(modules);
 
-    lnxproc_new(&modules, 2); // read /proc/groups and /proc/diskstats simultaneously
+    lnxproc_new(&modules, 2); // read /proc/groups and 
+                              // /proc/diskstats simultaneously
     lnxproc_set(modules, 0, LNXPROC_PROC_CGROUPS, NULL, 0);
     lnxproc_set(modules, 1, LNXPROC_PROC_DISKSTATS, NULL, 0);
     test_module(modules, "proc_diskstats");
     LNXPROC_FREE(modules);
 
-    lnxproc_new(&modules, 1); // Domainname - thei value is memoized
+    lnxproc_new(&modules, 1); // Domainname - the value is memoized
     lnxproc_set(modules, 0, LNXPROC_PROC_DOMAINNAME, NULL, 0);
     test_module(modules, "proc_domainname");
     LNXPROC_FREE(modules);
 
-    lnxproc_new(&modules, 1); // Get sector size for every disk on the system - memoized
+    lnxproc_new(&modules, 1); // Get sector size for every disk 
+                              // memoized
     lnxproc_set(modules, 0, LNXPROC_SYS_DISKSECTORS, NULL, 0);
     test_module(modules, "sys_disksectors");
     LNXPROC_FREE(modules);
@@ -434,7 +356,8 @@ main(int argc, char *argv[])
     test_module(modules, "sys_sd_disksectors");
     LNXPROC_FREE(modules);
 
-    lnxproc_new(&modules, 1); // Read /proc/<pid>/stat file for every process
+    lnxproc_new(&modules, 1); // Read /proc/<pid>/stat file for 
+                              // every process
     lnxproc_set(modules, 0, LNXPROC_PROC_PID_STAT, NULL, 0);
     test_module(modules, "proc_pid_stat");
     LNXPROC_FREE(modules);
@@ -442,7 +365,8 @@ main(int argc, char *argv[])
     char buf[32];
 
     snprintf(buf, sizeof buf, "%d", getpid());
-    lnxproc_new(&modules, 1); // Read /proc/<pid>/stat file for this process
+    lnxproc_new(&modules, 1); // Read /proc/<pid>/stat file for 
+                              // this process
     lnxproc_set(modules, 0, LNXPROC_PROC_PID_STAT, buf, 1 + strlen(buf));
     snprintf(buf, sizeof buf, "proc_%d_stat", getpid());
     test_module(modules, buf);
@@ -452,6 +376,7 @@ main(int argc, char *argv[])
 }
 .fi
 .SH SEE ALSO
+.TP
 TBD
 .SH COLOPHON
 A description of the project,
