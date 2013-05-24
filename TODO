@@ -1,8 +1,27 @@
 
 In no particular order:
 
-    - store previous values so that rates can be calculated
-    - privatise all functions that do not need to be public
-    - gather utility functions into one header file
     - autotools
+    - /proc/<pid>/status
+    - /proc/<pid>/statm
+    - /proc/<pid>/cmdline
+    - /proc/<pid>/smaps
+    - /proc/sys/fs/file-nr
+    - /proc/cpuinfo
+    - /proc/meminfo
+    - /proc/mounts
+    - /proc/loadavg
+    - /proc/misc
+    - /proc/uptime
+    - /proc/partitions
+    - /proc/stat
+    - /proc/net/rpc/nfs
+    - /proc/net/rpc/nfsd
+    - /proc/net/snmp
+    - /proc/net/snmp6
+    - /proc/net/snmp6
+    - /proc/net/udp
+    - /proc/net/udp6
+    -
+
 
