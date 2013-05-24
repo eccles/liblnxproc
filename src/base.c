@@ -167,8 +167,8 @@ base_rawread(char *filename, char **readbuf, int *nbytes)
     _LNXPROC_DEBUG("Nbytes %d read\n", inbytes);
 
     (*readbuf)[inbytes] = '\n';
-    *readbuf += inbytes;
-    *nbytes -= inbytes;
+    *readbuf += inbytes + 1;
+    *nbytes -= inbytes + 1;
     if (*nbytes < 1) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_READ_OVERFLOW, "Raw Read %s",
                              filename);
@@ -190,8 +190,13 @@ base_read_glob_files(_LNXPROC_BASE_T * base, char **readbuf, int *nbytes)
     _LNXPROC_ARRAY_T *array = data->array;
     _LNXPROC_LIMITS_T *limits = array->limits;
     size_t dim = limits->dim;
-    char separator = limits->row[dim - 1].chars[0];
+    size_t nseps = dim - 1;
+    char separators[nseps];
+    int i;
 
+    for (i = nseps; i > 0; i--) {
+        separators[nseps - i] = limits->row[i].chars[0];
+    }
     if (base->fileprefix) {
         if (base->filesuffix) {
             snprintf(globpat, sizeof globpat, "%s/%s/%s", base->fileprefix,
@@ -251,7 +256,7 @@ base_read_glob_files(_LNXPROC_BASE_T * base, char **readbuf, int *nbytes)
         return LNXPROC_ERROR_BASE_REGEX_FAILURE;
     }
 
-    int i, j;
+    int j;
 
     for (i = 0; i < globbuf.gl_pathc; i++) {
         _LNXPROC_DEBUG("%d:File %s\n", i, globbuf.gl_pathv[i]);
@@ -274,9 +279,9 @@ base_read_glob_files(_LNXPROC_BASE_T * base, char **readbuf, int *nbytes)
             _LNXPROC_DEBUG("%d:%d:Match from %d to %d '%.*s'\n", i, j,
                            (int) pmatch[j].rm_so, (int) pmatch[j].rm_eo, len,
                            s);
-            int n = snprintf(*readbuf, *nbytes, "%.*s%c", len, s, separator);
+            int n = snprintf(*readbuf, *nbytes, "%.*s", len, s);
 
-            if (n >= *nbytes) {
+            if (n >= *nbytes - dim + 1) {
                 globfree(&globbuf);
                 regfree(&reg);
                 return LNXPROC_ERROR_BASE_READ_OVERFLOW;
@@ -284,6 +289,11 @@ base_read_glob_files(_LNXPROC_BASE_T * base, char **readbuf, int *nbytes)
 
             *readbuf += n;
             *nbytes -= n;
+
+            memcpy(*readbuf, separators, nseps);
+            *readbuf += nseps;
+            *nbytes -= nseps;
+
             _LNXPROC_DEBUG("Readbuf %p Nbytes %d\n", *readbuf, *nbytes);
             ret = base_rawread(globbuf.gl_pathv[i], readbuf, nbytes);
             if (ret) {
@@ -292,8 +302,8 @@ base_read_glob_files(_LNXPROC_BASE_T * base, char **readbuf, int *nbytes)
                     regfree(&reg);
                     return ret;
                 }
-                *readbuf -= n;
-                *nbytes += n;
+                *readbuf -= n + nseps;
+                *nbytes += n + nseps;
             }
         }
     }
