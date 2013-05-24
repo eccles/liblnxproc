@@ -23,7 +23,6 @@
 #include <stdlib.h>             //calloc
 #include <string.h>             //memcpy
 
-#ifdef UNUSED
 /*
  * Reference counting
  */
@@ -31,44 +30,55 @@ struct allocate_t {
     unsigned count;
     void *data;
 };
+
 void *
-allocate(size_t size)
+Allocate(size_t size)
 {
-    struct allocate_t *a = calloc(1, sizeof(struct allocate_t) + size);
+#ifdef UNUSED
+    ALLOCATE_T *a = calloc(1, sizeof(ALLOCATE_T) + size);
 
     if (a) {
-        a->data = a + sizeof(struct allocate_t);
+        a->data = a + sizeof(ALLOCATE_T);
         a->count = 1;
         return a->data;
     }
     return NULL;
+#else
+    return calloc(1,size);
+#endif
 }
 
 void *
-release(void *p)
+Release(void *p)
 {
-    if (p) {
-        struct allocate_t *a = p - sizeof(struct allocate_t);
+    if (p)
+#ifdef UNUSED
+    {
+        ALLOCATE_T *a = p - sizeof(ALLOCATE_T);
 
         a->count--;
         if (a->count < 1) {
             free(a);
         }
     }
+#else
+        free(p);
+#endif
     return NULL;
 }
 
-void *
-retain(void *p)
+void
+Retain(void *p)
 {
+#ifdef UNUSED
     if (p) {
-        struct allocate_t *a = p - sizeof(struct allocate_t);
+        ALLOCATE_T *a = p - sizeof(ALLOCATE_T);
 
         a->count++;
     }
-    return p;
-}
 #endif
+}
+
 float
 lnxproc_timeval_secs(struct timeval *tv)
 {

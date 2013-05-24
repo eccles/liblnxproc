@@ -38,6 +38,17 @@ extern "C" {
 #define WARN_FORMAT(mmm,nnn) __attribute__((format(printf,mmm,nnn)))
 #endif
 
+typedef struct allocate_t ALLOCATE_T;
+
+void * Allocate(size_t size);
+void * Release(void *p);
+#define RELEASE(p) p = Release(p)
+
+void Retain(void *p);
+
+/*
+ * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
+ */
 #ifdef __cplusplus
 }                               // extern "C"
 #endif
