@@ -98,25 +98,24 @@ derived_values(int i, int j, _LNXPROC_RESULTS_T * results,
                float out, float tdiff)
 {
     if (tdiff > 0.0) {
-        _LNXPROC_RESULTS_TABLE_T pentry;
+        _LNXPROC_RESULTS_TABLE_T *pentry = NULL;
 
-        strcpy(pentry.key, pkey);
-        int ret = _lnxproc_results_fetch(presults, &pentry);
+        int ret = _lnxproc_results_fetch(presults, pkey, &pentry);
+
+        if (ret)
+            return;
 
 #ifdef DEBUG
         char buf[64];
 
         _LNXPROC_DEBUG("%d,%d:Prev %s = %s\n", i, j, pkey,
-                       _lnxproc_results_table_valuestr(&pentry, buf,
-                                                       sizeof buf));
+                       _lnxproc_results_table_valuestr(pentry, buf,
+                                                       sizeof buf, 0));
 #endif
-        if (ret)
-            return;
-
         char dkey[64];
 
         snprintf(dkey, sizeof dkey, "%s-s", pkey);
-        float value = (out - pentry.value.f) / tdiff;
+        float value = (out - pentry->value.f) / tdiff;
 
         _lnxproc_results_add_float(results, dkey, value);
 #ifdef DEBUG
@@ -231,17 +230,16 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
                 _lnxproc_results_add_float(results, pkey, secs);
                 if (!presults)
                     continue;
-                _LNXPROC_RESULTS_TABLE_T pentry;
+                _LNXPROC_RESULTS_TABLE_T *pentry = NULL;
 
-                strcpy(pentry.key, pkey);
-                int ret = _lnxproc_results_fetch(presults, &pentry);
+                int ret = _lnxproc_results_fetch(presults, pkey, &pentry);
 
                 if (ret)
                     continue;
 
-                _LNXPROC_DEBUG("%d,%d:Prev %s = %f\n", i, k, pentry.key,
-                               pentry.value.f);
-                iodiff[j] = secs - pentry.value.f;
+                _LNXPROC_DEBUG("%d,%d:Prev %s = %f\n", i, k, pentry->key,
+                               pentry->value.f);
+                iodiff[j] = secs - pentry->value.f;
                 _LNXPROC_DEBUG("%d:iodiff %s = %f\n", i, pkey, iodiff[j]);
             }
         }
@@ -269,7 +267,7 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
                 _LNXPROC_DEBUG("%d,%d:Curr %s = %f\n", i, j, pkey, out);
             }
             else {
-                _lnxproc_results_add_string(results, pkey, val);
+                _lnxproc_results_add_string(results, pkey, val, 0);
                 _LNXPROC_DEBUG("%d,%d:Curr %s = %s\n", i, j, pkey, val);
             }
             if (!presults)

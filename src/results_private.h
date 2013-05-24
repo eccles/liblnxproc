@@ -43,18 +43,21 @@ extern "C" {
         unsigned long ul;
         float f;
         char s[_LNXPROC_RESULTS_TABLE_VALLEN];
+        char *sptr;
         void *p;
     };
 
     typedef union _lnxproc_results_table_value_t _LNXPROC_RESULTS_TABLE_VALUE_T;
 
     enum _lnxproc_results_table_valuetype_t {
-        _LNXPROC_RESULTS_TABLE_VALUETYPE_INT = 0,
+        _LNXPROC_RESULTS_TABLE_VALUETYPE_NONE = 0,
+        _LNXPROC_RESULTS_TABLE_VALUETYPE_INT,
         _LNXPROC_RESULTS_TABLE_VALUETYPE_UNSIGNEDINT,
         _LNXPROC_RESULTS_TABLE_VALUETYPE_LONG,
         _LNXPROC_RESULTS_TABLE_VALUETYPE_UNSIGNED_LONG,
         _LNXPROC_RESULTS_TABLE_VALUETYPE_FLOAT,
         _LNXPROC_RESULTS_TABLE_VALUETYPE_STR,
+        _LNXPROC_RESULTS_TABLE_VALUETYPE_STRREF,
         _LNXPROC_RESULTS_TABLE_VALUETYPE_PTR,
     };
     typedef enum _lnxproc_results_table_valuetype_t
@@ -69,10 +72,7 @@ extern "C" {
     typedef struct _lnxproc_results_table_t _LNXPROC_RESULTS_TABLE_T;
 
     char *_lnxproc_results_table_valuestr(_LNXPROC_RESULTS_TABLE_T * entry,
-                                          char *buf, size_t len);
-
-    int _lnxproc_results_table_copy(_LNXPROC_RESULTS_TABLE_T * dest,
-                                    _LNXPROC_RESULTS_TABLE_T * src);
+                                          char *buf, size_t len, int copy);
 
     struct _lnxproc_results_t {
         char *tag;
@@ -98,8 +98,8 @@ extern "C" {
 
     int _lnxproc_results_init(_LNXPROC_RESULTS_T * results, size_t nentries);
 
-    int _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results,
-                               _LNXPROC_RESULTS_TABLE_T * entry);
+    int _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results, char *key,
+                               _LNXPROC_RESULTS_TABLE_T ** entry);
 
     int _lnxproc_results_add_int(_LNXPROC_RESULTS_T * results,
                                  const char *key, const int value);
@@ -108,7 +108,8 @@ extern "C" {
     int _lnxproc_results_add_float(_LNXPROC_RESULTS_T * results,
                                    const char *key, const float value);
     int _lnxproc_results_add_string(_LNXPROC_RESULTS_T * results,
-                                    const char *key, const char *value);
+                                    const char *key, const char *value,
+                                    size_t valuelen);
 
     typedef int (*_LNXPROC_RESULTS_ITERATE_FUNC) (_LNXPROC_RESULTS_T * results,
                                                   _LNXPROC_RESULTS_TABLE_T *

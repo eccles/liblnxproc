@@ -29,9 +29,10 @@
 #include "proc_domainname.h"
 #include "proc_hostname.h"
 #include "proc_osrelease.h"
+#include "proc_pid_environ.h"
+#include "proc_pid_stat.h"
 #include "sys_cpufreq.h"
 #include "sys_disksectors.h"
-#include "proc_pid_stat.h"
 
 static _LNXPROC_MODULE_ROW_T mymodules[] = {
     {.type = LNXPROC_PROC_CGROUPS,.new = _lnxproc_proc_cgroups_new,.base =
@@ -44,11 +45,13 @@ static _LNXPROC_MODULE_ROW_T mymodules[] = {
      NULL,.optional = NULL,},
     {.type = LNXPROC_PROC_OSRELEASE,.new = _lnxproc_proc_osrelease_new,.base =
      NULL,.optional = NULL,},
+    {.type = LNXPROC_PROC_PID_ENVIRON,.new =
+     _lnxproc_proc_pid_environ_new,.base = NULL,.optional = NULL,},
+    {.type = LNXPROC_PROC_PID_STAT,.new = _lnxproc_proc_pid_stat_new,.base =
+     NULL,.optional = NULL,},
     {.type = LNXPROC_SYS_CPUFREQ,.new = _lnxproc_sys_cpufreq_new,.base =
      NULL,.optional = NULL,},
     {.type = LNXPROC_SYS_DISKSECTORS,.new = _lnxproc_sys_disksectors_new,.base =
-     NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_PID_STAT,.new = _lnxproc_proc_pid_stat_new,.base =
      NULL,.optional = NULL,},
 };
 
@@ -243,8 +246,9 @@ results_iterate(_LNXPROC_RESULTS_T * results, _LNXPROC_RESULTS_TABLE_T * entry,
     LNXPROC_INTERFACE_METHOD func = env->func;
     char buf[32];
 
-    _lnxproc_results_table_valuestr(entry, buf, sizeof buf);
-    func(results->tag, entry->key, buf, env->data);
+    char *ret = _lnxproc_results_table_valuestr(entry, buf, sizeof buf, 0);
+
+    func(results->tag, entry->key, ret, env->data);
     return LNXPROC_OK;
 }
 
@@ -317,7 +321,7 @@ lnxproc_fetch(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type, char *key,
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
     if (!value || valuelen < 2) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Fecth buffer");
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Fetch buffer");
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
     int i;
@@ -332,14 +336,13 @@ lnxproc_fetch(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type, char *key,
                 _LNXPROC_BASE_DATA_T *base_data = base->current;
 
                 if (base_data) {
-                    _LNXPROC_RESULTS_TABLE_T entry;
+                    _LNXPROC_RESULTS_TABLE_T *entry = NULL;
 
-                    strlcpy(entry.key, key, sizeof entry.key);
                     int ret =
-                        _lnxproc_results_fetch(base_data->results, &entry);
+                        _lnxproc_results_fetch(base_data->results, key, &entry);
                     if (!ret) {
-                        _lnxproc_results_table_valuestr(&entry, value,
-                                                        valuelen);
+                        _lnxproc_results_table_valuestr(entry, value,
+                                                        valuelen, 1);
                         return LNXPROC_OK;
                     }
                 }

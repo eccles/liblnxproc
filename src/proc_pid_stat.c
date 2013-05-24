@@ -119,6 +119,7 @@ Description::
 #include "base_private.h"
 #include "proc_pid_stat.h"
 #include "uthash.h"
+#include "strlcpy.h"
 
 static int
 proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
@@ -220,7 +221,7 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
                     calloc(1, sizeof(_LNXPROC_RESULTS_TABLE_T));
                 if (!hentry)
                     continue;
-                strcpy(hentry->key, key);
+                strlcpy(hentry->key, key, sizeof hentry->key);
                 hentry->valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_FLOAT;
                 hentry->value.f = value;
                 _LNXPROC_DEBUG("%d,%d:Store %s = %f\n", i, j, hentry->key,
@@ -238,7 +239,7 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
 
             }
             else {
-                _lnxproc_results_add_string(results, key, val);
+                _lnxproc_results_add_string(results, key, val, 0);
             }
         }
     }
@@ -287,29 +288,27 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
             if (startentry) {
                 _LNXPROC_DEBUG("%d:current starttime for %s is %f\n", i, rowkey,
                                startentry->value.f);
-                _LNXPROC_RESULTS_TABLE_T pentry;
+                _LNXPROC_RESULTS_TABLE_T *pentry = NULL;
 
-                strcpy(pentry.key, key);
-                int ret = _lnxproc_results_fetch(presults, &pentry);
+                int ret = _lnxproc_results_fetch(presults, key, &pentry);
 
                 if (ret)
                     continue;
 
                 _LNXPROC_DEBUG("%d:previous starttime for %s is %f\n", i,
-                               rowkey, pentry.value.f);
-                if (pentry.value.f != startentry->value.f)
+                               rowkey, pentry->value.f);
+                if (pentry->value.f != startentry->value.f)
                     continue;
             }
 
             for (j = UTIMECOL; j <= CSTIMECOL; j++) {
                 snprintf(key, sizeof key, "/%s/%s", rowkey, colkey[j]);
-                _LNXPROC_RESULTS_TABLE_T pentry;
+                _LNXPROC_RESULTS_TABLE_T *pentry = NULL;
 
-                strcpy(pentry.key, key);
-                int ret = _lnxproc_results_fetch(presults, &pentry);
+                int ret = _lnxproc_results_fetch(presults, key, &pentry);
 
-                _LNXPROC_DEBUG("%d,%d:Prev value %s = %f\n", i, j, pentry.key,
-                               pentry.value.f);
+                _LNXPROC_DEBUG("%d,%d:Prev value %s = %f\n", i, j, pentry->key,
+                               pentry->value.f);
                 if (ret)
                     continue;
 
@@ -322,7 +321,7 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
                 char dkey[64];
 
                 snprintf(dkey, sizeof dkey, "%s%%", key);
-                float value = ((hentry->value.f - pentry.value.f) * 100.0)
+                float value = ((hentry->value.f - pentry->value.f) * 100.0)
                     / tdiff;
 
                 if (value < 0.0) {

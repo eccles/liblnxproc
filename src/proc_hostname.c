@@ -35,7 +35,8 @@ proc_hostname_normalize(_LNXPROC_BASE_T * base)
 {
     _lnxproc_results_init(base->current->results, 1);
     _lnxproc_results_add_string(base->current->results, "/value",
-                                base->current->lines);
+                                base->current->lines,
+                                strlen(base->current->lines));
 
     return LNXPROC_OK;
 }

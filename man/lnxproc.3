@@ -132,6 +132,34 @@ subsequent reads always return the same value.
 reads the /proc/sys/kernel/osrelease file. This call is memoized \- second and
 subsequent reads always return the same value.
 .TP
+.B LNXPROC_PROC_PID_ENVIRON
+reads the
+/proc/[1-9]*/environ
+files. 
+The 
+.B optional
+field is a glob pattern that can specify a subset of pids e.g. specifying
+.B '12345'
+will only return results for the pid 12345.
+.B optlen
+parameter must include the terminating NUL e.g. 
+.B 1 + strlen(optional)
+\.
+.TP
+.B LNXPROC_PROC_PID_STAT
+reads the
+/proc/[1-9]*/stat
+files. 
+The 
+.B optional
+field is a glob pattern that can specify a subset of pids e.g. specifying
+.B '12345'
+will only return results for the pid 12345.
+.B optlen
+parameter must include the terminating NUL e.g. 
+.B 1 + strlen(optional)
+\.
+.TP
 .B LNXPROC_SYS_CPUFREQ
 reads the
 /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
@@ -148,20 +176,6 @@ The
 field is a glob pattern that can specify a subset of disks e.g. specifying
 .B 'sd*'
 will only return results for local hard disks. The
-.B optlen
-parameter must include the terminating NUL e.g. 
-.B 1 + strlen(optional)
-\.
-.TP
-.B LNXPROC_PROC_PID_STAT
-reads the
-/proc/[1-9]*/stat
-files. 
-The 
-.B optional
-field is a glob pattern that can specify a subset of pids e.g. specifying
-.B '12345'
-will only return results for the pid 12345.
 .B optlen
 parameter must include the terminating NUL e.g. 
 .B 1 + strlen(optional)

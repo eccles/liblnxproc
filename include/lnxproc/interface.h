@@ -35,9 +35,10 @@ extern "C" {
         LNXPROC_PROC_DOMAINNAME,
         LNXPROC_PROC_HOSTNAME,
         LNXPROC_PROC_OSRELEASE,
+        LNXPROC_PROC_PID_ENVIRON,
+        LNXPROC_PROC_PID_STAT,
         LNXPROC_SYS_CPUFREQ,
         LNXPROC_SYS_DISKSECTORS,
-        LNXPROC_PROC_PID_STAT,
     };
     typedef enum lnxproc_module_type_t LNXPROC_MODULE_TYPE_T;
 

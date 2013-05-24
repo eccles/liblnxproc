@@ -40,6 +40,7 @@ This file is part of liblnxproc.
 #include "proc_osrelease.h"
 #include "sys_cpufreq.h"
 #include "sys_disksectors.h"
+#include "proc_pid_environ.h"
 #include "proc_pid_stat.h"
 
 /*----------------------------------------------------------------------------*/
@@ -582,9 +583,9 @@ execute_base(_LNXPROC_BASE_T * base)
 
                 printf("Failure %s\n", lnxproc_strerror(ret, buf, sizeof buf));
             }
-            else {
-                _lnxproc_base_print(base);
-            }
+            //else {
+            //    _lnxproc_base_print(base);
+            //}
             //sleep(20);
         }
         _LNXPROC_BASE_FREE(base);
@@ -688,6 +689,18 @@ test_proc_pid_stat(void)
 }
 
 /*----------------------------------------------------------------------------*/
+static void
+test_proc_pid_environ(void)
+{
+    _LNXPROC_BASE_T *proc_pid_environ = NULL;
+    int ret = _lnxproc_proc_pid_environ_new(&proc_pid_environ, NULL);
+
+    if (ret == LNXPROC_OK) {
+        execute_base(proc_pid_environ);
+    }
+}
+
+/*----------------------------------------------------------------------------*/
 int
 main(int argc, char *argv[])
 {
@@ -707,6 +720,7 @@ main(int argc, char *argv[])
         test_proc_osrelease();
         test_sys_cpufreq();
         test_sys_disksectors();
+        test_proc_pid_environ();
         test_proc_pid_stat();
     }
     else if (!strcmp(argv[1], "util")) {
@@ -750,6 +764,9 @@ main(int argc, char *argv[])
     }
     else if (!strcmp(argv[1], "sys_disksectors")) {
         test_sys_disksectors();
+    }
+    else if (!strcmp(argv[1], "proc_pid_environ")) {
+        test_proc_pid_environ();
     }
     else if (!strcmp(argv[1], "proc_pid_stat")) {
         test_proc_pid_stat();
