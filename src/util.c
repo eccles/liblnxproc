@@ -23,20 +23,6 @@
 #include <stdlib.h>             //calloc
 #include <string.h>             //memcpy
 
-void *
-memdup(void *old, size_t len)
-{
-    void *ret = NULL;
-
-    if (old && len > 0) {
-        ret = calloc(1, len);
-        if (ret) {
-            memcpy(ret, old, len);
-        }
-    }
-    return ret;
-}
-
 #ifdef UNUSED
 /*
  * Reference counting

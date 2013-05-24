@@ -18,30 +18,29 @@
  *
  */
 
-/* Common macros and utility functions
- */
-
-#ifndef LIBLNXPROC_UTIL_PRIVATE_H
-#define LIBLNXPROC_UTIL_PRIVATE_H 1
-
-#include <lnxproc/util.h>
+#ifndef LIBLNXPROC_MEMDUP_H
+#define LIBLNXPROC_MEMDUP_H 1
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#ifndef WARN_UNUSED
-#define WARN_UNUSED __attribute__((warn_unused_result))
-#endif
+    static inline void *memdup(void *old, size_t len) {
+        void *ret = NULL;
 
-#ifndef WARN_FORMAT
-#define WARN_FORMAT(mmm,nnn) __attribute__((format(printf,mmm,nnn)))
-#endif
+        if (old && len > 0) {
+            ret = calloc(1, len);
+            if (ret) {
+                memcpy(ret, old, len);
+            }
+        }
+        return ret;
+    }
 
 #ifdef __cplusplus
 }                               // extern "C"
 #endif
-#endif                          // LIBLNXPROC_UTIL_PRIVATE_H
+#endif                          // LIBLNXPROC_MEMDUP_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
  */
