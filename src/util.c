@@ -37,6 +37,52 @@ memdup(void *old, size_t len)
     return ret;
 }
 
+#ifdef UNUSED
+/*
+ * Reference counting
+ */
+struct allocate_t {
+    unsigned count;
+    void *data;
+};
+void *
+allocate(size_t size)
+{
+    struct allocate_t *a = calloc(1, sizeof(struct allocate_t) + size);
+
+    if (a) {
+        a->data = a + sizeof(struct allocate_t);
+        a->count = 1;
+        return a->data;
+    }
+    return NULL;
+}
+
+void *
+release(void *p)
+{
+    if (p) {
+        struct allocate_t *a = p - sizeof(struct allocate_t);
+
+        a->count--;
+        if (a->count < 1) {
+            free(a);
+        }
+    }
+    return NULL;
+}
+
+void *
+retain(void *p)
+{
+    if (p) {
+        struct allocate_t *a = p - sizeof(struct allocate_t);
+
+        a->count++;
+    }
+    return p;
+}
+#endif
 float
 lnxproc_timeval_secs(struct timeval *tv)
 {
