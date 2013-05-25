@@ -148,16 +148,11 @@ _lnxproc_array_free(_LNXPROC_ARRAY_T ** arrayptr)
     if (arrayptr && *arrayptr) {
         _LNXPROC_ARRAY_T *array = *arrayptr;
 
-        if (array->limits) {
-            _LNXPROC_LIMITS_FREE(array->limits);
-        }
-        if (array->vector) {
-            _LNXPROC_VECTOR_FREE(array->vector);
-        }
+        _LNXPROC_LIMITS_FREE(array->limits);
+        _LNXPROC_VECTOR_FREE(array->vector);
 
         _LNXPROC_DEBUG("Free array %p\n", array);
-        free(array);
-        array = NULL;
+        RELEASE(array);
         *arrayptr = NULL;
     }
 

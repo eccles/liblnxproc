@@ -170,8 +170,7 @@ _lnxproc_limits_set(_LNXPROC_LIMITS_T * limits, int pos, size_t expected,
     _LNXPROC_LIMITS_ROW_T *row = limits->row + pos;
 
     row->expected = expected;
-    if (row->chars)
-        free(row->chars);
+    RELEASE(row->chars);
     row->chars = c;
     row->len = len;
     return LNXPROC_OK;
@@ -232,14 +231,11 @@ _lnxproc_limits_free(_LNXPROC_LIMITS_T ** limits)
             _LNXPROC_DEBUG("Free Limit buffer %d\n", i);
             _LNXPROC_LIMITS_ROW_T *row = mylimits->row + i;
 
-            if (row->chars) {
-                free(row->chars);
-                row->chars = NULL;
-            }
+            RELEASE(row->chars);
         }
 
         _LNXPROC_DEBUG("Free Limits buffer %p\n", mylimits);
-        free(mylimits);
+        RELEASE(mylimits);
         *limits = NULL;
     }
     return LNXPROC_OK;

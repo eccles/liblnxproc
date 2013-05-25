@@ -168,15 +168,11 @@ _lnxproc_vector_free(_LNXPROC_VECTOR_T ** vectorptr)
             for (i = 0; i < vector->size; i++) {
                 _LNXPROC_VECTOR_FREE(vector->children[i]);
             }
-            free(vector->children);
-            vector->children = NULL;
+            RELEASE(vector->children);
         }
-        if (vector->values) {
-            free(vector->values);
-            vector->values = NULL;
-        }
+        RELEASE(vector->values);
         _LNXPROC_DEBUG("Free vector %p\n", vector);
-        free(vector);
+        RELEASE(vector);
         *vectorptr = NULL;
     }
 

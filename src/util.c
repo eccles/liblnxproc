@@ -24,27 +24,129 @@
 #include <string.h>             //memcpy
 
 /*
+ * string conversions
+ */
+int
+float2str(float value, char *buf, size_t len)
+{
+    int n = 0;
+
+    if (buf && len > 2) {
+        n = snprintf(buf, len, "%f", value);
+        if (n >= len) {
+            n = len - 1;
+        }
+    }
+    return n;
+}
+
+int
+int2str(int value, char *buf, size_t len)
+{
+    int n = 0;
+
+    if (buf && len > 2) {
+        n = snprintf(buf, len, "%d", value);
+        if (n >= len) {
+            n = len - 1;
+        }
+    }
+    return n;
+}
+
+int
+long2str(long value, char *buf, size_t len)
+{
+    int n = 0;
+
+    if (buf && len > 2) {
+        n = snprintf(buf, len, "%ld", value);
+        if (n >= len) {
+            n = len - 1;
+        }
+    }
+    return n;
+}
+
+int
+unsigned2str(unsigned value, char *buf, size_t len)
+{
+    int n = 0;
+
+    if (buf && len > 2) {
+        n = snprintf(buf, len, "%u", value);
+        if (n >= len) {
+            n = len - 1;
+        }
+    }
+    return n;
+}
+
+int
+unsignedlong2str(unsigned long value, char *buf, size_t len)
+{
+    int n = 0;
+
+    if (buf && len > 2) {
+        n = snprintf(buf, len, "%lu", value);
+        if (n >= len) {
+            n = len - 1;
+        }
+    }
+    return n;
+}
+
+/*
  * Reference counting
  */
+#ifdef UNUSED
 struct allocate_t {
     unsigned count;
+    size_t size;
     void *data;
 };
+#endif
 
 void *
-Allocate(size_t size)
+Allocate(void *p, size_t size)
 {
 #ifdef UNUSED
-    ALLOCATE_T *a = calloc(1, sizeof(ALLOCATE_T) + size);
+    ALLOCATE_T *a = NULL;
 
-    if (a) {
-        a->data = a + sizeof(ALLOCATE_T);
-        a->count = 1;
-        return a->data;
+    if (p) {
+        a = p - sizeof(ALLOCATE_T);
+        if (a->size == size) {
+            return p;
+        }
+        ALLOCATE_T *b = realloc(a, sizeof(ALLOCATE_T) + size);
+
+        if (!b)
+            return NULL;
+        if (b != a) {
+            b->data = b + sizeof(ALLOCATE_T);
+            b->size = size;
+        }
+        return b->data;
+    }
+    else {
+        a = calloc(1, sizeof(ALLOCATE_T) + size);
+
+        if (a) {
+            a->data = a + sizeof(ALLOCATE_T);
+            a->size = size;
+            a->count = 1;
+            return a->data;
+        }
     }
     return NULL;
 #else
-    return calloc(1,size);
+    if (p) {
+        return realloc(p, size);
+    }
+    else {
+        p = calloc(1, size);
+    }
+    return p;
 #endif
 }
 

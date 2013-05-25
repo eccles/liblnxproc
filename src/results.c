@@ -57,12 +57,12 @@ _lnxproc_results_table_valuestr(_LNXPROC_RESULTS_TABLE_T * entry, char *buf,
             break;
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_FLOAT:
             if (buf)
-                snprintf(buf, len, "%f", entry->value.f);
+                float2str(entry->value.f, buf, len);
             break;
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_STR:
             if (copy) {
                 if (buf)
-                    snprintf(buf, len, "%s", entry->value.s);
+                    strlcpy(buf, entry->value.s, len);
             }
             else {
                 ret = entry->value.s;
@@ -71,7 +71,7 @@ _lnxproc_results_table_valuestr(_LNXPROC_RESULTS_TABLE_T * entry, char *buf,
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_STRREF:
             if (copy) {
                 if (buf)
-                    snprintf(buf, len, "%s", entry->value.sptr);
+                    strlcpy(buf, entry->value.sptr, len);
             }
             else {
                 ret = entry->value.sptr;
@@ -126,14 +126,14 @@ _lnxproc_results_print(_LNXPROC_RESULTS_T * results)
     char buf[32];
 
     if (results->hash) {
-        snprintf(buf, sizeof buf, "Hash");
+        strlcpy(buf, "Hash", sizeof buf);
         _LNXPROC_RESULTS_TABLE_T *entry, *tmp;
 
         HASH_ITER(hh, results->hash, entry, tmp) {
             internal_print_func(results, entry, buf);
         }
     }
-    snprintf(buf, sizeof buf, "Line");
+    strlcpy(buf, "Line", sizeof buf);
     return _lnxproc_results_iterate(results, internal_print_func, buf);
 
 }
@@ -190,10 +190,7 @@ _lnxproc_results_free(_LNXPROC_RESULTS_T ** resultsptr)
         _LNXPROC_DEBUG("Free Results\n");
         _LNXPROC_RESULTS_T *results = *resultsptr;
 
-        if (results->tag) {
-            free(results->tag);
-            results->tag = NULL;
-        }
+        RELEASE(results->tag);
         HASH_CLEAR(hh, results->hash);
         _LNXPROC_DEBUG("Table hash freed to %p\n", results->hash);
         _LNXPROC_RESULTS_TABLE_T *table = results->table;
@@ -205,18 +202,12 @@ _lnxproc_results_free(_LNXPROC_RESULTS_T ** resultsptr)
                 _LNXPROC_RESULTS_TABLE_T *entry = table + i;
 
                 if (entry->valuetype == _LNXPROC_RESULTS_TABLE_VALUETYPE_STRREF) {
-                    if (entry->value.sptr) {
-                        _LNXPROC_DEBUG("Free %p at entry %d\n",
-                                       entry->value.sptr, i);
-                        free(entry->value.sptr);
-                        entry->value.sptr = NULL;
-                    }
+                    RELEASE(entry->value.sptr);
                 }
             }
-            free(table);
-            results->table = NULL;
+            RELEASE(results->table);
         }
-        free(results);
+        RELEASE(results);
         *resultsptr = NULL;
     }
 
@@ -406,13 +397,7 @@ prepare_entry(_LNXPROC_RESULTS_T * results)
     _LNXPROC_DEBUG("Entry %p(%zd) Type %d\n", tentry, results->length - 1,
                    tentry->valuetype);
     if (tentry->valuetype == _LNXPROC_RESULTS_TABLE_VALUETYPE_STRREF) {
-        if (tentry->value.sptr) {
-            _LNXPROC_DEBUG("XXX Free %p at entry %zd\n", tentry->value.sptr,
-                           results->length - 1);
-            _LNXPROC_DEBUG("XXX Free %s\n", tentry->value.sptr);
-            free(tentry->value.sptr);
-            tentry->value.sptr = NULL;
-        }
+        RELEASE(tentry->value.sptr);
     }
 
     return LNXPROC_OK;

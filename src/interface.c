@@ -130,7 +130,7 @@ lnxproc_set(LNXPROC_MODULE_T * module, size_t pos, LNXPROC_MODULE_TYPE_T type,
         }
     }
     if (row->optional)
-        free(row->optional);
+        RELEASE(row->optional);
 
     memcpy(row, mymodules + type - 1, sizeof(_LNXPROC_MODULE_ROW_T));
 
@@ -150,10 +150,9 @@ lnxproc_free(LNXPROC_MODULE_T ** modulesptr)
             _LNXPROC_MODULE_ROW_T *row = modules->row + i;
 
             _LNXPROC_BASE_FREE(row->base);
-            if (row->optional)
-                free(row->optional);
+            RELEASE(row->optional);
         }
-        free(modules);
+        RELEASE(modules);
         *modulesptr = NULL;
     }
     return LNXPROC_OK;
@@ -192,6 +191,7 @@ lnxproc_read(LNXPROC_MODULE_T * modules)
     }
     for (i = 0; i < modules->nmodules; i++) {
         _LNXPROC_MODULE_ROW_T *row = modules->row + i;
+
         if (row->new) {
             _LNXPROC_BASE_T *base = row->base;
 

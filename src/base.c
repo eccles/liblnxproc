@@ -860,19 +860,9 @@ static void
 base_data_free(_LNXPROC_BASE_DATA_T * data)
 {
     if (data) {
-        if (data->array) {
-            _LNXPROC_DEBUG("Free array\n");
-            _LNXPROC_ARRAY_FREE(data->array);
-        }
-        if (data->lines) {
-            _LNXPROC_DEBUG("Free Base buffer\n");
-            free(data->lines);
-            data->lines = NULL;
-        }
-        if (data->results) {
-            _LNXPROC_DEBUG("Free results \n");
-            _LNXPROC_RESULTS_FREE(data->results);
-        }
+        _LNXPROC_ARRAY_FREE(data->array);
+        RELEASE(data->lines);
+        _LNXPROC_RESULTS_FREE(data->results);
     }
 }
 
@@ -891,30 +881,16 @@ _lnxproc_base_free(_LNXPROC_BASE_T ** baseptr)
             int i;
 
             for (i = 0; i < base->nfiles; i++) {
-                if (base->filenames[i])
-                    free(base->filenames[i]);
+                RELEASE(base->filenames[i]);
             }
-            free(base->filenames);
-            base->filenames = NULL;
+            RELEASE(base->filenames);
         }
-        if (base->fileprefix) {
-            _LNXPROC_DEBUG("Free Base file prefix\n");
-            free(base->fileprefix);
-            base->fileprefix = NULL;
-        }
-        if (base->fileglob) {
-            _LNXPROC_DEBUG("Free Base file glob\n");
-            free(base->fileglob);
-            base->fileglob = NULL;
-        }
-        if (base->filesuffix) {
-            _LNXPROC_DEBUG("Free Base file suffix\n");
-            free(base->filesuffix);
-            base->filesuffix = NULL;
-        }
+        RELEASE(base->fileprefix);
+        RELEASE(base->fileglob);
+        RELEASE(base->filesuffix);
 
         _LNXPROC_DEBUG("Free Base\n");
-        free(base);
+        RELEASE(base);
         *baseptr = NULL;
     }
 
