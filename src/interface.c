@@ -188,6 +188,13 @@ lnxproc_read(LNXPROC_MODULE_T * modules)
             if (ret) {
                 return ret;
             }
+        }
+    }
+    for (i = 0; i < modules->nmodules; i++) {
+        _LNXPROC_MODULE_ROW_T *row = modules->row + i;
+        if (row->new) {
+            _LNXPROC_BASE_T *base = row->base;
+
             ret = _lnxproc_base_normalize(base);
             if (ret) {
                 return ret;
