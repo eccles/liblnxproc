@@ -134,10 +134,9 @@ _lnxproc_limits_new(_LNXPROC_LIMITS_T ** newlimits, size_t dim)
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
     _LNXPROC_DEBUG("Malloc limits %zd\n", dim);
-    _LNXPROC_LIMITS_T *nlimits = Allocate(NULL,
-                                          sizeof(_LNXPROC_LIMITS_T) +
-                                          (dim *
-                                           sizeof(_LNXPROC_LIMITS_ROW_T)));
+    _LNXPROC_LIMITS_T *nlimits = Acquire(NULL,
+                                         sizeof(_LNXPROC_LIMITS_T) +
+                                         (dim * sizeof(_LNXPROC_LIMITS_ROW_T)));
     if (!nlimits) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Limits");
         return LNXPROC_ERROR_MALLOC;
@@ -163,7 +162,7 @@ _lnxproc_limits_set(_LNXPROC_LIMITS_T * limits, int pos, size_t expected,
     char *c = strdup(chars);
 
     if (!c) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Chars at position %d", pos);
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Limits pos = %d", pos);
         return LNXPROC_ERROR_MALLOC;
     }
 
@@ -176,6 +175,7 @@ _lnxproc_limits_set(_LNXPROC_LIMITS_T * limits, int pos, size_t expected,
     return LNXPROC_OK;
 }
 
+#ifdef LNXPROC_UNUSED
 int
 _lnxproc_limits_dup(_LNXPROC_LIMITS_T ** newlimits, _LNXPROC_LIMITS_T * limits)
 {
@@ -216,12 +216,13 @@ _lnxproc_limits_dup(_LNXPROC_LIMITS_T ** newlimits, _LNXPROC_LIMITS_T * limits)
     }
     return LNXPROC_OK;
 }
+#endif
 
-int
-_lnxproc_limits_free(_LNXPROC_LIMITS_T ** limits)
+static void
+limits_rows_free(void *ptr)
 {
-    if (limits && *limits) {
-        _LNXPROC_LIMITS_T *mylimits = *limits;
+    if (ptr) {
+        _LNXPROC_LIMITS_T *mylimits = ptr;
 
         _LNXPROC_DEBUG("Free Limits buffer %zd\n", mylimits->dim);
 
@@ -233,9 +234,17 @@ _lnxproc_limits_free(_LNXPROC_LIMITS_T ** limits)
 
             DESTROY(row->chars);
         }
+    }
+}
+
+int
+_lnxproc_limits_free(_LNXPROC_LIMITS_T ** limits)
+{
+    if (limits && *limits) {
+        _LNXPROC_LIMITS_T *mylimits = *limits;
 
         _LNXPROC_DEBUG("Free Limits buffer %p\n", mylimits);
-        DESTROY(mylimits);
+        RELEASE(mylimits, limits_rows_free);
         *limits = NULL;
     }
     return LNXPROC_OK;

@@ -45,8 +45,10 @@ extern "C" {
     int _lnxproc_limits_set(_LNXPROC_LIMITS_T * limits, int pos,
                             size_t expected, char *chars, int len);
 
+#ifdef LNXPROC_UNUSED
     int _lnxproc_limits_dup(_LNXPROC_LIMITS_T ** newlimits,
                             _LNXPROC_LIMITS_T * limits);
+#endif
 
     int _lnxproc_limits_free(_LNXPROC_LIMITS_T ** limits);
 

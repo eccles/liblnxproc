@@ -38,12 +38,11 @@ extern "C" {
 #define WARN_FORMAT(mmm,nnn) __attribute__((format(printf,mmm,nnn)))
 #endif
 
-    void *Acquire(size_t size);
-    void *Release(void *p);
+    void *Acquire(void *p, size_t size);
+    typedef void (*RELEASE_METHOD) (void *);
+    void *Release(void *p, RELEASE_METHOD func);
 
-#define RELEASE(p) p = Release(p)
-
-    void *Retain(void *p);
+#define RELEASE(p,f) p = Release(p,f)
 
 #ifdef __cplusplus
 }                               // extern "C"

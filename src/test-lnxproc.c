@@ -98,7 +98,8 @@ test_limits(void)
 
     _LNXPROC_LIMITS_T *limits1 = NULL;
 
-    _lnxproc_limits_dup(&limits1, mylimits1);
+    //_lnxproc_limits_dup(&limits1, mylimits1);
+    limits1 = Acquire(mylimits1, 0);
 
     int i;
 
@@ -127,7 +128,8 @@ test_limits(void)
 
     _LNXPROC_LIMITS_T *limits2 = NULL;
 
-    _lnxproc_limits_dup(&limits2, mylimits2);
+    //_lnxproc_limits_dup(&limits2, mylimits2);
+    limits2 = Acquire(mylimits2, 0);
 
     for (i = 0; i < limits2->dim; i++) {
         char *c = limit_chr(limits2->row + i, ' ');
@@ -156,7 +158,8 @@ test_limits(void)
 
     _LNXPROC_LIMITS_T *limits3 = NULL;
 
-    _lnxproc_limits_dup(&limits3, mylimits3);
+    //_lnxproc_limits_dup(&limits3, mylimits3);
+    limits3 = Acquire(mylimits3, 0);
 
     for (i = 0; i < limits3->dim; i++) {
         char *c = limit_chr(limits3->row + i, ' ');

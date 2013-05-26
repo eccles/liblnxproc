@@ -112,12 +112,13 @@ _lnxproc_array_new(_LNXPROC_ARRAY_T ** array, _LNXPROC_LIMITS_T * limits)
         return LNXPROC_ERROR_MALLOC;
     }
 
-    int ret = _lnxproc_limits_dup(&p->limits, limits);
+    p->limits = Acquire(limits, 0);
+    //int ret = _lnxproc_limits_dup(&p->limits, limits);
 
-    if (ret) {
-        _LNXPROC_ARRAY_FREE(p);
-        return ret;
-    }
+    //if (ret) {
+    //    _LNXPROC_ARRAY_FREE(p);
+    //    return ret;
+    //}
 
     if (limits->dim > 0) {
         p->vector = array_create(limits, 0);
@@ -131,7 +132,8 @@ _lnxproc_array_new(_LNXPROC_ARRAY_T ** array, _LNXPROC_LIMITS_T * limits)
         _LNXPROC_DEBUG("Scalar\n");
 
         p->vector = NULL;
-        ret = _lnxproc_vector_new(&p->vector, 1, 0);
+        int ret = _lnxproc_vector_new(&p->vector, 1, 0);
+
         if (ret) {
             _LNXPROC_ARRAY_FREE(p);
             return ret;

@@ -97,16 +97,23 @@ proc_pid_environ_normalize(_LNXPROC_BASE_T * base)
 
                 if (!val1)
                     continue;
+
+                char *val = NULL;
+
                 for (k = 2; k < ncols; k++) {
-                    char *val = values[i][j][k];
+                    val = values[i][j][k];
 
                     if (!val)
                         continue;
 
                     *(--val) = '=';
                 }
+                size_t n = 0;
+
+                if (val)
+                    n = 1 + val - val1 + strlen(val);
                 _LNXPROC_DEBUG("%d,%d:value1 %s\n", i, j, val1);
-                _lnxproc_results_add_string(results, buf, val1, 0);
+                _lnxproc_results_add_string(results, buf, val1, n);
             }
         }
     }

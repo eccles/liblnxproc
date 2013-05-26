@@ -34,7 +34,7 @@ extern "C" {
 
     static inline void *Allocate(void *p, size_t size) {
         if (p) {
-            return realloc(p, size);
+            p = realloc(p, size);
         }
         else {
             p = calloc(1, size);
