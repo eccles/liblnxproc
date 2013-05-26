@@ -85,6 +85,7 @@ Typical contents of /proc/diskstats::
 #include <stdlib.h>
 #include <string.h>
 
+#include "strlcpy.h"
 #include "error_private.h"
 #include "limits_private.h"
 #include "array_private.h"
@@ -114,7 +115,10 @@ derived_values(int i, int j, _LNXPROC_RESULTS_T * results,
 #endif
         char dkey[64];
 
-        snprintf(dkey, sizeof dkey, "%s-s", pkey);
+        int n = 0;
+
+        STRLCAT(dkey, pkey, n, sizeof(dkey));
+        STRLCAT(dkey, "-s", n, sizeof(dkey));
         float value = (out - pentry->value.f) / tdiff;
 
         _lnxproc_results_add_float(results, dkey, value);
@@ -225,7 +229,14 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
                 float secs = pars[k].scale * atoi(val);
                 char pkey[64];
 
-                snprintf(pkey, sizeof pkey, "/%s/%s", key, pars[k].name);
+                int n = 0;
+
+                STRLCAT(pkey, "/", n, sizeof(pkey));
+                STRLCAT(pkey, key, n, sizeof(pkey));
+                STRLCAT(pkey, "/", n, sizeof(pkey));
+                STRLCAT(pkey, pars[k].name, n, sizeof(pkey));
+
+                //snprintf(pkey, sizeof pkey, "/%s/%s", key, pars[k].name);
                 _LNXPROC_DEBUG("%d,%d:Curr %s = %f\n", i, k, pkey, secs);
                 _lnxproc_results_add_float(results, pkey, secs);
                 if (!presults)
@@ -253,7 +264,12 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
             float out = 0.0;
             char pkey[64];
 
-            snprintf(pkey, sizeof pkey, "/%s/%s", key, pars[j].name);
+            int n = 0;
+
+            STRLCAT(pkey, "/", n, sizeof(pkey));
+            STRLCAT(pkey, key, n, sizeof(pkey));
+            STRLCAT(pkey, "/", n, sizeof(pkey));
+            STRLCAT(pkey, pars[j].name, n, sizeof(pkey));
 
             char *val = values[i][j];
 

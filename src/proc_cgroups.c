@@ -34,6 +34,7 @@ typical contents of /proc/cgroups file::
 #include <stdio.h>
 #include <string.h>
 
+#include "strlcpy.h"
 #include "error_private.h"
 #include "limits_private.h"
 #include "array_private.h"
@@ -74,7 +75,12 @@ proc_cgroups_normalize(_LNXPROC_BASE_T * base)
                 continue;
             char buf[64];
 
-            snprintf(buf, sizeof buf, "/%s/%s", rowkey, colkey);
+            int n = 0;
+
+            STRLCAT(buf, "/", n, sizeof(buf));
+            STRLCAT(buf, rowkey, n, sizeof(buf));
+            STRLCAT(buf, "/", n, sizeof(buf));
+            STRLCAT(buf, colkey, n, sizeof(buf));
             _lnxproc_results_add_int(results, buf, atoi(val));
         }
     }

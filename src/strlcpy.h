@@ -24,12 +24,16 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define STRLCAT(dest,src,offset,size) \
+        offset += strlcpy((dest) + (offset), (src), (size) - (offset));\
+
 /*
- * Replaces strncpy() - more efficient and always returns a string in dest.
- * Also returns a pointer to the terminating NULL character of the destination
- * string so catenation can be implemented efficiently
+ * Replaces strncpy() - more efficient and returns the number of chars 
+ * copied not including the terminating null so catenation can be 
+ * implemented efficiently
  */
-    static inline void *strlcpy(void *dest, const void *src, size_t len) {
+    static inline int strlcpy(void *dest, const void *src, int len) {
         int i = 0;
         char *d = dest;
         char *s = (char *) src;
@@ -40,7 +44,7 @@ extern "C" {
         }
         *d = '\0';
 
-        return d;
+        return i;
     }
 
 #ifdef __cplusplus

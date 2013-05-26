@@ -192,7 +192,13 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
 
             char key[64];
 
-            snprintf(key, sizeof key, "/%s/%s", rowkey, colkey[j]);
+            int n = 0;
+
+            STRLCAT(key, "/", n, sizeof(key));
+            STRLCAT(key, rowkey, n, sizeof(key));
+            STRLCAT(key, "/", n, sizeof(key));
+            STRLCAT(key, colkey[j], n, sizeof(key));
+
             if ((j == VSIZECOL) || (j == RLIMCOL)) {
                 int value = atoi(val) / 1024;
 
@@ -218,7 +224,7 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
                 _lnxproc_results_add_float(results, key, value);
 
                 _LNXPROC_RESULTS_TABLE_T *hentry =
-                    calloc(1, sizeof(_LNXPROC_RESULTS_TABLE_T));
+                    Allocate(NULL, sizeof(_LNXPROC_RESULTS_TABLE_T));
                 if (!hentry)
                     continue;
                 strlcpy(hentry->key, key, sizeof hentry->key);
@@ -276,7 +282,12 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
 
             char key[64];
 
-            snprintf(key, sizeof key, "/%s/%s", rowkey, colkey[STARTTIMECOL]);
+            int n = 0;
+
+            STRLCAT(key, "/", n, sizeof(key));
+            STRLCAT(key, rowkey, n, sizeof(key));
+            STRLCAT(key, "/", n, sizeof(key));
+            STRLCAT(key, colkey[STARTTIMECOL], n, sizeof(key));
 
             _LNXPROC_RESULTS_TABLE_T *startentry = NULL;
 
@@ -302,7 +313,13 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
             }
 
             for (j = UTIMECOL; j <= CSTIMECOL; j++) {
-                snprintf(key, sizeof key, "/%s/%s", rowkey, colkey[j]);
+                int n = 0;
+
+                STRLCAT(key, "/", n, sizeof(key));
+                STRLCAT(key, rowkey, n, sizeof(key));
+                STRLCAT(key, "/", n, sizeof(key));
+                STRLCAT(key, colkey[j], n, sizeof(key));
+
                 _LNXPROC_RESULTS_TABLE_T *pentry = NULL;
 
                 int ret = _lnxproc_results_fetch(presults, key, &pentry);
@@ -320,7 +337,10 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
 
                 char dkey[64];
 
-                snprintf(dkey, sizeof dkey, "%s%%", key);
+                n = 0;
+                STRLCAT(dkey, key, n, sizeof(dkey));
+                STRLCAT(dkey, "%", n, sizeof(dkey));
+
                 float value = ((hentry->value.f - pentry->value.f) * 100.0)
                     / tdiff;
 

@@ -34,6 +34,7 @@
 #include <sys/stat.h>           // stat,lstat
 #include <unistd.h>             // stat,lstat
 
+#include "strlcpy.h"
 #include "util_private.h"
 #include "error_private.h"
 #include "limits_private.h"
@@ -197,26 +198,24 @@ base_read_glob_files(_LNXPROC_BASE_T * base, char **readbuf, int *nbytes)
     for (i = nseps; i > 0; i--) {
         separators[nseps - i] = limits->row[i].chars[0];
     }
+    int m = 0;
+    int n = 0;
+
     if (base->fileprefix) {
-        if (base->filesuffix) {
-            snprintf(globpat, sizeof globpat, "%s/%s/%s", base->fileprefix,
-                     globwild, base->filesuffix);
-            snprintf(regpat, sizeof regpat, "%s/%s/%s", base->fileprefix,
-                     regwild, base->filesuffix);
-        }
-        else {
-            snprintf(globpat, sizeof globpat, "%s/%s", base->fileprefix,
-                     globwild);
-            snprintf(regpat, sizeof regpat, "%s/%s", base->fileprefix, regwild);
-        }
+        STRLCAT(globpat, base->fileprefix, m, sizeof(globpat));
+        STRLCAT(regpat, base->fileprefix, n, sizeof(regpat));
     }
-    else {
-        if (base->filesuffix) {
-            snprintf(globpat, sizeof globpat, "/%s/%s", globwild,
-                     base->filesuffix);
-            snprintf(regpat, sizeof regpat, "/%s/%s", regwild,
-                     base->filesuffix);
-        }
+
+    STRLCAT(globpat, "/", m, sizeof(globpat));
+    STRLCAT(globpat, globwild, m, sizeof(globpat));
+    STRLCAT(regpat, "/", n, sizeof(regpat));
+    STRLCAT(regpat, regwild, n, sizeof(regpat));
+
+    if (base->filesuffix) {
+        STRLCAT(globpat, "/", m, sizeof(globpat));
+        STRLCAT(globpat, base->filesuffix, m, sizeof(globpat));
+        STRLCAT(regpat, "/", n, sizeof(regpat));
+        STRLCAT(regpat, base->filesuffix, n, sizeof(regpat));
     }
 #ifdef DEBUG
     char errbuf[128];
@@ -343,8 +342,8 @@ base_read_files(_LNXPROC_BASE_T * base)
 static int
 base_new_rawread_buffer(_LNXPROC_BASE_DATA_T * data, size_t newlen)
 {
-    _LNXPROC_DEBUG("Malloc lines buffer to %zd bytes\n", newlen);
-    char *p = realloc(data->lines, newlen + 1);
+    _LNXPROC_DEBUG("Allocate lines buffer to %zd bytes\n", newlen);
+    char *p = Allocate(data->lines, newlen + 1);
 
     if (!p) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Base buffer");
@@ -743,14 +742,14 @@ _lnxproc_base_new(_LNXPROC_BASE_T ** base,
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
-    _LNXPROC_BASE_T *p = calloc(1, sizeof(_LNXPROC_BASE_T));
+    _LNXPROC_BASE_T *p = Allocate(NULL, sizeof(_LNXPROC_BASE_T));
 
     if (!p) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Base");
         return LNXPROC_ERROR_MALLOC;
     }
 
-    _LNXPROC_DEBUG("Malloc data area\n");
+    _LNXPROC_DEBUG("Allocate data area\n");
     ret = _base_data_new(p->data + 0, 0, tag, buflen, limits);
     if (ret) {
         _LNXPROC_BASE_FREE(p);
@@ -764,7 +763,7 @@ _lnxproc_base_new(_LNXPROC_BASE_T ** base,
 
     p->nfiles = 0;
     if (filenames) {
-        p->filenames = calloc(nfiles, sizeof(char *));
+        p->filenames = Allocate(NULL, nfiles * sizeof(char *));
         if (!p->filenames) {
             _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Base filenames");
             _LNXPROC_BASE_FREE(p);
@@ -776,7 +775,10 @@ _lnxproc_base_new(_LNXPROC_BASE_T ** base,
             if (testroot) {
                 char fname[FILENAME_MAX];
 
-                snprintf(fname, sizeof fname, "%s%s", testroot, filenames[i]);
+                int n = 0;
+
+                STRLCAT(fname, testroot, n, sizeof fname);
+                STRLCAT(fname, filenames[i], n, sizeof fname);
                 p->filenames[i] = strdup(fname);
             }
             else {
@@ -798,7 +800,10 @@ _lnxproc_base_new(_LNXPROC_BASE_T ** base,
         if (testroot) {
             char fname[FILENAME_MAX];
 
-            snprintf(fname, sizeof fname, "%s%s", testroot, fileprefix);
+            int n = 0;
+
+            STRLCAT(fname, testroot, n, sizeof fname);
+            STRLCAT(fname, fileprefix, n, sizeof fname);
             p->fileprefix = strdup(fname);
         }
         else {
@@ -861,7 +866,7 @@ base_data_free(_LNXPROC_BASE_DATA_T * data)
 {
     if (data) {
         _LNXPROC_ARRAY_FREE(data->array);
-        RELEASE(data->lines);
+        DESTROY(data->lines);
         _LNXPROC_RESULTS_FREE(data->results);
     }
 }
@@ -881,16 +886,16 @@ _lnxproc_base_free(_LNXPROC_BASE_T ** baseptr)
             int i;
 
             for (i = 0; i < base->nfiles; i++) {
-                RELEASE(base->filenames[i]);
+                DESTROY(base->filenames[i]);
             }
-            RELEASE(base->filenames);
+            DESTROY(base->filenames);
         }
-        RELEASE(base->fileprefix);
-        RELEASE(base->fileglob);
-        RELEASE(base->filesuffix);
+        DESTROY(base->fileprefix);
+        DESTROY(base->fileglob);
+        DESTROY(base->filesuffix);
 
         _LNXPROC_DEBUG("Free Base\n");
-        RELEASE(base);
+        DESTROY(base);
         *baseptr = NULL;
     }
 

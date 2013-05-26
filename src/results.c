@@ -40,24 +40,19 @@ _lnxproc_results_table_valuestr(_LNXPROC_RESULTS_TABLE_T * entry, char *buf,
     if (entry) {
         switch (entry->valuetype) {
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_INT:
-            if (buf)
-                snprintf(buf, len, "%d", entry->value.i);
+            int2str(entry->value.i, buf, len);
             break;
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_UNSIGNEDINT:
-            if (buf)
-                snprintf(buf, len, "%u", entry->value.ui);
+            unsigned2str(entry->value.ui, buf, len);
             break;
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_LONG:
-            if (buf)
-                snprintf(buf, len, "%ld", entry->value.l);
+            long2str(entry->value.ui, buf, len);
             break;
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_UNSIGNED_LONG:
-            if (buf)
-                snprintf(buf, len, "%lu", entry->value.ul);
+            unsignedlong2str(entry->value.ul, buf, len);
             break;
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_FLOAT:
-            if (buf)
-                float2str(entry->value.f, buf, len);
+            float2str(entry->value.f, buf, len);
             break;
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_STR:
             if (copy) {
@@ -78,8 +73,7 @@ _lnxproc_results_table_valuestr(_LNXPROC_RESULTS_TABLE_T * entry, char *buf,
             }
             break;
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_PTR:
-            if (buf)
-                snprintf(buf, len, "%p", entry->value.p);
+            ptr2str(entry->value.p, buf, len);
             break;
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_NONE:
             if (buf)
@@ -154,7 +148,7 @@ _lnxproc_results_new(_LNXPROC_RESULTS_T ** results, char *tag)
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
-    _LNXPROC_RESULTS_T *p = calloc(1, sizeof(_LNXPROC_RESULTS_T));
+    _LNXPROC_RESULTS_T *p = Allocate(NULL, sizeof(_LNXPROC_RESULTS_T));
 
     if (!p) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Results");
@@ -190,7 +184,7 @@ _lnxproc_results_free(_LNXPROC_RESULTS_T ** resultsptr)
         _LNXPROC_DEBUG("Free Results\n");
         _LNXPROC_RESULTS_T *results = *resultsptr;
 
-        RELEASE(results->tag);
+        DESTROY(results->tag);
         HASH_CLEAR(hh, results->hash);
         _LNXPROC_DEBUG("Table hash freed to %p\n", results->hash);
         _LNXPROC_RESULTS_TABLE_T *table = results->table;
@@ -202,12 +196,12 @@ _lnxproc_results_free(_LNXPROC_RESULTS_T ** resultsptr)
                 _LNXPROC_RESULTS_TABLE_T *entry = table + i;
 
                 if (entry->valuetype == _LNXPROC_RESULTS_TABLE_VALUETYPE_STRREF) {
-                    RELEASE(entry->value.sptr);
+                    DESTROY(entry->value.sptr);
                 }
             }
-            RELEASE(results->table);
+            DESTROY(results->table);
         }
-        RELEASE(results);
+        DESTROY(results);
         *resultsptr = NULL;
     }
 
@@ -215,7 +209,7 @@ _lnxproc_results_free(_LNXPROC_RESULTS_T ** resultsptr)
 }
 
 static int
-realloc_results_table(_LNXPROC_RESULTS_T * results, size_t nentries)
+allocate_results_table(_LNXPROC_RESULTS_T * results, size_t nentries)
 {
     _LNXPROC_DEBUG("Table %p nentries %zd\n", results->table, nentries);
     _LNXPROC_DEBUG("Sizeof table entry %zd\n",
@@ -224,7 +218,7 @@ realloc_results_table(_LNXPROC_RESULTS_T * results, size_t nentries)
     size_t nsize =
         (nentries + results->size) * sizeof(_LNXPROC_RESULTS_TABLE_T);
     _LNXPROC_DEBUG("Nsize %zd\n", nsize);
-    _LNXPROC_RESULTS_TABLE_T *t = realloc(results->table, nsize);
+    _LNXPROC_RESULTS_TABLE_T *t = Allocate(results->table, nsize);
 
     if (!t) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Results table");
@@ -261,7 +255,7 @@ _lnxproc_results_init(_LNXPROC_RESULTS_T * results, size_t nentries)
 
     _LNXPROC_DEBUG("Table %p nentries %zd\n", results->table, nentries);
     if (nentries > results->size) {
-        int ret = realloc_results_table(results, nentries - results->size);
+        int ret = allocate_results_table(results, nentries - results->size);
 
         if (ret) {
             return ret;
@@ -382,7 +376,7 @@ prepare_entry(_LNXPROC_RESULTS_T * results)
     _LNXPROC_DEBUG("Table %p\n", results->table);
 
     if (results->length >= results->size) {
-        int ret = realloc_results_table(results, 1);
+        int ret = allocate_results_table(results, 1);
 
         if (ret) {
             return ret;
@@ -397,7 +391,7 @@ prepare_entry(_LNXPROC_RESULTS_T * results)
     _LNXPROC_DEBUG("Entry %p(%zd) Type %d\n", tentry, results->length - 1,
                    tentry->valuetype);
     if (tentry->valuetype == _LNXPROC_RESULTS_TABLE_VALUETYPE_STRREF) {
-        RELEASE(tentry->value.sptr);
+        DESTROY(tentry->value.sptr);
     }
 
     return LNXPROC_OK;

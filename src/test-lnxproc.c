@@ -24,6 +24,7 @@ This file is part of liblnxproc.
 #include <sys/types.h>          // getpid()
 #include <unistd.h>             // sleep(),getpid()
 
+#include "strlcpy.h"
 #include "error_private.h"
 #include "util_private.h"
 #include "vector_private.h"
@@ -545,7 +546,7 @@ test_interface(void)
     lnxproc_iterate(modules, interface_func, "All");
     LNXPROC_FREE(modules);
 
-    snprintf(buf, sizeof buf, "%d", getpid());
+    int2str(getpid(), buf, sizeof buf);
 
     lnxproc_new(&modules, 1);
     lnxproc_set(modules, 0, LNXPROC_PROC_PID_STAT, buf, 1 + strlen(buf));
@@ -556,7 +557,7 @@ test_interface(void)
     lnxproc_iterate(modules, interface_func, "PID_STAT");
     LNXPROC_FREE(modules);
 
-    snprintf(buf, sizeof buf, "%s", "sd*");
+    strlcpy(buf, "sd*", sizeof buf);
     lnxproc_new(&modules, 1);
     lnxproc_set(modules, 0, LNXPROC_SYS_DISKSECTORS, buf, 1 + strlen(buf));
     lnxproc_read(modules);

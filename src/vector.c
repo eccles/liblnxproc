@@ -31,7 +31,7 @@
 static _LNXPROC_VECTOR_T **
 vector_malloc_children(size_t size)
 {
-    return calloc(size, sizeof(_LNXPROC_VECTOR_T *));
+    return Allocate(NULL, size * sizeof(_LNXPROC_VECTOR_T *));
 }
 
 static _LNXPROC_VECTOR_T **
@@ -45,7 +45,7 @@ vector_realloc_children(_LNXPROC_VECTOR_T ** old, size_t oldsize,
 
     _LNXPROC_DEBUG("nsize %zd n %zd\n", nsize, n);
 
-    _LNXPROC_VECTOR_T **p = realloc(old, n);
+    _LNXPROC_VECTOR_T **p = Allocate(old, n);
 
     _LNXPROC_DEBUG("New %p\n", p);
     if (p) {
@@ -64,7 +64,7 @@ vector_realloc_children(_LNXPROC_VECTOR_T ** old, size_t oldsize,
 static char **
 vector_malloc_values(size_t size)
 {
-    return calloc(size, sizeof(char *));
+    return Allocate(NULL, size * sizeof(char *));
 }
 
 static char **
@@ -77,7 +77,7 @@ vector_realloc_values(char **old, size_t oldsize, size_t addsize)
 
     _LNXPROC_DEBUG("nsize %zd n %zd\n", nsize, n);
 
-    char **p = realloc(old, n);
+    char **p = Allocate(old, n);
 
     _LNXPROC_DEBUG("New %p\n", p);
 
@@ -112,7 +112,7 @@ _lnxproc_vector_new(_LNXPROC_VECTOR_T ** vector, size_t size, int recursive)
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
-    _LNXPROC_VECTOR_T *p = calloc(1, sizeof(_LNXPROC_VECTOR_T));
+    _LNXPROC_VECTOR_T *p = Allocate(NULL, sizeof(_LNXPROC_VECTOR_T));
 
     if (!p) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Vector");
@@ -168,11 +168,11 @@ _lnxproc_vector_free(_LNXPROC_VECTOR_T ** vectorptr)
             for (i = 0; i < vector->size; i++) {
                 _LNXPROC_VECTOR_FREE(vector->children[i]);
             }
-            RELEASE(vector->children);
+            DESTROY(vector->children);
         }
-        RELEASE(vector->values);
+        DESTROY(vector->values);
         _LNXPROC_DEBUG("Free vector %p\n", vector);
-        RELEASE(vector);
+        DESTROY(vector);
         *vectorptr = NULL;
     }
 

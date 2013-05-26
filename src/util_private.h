@@ -38,24 +38,23 @@ extern "C" {
 #define WARN_FORMAT(mmm,nnn) __attribute__((format(printf,mmm,nnn)))
 #endif
 
+    int ptr2str(void *value, char *buf, size_t len);
     int float2str(float value, char *buf, size_t len);
     int int2str(int value, char *buf, size_t len);
+    int sizet2str(size_t value, char *buf, size_t len);
     int long2str(long value, char *buf, size_t len);
     int unsigned2str(unsigned value, char *buf, size_t len);
     int unsignedlong2str(unsigned long value, char *buf, size_t len);
 
-#ifdef UNUSED
-    typedef struct allocate_t ALLOCATE_T;
-#endif
-    void *Allocate(size_t size);
+    void *Allocate(void *p, size_t size);
+    void *Destroy(void *p);
+#define DESTROY(p) p = Destroy(p)
+
+    void *Acquire(size_t size);
     void *Release(void *p);
 #define RELEASE(p) p = Release(p)
+    void *Retain(void *p);
 
-    void Retain(void *p);
-
-/*
- * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
- */
 #ifdef __cplusplus
 }                               // extern "C"
 #endif

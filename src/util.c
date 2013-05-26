@@ -19,127 +19,75 @@
  */
 
 #include <sys/time.h>           //gettimeofday
+#include <stddef.h>             //offsetof
 #include <stdio.h>              //snprintf
 #include <stdlib.h>             //calloc
 #include <string.h>             //memcpy
 
-/*
+/*-----------------------------------------------------------------------------
  * string conversions
  */
+#define SNPRINTF(buf,len,fmt,value) {\
+    int n = 0;\
+\
+    if ((buf) && (len) > 2) {\
+        n = snprintf((buf), (len), (fmt), (value));\
+        if (n >= (len)) {\
+            n = (len) - 1;\
+        }\
+    }\
+    return n;\
+}
+
+int
+ptr2str(void *value, char *buf, size_t len)
+{
+    SNPRINTF(buf, len, "%p", value);
+}
+
 int
 float2str(float value, char *buf, size_t len)
 {
-    int n = 0;
-
-    if (buf && len > 2) {
-        n = snprintf(buf, len, "%f", value);
-        if (n >= len) {
-            n = len - 1;
-        }
-    }
-    return n;
+    SNPRINTF(buf, len, "%f", value);
 }
 
 int
 int2str(int value, char *buf, size_t len)
 {
-    int n = 0;
+    SNPRINTF(buf, len, "%d", value);
+}
 
-    if (buf && len > 2) {
-        n = snprintf(buf, len, "%d", value);
-        if (n >= len) {
-            n = len - 1;
-        }
-    }
-    return n;
+int
+sizet2str(size_t value, char *buf, size_t len)
+{
+    SNPRINTF(buf, len, "%zd", value);
 }
 
 int
 long2str(long value, char *buf, size_t len)
 {
-    int n = 0;
-
-    if (buf && len > 2) {
-        n = snprintf(buf, len, "%ld", value);
-        if (n >= len) {
-            n = len - 1;
-        }
-    }
-    return n;
+    SNPRINTF(buf, len, "%ld", value);
 }
 
 int
 unsigned2str(unsigned value, char *buf, size_t len)
 {
-    int n = 0;
-
-    if (buf && len > 2) {
-        n = snprintf(buf, len, "%u", value);
-        if (n >= len) {
-            n = len - 1;
-        }
-    }
-    return n;
+    SNPRINTF(buf, len, "%u", value);
 }
 
 int
 unsignedlong2str(unsigned long value, char *buf, size_t len)
 {
-    int n = 0;
-
-    if (buf && len > 2) {
-        n = snprintf(buf, len, "%lu", value);
-        if (n >= len) {
-            n = len - 1;
-        }
-    }
-    return n;
+    SNPRINTF(buf, len, "%lu", value);
 }
 
-/*
- * Reference counting
+/*-----------------------------------------------------------------------------
+ * Memory allocation
  */
-#ifdef UNUSED
-struct allocate_t {
-    unsigned count;
-    size_t size;
-    void *data;
-};
-#endif
 
 void *
 Allocate(void *p, size_t size)
 {
-#ifdef UNUSED
-    ALLOCATE_T *a = NULL;
-
-    if (p) {
-        a = p - sizeof(ALLOCATE_T);
-        if (a->size == size) {
-            return p;
-        }
-        ALLOCATE_T *b = realloc(a, sizeof(ALLOCATE_T) + size);
-
-        if (!b)
-            return NULL;
-        if (b != a) {
-            b->data = b + sizeof(ALLOCATE_T);
-            b->size = size;
-        }
-        return b->data;
-    }
-    else {
-        a = calloc(1, sizeof(ALLOCATE_T) + size);
-
-        if (a) {
-            a->data = a + sizeof(ALLOCATE_T);
-            a->size = size;
-            a->count = 1;
-            return a->data;
-        }
-    }
-    return NULL;
-#else
     if (p) {
         return realloc(p, size);
     }
@@ -147,39 +95,68 @@ Allocate(void *p, size_t size)
         p = calloc(1, size);
     }
     return p;
-#endif
+}
+
+void *
+Destroy(void *p)
+{
+    if (p)
+        free(p);
+    return NULL;
+}
+
+/*-----------------------------------------------------------------------------
+ * Reference counting
+ */
+
+struct allocate_t {
+    unsigned count;
+    void *data[];
+};
+typedef struct allocate_t ALLOCATE_T;
+
+void *
+Acquire(size_t size)
+{
+    ALLOCATE_T *a = NULL;
+
+    a = calloc(1, sizeof(ALLOCATE_T) + size);
+
+    if (a) {
+        a->count = 1;
+        return a->data;
+    }
+    return NULL;
 }
 
 void *
 Release(void *p)
 {
-    if (p)
-#ifdef UNUSED
-    {
-        ALLOCATE_T *a = p - sizeof(ALLOCATE_T);
+    if (p) {
+        ALLOCATE_T *a = p - offsetof(ALLOCATE_T, data);
 
         a->count--;
         if (a->count < 1) {
             free(a);
         }
     }
-#else
-        free(p);
-#endif
     return NULL;
 }
 
-void
+void *
 Retain(void *p)
 {
-#ifdef UNUSED
     if (p) {
-        ALLOCATE_T *a = p - sizeof(ALLOCATE_T);
+        ALLOCATE_T *a = p - offsetof(ALLOCATE_T, data);
 
         a->count++;
     }
-#endif
+    return p;
 }
+
+/*-----------------------------------------------------------------------------
+ * Time stamp handling
+ */
 
 float
 lnxproc_timeval_secs(struct timeval *tv)

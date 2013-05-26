@@ -74,14 +74,14 @@ lnxproc_new(LNXPROC_MODULE_T ** moduleptr, size_t nmodule)
     LNXPROC_MODULE_T *p;
 
     if (nmodule == 0) {
-        p = calloc(1,
-                   sizeof(LNXPROC_MODULE_T) +
-                   (nmodules * sizeof(_LNXPROC_MODULE_ROW_T)));
+        p = Allocate(NULL,
+                     sizeof(LNXPROC_MODULE_T) +
+                     (nmodules * sizeof(_LNXPROC_MODULE_ROW_T)));
     }
     else {
-        p = calloc(1,
-                   sizeof(LNXPROC_MODULE_T) +
-                   (nmodule * sizeof(_LNXPROC_MODULE_ROW_T)));
+        p = Allocate(NULL,
+                     sizeof(LNXPROC_MODULE_T) +
+                     (nmodule * sizeof(_LNXPROC_MODULE_ROW_T)));
     }
 
     if (!p) {
@@ -129,8 +129,7 @@ lnxproc_set(LNXPROC_MODULE_T * module, size_t pos, LNXPROC_MODULE_TYPE_T type,
             return LNXPROC_ERROR_MALLOC;
         }
     }
-    if (row->optional)
-        RELEASE(row->optional);
+    DESTROY(row->optional);
 
     memcpy(row, mymodules + type - 1, sizeof(_LNXPROC_MODULE_ROW_T));
 
@@ -150,9 +149,9 @@ lnxproc_free(LNXPROC_MODULE_T ** modulesptr)
             _LNXPROC_MODULE_ROW_T *row = modules->row + i;
 
             _LNXPROC_BASE_FREE(row->base);
-            RELEASE(row->optional);
+            DESTROY(row->optional);
         }
-        RELEASE(modules);
+        DESTROY(modules);
         *modulesptr = NULL;
     }
     return LNXPROC_OK;

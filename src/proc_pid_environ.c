@@ -22,6 +22,7 @@ This file is part of liblnxproc.
 #include <stdlib.h>
 #include <string.h>
 
+#include "strlcpy.h"
 #include "error_private.h"
 #include "limits_private.h"
 #include "array_private.h"
@@ -72,7 +73,13 @@ proc_pid_environ_normalize(_LNXPROC_BASE_T * base)
 
             char buf[32];
 
-            snprintf(buf, sizeof buf, "/%s/%s", pidkey, key);
+            int n = 0;
+
+            STRLCAT(buf, "/", n, sizeof(buf));
+            STRLCAT(buf, pidkey, n, sizeof(buf));
+            STRLCAT(buf, "/", n, sizeof(buf));
+            STRLCAT(buf, key, n, sizeof(buf));
+
             _LNXPROC_DEBUG("%d,%d:hash key %s\n", i, j, buf);
 
             if (ncols < 3) {

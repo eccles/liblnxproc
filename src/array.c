@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "util_private.h"
 #include "error_private.h"
 #include "vector_private.h"
 #include "limits_private.h"
@@ -102,7 +103,7 @@ _lnxproc_array_new(_LNXPROC_ARRAY_T ** array, _LNXPROC_LIMITS_T * limits)
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
-    _LNXPROC_ARRAY_T *p = calloc(1, sizeof(_LNXPROC_ARRAY_T));
+    _LNXPROC_ARRAY_T *p = Allocate(NULL, sizeof(_LNXPROC_ARRAY_T));
 
     if (!p) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Array");
@@ -152,7 +153,7 @@ _lnxproc_array_free(_LNXPROC_ARRAY_T ** arrayptr)
         _LNXPROC_VECTOR_FREE(array->vector);
 
         _LNXPROC_DEBUG("Free array %p\n", array);
-        RELEASE(array);
+        DESTROY(array);
         *arrayptr = NULL;
     }
 
@@ -167,7 +168,7 @@ _lnxproc_array_free(_LNXPROC_ARRAY_T ** arrayptr)
     int s = sizeof buf;\
     char *c = buf;\
     for( i=0; i < (ddd); i++ ) {\
-        int n = snprintf(c, s,"%zd,",(iii)[i]);\
+        int n = sizet2str((iii)[i],c, s);\
         c += n;\
         s -= n;\
     }\
