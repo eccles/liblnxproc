@@ -205,14 +205,14 @@ lnxproc_read(LNXPROC_MODULE_T * modules)
 
 int
 lnxproc_performance(LNXPROC_MODULE_T * modules,
-                    long *rawread_time, long *map_time, long *hash_time,
-                    long *normalize_time)
+                    long *rawread_time, long *map_time, long *normalize_time,
+                    long *hash_time)
 {
 
     *rawread_time = 0;
     *map_time = 0;
-    *hash_time = 0;
     *normalize_time = 0;
+    *hash_time = 0;
 
     if (!modules) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Modules");
@@ -233,8 +233,8 @@ lnxproc_performance(LNXPROC_MODULE_T * modules,
                 if (base_data) {
                     *rawread_time += base_data->rawread_time;
                     *map_time += base_data->map_time;
-                    *hash_time += base_data->hash_time;
                     *normalize_time += base_data->normalize_time;
+                    *hash_time += base_data->hash_time;
                 }
             }
         }

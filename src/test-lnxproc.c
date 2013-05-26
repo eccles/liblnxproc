@@ -584,9 +584,9 @@ execute_base(_LNXPROC_BASE_T * base)
 
                 printf("Failure %s\n", lnxproc_strerror(ret, buf, sizeof buf));
             }
-            //else {
-            //    _lnxproc_base_print(base);
-            //}
+            else {
+                _lnxproc_base_print(base);
+            }
             //sleep(20);
         }
         _LNXPROC_BASE_FREE(base);

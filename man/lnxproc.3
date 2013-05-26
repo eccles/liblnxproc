@@ -48,8 +48,8 @@ lnxproc \- interface to reading the /proc/ & /sys filesystems
 .BI "int lnxproc_performance(LNXPROC_MODULE_T *" modules ,
 .BI "                        long *" rawread_time ,
 .BI "                        long *" map_time , 
-.BI "                        long *" hash_time ,
-.BI "                        long *" normalize_time ");"
+.BI "                        long *" normalize_time ,
+.BI "                        long *" hash_time ");"
 
 .BI "typedef (*LNXPROC_INTERFACE_METHOD)(char *" module , 
 .BI "                                    char *" key ,

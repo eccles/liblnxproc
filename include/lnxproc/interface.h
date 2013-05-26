@@ -59,8 +59,8 @@ extern "C" {
 
     int lnxproc_performance(LNXPROC_MODULE_T * modules,
                             long *rawread_time,
-                            long *map_time, long *hash_time,
-                            long *normalize_time);
+                            long *map_time,
+                            long *normalize_time, long *hash_time);
 
     typedef int (*LNXPROC_INTERFACE_METHOD) (char *mod, char *key, char *value,
                                              void *data);
