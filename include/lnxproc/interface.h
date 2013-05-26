@@ -49,9 +49,7 @@ extern "C" {
                     LNXPROC_MODULE_TYPE_T type, void *optional, size_t optlen);
     int lnxproc_free(LNXPROC_MODULE_T ** modulesptr);
 
-#define LNXPROC_FREE(b) {\
-    lnxproc_free(&b);\
-}
+#define LNXPROC_FREE(b) lnxproc_free(&b)
 
     int lnxproc_read(LNXPROC_MODULE_T * modules);
 

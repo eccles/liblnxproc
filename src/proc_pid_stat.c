@@ -112,6 +112,8 @@ Description::
 #include <stdlib.h>
 #include <string.h>
 
+#include "allocate.h"
+#include "strlcpy.h"
 #include "error_private.h"
 #include "limits_private.h"
 #include "array_private.h"
@@ -119,7 +121,6 @@ Description::
 #include "base_private.h"
 #include "proc_pid_stat.h"
 #include "uthash.h"
-#include "strlcpy.h"
 
 static int
 proc_pid_stat_normalize(_LNXPROC_BASE_T * base)

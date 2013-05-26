@@ -18,37 +18,42 @@
  *
  */
 
-/* Common macros and utility functions
- */
-
-#ifndef LIBLNXPROC_UTIL_PRIVATE_H
-#define LIBLNXPROC_UTIL_PRIVATE_H 1
-
-#include <lnxproc/util.h>
+#ifndef LIBLNXPROC_ALLOCATE_H
+#define LIBLNXPROC_ALLOCATE_H 1
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#ifndef WARN_UNUSED
-#define WARN_UNUSED __attribute__((warn_unused_result))
-#endif
+#include <stdlib.h>             //calloc
+#include <string.h>             //memcpy
 
-#ifndef WARN_FORMAT
-#define WARN_FORMAT(mmm,nnn) __attribute__((format(printf,mmm,nnn)))
-#endif
+/*-----------------------------------------------------------------------------
+ * Memory allocation
+ */
 
-    void *Acquire(size_t size);
-    void *Release(void *p);
+    static inline void *Allocate(void *p, size_t size) {
+        if (p) {
+            return realloc(p, size);
+        }
+        else {
+            p = calloc(1, size);
+        }
+        return p;
+    }
 
-#define RELEASE(p) p = Release(p)
+    static inline void *Destroy(void *p) {
+        if (p)
+            free(p);
+        return NULL;
+    }
 
-    void *Retain(void *p);
+#define DESTROY(p) p = Destroy(p)
 
 #ifdef __cplusplus
 }                               // extern "C"
 #endif
-#endif                          // LIBLNXPROC_UTIL_PRIVATE_H
+#endif                          // LIBLNXPROC_ALLOCATE_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
  */

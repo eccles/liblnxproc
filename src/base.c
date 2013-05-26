@@ -34,6 +34,7 @@
 #include <sys/stat.h>           // stat,lstat
 #include <unistd.h>             // stat,lstat
 
+#include "allocate.h"
 #include "strlcpy.h"
 #include "util_private.h"
 #include "error_private.h"

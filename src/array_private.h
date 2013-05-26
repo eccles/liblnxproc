@@ -44,9 +44,7 @@ extern "C" {
 
     int _lnxproc_array_free(_LNXPROC_ARRAY_T ** arrayptr);
 
-#define _LNXPROC_ARRAY_FREE(a) {\
-    _lnxproc_array_free(&a);\
-}
+#define _LNXPROC_ARRAY_FREE(a) _lnxproc_array_free(&a)
 
     int _lnxproc_array_set(_LNXPROC_ARRAY_T * array, size_t idx[],
                            size_t dim, char *val);

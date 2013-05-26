@@ -27,7 +27,9 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "allocate.h"
 #include "strlcpy.h"
+#include "val2str.h"
 #include "error_private.h"
 #include "results_private.h"
 

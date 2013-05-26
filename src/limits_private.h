@@ -50,9 +50,7 @@ extern "C" {
 
     int _lnxproc_limits_free(_LNXPROC_LIMITS_T ** limits);
 
-#define _LNXPROC_LIMITS_FREE(ll) {\
-    _lnxproc_limits_free(&ll);\
-}
+#define _LNXPROC_LIMITS_FREE(ll) _lnxproc_limits_free(&ll)
 
     int _lnxproc_chars_print(char *chars, size_t nchars, char *buf,
                              size_t buflen);

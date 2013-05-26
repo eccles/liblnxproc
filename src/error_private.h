@@ -43,7 +43,7 @@ extern "C" {
 #define _LNXPROC_DEBUG(fmt, args...) \
                           _lnxproc_debug(__FILE__,__LINE__,__func__, fmt, ##args)
 
-#define _LNXPROC_ERROR_DEBUG(s, fmt, args...) {\
+#define _LNXPROC_ERROR_DEBUG(s, fmt, args...) do {\
     char errdbgbuf[32];\
     const char *c = lnxproc_strerror(s,errdbgbuf,sizeof errdbgbuf);\
     char errdbgbuf1[64];\
@@ -51,7 +51,7 @@ extern "C" {
     char errdbgbuf2[512];\
     snprintf(errdbgbuf2,sizeof errdbgbuf2,fmt, ##args);\
     _lnxproc_debug(__FILE__,__LINE__,__func__, "%s: %s\n", errdbgbuf1, errdbgbuf2);\
-}
+} while(0)
 
 #else
 #define _LNXPROC_DEBUG(fmt, args...)

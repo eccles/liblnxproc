@@ -104,9 +104,7 @@ extern "C" {
 
     int _lnxproc_base_free(_LNXPROC_BASE_T ** baseptr);
 
-#define _LNXPROC_BASE_FREE(b) {\
-    _lnxproc_base_free(&b);\
-}
+#define _LNXPROC_BASE_FREE(b) _lnxproc_base_free(&b)
 
     int _lnxproc_base_read(_LNXPROC_BASE_T * base);
     int _lnxproc_base_rawread(_LNXPROC_BASE_T * base);

@@ -25,6 +25,7 @@ This file is part of liblnxproc.
 #include <unistd.h>             // sleep(),getpid()
 
 #include "strlcpy.h"
+#include "val2str.h"
 #include "error_private.h"
 #include "util_private.h"
 #include "vector_private.h"

@@ -89,9 +89,8 @@ extern "C" {
     int _lnxproc_results_new(_LNXPROC_RESULTS_T ** newresults, char *tag);
 
     int _lnxproc_results_free(_LNXPROC_RESULTS_T ** resultsptr);
-#define _LNXPROC_RESULTS_FREE(r) {\
-    _lnxproc_results_free(&r);\
-}
+
+#define _LNXPROC_RESULTS_FREE(r) _lnxproc_results_free(&r)
 
     int _lnxproc_results_print(_LNXPROC_RESULTS_T * results);
     int _lnxproc_results_hash(_LNXPROC_RESULTS_T * results);

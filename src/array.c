@@ -25,6 +25,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "allocate.h"
+#include "val2str.h"
 #include "util_private.h"
 #include "error_private.h"
 #include "vector_private.h"

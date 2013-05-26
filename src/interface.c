@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "allocate.h"
 #include "memdup.h"
 #include "strlcpy.h"
 #include "error_private.h"
