@@ -24,6 +24,7 @@ This file is part of liblnxproc.
 #include <sys/types.h>          // getpid()
 #include <unistd.h>             // sleep(),getpid()
 
+#include "reference.h"
 #include "strlcpy.h"
 #include "val2str.h"
 #include "error_private.h"

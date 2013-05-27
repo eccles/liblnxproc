@@ -28,6 +28,7 @@
 #include <string.h>
 
 #include "allocate.h"
+#include "reference.h"
 #include "strlcpy.h"
 #include "val2str.h"
 #include "util_private.h"

@@ -26,6 +26,7 @@
 #include <string.h>
 
 #include "allocate.h"
+#include "reference.h"
 #include "val2str.h"
 #include "util_private.h"
 #include "error_private.h"

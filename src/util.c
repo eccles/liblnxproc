@@ -19,75 +19,9 @@
  */
 
 #include <sys/time.h>           //gettimeofday
-#include <stddef.h>             //offsetof
 #include <stdio.h>              //snprintf
-#include <stdlib.h>             //calloc
-#include <string.h>             //memcpy
 
 #include "util_private.h"
-
-/*-----------------------------------------------------------------------------
- * Reference counting
- */
-
-struct allocate_t {
-    unsigned count;
-    void *data[];
-};
-typedef struct allocate_t ALLOCATE_T;
-
-void *
-Acquire(void *p, size_t size)
-{
-    ALLOCATE_T *a = NULL;
-
-    if (p) {
-        a = p - offsetof(ALLOCATE_T, data);
-        a->count++;
-        return a->data;
-    }
-    else {
-
-        a = calloc(1, sizeof(ALLOCATE_T) + size);
-
-        if (a) {
-            a->count = 1;
-            return a->data;
-        }
-    }
-    return NULL;
-}
-
-#ifdef LNXPROC_UNUSED
-int
-NextRelease(void *p)
-{
-    int ret = 0;
-
-    if (p) {
-        ALLOCATE_T *a = p - offsetof(ALLOCATE_T, data);
-
-        ret = a->count < 2 ? 1 : 0;
-    }
-    return ret;
-}
-#endif
-
-void *
-Release(void *p, RELEASE_METHOD func)
-{
-    if (p) {
-        ALLOCATE_T *a = p - offsetof(ALLOCATE_T, data);
-
-        a->count--;
-        if (a->count < 1) {
-            if (func)
-                func(a->data);
-            free(a);
-        }
-    }
-    return NULL;
-}
 
 /*-----------------------------------------------------------------------------
  * Time stamp handling
