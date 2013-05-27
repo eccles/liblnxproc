@@ -33,15 +33,7 @@ This file is part of liblnxproc.
 #include "base_private.h"
 #include "interface_private.h"
 #include "results_private.h"
-#include "proc_cgroups.h"
-#include "proc_diskstats.h"
-#include "proc_domainname.h"
-#include "proc_hostname.h"
-#include "proc_osrelease.h"
-#include "sys_cpufreq.h"
-#include "sys_disksectors.h"
-#include "proc_pid_environ.h"
-#include "proc_pid_stat.h"
+#include "modules.h"
 
 /*----------------------------------------------------------------------------*/
 static void

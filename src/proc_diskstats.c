@@ -91,7 +91,6 @@ Typical contents of /proc/diskstats::
 #include "array_private.h"
 #include "results_private.h"
 #include "base_private.h"
-#include "proc_diskstats.h"
 
 static void
 derived_values(int i, int j, _LNXPROC_RESULTS_T * results,
@@ -283,7 +282,7 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
                 _LNXPROC_DEBUG("%d,%d:Curr %s = %f\n", i, j, pkey, out);
             }
             else {
-                _lnxproc_results_add_string(results, pkey, val, 0);
+                _lnxproc_results_add_stringref(results, pkey, val);
                 _LNXPROC_DEBUG("%d,%d:Curr %s = %s\n", i, j, pkey, val);
             }
             if (!presults)

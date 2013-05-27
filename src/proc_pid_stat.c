@@ -119,7 +119,6 @@ Description::
 #include "array_private.h"
 #include "results_private.h"
 #include "base_private.h"
-#include "proc_pid_stat.h"
 #include "uthash.h"
 
 static int
@@ -246,7 +245,7 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
 
             }
             else {
-                _lnxproc_results_add_string(results, key, val, 0);
+                _lnxproc_results_add_stringref(results, key, val);
             }
         }
     }

@@ -28,7 +28,6 @@ This file is part of liblnxproc.
 #include "limits_private.h"
 #include "results_private.h"
 #include "base_private.h"
-#include "sys_disksectors.h"
 
 struct env_t {
     _LNXPROC_RESULTS_T *results;

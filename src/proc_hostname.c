@@ -28,15 +28,13 @@ Typical contents of file /proc/sys/kernel/hostname::
 #include "error_private.h"
 #include "results_private.h"
 #include "base_private.h"
-#include "proc_hostname.h"
 
 static int
 proc_hostname_normalize(_LNXPROC_BASE_T * base)
 {
     _lnxproc_results_init(base->current->results, 1);
-    _lnxproc_results_add_string(base->current->results, "/value",
-                                base->current->lines,
-                                strlen(base->current->lines));
+    _lnxproc_results_add_stringref(base->current->results, "/value",
+                                   base->current->lines);
 
     return LNXPROC_OK;
 }

@@ -28,7 +28,6 @@ This file is part of liblnxproc.
 #include "array_private.h"
 #include "results_private.h"
 #include "base_private.h"
-#include "proc_pid_environ.h"
 
 static int
 proc_pid_environ_normalize(_LNXPROC_BASE_T * base)
@@ -71,7 +70,7 @@ proc_pid_environ_normalize(_LNXPROC_BASE_T * base)
                 continue;
             _LNXPROC_DEBUG("%d,%d:key %s\n", i, j, key);
 
-            char buf[32];
+            char buf[64];
 
             int n = 0;
 
@@ -89,10 +88,10 @@ proc_pid_environ_normalize(_LNXPROC_BASE_T * base)
                     continue;
 
                 _LNXPROC_DEBUG("%d,%d:val %s\n", i, j, val);
-                _lnxproc_results_add_string(results, buf, val, 0);
+                _lnxproc_results_add_stringref(results, buf, val);
             }
             else {
-                _LNXPROC_DEBUG("%d,%d:WARN ncols = %zd\n", i, j, ncols);
+                _LNXPROC_DEBUG("%d,%d:ncols = %zd\n", i, j, ncols);
                 char *val1 = values[i][j][1];
 
                 if (!val1)
@@ -108,12 +107,8 @@ proc_pid_environ_normalize(_LNXPROC_BASE_T * base)
 
                     *(--val) = '=';
                 }
-                size_t n = 0;
-
-                if (val)
-                    n = 1 + val - val1 + strlen(val);
                 _LNXPROC_DEBUG("%d,%d:value1 %s\n", i, j, val1);
-                _lnxproc_results_add_string(results, buf, val1, n);
+                _lnxproc_results_add_stringref(results, buf, val1);
             }
         }
     }

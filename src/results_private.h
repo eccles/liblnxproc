@@ -26,7 +26,7 @@
 #endif
 #include "uthash.h"
 
-#define _LNXPROC_RESULTS_TABLE_KEYLEN 32
+#define _LNXPROC_RESULTS_TABLE_KEYLEN 48
 #define _LNXPROC_RESULTS_TABLE_VALLEN 32
 
 union _lnxproc_results_table_value_t {
@@ -37,7 +37,7 @@ union _lnxproc_results_table_value_t {
     float f;
     char s[_LNXPROC_RESULTS_TABLE_VALLEN];
     char *sptr;
-    void *p;
+    void *ptr;
 };
 
 typedef union _lnxproc_results_table_value_t _LNXPROC_RESULTS_TABLE_VALUE_T;
@@ -51,6 +51,7 @@ enum _lnxproc_results_table_valuetype_t {
     _LNXPROC_RESULTS_TABLE_VALUETYPE_FLOAT,
     _LNXPROC_RESULTS_TABLE_VALUETYPE_STR,
     _LNXPROC_RESULTS_TABLE_VALUETYPE_STRREF,
+    _LNXPROC_RESULTS_TABLE_VALUETYPE_STRREFS,
     _LNXPROC_RESULTS_TABLE_VALUETYPE_PTR,
 };
 typedef enum _lnxproc_results_table_valuetype_t
@@ -102,6 +103,12 @@ int _lnxproc_results_add_float(_LNXPROC_RESULTS_T * results,
 int _lnxproc_results_add_string(_LNXPROC_RESULTS_T * results,
                                 const char *key, const char *value,
                                 size_t valuelen);
+
+int _lnxproc_results_add_stringref(_LNXPROC_RESULTS_T * results,
+                                   const char *key, const char *value);
+
+int _lnxproc_results_add_ptr(_LNXPROC_RESULTS_T * results,
+                             const char *key, const void *value);
 
 typedef int (*_LNXPROC_RESULTS_ITERATE_FUNC) (_LNXPROC_RESULTS_T * results,
                                               _LNXPROC_RESULTS_TABLE_T *

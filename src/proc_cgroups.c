@@ -40,7 +40,6 @@ typical contents of /proc/cgroups file::
 #include "array_private.h"
 #include "results_private.h"
 #include "base_private.h"
-#include "proc_cgroups.h"
 
 static int
 proc_cgroups_normalize(_LNXPROC_BASE_T * base)

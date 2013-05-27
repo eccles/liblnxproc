@@ -26,15 +26,7 @@
 #include "error_private.h"
 #include "base_private.h"
 #include "interface_private.h"
-#include "proc_cgroups.h"
-#include "proc_diskstats.h"
-#include "proc_domainname.h"
-#include "proc_hostname.h"
-#include "proc_osrelease.h"
-#include "proc_pid_environ.h"
-#include "proc_pid_stat.h"
-#include "sys_cpufreq.h"
-#include "sys_disksectors.h"
+#include "modules.h"
 
 static _LNXPROC_MODULE_ROW_T mymodules[] = {
     {.type = LNXPROC_PROC_CGROUPS,.new = _lnxproc_proc_cgroups_new,.base =
