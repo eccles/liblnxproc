@@ -47,6 +47,8 @@ static _LNXPROC_MODULE_ROW_T mymodules[] = {
      NULL,.optional = NULL,},
     {.type = LNXPROC_SYS_DISKSECTORS,.new = _lnxproc_sys_disksectors_new,.base =
      NULL,.optional = NULL,},
+    {.type = LNXPROC_PROC_BUDDYINFO,.new = _lnxproc_proc_buddyinfo_new,.base =
+     NULL,.optional = NULL,},
 };
 
 static size_t nmodules = sizeof(mymodules) / sizeof(mymodules[0]);

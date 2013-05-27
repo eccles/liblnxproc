@@ -589,6 +589,18 @@ execute_base(_LNXPROC_BASE_T * base)
 
 /*----------------------------------------------------------------------------*/
 static void
+test_proc_buddyinfo(void)
+{
+    _LNXPROC_BASE_T *proc_buddyinfo = NULL;
+    int ret = _lnxproc_proc_buddyinfo_new(&proc_buddyinfo, NULL);
+
+    if (ret == LNXPROC_OK) {
+        execute_base(proc_buddyinfo);
+    }
+}
+
+/*----------------------------------------------------------------------------*/
+static void
 test_proc_cgroups(void)
 {
     _LNXPROC_BASE_T *proc_cgroups = NULL;
@@ -708,6 +720,7 @@ main(int argc, char *argv[])
         test_limits();
         test_array();
         test_interface();
+        test_proc_buddyinfo();
         test_proc_cgroups();
         test_proc_diskstats();
         test_proc_domainname();
@@ -738,6 +751,9 @@ main(int argc, char *argv[])
     }
     else if (!strcmp(argv[1], "interface")) {
         test_interface();
+    }
+    else if (!strcmp(argv[1], "proc_buddyinfo")) {
+        test_proc_buddyinfo();
     }
     else if (!strcmp(argv[1], "proc_cgroups")) {
         test_proc_cgroups();

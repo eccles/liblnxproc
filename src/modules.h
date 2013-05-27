@@ -23,6 +23,7 @@
 
 #include "base_private.h"
 
+int _lnxproc_proc_buddyinfo_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_cgroups_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_diskstats_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_domainname_new(_LNXPROC_BASE_T ** base, void *optional);

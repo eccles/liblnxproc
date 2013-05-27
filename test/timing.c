@@ -106,6 +106,18 @@ test_all(void)
 
 /*----------------------------------------------------------------------------*/
 static void
+test_proc_buddyinfo(void)
+{
+    LNXPROC_MODULE_T *modules = NULL;
+
+    lnxproc_new(&modules, 1);
+    lnxproc_set(modules, 0, LNXPROC_PROC_BUDDYINFO, NULL, 0);
+    test_module(modules, "proc_buddyinfo");
+    LNXPROC_FREE(modules);
+
+}
+/*----------------------------------------------------------------------------*/
+static void
 test_proc_cgroups(void)
 {
     LNXPROC_MODULE_T *modules = NULL;
@@ -267,6 +279,7 @@ main(int argc, char *argv[])
     if (argc < 2) {
 
         test_all();
+        test_proc_buddyinfo();
         test_proc_cgroups();
         test_proc_diskstats();
         test_proc_domainname();
@@ -277,6 +290,9 @@ main(int argc, char *argv[])
         test_proc_pid_environ();
         test_proc_pid_stat();
 
+    }
+    else if (!strcmp(argv[1], "proc_buddyinfo")) {
+        test_proc_buddyinfo();
     }
     else if (!strcmp(argv[1], "proc_cgroups")) {
         test_proc_cgroups();
