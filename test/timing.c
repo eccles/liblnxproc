@@ -18,9 +18,8 @@ This file is part of liblnxproc.
 
 */
 
-#include <stdio.h>
+#include <stdio.h>              // printf
 #include <string.h>             // strrchr()
-#include <sys/time.h>
 #include <sys/types.h>          // getpid()
 #include <unistd.h>             // getpid()
 
