@@ -99,7 +99,9 @@ proc_buddyinfo_normalize(_LNXPROC_BASE_T * base)
             _LNXPROC_DEBUG("%d:key %s\n", i, key);
 
             _LNXPROC_DEBUG("%d,%d:value %s\n", i, j, val);
-            _lnxproc_results_add_int(results, key, atoi(val));
+            int myval = (1 << k) * results->page_size * atoi(val);
+
+            _lnxproc_results_add_int(results, key, myval);
         }
     }
     return LNXPROC_OK;
