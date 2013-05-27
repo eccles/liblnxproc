@@ -58,6 +58,7 @@ typedef enum _lnxproc_results_table_valuetype_t
  _LNXPROC_RESULTS_TABLE_VALUETYPE_T;
 
 struct _lnxproc_results_table_t {
+    size_t keylen;
     char key[_LNXPROC_RESULTS_TABLE_KEYLEN];
     _LNXPROC_RESULTS_TABLE_VALUETYPE_T valuetype;
     _LNXPROC_RESULTS_TABLE_VALUE_T value;

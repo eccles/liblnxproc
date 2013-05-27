@@ -192,12 +192,12 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
 
             char key[64];
 
-            int n = 0;
+            int keylen = 0;
 
-            STRLCAT(key, "/", n, sizeof(key));
-            STRLCAT(key, rowkey, n, sizeof(key));
-            STRLCAT(key, "/", n, sizeof(key));
-            STRLCAT(key, colkey[j], n, sizeof(key));
+            STRLCAT(key, "/", keylen, sizeof(key));
+            STRLCAT(key, rowkey, keylen, sizeof(key));
+            STRLCAT(key, "/", keylen, sizeof(key));
+            STRLCAT(key, colkey[j], keylen, sizeof(key));
 
             if ((j == VSIZECOL) || (j == RLIMCOL)) {
                 int value = atoi(val) / 1024;
@@ -232,7 +232,7 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
                 hentry->value.f = value;
                 _LNXPROC_DEBUG("%d,%d:Store %s = %f\n", i, j, hentry->key,
                                value);
-                HASH_ADD_STR(hash, key, hentry);
+                HASH_ADD(hh, hash, key, keylen, hentry);
             }
             else if ((j == ITREALVALUECOL) ||
                      (j == GUEST_TIMECOL) ||

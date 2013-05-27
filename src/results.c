@@ -90,8 +90,9 @@ internal_print_func(_LNXPROC_RESULTS_T * results,
 {
     char buf[64];
 
-    printf("%s %s Key %s = %s\n", (char *) data, results->tag, entry->key,
-           _lnxproc_results_table_valuestr(entry, buf, sizeof buf, 0));
+    printf("%s %s Key %s(%zd) = %s\n", (char *) data, results->tag, entry->key,
+           entry->keylen, _lnxproc_results_table_valuestr(entry, buf,
+                                                          sizeof buf, 0));
     return LNXPROC_OK;
 }
 
@@ -276,7 +277,7 @@ _lnxproc_results_hash(_LNXPROC_RESULTS_T * results)
                     _LNXPROC_RESULTS_TABLE_T *entry = table + i;
 
                     _LNXPROC_DEBUG("%d key %s\n", i, entry->key);
-                    HASH_ADD_STR(results->hash, key, entry);
+                    HASH_ADD(hh, results->hash, key, entry->keylen, entry);
                 }
             }
         }
@@ -390,22 +391,23 @@ prepare_entry(_LNXPROC_RESULTS_T * results, const char *key,
 
     results->length++;
 
-    *tentry = results->table + results->length - 1;
+    _LNXPROC_RESULTS_TABLE_T *entry = results->table + results->length - 1;
 
-    _LNXPROC_DEBUG("Entry %p(%zd) Type %d\n", tentry, results->length - 1,
-                   (*tentry)->valuetype);
-    if ((*tentry)->valuetype == _LNXPROC_RESULTS_TABLE_VALUETYPE_STRREF) {
-        DESTROY((*tentry)->value.sptr);
+    _LNXPROC_DEBUG("Entry %p(%zd) Type %d\n", entry, results->length - 1,
+                   entry->valuetype);
+    if (entry->valuetype == _LNXPROC_RESULTS_TABLE_VALUETYPE_STRREF) {
+        DESTROY(entry->value.sptr);
     }
 
 #ifdef DEBUG
-    if (strlen(key) >= sizeof((*tentry)->key)) {
+    if (strlen(key) >= sizeof(entry->key)) {
         _LNXPROC_DEBUG("WARNING:%s:Key length %lu > table key length %zd\n",
-                       results->tag, strlen(key), sizeof((*tentry)->key) - 1);
+                       results->tag, strlen(key), sizeof(entry->key) - 1);
     }
 #endif
 
-    strlcpy((*tentry)->key, key, sizeof((*tentry)->key));
+    entry->keylen = strlcpy(entry->key, key, sizeof(entry->key));
+    *tentry = entry;
     return LNXPROC_OK;
 }
 
