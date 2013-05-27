@@ -21,10 +21,6 @@
 #ifndef LIBLNXPROC_VAL2STR_H
 #define LIBLNXPROC_VAL2STR_H 1
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdio.h>              //snprintf
 
 /*-----------------------------------------------------------------------------
@@ -42,63 +38,48 @@ extern "C" {
     return n;\
 } while(0)
 
-/*
- * float
- */
-    static inline int
-     float2str(float value, char *buf, size_t len) {
-        SNPRINTF(buf, len, "%f", value);
-    }
-/*
- * pointer
- */ static inline int
-     ptr2str(void *value, char *buf, size_t len) {
-        SNPRINTF(buf, len, "%p", value);
-    }
+static inline int
+float2str(float value, char *buf, size_t len)
+{
+    SNPRINTF(buf, len, "%f", value);
+}
 
-/*
- * int
- */
-    static inline int
-     int2str(int value, char *buf, size_t len) {
-        SNPRINTF(buf, len, "%d", value);
-    }
+static inline int
+ptr2str(void *value, char *buf, size_t len)
+{
+    SNPRINTF(buf, len, "%p", value);
+}
 
-/*
- * size_t
- */
-    static inline int
-     sizet2str(size_t value, char *buf, size_t len) {
-        SNPRINTF(buf, len, "%zd", value);
-    }
+static inline int
+int2str(int value, char *buf, size_t len)
+{
+    SNPRINTF(buf, len, "%d", value);
+}
 
-/*
- * long
- */
-    static inline int
-     long2str(long value, char *buf, size_t len) {
-        SNPRINTF(buf, len, "%ld", value);
-    }
+static inline int
+sizet2str(size_t value, char *buf, size_t len)
+{
+    SNPRINTF(buf, len, "%zd", value);
+}
 
-/*
- * unsigned
- */
-    static inline int
-     unsigned2str(unsigned value, char *buf, size_t len) {
-        SNPRINTF(buf, len, "%u", value);
-    }
+static inline int
+long2str(long value, char *buf, size_t len)
+{
+    SNPRINTF(buf, len, "%ld", value);
+}
 
-/*
- * unsigned long
- */
-    static inline int
-     unsignedlong2str(unsigned long value, char *buf, size_t len) {
-        SNPRINTF(buf, len, "%lu", value);
-    }
+static inline int
+unsigned2str(unsigned value, char *buf, size_t len)
+{
+    SNPRINTF(buf, len, "%u", value);
+}
 
-#ifdef __cplusplus
-}                               // extern "C"
-#endif
+static inline int
+unsignedlong2str(unsigned long value, char *buf, size_t len)
+{
+    SNPRINTF(buf, len, "%lu", value);
+}
+
 #endif                          // LIBLNXPROC_VAL2STR_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab

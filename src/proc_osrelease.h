@@ -21,18 +21,10 @@
 #ifndef LIBLNXPROC_PROC_OSRELEASE_H
 #define LIBLNXPROC_PROC_OSRELEASE_H 1
 
-#include <lnxproc/error.h>
 #include "base_private.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+int _lnxproc_proc_osrelease_new(_LNXPROC_BASE_T ** base, void *optional);
 
-    int _lnxproc_proc_osrelease_new(_LNXPROC_BASE_T ** base, void *optional);
-
-#ifdef __cplusplus
-}                               // extern "C"
-#endif
 #endif                          // LIBLNXPROC_PROC_OSRELEASE_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab

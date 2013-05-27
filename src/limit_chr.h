@@ -23,9 +23,6 @@
 
 #include "limits_private.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 /*
  * replaces
  * char *ret = strchr(limit->chars, c); 
@@ -33,22 +30,21 @@ extern "C" {
  * because we want to include the trailing NUL char if required
  */
 
-    static inline char *limit_chr(_LNXPROC_LIMITS_ROW_T * limit, char c) {
-        if (limit) {
-            int i;
+static inline char *
+limit_chr(_LNXPROC_LIMITS_ROW_T * limit, char c)
+{
+    if (limit) {
+        int i;
 
-            for (i = 0; i < limit->len; i++) {
-                if (c == limit->chars[i]) {
-                    return limit->chars + i;
-                }
+        for (i = 0; i < limit->len; i++) {
+            if (c == limit->chars[i]) {
+                return limit->chars + i;
             }
         }
-        return NULL;
     }
+    return NULL;
+}
 
-#ifdef __cplusplus
-}                               // extern "C"
-#endif
 #endif                          // LIBLNXPROC_LIMITS_CHR_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab

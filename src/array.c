@@ -21,14 +21,11 @@
 /* This file is a re-implementation of the 'list' type from Python
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <string.h>             //memset
 
 #include "allocate.h"
 #include "reference.h"
 #include "val2str.h"
-#include "util_private.h"
 #include "error_private.h"
 #include "vector_private.h"
 #include "limits_private.h"

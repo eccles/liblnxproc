@@ -21,25 +21,20 @@
 #ifndef LIBLNXPROC_MEMDUP_H
 #define LIBLNXPROC_MEMDUP_H 1
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+static inline void *
+memdup(void *old, size_t len)
+{
+    void *ret = NULL;
 
-    static inline void *memdup(void *old, size_t len) {
-        void *ret = NULL;
-
-        if (old && len > 0) {
-            ret = calloc(1, len);
-            if (ret) {
-                memcpy(ret, old, len);
-            }
+    if (old && len > 0) {
+        ret = calloc(1, len);
+        if (ret) {
+            memcpy(ret, old, len);
         }
-        return ret;
     }
+    return ret;
+}
 
-#ifdef __cplusplus
-}                               // extern "C"
-#endif
 #endif                          // LIBLNXPROC_MEMDUP_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab

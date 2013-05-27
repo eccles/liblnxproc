@@ -24,11 +24,7 @@
 #include "util_private.h"
 #include <lnxproc/error.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-    int _lnxproc_error_check(void);
+int _lnxproc_error_check(void);
 
 #define _LNXPROC_ERROR_CHECK() _lnxproc_error_check()
 
@@ -36,9 +32,11 @@ extern "C" {
 
 #include <stdio.h>
 
-    void _lnxproc_debug(const char *filename,
-                        int lineno, const char *funcname, char *fmt, ...
-    ) WARN_FORMAT(4, 5);
+void
+_lnxproc_debug(const char *filename,
+               int lineno, const char *funcname, char *fmt, ...
+    )
+WARN_FORMAT(4, 5);
 
 #define _LNXPROC_DEBUG(fmt, args...) \
                           _lnxproc_debug(__FILE__,__LINE__,__func__, fmt, ##args)
@@ -58,9 +56,6 @@ extern "C" {
 #define _LNXPROC_ERROR_DEBUG(s, fmt, args...)
 #endif
 
-#ifdef __cplusplus
-}                               // extern "C"
-#endif
 #endif                          // LIBLNXPROC_ERROR_PRIVATE_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab

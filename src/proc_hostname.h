@@ -21,18 +21,10 @@
 #ifndef LIBLNXPROC_PROC_HOSTNAME_H
 #define LIBLNXPROC_PROC_HOSTNAME_H 1
 
-#include <lnxproc/error.h>
 #include "base_private.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+int _lnxproc_proc_hostname_new(_LNXPROC_BASE_T ** base, void *optional);
 
-    int _lnxproc_proc_hostname_new(_LNXPROC_BASE_T ** base, void *optional);
-
-#ifdef __cplusplus
-}                               // extern "C"
-#endif
 #endif                          // LIBLNXPROC_PROC_HOSTNAME_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab

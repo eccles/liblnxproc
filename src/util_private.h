@@ -26,10 +26,6 @@
 
 #include <lnxproc/util.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #ifndef WARN_UNUSED
 #define WARN_UNUSED __attribute__((warn_unused_result))
 #endif
@@ -38,9 +34,6 @@ extern "C" {
 #define WARN_FORMAT(mmm,nnn) __attribute__((format(printf,mmm,nnn)))
 #endif
 
-#ifdef __cplusplus
-}                               // extern "C"
-#endif
 #endif                          // LIBLNXPROC_UTIL_PRIVATE_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab

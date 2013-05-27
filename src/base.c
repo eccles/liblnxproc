@@ -18,21 +18,13 @@
  *
  */
 
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <glob.h>
-#include <regex.h>
+#include <errno.h>              //errno
+#include <fcntl.h>              //open
+#include <stdio.h>              //printf
+#include <glob.h>               // glob
+#include <regex.h>              // regex
 
-#include <sys/types.h>          //closedir,opendir,stat,lstat
-#include <dirent.h>             //closedir,readdir,opendir
-#include <sys/stat.h>           // stat,lstat
-#include <unistd.h>             // stat,lstat
+#include <unistd.h>             // read,close
 
 #include "allocate.h"
 #include "strlcpy.h"

@@ -21,9 +21,8 @@
 /* This file is a re-implementation of the 'list' type from Python
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <stdio.h>              //printf
+#include <string.h>             //memset
 
 #include "allocate.h"
 #include "error_private.h"

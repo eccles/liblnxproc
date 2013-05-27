@@ -21,10 +21,6 @@
 #ifndef LIBLNXPROC_REFERENCE_H
 #define LIBLNXPROC_REFERENCE_H 1
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stddef.h>             //offsetof
 #include <stdlib.h>             //calloc
 
@@ -32,53 +28,54 @@ extern "C" {
  * Reference counting
  */
 
-    struct allocate_t {
-        unsigned count;
-        void *data[];
-    };
-    typedef struct allocate_t ALLOCATE_T;
+struct allocate_t {
+    unsigned count;
+    void *data[];
+};
+typedef struct allocate_t ALLOCATE_T;
 
-    static inline void *Acquire(void *p, size_t size) {
-        ALLOCATE_T *a = NULL;
+static inline void *
+Acquire(void *p, size_t size)
+{
+    ALLOCATE_T *a = NULL;
 
-        if (p) {
-            a = p - offsetof(ALLOCATE_T, data);
-            a->count++;
+    if (p) {
+        a = p - offsetof(ALLOCATE_T, data);
+        a->count++;
+        return a->data;
+    }
+    else {
+
+        a = calloc(1, sizeof(ALLOCATE_T) + size);
+
+        if (a) {
+            a->count = 1;
             return a->data;
         }
-        else {
-
-            a = calloc(1, sizeof(ALLOCATE_T) + size);
-
-            if (a) {
-                a->count = 1;
-                return a->data;
-            }
-        }
-        return NULL;
     }
+    return NULL;
+}
 
-    typedef void (*RELEASE_METHOD) (void *);
+typedef void (*RELEASE_METHOD) (void *);
 
-    static inline void *Release(void *p, RELEASE_METHOD func) {
-        if (p) {
-            ALLOCATE_T *a = p - offsetof(ALLOCATE_T, data);
+static inline void *
+Release(void *p, RELEASE_METHOD func)
+{
+    if (p) {
+        ALLOCATE_T *a = p - offsetof(ALLOCATE_T, data);
 
-            a->count--;
-            if (a->count < 1) {
-                if (func)
-                    func(a->data);
-                free(a);
-            }
+        a->count--;
+        if (a->count < 1) {
+            if (func)
+                func(a->data);
+            free(a);
         }
-        return NULL;
     }
+    return NULL;
+}
 
 #define RELEASE(p,f) p = Release(p,f)
 
-#ifdef __cplusplus
-}                               // extern "C"
-#endif
 #endif                          // LIBLNXPROC_REFERENCE_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab

@@ -21,49 +21,33 @@
 #ifndef LIBLNXPROC_LIMITS_PRIVATE_H
 #define LIBLNXPROC_LIMITS_PRIVATE_H 1
 
-#include "util_private.h"
-#include "error_private.h"
+struct _lnxproc_limits_row_t {
+    size_t expected;
+    char *chars;
+    int len;
+};
+typedef struct _lnxproc_limits_row_t _LNXPROC_LIMITS_ROW_T;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+struct _lnxproc_limits_t {
+    size_t dim;
+    _LNXPROC_LIMITS_ROW_T row[];
+};
+typedef struct _lnxproc_limits_t _LNXPROC_LIMITS_T;
 
-    struct _lnxproc_limits_row_t {
-        size_t expected;
-        char *chars;
-        int len;
-    };
-    typedef struct _lnxproc_limits_row_t _LNXPROC_LIMITS_ROW_T;
+int _lnxproc_limits_new(_LNXPROC_LIMITS_T ** newlimits, size_t dim);
+int _lnxproc_limits_set(_LNXPROC_LIMITS_T * limits, int pos,
+                        size_t expected, char *chars, int len);
 
-    struct _lnxproc_limits_t {
-        size_t dim;
-        _LNXPROC_LIMITS_ROW_T row[];
-    };
-    typedef struct _lnxproc_limits_t _LNXPROC_LIMITS_T;
-
-    int _lnxproc_limits_new(_LNXPROC_LIMITS_T ** newlimits, size_t dim);
-    int _lnxproc_limits_set(_LNXPROC_LIMITS_T * limits, int pos,
-                            size_t expected, char *chars, int len);
-
-#ifdef LNXPROC_UNUSED
-    int _lnxproc_limits_dup(_LNXPROC_LIMITS_T ** newlimits,
-                            _LNXPROC_LIMITS_T * limits);
-#endif
-
-    int _lnxproc_limits_free(_LNXPROC_LIMITS_T ** limits);
+int _lnxproc_limits_free(_LNXPROC_LIMITS_T ** limits);
 
 #define _LNXPROC_LIMITS_FREE(ll) _lnxproc_limits_free(&ll)
 
-    int _lnxproc_chars_print(char *chars, size_t nchars, char *buf,
-                             size_t buflen);
+int _lnxproc_chars_print(char *chars, size_t nchars, char *buf, size_t buflen);
 
-    int _lnxproc_limit_print(_LNXPROC_LIMITS_ROW_T * limit,
-                             char *buf, size_t buflen);
-    int _lnxproc_limits_print(_LNXPROC_LIMITS_T * limits);
+int _lnxproc_limit_print(_LNXPROC_LIMITS_ROW_T * limit,
+                         char *buf, size_t buflen);
+int _lnxproc_limits_print(_LNXPROC_LIMITS_T * limits);
 
-#ifdef __cplusplus
-}                               // extern "C"
-#endif
 #endif                          // LIBLNXPROC_LIMITS_PRIVATE_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab

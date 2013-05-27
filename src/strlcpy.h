@@ -21,10 +21,6 @@
 #ifndef LIBLNXPROC_STRLCPY_H
 #define LIBLNXPROC_STRLCPY_H 1
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define STRLCAT(dest,src,offset,size) \
         offset += strlcpy((dest) + (offset), (src), (size) - (offset));\
 
@@ -33,23 +29,22 @@ extern "C" {
  * copied not including the terminating null so catenation can be 
  * implemented efficiently
  */
-    static inline int strlcpy(void *dest, const void *src, int len) {
-        int i = 0;
-        char *d = dest;
-        char *s = (char *) src;
+static inline int
+strlcpy(void *dest, const void *src, int len)
+{
+    int i = 0;
+    char *d = dest;
+    char *s = (char *) src;
 
-        while (*s && i < len - 1) {
-            *d++ = *s++;
-            i++;
-        }
-        *d = '\0';
-
-        return i;
+    while (*s && i < len - 1) {
+        *d++ = *s++;
+        i++;
     }
+    *d = '\0';
 
-#ifdef __cplusplus
-}                               // extern "C"
-#endif
+    return i;
+}
+
 #endif                          // LIBLNXPROC_STRLCPY_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab

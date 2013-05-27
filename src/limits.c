@@ -18,14 +18,7 @@
  *
  */
 
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <string.h>             //strdup
 
 #include "allocate.h"
 #include "reference.h"
@@ -175,49 +168,6 @@ _lnxproc_limits_set(_LNXPROC_LIMITS_T * limits, int pos, size_t expected,
     row->len = len;
     return LNXPROC_OK;
 }
-
-#ifdef LNXPROC_UNUSED
-int
-_lnxproc_limits_dup(_LNXPROC_LIMITS_T ** newlimits, _LNXPROC_LIMITS_T * limits)
-{
-    _LNXPROC_DEBUG("sizeof ptr %lu\n", sizeof(void *));
-    _LNXPROC_DEBUG("sizeof _LNXPROC_LIMITS_T %lu\n", sizeof(_LNXPROC_LIMITS_T));
-
-    if (!newlimits) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Limits address");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
-    }
-    if (*newlimits) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Limits");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
-    }
-    if (!limits) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Limits");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
-    }
-
-    int ret = _lnxproc_limits_new(newlimits, limits->dim);
-
-    if (ret) {
-        return ret;
-    }
-
-    _LNXPROC_DEBUG("Malloc limits %p\n", *newlimits);
-    int i;
-
-    for (i = 0; i < limits->dim; i++) {
-        _LNXPROC_LIMITS_ROW_T *row = limits->row + i;
-
-        _lnxproc_limits_set(*newlimits, i, row->expected, row->chars, row->len);
-#ifdef DEBUG
-        char buf[64];
-
-        _lnxproc_limit_print(row, buf, sizeof buf);
-#endif
-    }
-    return LNXPROC_OK;
-}
-#endif
 
 static void
 limits_rows_free(void *ptr)

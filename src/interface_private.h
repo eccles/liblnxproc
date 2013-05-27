@@ -24,28 +24,21 @@
 #include "base_private.h"
 #include <lnxproc/interface.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+typedef int (*_LNXPROC_METHOD) (_LNXPROC_BASE_T ** base, void *optional);
 
-    typedef int (*_LNXPROC_METHOD) (_LNXPROC_BASE_T ** base, void *optional);
+struct _lnxproc_module_row_t {
+    LNXPROC_MODULE_TYPE_T type;
+    _LNXPROC_METHOD new;
+    _LNXPROC_BASE_T *base;
+    void *optional;
+};
+typedef struct _lnxproc_module_row_t _LNXPROC_MODULE_ROW_T;
 
-    struct _lnxproc_module_row_t {
-        LNXPROC_MODULE_TYPE_T type;
-        _LNXPROC_METHOD new;
-        _LNXPROC_BASE_T *base;
-        void *optional;
-    };
-    typedef struct _lnxproc_module_row_t _LNXPROC_MODULE_ROW_T;
+struct lnxproc_module_t {
+    size_t nmodules;
+    _LNXPROC_MODULE_ROW_T row[];
+};
 
-    struct lnxproc_module_t {
-        size_t nmodules;
-        _LNXPROC_MODULE_ROW_T row[];
-    };
-
-#ifdef __cplusplus
-}                               // extern "C"
-#endif
 #endif                          // LIBLNXPROC_INTERFACE_PRIVATE_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab

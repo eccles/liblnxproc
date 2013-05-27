@@ -18,8 +18,7 @@
  *
  */
 
-#include <stdlib.h>
-#include <string.h>
+#include <string.h>             //memcpy
 
 #include "allocate.h"
 #include "memdup.h"
