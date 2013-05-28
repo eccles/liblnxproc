@@ -617,13 +617,14 @@ main(int argc, char *argv[])
         TEST_MODULE(LNXPROC_PROC_MEMINFO, NULL, 0);
         TEST_MODULE(LNXPROC_PROC_MOUNTS, NULL, 0);
         TEST_MODULE(LNXPROC_PROC_OSRELEASE, NULL, 0);
-        TEST_MODULE(LNXPROC_SYS_CPUFREQ, NULL, 0);
-        TEST_MODULE(LNXPROC_SYS_DISKSECTORS, NULL, 0);
-        TEST_MODULE(LNXPROC_SYS_DISKSECTORS, "sd*", 4);
+        TEST_MODULE(LNXPROC_PROC_PARTITIONS, NULL, 0);
         TEST_MODULE(LNXPROC_PROC_PID_ENVIRON, NULL, 0);
         TEST_MODULE(LNXPROC_PROC_PID_ENVIRON, buf, 1 + strlen(buf));
         TEST_MODULE(LNXPROC_PROC_PID_STAT, NULL, 0);
         TEST_MODULE(LNXPROC_PROC_PID_STAT, buf, 1 + strlen(buf));
+        TEST_MODULE(LNXPROC_SYS_CPUFREQ, NULL, 0);
+        TEST_MODULE(LNXPROC_SYS_DISKSECTORS, NULL, 0);
+        TEST_MODULE(LNXPROC_SYS_DISKSECTORS, "sd*", 4);
     }
     else if (!strcmp(argv[1], "util")) {
         test_util();
@@ -682,12 +683,8 @@ main(int argc, char *argv[])
     else if (!strcmp(argv[1], "proc_osrelease")) {
         TEST_MODULE(LNXPROC_PROC_OSRELEASE, NULL, 0);
     }
-    else if (!strcmp(argv[1], "sys_cpufreq")) {
-        TEST_MODULE(LNXPROC_SYS_CPUFREQ, NULL, 0);
-    }
-    else if (!strcmp(argv[1], "sys_disksectors")) {
-        TEST_MODULE(LNXPROC_SYS_DISKSECTORS, NULL, 0);
-        TEST_MODULE(LNXPROC_SYS_DISKSECTORS, "sd*", 4);
+    else if (!strcmp(argv[1], "proc_partitions")) {
+        TEST_MODULE(LNXPROC_PROC_PARTITIONS, NULL, 0);
     }
     else if (!strcmp(argv[1], "proc_pid_environ")) {
         TEST_MODULE(LNXPROC_PROC_PID_ENVIRON, NULL, 0);
@@ -696,6 +693,13 @@ main(int argc, char *argv[])
     else if (!strcmp(argv[1], "proc_pid_stat")) {
         TEST_MODULE(LNXPROC_PROC_PID_STAT, NULL, 0);
         TEST_MODULE(LNXPROC_PROC_PID_STAT, buf, 1 + strlen(buf));
+    }
+    else if (!strcmp(argv[1], "sys_cpufreq")) {
+        TEST_MODULE(LNXPROC_SYS_CPUFREQ, NULL, 0);
+    }
+    else if (!strcmp(argv[1], "sys_disksectors")) {
+        TEST_MODULE(LNXPROC_SYS_DISKSECTORS, NULL, 0);
+        TEST_MODULE(LNXPROC_SYS_DISKSECTORS, "sd*", 4);
     }
     return 0;
 }
