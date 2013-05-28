@@ -36,6 +36,7 @@ static const char *errstr[] = {
     "Base regex failure",
     "Base glob failure",
     "Key not found",
+    "Read buffer > SSIZE_MAX bytes",
 };
 
 #define ERRSTR_SIZE sizeof(errstr)/sizeof(errstr[0])

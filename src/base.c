@@ -20,6 +20,7 @@
 
 #include <errno.h>              //errno
 #include <fcntl.h>              //open
+#include <limits.h>             //SSIZE_MAX
 #include <stdio.h>              //printf
 #include <glob.h>               // glob
 #include <regex.h>              // regex
@@ -119,9 +120,9 @@ _lnxproc_base_print(_LNXPROC_BASE_T * base)
 }
 
 static int
-base_rawread(char *filename, char **readbuf, int *nbytes)
+base_rawread(char *filename, char **readbuf, size_t * nbytes)
 {
-    _LNXPROC_DEBUG("Filename %s Readbuf %p Nbytes %d\n", filename, *readbuf,
+    _LNXPROC_DEBUG("Filename %s Readbuf %p Nbytes %zd\n", filename, *readbuf,
                    *nbytes);
 
     if (*nbytes < 1) {
@@ -144,35 +145,53 @@ base_rawread(char *filename, char **readbuf, int *nbytes)
     /* we do not have to check return status of close as we are only
      * reading the file
      */
-    _LNXPROC_DEBUG("Read %s\n", filename);
-    int inbytes = read(fd, *readbuf, *nbytes);
+    char *mybuf = *readbuf;
+    size_t mybytes = *nbytes;
 
-    if (inbytes < 0) {
-        int myerrno = -errno;
-
-        _LNXPROC_ERROR_DEBUG(myerrno, "Read %s", filename);
-        _LNXPROC_DEBUG("Close %s\n", filename);
-        close(fd);
-
-        return myerrno;
+    if (mybytes > SSIZE_MAX) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_READ_SSIZE_MAX, "mybytes %zd",
+                             mybytes);
+        return LNXPROC_ERROR_BASE_READ_SSIZE_MAX;
     }
+
+    _LNXPROC_DEBUG("Read %s\n", filename);
+    ssize_t inbytes;
+
+    do {
+        inbytes = read(fd, mybuf, mybytes);
+
+        if (inbytes < 0) {
+            int myerrno = -errno;
+
+            _LNXPROC_ERROR_DEBUG(myerrno, "Read %s", filename);
+            _LNXPROC_DEBUG("Close %s\n", filename);
+            close(fd);
+
+            return myerrno;
+        }
+        _LNXPROC_DEBUG("%zd bytes read\n", inbytes);
+        mybuf += inbytes;
+        mybytes -= inbytes;
+    } while (inbytes > 0);
     close(fd);
 
-    _LNXPROC_DEBUG("Nbytes %d read\n", inbytes);
+    _LNXPROC_DEBUG("Nbytes %zd read\n", (*nbytes) - mybytes);
 
-    (*readbuf)[inbytes] = '\n';
-    *readbuf += inbytes + 1;
-    *nbytes -= inbytes + 1;
-    if (*nbytes < 1) {
+    if (mybytes < 1) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_READ_OVERFLOW, "Raw Read %s",
                              filename);
         return LNXPROC_ERROR_BASE_READ_OVERFLOW;
     }
+    *mybuf = '\n';
+    mybuf += 1;
+    mybytes -= 1;
+    *readbuf = mybuf;
+    *nbytes = mybytes;
     return LNXPROC_OK;
 }
 
 static int
-base_read_glob_files(_LNXPROC_BASE_T * base, char **readbuf, int *nbytes)
+base_read_glob_files(_LNXPROC_BASE_T * base, char **readbuf, size_t * nbytes)
 {
 
     const char *globwild = base->fileglob;
@@ -286,7 +305,7 @@ base_read_glob_files(_LNXPROC_BASE_T * base, char **readbuf, int *nbytes)
             *readbuf += nseps;
             *nbytes -= nseps;
 
-            _LNXPROC_DEBUG("Readbuf %p Nbytes %d\n", *readbuf, *nbytes);
+            _LNXPROC_DEBUG("Readbuf %p Nbytes %zd\n", *readbuf, *nbytes);
             ret = base_rawread(globbuf.gl_pathv[i], readbuf, nbytes);
             if (ret) {
                 if (ret == LNXPROC_ERROR_BASE_READ_OVERFLOW) {
@@ -310,7 +329,7 @@ base_read_files(_LNXPROC_BASE_T * base)
     _LNXPROC_BASE_DATA_T *data = base->current;
     int i;
     char *readbuf = data->lines;
-    int nbytes = data->buflen;
+    size_t nbytes = data->buflen;
 
     int ret;
 
