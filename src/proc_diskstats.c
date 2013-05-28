@@ -41,7 +41,7 @@ This is the order of metrics in /proc/diskstats::
                   are given to appropriate request_queue_t and decremented as
                   they finish.
    12 ms_io       This field is increases so long as field 9 is nonzero.
-   13 ms_weighted This field is incremented at each I/O start, I/O completion, #
+   13 ms_weighted This field is incremented at each I/O start, I/O completion, 
                   I/O
 
 Typical contents of /proc/diskstats::
@@ -172,7 +172,7 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
 #define IOSCOL 11
 #define MS_IOCOL 12
 #define MS_WEIGHTEDCOL 13
-    static const int const precols[] = { MS_READCOL, MS_WRITECOL, };
+    static const int const precols[] = { MS_READCOL, MS_WRITECOL, MS_IOCOL, };
     static const int nprecols = sizeof(precols) / sizeof(precols[0]);
 
 /*
@@ -185,20 +185,22 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
         const char *name;
         const float scale;
     };
-    static const struct par_t pars[] = { {.name = "major",.scale = 0.0,},
-    {.name = "minor",.scale = 0.0,},
-    {.name = "name ",.scale = 0.0,},
-    {.name = "reads",.scale = 1.0,},
-    {.name = "merge_read",.scale = 1.0,},
-    {.name = "s_read",.scale = sectorscale,},
-    {.name = "ms_read",.scale = 1.e-3,},
-    {.name = "writes",.scale = 1.0,},
-    {.name = "merge_write",.scale = 1.0,},
-    {.name = "s_write",.scale = sectorscale,},
-    {.name = "ms_write",.scale = 1.e-3,},
-    {.name = "ios",.scale = 0.0,},
-    {.name = "ms_io",.scale = 1.e-1,},
-    {.name = "ms_weighted",.scale = 1.e-1,},
+
+    static const struct par_t pars[] = {
+        {.name = "major",},
+        {.name = "minor",},
+        {.name = "name ",},
+        {.name = "reads",.scale = 1.0,},
+        {.name = "merge_read",.scale = 1.0,},
+        {.name = "s_read",.scale = sectorscale,},
+        {.name = "ms_read",.scale = 1.e-3,},
+        {.name = "writes",.scale = 1.0,},
+        {.name = "merge_write",.scale = 1.0,},
+        {.name = "s_write",.scale = sectorscale,},
+        {.name = "ms_write",.scale = 1.e-3,},
+        {.name = "ios",.scale = 1.0,},
+        {.name = "ms_io",.scale = 1.e-3,},
+        {.name = "ms_weighted",.scale = 1.e-3,},
     };
     static const size_t numcols = sizeof(pars) / sizeof(pars[0]);
 
@@ -235,7 +237,6 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
                 STRLCAT(pkey, "/", n, sizeof(pkey));
                 STRLCAT(pkey, pars[k].name, n, sizeof(pkey));
 
-                //snprintf(pkey, sizeof pkey, "/%s/%s", key, pars[k].name);
                 _LNXPROC_DEBUG("%d,%d:Curr %s = %f\n", i, k, pkey, secs);
                 _lnxproc_results_add_float(results, pkey, secs);
                 if (!presults)
@@ -289,14 +290,14 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
                 continue;
 
             if ((j == READSCOL) || (j == MERGE_READCOL) || (j == S_READCOL)) {
-
                 derived_values(i, j, results, presults, pkey, out, iodiff[0]);
             }
-            if ((j == WRITESCOL) || (j == MERGE_WRITECOL) || (j == S_WRITECOL)) {
+            else if ((j == WRITESCOL) || (j == MERGE_WRITECOL)
+                     || (j == S_WRITECOL)) {
                 derived_values(i, j, results, presults, pkey, out, iodiff[1]);
             }
-            if ((j == MS_IOCOL) || (j == MS_WEIGHTEDCOL)) {
-                derived_values(i, j, results, presults, pkey, out, tdiff);
+            else if ((j == IOSCOL)) {
+                derived_values(i, j, results, presults, pkey, out, iodiff[2]);
             }
         }
     }
