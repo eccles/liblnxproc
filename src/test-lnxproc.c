@@ -563,178 +563,38 @@ test_interface(void)
 }
 
 /*----------------------------------------------------------------------------*/
-static void
-execute_base(_LNXPROC_BASE_T * base)
-{
-    if (base) {
-        int i;
-
-        for (i = 0; i < 5; i++) {
-            printf("Execute %d\n", i + 1);
-            int ret = _lnxproc_base_read(base);
-
-            if (ret) {
-                char buf[64];
-
-                printf("Failure %s\n", lnxproc_strerror(ret, buf, sizeof buf));
-            }
-            else {
-                _lnxproc_base_print(base);
-            }
-            //sleep(20);
-        }
-        _LNXPROC_BASE_FREE(base);
-    }
-}
-
-/*----------------------------------------------------------------------------*/
-static void
-test_proc_buddyinfo(void)
-{
-    _LNXPROC_BASE_T *proc_buddyinfo = NULL;
-    int ret = _lnxproc_proc_buddyinfo_new(&proc_buddyinfo, NULL);
-
-    if (ret == LNXPROC_OK) {
-        execute_base(proc_buddyinfo);
-    }
-}
-
-/*----------------------------------------------------------------------------*/
-static void
-test_proc_cgroups(void)
-{
-    _LNXPROC_BASE_T *proc_cgroups = NULL;
-    int ret = _lnxproc_proc_cgroups_new(&proc_cgroups, NULL);
-
-    if (ret == LNXPROC_OK) {
-        execute_base(proc_cgroups);
-    }
-}
-
-/*----------------------------------------------------------------------------*/
-static void
-test_proc_cmdline(void)
-{
-    _LNXPROC_BASE_T *proc_cmdline = NULL;
-    int ret = _lnxproc_proc_cmdline_new(&proc_cmdline, NULL);
-
-    if (ret == LNXPROC_OK) {
-        execute_base(proc_cmdline);
-    }
-}
-
-/*----------------------------------------------------------------------------*/
-static void
-test_proc_cpuinfo(void)
-{
-    _LNXPROC_BASE_T *proc_cpuinfo = NULL;
-    int ret = _lnxproc_proc_cpuinfo_new(&proc_cpuinfo, NULL);
-
-    if (ret == LNXPROC_OK) {
-        execute_base(proc_cpuinfo);
-    }
-}
-
-/*----------------------------------------------------------------------------*/
-static void
-test_proc_diskstats(void)
-{
-    _LNXPROC_BASE_T *proc_diskstats = NULL;
-    int ret = _lnxproc_proc_diskstats_new(&proc_diskstats, NULL);
-
-    if (ret == LNXPROC_OK) {
-        execute_base(proc_diskstats);
-    }
-}
-
-/*----------------------------------------------------------------------------*/
-static void
-test_proc_domainname(void)
-{
-    _LNXPROC_BASE_T *proc_domainname = NULL;
-    int ret = _lnxproc_proc_domainname_new(&proc_domainname, NULL);
-
-    if (ret == LNXPROC_OK) {
-        execute_base(proc_domainname);
-    }
-}
-
-/*----------------------------------------------------------------------------*/
-static void
-test_proc_hostname(void)
-{
-    _LNXPROC_BASE_T *proc_hostname = NULL;
-    int ret = _lnxproc_proc_hostname_new(&proc_hostname, NULL);
-
-    if (ret == LNXPROC_OK) {
-        execute_base(proc_hostname);
-    }
-}
-
-/*----------------------------------------------------------------------------*/
-static void
-test_proc_osrelease(void)
-{
-    _LNXPROC_BASE_T *proc_osrelease = NULL;
-    int ret = _lnxproc_proc_osrelease_new(&proc_osrelease, NULL);
-
-    if (ret == LNXPROC_OK) {
-        execute_base(proc_osrelease);
-    }
-}
-
-/*----------------------------------------------------------------------------*/
-static void
-test_sys_cpufreq(void)
-{
-    _LNXPROC_BASE_T *sys_cpufreq = NULL;
-    int ret = _lnxproc_sys_cpufreq_new(&sys_cpufreq, NULL);
-
-    if (ret == LNXPROC_OK) {
-        execute_base(sys_cpufreq);
-    }
-}
-
-/*----------------------------------------------------------------------------*/
-static void
-test_sys_disksectors(void)
-{
-    _LNXPROC_BASE_T *sys_disksectors = NULL;
-    int ret = _lnxproc_sys_disksectors_new(&sys_disksectors, NULL);
-
-    if (ret == LNXPROC_OK) {
-        execute_base(sys_disksectors);
-    }
-}
-
-/*----------------------------------------------------------------------------*/
-static void
-test_proc_pid_stat(void)
-{
-    _LNXPROC_BASE_T *proc_pid_stat = NULL;
-    int ret = _lnxproc_proc_pid_stat_new(&proc_pid_stat, NULL);
-
-    if (ret == LNXPROC_OK) {
-        execute_base(proc_pid_stat);
-    }
-}
-
-/*----------------------------------------------------------------------------*/
-static void
-test_proc_pid_environ(void)
-{
-    _LNXPROC_BASE_T *proc_pid_environ = NULL;
-    int ret = _lnxproc_proc_pid_environ_new(&proc_pid_environ, NULL);
-
-    if (ret == LNXPROC_OK) {
-        execute_base(proc_pid_environ);
-    }
-}
+#define TEST_MODULE(type,buf,len) do {\
+    char errbuf[128]; \
+    LNXPROC_MODULE_T *modules = NULL; \
+    int ret = lnxproc_new(&modules, 1); \
+    if( ret ) { \
+        printf(#type " Error '%s'\n", lnxproc_strerror(ret, errbuf, sizeof errbuf)); \
+    } \
+    else { \
+        ret = lnxproc_set(modules, 0, (type), (buf), (len)); \
+        if( ret ) { \
+            printf(#type " Error '%s'\n", lnxproc_strerror(ret, errbuf, sizeof errbuf)); \
+        } \
+        else { \
+            int i; \
+            for (i = 0; i < 5; i++) { \
+                ret = lnxproc_read(modules); \
+                if( ret ) { \
+                    printf(#type " Error '%s'\n", lnxproc_strerror(ret, errbuf, sizeof errbuf)); \
+                } \
+            } \
+            lnxproc_print(modules); \
+        } \
+        LNXPROC_FREE(modules); \
+    } \
+} while(0)
 
 /*----------------------------------------------------------------------------*/
 int
 main(int argc, char *argv[])
 {
+    char buf[16];
+    int2str(getpid(), buf, sizeof buf);
 
     if (argc < 2) {
         test_error();
@@ -744,18 +604,21 @@ main(int argc, char *argv[])
         test_limits();
         test_array();
         test_interface();
-        test_proc_buddyinfo();
-        test_proc_cgroups();
-        test_proc_cmdline();
-        test_proc_cpuinfo();
-        test_proc_diskstats();
-        test_proc_domainname();
-        test_proc_hostname();
-        test_proc_osrelease();
-        test_sys_cpufreq();
-        test_sys_disksectors();
-        test_proc_pid_environ();
-        test_proc_pid_stat();
+        TEST_MODULE(LNXPROC_PROC_BUDDYINFO,NULL,0);
+        TEST_MODULE(LNXPROC_PROC_CGROUPS,NULL,0);
+        TEST_MODULE(LNXPROC_PROC_CMDLINE,NULL,0);
+        TEST_MODULE(LNXPROC_PROC_CPUINFO,NULL,0);
+        TEST_MODULE(LNXPROC_PROC_DISKSTATS,NULL,0);
+        TEST_MODULE(LNXPROC_PROC_DOMAINNAME,NULL,0);
+        TEST_MODULE(LNXPROC_PROC_HOSTNAME,NULL,0);
+        TEST_MODULE(LNXPROC_PROC_OSRELEASE,NULL,0);
+        TEST_MODULE(LNXPROC_SYS_CPUFREQ,NULL,0);
+        TEST_MODULE(LNXPROC_SYS_DISKSECTORS,NULL,0);
+        TEST_MODULE(LNXPROC_SYS_DISKSECTORS,"sd*",4);
+        TEST_MODULE(LNXPROC_PROC_PID_ENVIRON,NULL,0);
+        TEST_MODULE(LNXPROC_PROC_PID_ENVIRON,buf,1+strlen(buf));
+        TEST_MODULE(LNXPROC_PROC_PID_STAT,NULL,0);
+        TEST_MODULE(LNXPROC_PROC_PID_STAT,buf,1+strlen(buf));
     }
     else if (!strcmp(argv[1], "util")) {
         test_util();
@@ -779,40 +642,43 @@ main(int argc, char *argv[])
         test_interface();
     }
     else if (!strcmp(argv[1], "proc_buddyinfo")) {
-        test_proc_buddyinfo();
+        TEST_MODULE(LNXPROC_PROC_BUDDYINFO,NULL,0);
     }
     else if (!strcmp(argv[1], "proc_cgroups")) {
-        test_proc_cgroups();
+        TEST_MODULE(LNXPROC_PROC_CGROUPS,NULL,0);
     }
     else if (!strcmp(argv[1], "proc_cmdline")) {
-        test_proc_cmdline();
+        TEST_MODULE(LNXPROC_PROC_CMDLINE,NULL,0);
     }
     else if (!strcmp(argv[1], "proc_cpuinfo")) {
-        test_proc_cpuinfo();
+        TEST_MODULE(LNXPROC_PROC_CPUINFO,NULL,0);
     }
     else if (!strcmp(argv[1], "proc_diskstats")) {
-        test_proc_diskstats();
+        TEST_MODULE(LNXPROC_PROC_DISKSTATS,NULL,0);
     }
     else if (!strcmp(argv[1], "proc_domainname")) {
-        test_proc_domainname();
+        TEST_MODULE(LNXPROC_PROC_DOMAINNAME,NULL,0);
     }
     else if (!strcmp(argv[1], "proc_hostname")) {
-        test_proc_hostname();
+        TEST_MODULE(LNXPROC_PROC_HOSTNAME,NULL,0);
     }
     else if (!strcmp(argv[1], "proc_osrelease")) {
-        test_proc_osrelease();
+        TEST_MODULE(LNXPROC_PROC_OSRELEASE,NULL,0);
     }
     else if (!strcmp(argv[1], "sys_cpufreq")) {
-        test_sys_cpufreq();
+        TEST_MODULE(LNXPROC_SYS_CPUFREQ,NULL,0);
     }
     else if (!strcmp(argv[1], "sys_disksectors")) {
-        test_sys_disksectors();
+        TEST_MODULE(LNXPROC_SYS_DISKSECTORS,NULL,0);
+        TEST_MODULE(LNXPROC_SYS_DISKSECTORS,"sd*",4);
     }
     else if (!strcmp(argv[1], "proc_pid_environ")) {
-        test_proc_pid_environ();
+        TEST_MODULE(LNXPROC_PROC_PID_ENVIRON,NULL,0);
+        TEST_MODULE(LNXPROC_PROC_PID_ENVIRON,buf,1+strlen(buf));
     }
     else if (!strcmp(argv[1], "proc_pid_stat")) {
-        test_proc_pid_stat();
+        TEST_MODULE(LNXPROC_PROC_PID_STAT,NULL,0);
+        TEST_MODULE(LNXPROC_PROC_PID_STAT,buf,1+strlen(buf));
     }
     return 0;
 }
