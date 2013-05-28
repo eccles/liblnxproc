@@ -22,7 +22,7 @@
 #define LIBLNXPROC_STRLCPY_H 1
 
 #define STRLCAT(dest,src,offset,size) \
-        offset += strlcpy((dest) + (offset), (src), (size) - (offset));\
+        offset += strlcpy((dest) + (offset), (src), (size) - (offset))
 
 /*
  * Replaces strncpy() - more efficient and returns the number of chars 
