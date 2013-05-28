@@ -26,6 +26,7 @@
 int _lnxproc_proc_buddyinfo_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_cgroups_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_cmdline_new(_LNXPROC_BASE_T ** base, void *optional);
+int _lnxproc_proc_cpuinfo_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_diskstats_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_domainname_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_hostname_new(_LNXPROC_BASE_T ** base, void *optional);
