@@ -59,6 +59,7 @@ _lnxproc_results_table_valuestr(_LNXPROC_RESULTS_TABLE_T * entry, char *buf,
             }
             break;
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_STRREF:
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_STRREFS:
             if (copy) {
                 if (buf)
                     strlcpy(buf, entry->value.sptr, len);
