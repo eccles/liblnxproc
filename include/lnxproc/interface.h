@@ -45,6 +45,7 @@ extern "C" {
         LNXPROC_PROC_INTERRUPTS,
         LNXPROC_PROC_LOADAVG,
         LNXPROC_PROC_MEMINFO,
+        LNXPROC_PROC_MOUNTS,
         LNXPROC_LAST,           // must be last
     };
     typedef enum lnxproc_module_type_t LNXPROC_MODULE_TYPE_T;
