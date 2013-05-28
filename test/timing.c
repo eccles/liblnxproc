@@ -116,6 +116,7 @@ test_proc_buddyinfo(void)
     LNXPROC_FREE(modules);
 
 }
+
 /*----------------------------------------------------------------------------*/
 static void
 test_proc_cgroups(void)
@@ -138,6 +139,19 @@ test_proc_cmdline(void)
     lnxproc_new(&modules, 1);
     lnxproc_set(modules, 0, LNXPROC_PROC_CMDLINE, NULL, 0);
     test_module(modules, "proc_cmdline");
+    LNXPROC_FREE(modules);
+
+}
+
+/*----------------------------------------------------------------------------*/
+static void
+test_proc_cpuinfo(void)
+{
+    LNXPROC_MODULE_T *modules = NULL;
+
+    lnxproc_new(&modules, 1);
+    lnxproc_set(modules, 0, LNXPROC_PROC_CPUINFO, NULL, 0);
+    test_module(modules, "proc_cpuinfo");
     LNXPROC_FREE(modules);
 
 }
@@ -295,6 +309,7 @@ main(int argc, char *argv[])
         test_proc_buddyinfo();
         test_proc_cgroups();
         test_proc_cmdline();
+        test_proc_cpuinfo();
         test_proc_diskstats();
         test_proc_domainname();
         test_proc_hostname();
@@ -313,6 +328,9 @@ main(int argc, char *argv[])
     }
     else if (!strcmp(argv[1], "proc_cmdline")) {
         test_proc_cmdline();
+    }
+    else if (!strcmp(argv[1], "proc_cpuinfo")) {
+        test_proc_cpuinfo();
     }
     else if (!strcmp(argv[1], "proc_diskstats")) {
         test_proc_diskstats();
