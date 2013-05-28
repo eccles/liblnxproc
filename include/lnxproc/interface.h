@@ -42,6 +42,7 @@ extern "C" {
         LNXPROC_PROC_BUDDYINFO,
         LNXPROC_PROC_CMDLINE,
         LNXPROC_PROC_CPUINFO,
+        LNXPROC_PROC_INTERRUPTS,
         LNXPROC_LAST,           // must be last
     };
     typedef enum lnxproc_module_type_t LNXPROC_MODULE_TYPE_T;
