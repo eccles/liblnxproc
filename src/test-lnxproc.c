@@ -613,6 +613,18 @@ test_proc_cgroups(void)
 
 /*----------------------------------------------------------------------------*/
 static void
+test_proc_cmdline(void)
+{
+    _LNXPROC_BASE_T *proc_cmdline = NULL;
+    int ret = _lnxproc_proc_cmdline_new(&proc_cmdline, NULL);
+
+    if (ret == LNXPROC_OK) {
+        execute_base(proc_cmdline);
+    }
+}
+
+/*----------------------------------------------------------------------------*/
+static void
 test_proc_diskstats(void)
 {
     _LNXPROC_BASE_T *proc_diskstats = NULL;
@@ -722,6 +734,7 @@ main(int argc, char *argv[])
         test_interface();
         test_proc_buddyinfo();
         test_proc_cgroups();
+        test_proc_cmdline();
         test_proc_diskstats();
         test_proc_domainname();
         test_proc_hostname();
@@ -757,6 +770,9 @@ main(int argc, char *argv[])
     }
     else if (!strcmp(argv[1], "proc_cgroups")) {
         test_proc_cgroups();
+    }
+    else if (!strcmp(argv[1], "proc_cmdline")) {
+        test_proc_cmdline();
     }
     else if (!strcmp(argv[1], "proc_diskstats")) {
         test_proc_diskstats();
