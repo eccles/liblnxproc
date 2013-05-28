@@ -95,7 +95,7 @@ proc_buddyinfo_normalize(_LNXPROC_BASE_T * base)
             int m = 0;
 
             STRLCAT(key, buf, m, sizeof(key));
-            m += int2str(k, key + m, sizeof(key) - m);
+            INTCAT(key, k, m, sizeof(key));
             _LNXPROC_DEBUG("%d:key %s\n", i, key);
 
             _LNXPROC_DEBUG("%d,%d:value %s\n", i, j, val);
