@@ -116,6 +116,9 @@ reads the /proc/cgroups file.
 .B LNXPROC_PROC_CMDLINE    
 reads the /proc/cmdline file.
 .TP
+.B LNXPROC_PROC_CPUINFO    
+reads the /proc/cpuinfo file.
+.TP
 .B LNXPROC_PROC_DISKSTATS
 reads the /proc/diskstats file.
 .TP
@@ -260,6 +263,9 @@ at time of writing ) use file globbing.
 .B LNXPROC_ERROR_NOT_FOUND
 Requested group/key does not exist in the data read from the /proc and/or
 /sys filesystems.
+.TP
+.B LNXPROC_ERROR_BASE_READ_SSIZE_MAX
+Read request exceeds system limit SSIZE_MAX.
 .SH ENVIRONMENT
 The environment variable 
 .B LNXPROC_TESTROOT
