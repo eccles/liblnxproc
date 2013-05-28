@@ -107,12 +107,8 @@ The type field is an enumerated field. The following table shows each module
 type together with other characteristics:
 
 .TP
-.B LNXPROC_ALL
-Loads all modules. This option is not normally used as specifying
-.B nmodules = 0
-to the 
-.B lnxproc_new()
-function achieves the same thing.
+.B LNXPROC_PROC_BUDDYINFO    
+reads the /proc/buddyinfo file.
 .TP
 .B LNXPROC_PROC_CGROUPS    
 reads the /proc/cgroups file.
@@ -276,7 +272,10 @@ TBD
 TBD
 .SH NOTES
 .TP
-TBD
+Currently the key field of the hashtable produced by all the modules of lnxproc has
+a hardwired limit of 48 characters. When adding a new module please ensure that any
+generated keys are are either not longer than this or increase the key length
+limit.
 .SH BUGS
 The 
 .B lnxproc

@@ -105,6 +105,10 @@ lnxproc_set(LNXPROC_MODULE_T * module, size_t pos, LNXPROC_MODULE_TYPE_T type,
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Pos = %zd", pos);
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
+    if (type < 1 || type >= LNXPROC_LAST) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Type = %d", type);
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
     _LNXPROC_MODULE_ROW_T *row = module->row + pos;
 
     if (row->base) {
