@@ -113,7 +113,7 @@ _lnxproc_results_print(_LNXPROC_RESULTS_T * results)
     printf("Page size = %ld\n", results->page_size);
     printf("Table size = %zd\n", results->size);
     printf("Table length = %zd\n", results->length);
-    printf("Hash = %p\n", results->hash);
+    _LNXPROC_DEBUG("Hash = %p\n", results->hash);
     char buf[32];
 
     if (results->hash) {

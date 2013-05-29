@@ -14,6 +14,8 @@ then
 fi
 OPT=$1
 shift
+#echo "$#"
+#exit 0
 VALOPTS="--track-fds=yes --leak-check=full --show-reachable=yes --read-var-info=yes --track-origins=yes"
 if [ "${OPT}" = "leak" ]
 then
@@ -38,7 +40,7 @@ then
     ${BIN}-prf $*
 elif [ "${OPT}" = "nodbg" ]
 then
-    if [ "${0}" = "./testing.sh" ]
+    if [ "${0}" = "./testing.sh" -a $# -eq 0 ]
     then
         ${BIN} $* &>testoutput
         diff testoutput testdata

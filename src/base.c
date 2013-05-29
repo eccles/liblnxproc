@@ -151,6 +151,7 @@ base_rawread(char *filename, char **readbuf, size_t * nbytes)
     if (mybytes > SSIZE_MAX) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_READ_SSIZE_MAX, "mybytes %zd",
                              mybytes);
+        close(fd);
         return LNXPROC_ERROR_BASE_READ_SSIZE_MAX;
     }
 

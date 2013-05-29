@@ -182,6 +182,7 @@ lnxproc_read(LNXPROC_MODULE_T * modules)
 
     int i;
     int ret;
+    int ret1 = LNXPROC_OK;
 
     for (i = 0; i < modules->nmodules; i++) {
         _LNXPROC_MODULE_ROW_T *row = modules->row + i;
@@ -191,14 +192,18 @@ lnxproc_read(LNXPROC_MODULE_T * modules)
                 ret = row->new(&row->base, row->optional);
 
                 if (ret) {
-                    return ret;
+                    _LNXPROC_ERROR_DEBUG(ret, "Module %d Type %d",i,row->type);
+                    ret1 = ret;
                 }
             }
-            _LNXPROC_BASE_T *base = row->base;
+            if (row->base) {
+                _LNXPROC_BASE_T *base = row->base;
 
-            ret = _lnxproc_base_rawread(base);
-            if (ret) {
-                return ret;
+                ret = _lnxproc_base_rawread(base);
+                if (ret) {
+                    _LNXPROC_ERROR_DEBUG(ret, "Module %d Type %d",i,row->type);
+                    ret1 = ret;
+                }
             }
         }
     }
@@ -207,14 +212,17 @@ lnxproc_read(LNXPROC_MODULE_T * modules)
 
         if (row->new) {
             _LNXPROC_BASE_T *base = row->base;
+            if( base ) {
 
-            ret = _lnxproc_base_normalize(base);
-            if (ret) {
-                return ret;
+                ret = _lnxproc_base_normalize(base);
+                if (ret) {
+                    _LNXPROC_ERROR_DEBUG(ret, "Module %d Type %d",i,row->type);
+                    ret1 = ret;
+                }
             }
         }
     }
-    return LNXPROC_OK;
+    return ret1;
 }
 
 int
