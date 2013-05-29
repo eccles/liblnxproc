@@ -18,7 +18,6 @@ This file is part of liblnxproc.
 
 */
 
-#include <ctype.h>              //isdigit
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -32,7 +31,7 @@ This file is part of liblnxproc.
 #include "base_private.h"
 
 static int
-proc_interrupts_normalize(_LNXPROC_BASE_T * base)
+proc_softirqs_normalize(_LNXPROC_BASE_T * base)
 {
     _LNXPROC_BASE_DATA_T *data = base->current;
     _LNXPROC_RESULTS_T *results = data->results;
@@ -78,9 +77,6 @@ proc_interrupts_normalize(_LNXPROC_BASE_T * base)
     _LNXPROC_DEBUG("Ncpus %zd\n", ncpus);
 
     for (i = 1; i < nrows; i++) {
-        size_t ncols = vector->children[i]->length;
-
-        _LNXPROC_DEBUG("%d:Ncols %zd\n", i, ncols);
 
         char *key = values[i][0];
 
@@ -90,22 +86,24 @@ proc_interrupts_normalize(_LNXPROC_BASE_T * base)
         int n = 0;
         char hashkey[64];
 
-        if (ncols < ncpus) {
-            n = 0;
-            STRLCAT(hashkey, "/", n, sizeof(hashkey));
-            STRLCAT(hashkey, key, n, sizeof(hashkey));
-            _LNXPROC_DEBUG("%d:hashkey %s\n", i, hashkey);
-
-            char *val = values[i][1];
+        for (j = 1; j < ncpus + 1; j++) {
+            char *val = values[i][j];
 
             if (!val)
                 continue;
-            _LNXPROC_DEBUG("%d:hashkey %s\n", i, hashkey);
+
+            _LNXPROC_DEBUG("%d,%d:title %s\n", i, j - 1, titles[j - 1]);
+            n = 0;
+            STRLCAT(hashkey, "/", n, sizeof(hashkey));
+            STRLCAT(hashkey, key, n, sizeof(hashkey));
+            STRLCAT(hashkey, "/", n, sizeof(hashkey));
+            STRLCAT(hashkey, titles[j - 1], n, sizeof(hashkey));
+            _LNXPROC_DEBUG("%d,%d:hashkey %s\n", i, j, hashkey);
+
             int v = atoi(val);
 
-            _LNXPROC_DEBUG("%d:val %d\n", i, v);
+            _LNXPROC_DEBUG("%d,%d:val %d\n", i, j, v);
             _lnxproc_results_add_int(results, hashkey, v);
-
             if (tdiff > 0.0) {
                 _LNXPROC_RESULTS_TABLE_T *pentry = NULL;
 
@@ -119,58 +117,11 @@ proc_interrupts_normalize(_LNXPROC_BASE_T * base)
 
                 _lnxproc_results_add_float(results, hashkey, value);
 #ifdef DEBUG
-                _LNXPROC_DEBUG("%d:Curr %s = %f\n", i, hashkey, value);
+                _LNXPROC_DEBUG("%d,%d:Curr %s = %f\n", i, j, hashkey, value);
                 if (value < 0.0) {
                     _LNXPROC_DEBUG("WARN: diff < 0 (=%f)\n", value);
                 }
 #endif
-            }
-
-        }
-        else {
-            for (j = 1; j < ncpus + 1; j++) {
-                char *val = values[i][j];
-
-                if (!val)
-                    continue;
-
-                _LNXPROC_DEBUG("%d,%d:title %s\n", i, j - 1, titles[j - 1]);
-                n = 0;
-                STRLCAT(hashkey, "/", n, sizeof(hashkey));
-                if (isdigit(key[0])) {
-                    STRLCAT(hashkey, "INT", n, sizeof(hashkey));
-                }
-                STRLCAT(hashkey, key, n, sizeof(hashkey));
-                STRLCAT(hashkey, "/", n, sizeof(hashkey));
-                STRLCAT(hashkey, titles[j - 1], n, sizeof(hashkey));
-                _LNXPROC_DEBUG("%d,%d:hashkey %s\n", i, j, hashkey);
-
-                int v = atoi(val);
-
-                _LNXPROC_DEBUG("%d,%d:val %d\n", i, j, v);
-                _lnxproc_results_add_int(results, hashkey, v);
-                if (tdiff > 0.0) {
-                    _LNXPROC_RESULTS_TABLE_T *pentry = NULL;
-
-                    int ret =
-                        _lnxproc_results_fetch(presults, hashkey, &pentry);
-
-                    if (ret)
-                        continue;
-
-                    STRLCAT(hashkey, "-s", n, sizeof(hashkey));
-                    float value = (v - pentry->value.i) / tdiff;
-
-                    _lnxproc_results_add_float(results, hashkey, value);
-#ifdef DEBUG
-                    _LNXPROC_DEBUG("%d,%d:Curr %s = %f\n", i, j, hashkey,
-                                   value);
-                    if (value < 0.0) {
-                        _LNXPROC_DEBUG("WARN: diff < 0 (=%f)\n", value);
-                    }
-#endif
-                }
-
             }
         }
     }
@@ -178,7 +129,7 @@ proc_interrupts_normalize(_LNXPROC_BASE_T * base)
 }
 
 int
-_lnxproc_proc_interrupts_new(_LNXPROC_BASE_T ** base, void *optional)
+_lnxproc_proc_softirqs_new(_LNXPROC_BASE_T ** base, void *optional)
 {
 
     _LNXPROC_LIMITS_T *limits = NULL;
@@ -198,11 +149,11 @@ _lnxproc_proc_interrupts_new(_LNXPROC_BASE_T ** base, void *optional)
         return ret;
     }
 
-    char *filenames[] = { "/proc/interrupts", };
+    char *filenames[] = { "/proc/softirqs", };
     ret =
-        _lnxproc_base_new(base, "proc_interrupts", _LNXPROC_BASE_TYPE_PREVIOUS,
+        _lnxproc_base_new(base, "proc_softirqs", _LNXPROC_BASE_TYPE_PREVIOUS,
                           filenames, 1, NULL, NULL, NULL, NULL,
-                          proc_interrupts_normalize, NULL, 256, limits);
+                          proc_softirqs_normalize, NULL, 256, limits);
     _LNXPROC_LIMITS_FREE(limits);
     return ret;
 }

@@ -47,6 +47,7 @@ extern "C" {
         LNXPROC_PROC_MEMINFO,
         LNXPROC_PROC_MOUNTS,
         LNXPROC_PROC_PARTITIONS,
+        LNXPROC_PROC_SOFTIRQS,
         LNXPROC_LAST,           // must be last
     };
     typedef enum lnxproc_module_type_t LNXPROC_MODULE_TYPE_T;

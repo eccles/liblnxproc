@@ -38,6 +38,7 @@ int _lnxproc_proc_osrelease_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_partitions_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_pid_environ_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_pid_stat_new(_LNXPROC_BASE_T ** base, void *optional);
+int _lnxproc_proc_softirqs_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_sys_cpufreq_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_sys_disksectors_new(_LNXPROC_BASE_T ** base, void *optional);
 

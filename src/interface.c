@@ -63,6 +63,8 @@ static _LNXPROC_MODULE_ROW_T mymodules[] = {
      NULL,.optional = NULL,},
     {.type = LNXPROC_PROC_PARTITIONS,.new = _lnxproc_proc_partitions_new,.base =
      NULL,.optional = NULL,},
+    {.type = LNXPROC_PROC_SOFTIRQS,.new = _lnxproc_proc_softirqs_new,.base =
+     NULL,.optional = NULL,},
 };
 
 static size_t nmodules = sizeof(mymodules) / sizeof(mymodules[0]);
