@@ -18,6 +18,7 @@ This file is part of liblnxproc.
 
 */
 
+#include <ctype.h> //isdigit
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -61,9 +62,19 @@ proc_interrupts_normalize(_LNXPROC_BASE_T * base)
 
     _lnxproc_results_init(results, nrows);
 
-    size_t ncpus = vector->children[0]->length;
+    size_t n = vector->children[0]->length;
+    _LNXPROC_DEBUG("N %zd\n", n);
 
-    _LNXPROC_DEBUG("Ncpus+1 %zd\n", ncpus);
+    char **titles = (char **) values[0];
+    size_t ncpus = 0;
+    for (j = 0; j < n; j++) {
+        if( titles[j] && titles[j][0]) {
+            ncpus++;
+            _LNXPROC_DEBUG("%d,%d:title '%s'\n", 0, j, titles[j]);
+        }
+    }
+    _LNXPROC_DEBUG("Ncpus %zd\n", ncpus);
+
     for (i = 1; i < nrows; i++) {
         size_t ncols = vector->children[i]->length;
 
@@ -115,17 +126,21 @@ proc_interrupts_normalize(_LNXPROC_BASE_T * base)
 
         }
         else {
-            for (j = 1; j < ncpus; j++) {
+            for (j = 1; j < ncpus+1; j++) {
                 char *val = values[i][j];
 
                 if (!val)
                     continue;
 
+                _LNXPROC_DEBUG("%d,%d:title %s\n", i, j-1, titles[j-1]);
                 n = 0;
                 STRLCAT(hashkey, "/", n, sizeof(hashkey));
+                if( isdigit(key[0])) { 
+                    STRLCAT(hashkey, "INT", n, sizeof(hashkey));
+                }
                 STRLCAT(hashkey, key, n, sizeof(hashkey));
                 STRLCAT(hashkey, "/", n, sizeof(hashkey));
-                INTCAT(hashkey, j, n, sizeof(hashkey));
+                STRLCAT(hashkey, titles[j-1], n, sizeof(hashkey));
                 _LNXPROC_DEBUG("%d,%d:hashkey %s\n", i, j, hashkey);
 
                 int v = atoi(val);
