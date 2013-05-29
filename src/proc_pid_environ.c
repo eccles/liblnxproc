@@ -56,7 +56,7 @@ proc_pid_environ_normalize(_LNXPROC_BASE_T * base)
         _LNXPROC_VECTOR_T *child = vector->children[i];
         size_t nrows = child->length;
 
-        _LNXPROC_DEBUG("%d:first pidkey value %s\n", i, pidkey);
+        _LNXPROC_DEBUG("%d:first pidkey value '%s'\n", i, pidkey);
         _LNXPROC_DEBUG("%d:nrows = %zd\n", i, nrows);
         for (j = 1; j < nrows; j++) {
             _LNXPROC_VECTOR_T *grandchild = child->children[j];
@@ -68,7 +68,7 @@ proc_pid_environ_normalize(_LNXPROC_BASE_T * base)
 
             if (!key)
                 continue;
-            _LNXPROC_DEBUG("%d,%d:key %s\n", i, j, key);
+            _LNXPROC_DEBUG("%d,%d:key '%s'\n", i, j, key);
 
             char buf[64];
 
@@ -79,16 +79,19 @@ proc_pid_environ_normalize(_LNXPROC_BASE_T * base)
             STRLCAT(buf, "/", n, sizeof(buf));
             STRLCAT(buf, key, n, sizeof(buf));
 
-            _LNXPROC_DEBUG("%d,%d:hash key %s\n", i, j, buf);
+            _LNXPROC_DEBUG("%d,%d:hash key '%s'\n", i, j, buf);
 
             if (ncols < 3) {
                 char *val = values[i][j][1];
 
-                if (!val)
-                    continue;
-
-                _LNXPROC_DEBUG("%d,%d:val %s\n", i, j, val);
-                _lnxproc_results_add_stringref(results, buf, val);
+                if (val) {
+                    _LNXPROC_DEBUG("%d,%d:val '%s'\n", i, j, val);
+                    _lnxproc_results_add_stringref(results, buf, val);
+                }
+                else {
+                    _LNXPROC_DEBUG("%d,%d:val '%s'\n", i, j, "");
+                    _lnxproc_results_add_stringref(results, buf, "");
+                }
             }
             else {
                 _LNXPROC_DEBUG("%d,%d:ncols = %zd\n", i, j, ncols);
@@ -107,7 +110,7 @@ proc_pid_environ_normalize(_LNXPROC_BASE_T * base)
 
                     *(--val) = '=';
                 }
-                _LNXPROC_DEBUG("%d,%d:value1 %s\n", i, j, val1);
+                _LNXPROC_DEBUG("%d,%d:value1 '%s'\n", i, j, val1);
                 _lnxproc_results_add_stringref(results, buf, val1);
             }
         }

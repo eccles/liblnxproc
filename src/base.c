@@ -441,7 +441,7 @@ _lnxproc_base_rawread(_LNXPROC_BASE_T * base)
     return LNXPROC_OK;
 }
 
-int
+static int
 base_map(_LNXPROC_BASE_T * base)
 {
     _LNXPROC_BASE_DATA_T *data = base->current;
@@ -477,58 +477,67 @@ base_map(_LNXPROC_BASE_T * base)
         if (array) {
 
             _LNXPROC_LIMITS_T *limits = data->array->limits;
-            int dim = limits->dim;
+            size_t dim = limits->dim;
 
-            _LNXPROC_DEBUG("Limits %p Dim %d\n", limits, dim);
+            _LNXPROC_DEBUG("Limits %p Dim %zd\n", limits, dim);
 
             size_t idx[dim];
 
             memset(idx, 0, dim * sizeof(size_t));
 
             _LNXPROC_DEBUG("%p:Idx[%d] = %zd\n", idx, 0, idx[0]);
-            size_t i;
+            int i, j;
 
-            for (i = 0; i < dim && c < d; i++) {
+            /* swallow any leading separators */
+            for (i = dim - 1; i >= 0 && c < d; i--) {
                 _LNXPROC_DEBUG("At Char %p '%c'\n", c, *c);
-                while (limit_chr(limits->row + i, *c) && (++c < d));
+                while (c < d && limit_chr(limits->row + i, *c)) {
+                    c++;
+                }
             }
 
             char *saveptr = c;
 
             while (c < d) {
+
                 int increment = 1;
 
-                for (i = 0; i < dim && c < d; i++) {
-                    _LNXPROC_DEBUG("Depth : %zd: At Char %p '%c'\n", i, c, *c);
+                _LNXPROC_DEBUG("At Char %p '%c'\n", c, *c);
+                for (i = dim - 1; (i >= 0) && (c < d); i--) {
                     if (limit_chr(limits->row + i, *c)) {
                         *c = '\0';
-
                         _LNXPROC_DEBUG("Saveptr %1$p '%1$s'\n", saveptr);
-                        int ret =
-                            _lnxproc_array_set_last(array, idx, dim, saveptr);
+                        if (c > saveptr) {
+#ifdef DEBUG
+                            int k;
 
-                        if (ret) {
-                            return ret;
-                        }
-
-                        while ((++c < d) && limit_chr(limits->row + i, *c));
-
-                        if (c < d) {
-                            idx[i]++;
-                            _LNXPROC_DEBUG("%p:Idx[%zd] = %zd\n", idx, i,
-                                           idx[i]);
-
-                            int j;
-
-                            for (j = i + 1; j < dim; j++) {
-                                idx[j] = 0;
-                                while (limit_chr(limits->row + j, *c)
-                                       && (++c < d));
+                            for (k = 0; k < dim; k++) {
+                                _LNXPROC_DEBUG("Idx[%d] %zd\n", k, idx[k]);
                             }
-                            saveptr = c;
-                            _LNXPROC_DEBUG("New Saveptr %p\n", saveptr);
+#endif
+                            int ret = _lnxproc_array_set_last(array, idx, dim,
+                                                              saveptr);
 
+                            if (ret) {
+                                return ret;
+                            }
                         }
+                        c++;
+                        /* swallow any repeated separators */
+                        while ((c < d) && limit_chr(limits->row + i, *c)) {
+                            c++;
+                        }
+                        idx[i]++;
+                        _LNXPROC_DEBUG("New Idx[%d] %zd\n", i, idx[i]);
+                        for (j = i + 1; j < dim; j++) {
+                            idx[j] = 0;
+                            while ((c < d) && limit_chr(limits->row + j, *c)) {
+                                c++;
+                            }
+                            _LNXPROC_DEBUG("New Idx[%d] %zd\n", j, idx[j]);
+                        }
+                        saveptr = c;
+                        _LNXPROC_DEBUG("New Saveptr %p\n", saveptr);
                         increment = 0;
                     }
                 }
@@ -798,8 +807,8 @@ _lnxproc_base_new(_LNXPROC_BASE_T ** base,
                 p->filenames[i] = strdup(filenames[i]);
             }
             if (!p->filenames[i]) {
-                _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Base filenames %d",
-                                     i);
+                _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC,
+                                     "Base filenames %d", i);
                 _LNXPROC_BASE_FREE(p);
                 return LNXPROC_ERROR_MALLOC;
             }

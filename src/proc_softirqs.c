@@ -61,19 +61,10 @@ proc_softirqs_normalize(_LNXPROC_BASE_T * base)
 
     _lnxproc_results_init(results, nrows);
 
-    size_t n = vector->children[0]->length;
-
-    _LNXPROC_DEBUG("N %zd\n", n);
+    size_t ncpus = vector->children[0]->length;
 
     char **titles = (char **) values[0];
-    size_t ncpus = 0;
 
-    for (j = 0; j < n; j++) {
-        if (titles[j] && titles[j][0]) {
-            ncpus++;
-            _LNXPROC_DEBUG("%d,%d:title '%s'\n", 0, j, titles[j]);
-        }
-    }
     _LNXPROC_DEBUG("Ncpus %zd\n", ncpus);
 
     for (i = 1; i < nrows; i++) {
@@ -83,6 +74,7 @@ proc_softirqs_normalize(_LNXPROC_BASE_T * base)
         if (!key)
             continue;
 
+        _LNXPROC_DEBUG("%d:key %s\n", i, key);
         int n = 0;
         char hashkey[64];
 
