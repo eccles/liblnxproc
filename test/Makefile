@@ -1,7 +1,9 @@
 
 RELDIR=../
 TSKS=timing timing-dbg timing-prf
+LTSKS=testing testing-dbg testing-prf
 SRCS=timing.c
+SHS=testing.sh
 
 CC=gcc
 CCFLAGS=-O2 -I../include -Wall -Winline -Werror
@@ -11,20 +13,32 @@ LDFLAGS=-L../src -llnxproc
 LDFLAGSDBG=-L../src -llnxproc-dbg
 LDFLAGSPRF=../src/liblnxproc-prf.a -pg
 
-all: $(TSKS)
+all: $(TSKS) $(LTSKS) $(SHS)
 
 timing: timing.c
 	$(CC) $(CCFLAGS) -o $@ $^ $(LDFLAGS)
 
+testing.sh: timing.sh
+	ln -f $^ $@
+
+testing: timing
+	ln -f $^ $@
+
 timing-dbg: timing.c
 	$(CC) $(CCFLAGSDBG) -o $@ $^ $(LDFLAGSDBG)
 
+testing-dbg: timing-dbg
+	ln -f $^ $@
+
 timing-prf: timing.c 
 	$(CC) $(CCFLAGSPRF) -o $@ $^ $(LDFLAGSPRF)
+
+testing-prf: timing-prf
+	ln -f $^ $@
 
 check: $(SRCS)
 	$(RELDIR)/check.sh $(SRCS)
 
 clean:
-	rm -f $(TSKS) *~ *.orig core* vgcore* x y z
+	rm -f $(TSKS) $(LTSKS) $(SHS) *~ *.orig core* vgcore* x y z
 

@@ -35,7 +35,6 @@ test_module(LNXPROC_MODULE_T * modules, char *str)
         char buf[96];
         int ret = lnxproc_read(modules);
 
-        ret = lnxproc_read(modules);
         if (ret) {
             printf("Error %s\n", lnxproc_strerror(ret, buf, sizeof buf));
         }
@@ -43,6 +42,12 @@ test_module(LNXPROC_MODULE_T * modules, char *str)
         if (ret) {
             printf("Error %s\n", lnxproc_strerror(ret, buf, sizeof buf));
         }
+        ret = lnxproc_read(modules);
+        if (ret) {
+            printf("Error %s\n", lnxproc_strerror(ret, buf, sizeof buf));
+        }
+
+        int i;
 
         if (testtype == 0) {
             long rawread_time;
@@ -54,8 +59,6 @@ test_module(LNXPROC_MODULE_T * modules, char *str)
             float sum_normalize_time = 0;
             float sum_hash_time = 0;
             struct timeval start = lnxproc_timeval();
-
-            int i;
 
             for (i = 0; i < ntimes; i++) {
                 ret = lnxproc_read(modules);
@@ -81,12 +84,9 @@ test_module(LNXPROC_MODULE_T * modules, char *str)
                    sum_normalize_time / ntimes, sum_hash_time / ntimes);
         }
         else if (testtype == 1) {
-            lnxproc_read(modules);
-            printf("%s:Results 1\n", str);
-            lnxproc_print(modules);
-
-            lnxproc_read(modules);
-            printf("%s:Results 2\n", str);
+            for (i = 0; i < 2; i++) {
+                lnxproc_read(modules);
+            }
             lnxproc_print(modules);
         }
     }
@@ -158,9 +158,13 @@ main(int argc, char *argv[])
         TEST_MODULE(LNXPROC_PROC_OSRELEASE, NULL, 0);
         TEST_MODULE(LNXPROC_PROC_PARTITIONS, NULL, 0);
         TEST_MODULE(LNXPROC_PROC_PID_ENVIRON, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_PID_ENVIRON, pid, 1 + strlen(pid));
+        if( testtype == 0 ) {
+            TEST_MODULE(LNXPROC_PROC_PID_ENVIRON, pid, 1 + strlen(pid));
+        }
         TEST_MODULE(LNXPROC_PROC_PID_STAT, NULL, 0);
+        if( testtype == 0 ) {
         TEST_MODULE(LNXPROC_PROC_PID_STAT, pid, 1 + strlen(pid));
+        }
         TEST_MODULE(LNXPROC_PROC_SOFTIRQS, NULL, 0);
         TEST_MODULE(LNXPROC_SYS_CPUFREQ, NULL, 0);
         TEST_MODULE(LNXPROC_SYS_DISKSECTORS, NULL, 0);
@@ -207,11 +211,15 @@ main(int argc, char *argv[])
     }
     else if (!strcmp(argv[1], "proc_pid_environ")) {
         TEST_MODULE(LNXPROC_PROC_PID_ENVIRON, NULL, 0);
+        if( testtype == 0 ) {
         TEST_MODULE(LNXPROC_PROC_PID_ENVIRON, pid, 1 + strlen(pid));
+        }
     }
     else if (!strcmp(argv[1], "proc_pid_stat")) {
         TEST_MODULE(LNXPROC_PROC_PID_STAT, NULL, 0);
+        if( testtype == 0 ) {
         TEST_MODULE(LNXPROC_PROC_PID_STAT, pid, 1 + strlen(pid));
+        }
     }
     else if (!strcmp(argv[1], "proc_softirqs")) {
         TEST_MODULE(LNXPROC_PROC_SOFTIRQS, NULL, 0);

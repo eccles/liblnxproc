@@ -11,16 +11,7 @@ BIN=${0%*.sh}
 if [ "${0}" = "./testing.sh" ]
 then
     export LNXPROC_TESTROOT=`pwd`
-    rm -f testing
-    ln timing testing
-    rm -f testing-dbg
-    ln timing-dbg testing-dbg
-    rm -f testing-prf
-    ln timing-prf testing-prf
 fi
-#echo $LNXPROC_TESTROOT
-#echo $BIN
-#exit 0
 OPT=$1
 shift
 VALOPTS="--track-fds=yes --leak-check=full --show-reachable=yes --read-var-info=yes --track-origins=yes"
@@ -47,7 +38,13 @@ then
     ${BIN}-prf $*
 elif [ "${OPT}" = "nodbg" ]
 then
-    ${BIN} $*
+    if [ "${0}" = "./testing.sh" ]
+    then
+        ${BIN} $* &>testoutput
+        diff testoutput testdata
+    else
+        ${BIN} $*
+    fi
 elif [ "${OPT}" = "time" ]
 then
     time ${BIN} $*
