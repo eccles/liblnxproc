@@ -50,6 +50,7 @@ extern "C" {
         LNXPROC_PROC_SOFTIRQS,
         LNXPROC_PROC_STAT,
         LNXPROC_PROC_UPTIME,
+        LNXPROC_PROC_VMSTAT,
         LNXPROC_LAST,           // must be last
     };
     typedef enum lnxproc_module_type_t LNXPROC_MODULE_TYPE_T;
