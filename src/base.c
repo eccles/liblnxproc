@@ -291,16 +291,20 @@ base_read_glob_files(_LNXPROC_BASE_T * base, char **readbuf, size_t * nbytes)
             _LNXPROC_DEBUG("%d:%d:Match from %d to %d '%.*s'\n", i, j,
                            (int) pmatch[j].rm_so, (int) pmatch[j].rm_eo, len,
                            s);
-            int n = snprintf(*readbuf, *nbytes, "%.*s", len, s);
-
-            if (n >= *nbytes - dim + 1) {
+            if( (*nbytes) < len ) {
                 globfree(&globbuf);
                 regfree(&reg);
                 return LNXPROC_ERROR_BASE_READ_OVERFLOW;
             }
-
+            int n = strlcpy(*readbuf, s, len);
             *readbuf += n;
             *nbytes -= n;
+
+            if( (*nbytes) < nseps ) {
+                globfree(&globbuf);
+                regfree(&reg);
+                return LNXPROC_ERROR_BASE_READ_OVERFLOW;
+            }
 
             memcpy(*readbuf, separators, nseps);
             *readbuf += nseps;
