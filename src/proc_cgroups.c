@@ -96,7 +96,7 @@ _lnxproc_proc_cgroups_new(_LNXPROC_BASE_T ** base, void *optional)
     if (ret) {
         return ret;
     }
-    ret = _lnxproc_limits_set(limits, 0, 9, "\n", 1);   /* row delimiters */
+    ret = _lnxproc_limits_set(limits, 0, 9, "\f\n", 2); /* row delimiters */
     if (ret) {
         _LNXPROC_LIMITS_FREE(limits);
         return ret;

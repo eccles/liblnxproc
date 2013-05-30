@@ -183,7 +183,7 @@ base_rawread(char *filename, char **readbuf, size_t * nbytes)
                              filename);
         return LNXPROC_ERROR_BASE_READ_OVERFLOW;
     }
-    *mybuf = '\n';
+    *mybuf = '\f';
     mybuf += 1;
     mybytes -= 1;
     *readbuf = mybuf;
@@ -363,7 +363,7 @@ base_new_rawread_buffer(_LNXPROC_BASE_DATA_T * data, size_t newlen)
         return LNXPROC_ERROR_MALLOC;
     }
     memset(p, 0, newlen);
-    p[newlen] = '\n';
+    p[newlen] = '\f';
     data->lines = p;
     data->buflen = newlen;
     return LNXPROC_OK;

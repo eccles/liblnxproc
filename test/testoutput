@@ -17791,13 +17791,14 @@ Tag = proc_cmdline
 Jiffies per second = 100
 Seconds per jiffy = 0.010000
 Page size = 4
-Table size = 5
-Table length = 5
+Table size = 6
+Table length = 6
 Line proc_cmdline Key /0(2) = BOOT_IMAGE=/vmlinuz-3.8.0-21-generic
 Line proc_cmdline Key /1(2) = root=/dev/mapper/ubuntu-root
 Line proc_cmdline Key /2(2) = ro
 Line proc_cmdline Key /3(2) = quiet
 Line proc_cmdline Key /4(2) = splash
+Line proc_cmdline Key /5(2) = vt.handoff=7
 Tag = proc_cpuinfo
 Jiffies per second = 100
 Seconds per jiffy = 0.010000
@@ -18884,13 +18885,14 @@ Tag = proc_loadavg
 Jiffies per second = 100
 Seconds per jiffy = 0.010000
 Page size = 4
-Table size = 5
-Table length = 5
+Table size = 6
+Table length = 6
 Line proc_loadavg Key /run1(5) = 0.46
 Line proc_loadavg Key /run5(5) = 0.36
 Line proc_loadavg Key /run15(6) = 0.30
 Line proc_loadavg Key /nproc(6) = 2
 Line proc_loadavg Key /nsched(7) = 710
+Line proc_loadavg Key /lastpid(8) = 28243
 Tag = proc_meminfo
 Jiffies per second = 100
 Seconds per jiffy = 0.010000
@@ -22053,13 +22055,14 @@ Tag = proc_cmdline
 Jiffies per second = 100
 Seconds per jiffy = 0.010000
 Page size = 4
-Table size = 5
-Table length = 5
+Table size = 6
+Table length = 6
 Line proc_cmdline Key /0(2) = BOOT_IMAGE=/vmlinuz-3.8.0-21-generic
 Line proc_cmdline Key /1(2) = root=/dev/mapper/ubuntu-root
 Line proc_cmdline Key /2(2) = ro
 Line proc_cmdline Key /3(2) = quiet
 Line proc_cmdline Key /4(2) = splash
+Line proc_cmdline Key /5(2) = vt.handoff=7
 Tag = proc_cpuinfo
 Jiffies per second = 100
 Seconds per jiffy = 0.010000
@@ -24622,13 +24625,14 @@ Tag = proc_loadavg
 Jiffies per second = 100
 Seconds per jiffy = 0.010000
 Page size = 4
-Table size = 5
-Table length = 5
+Table size = 6
+Table length = 6
 Line proc_loadavg Key /run1(5) = 0.46
 Line proc_loadavg Key /run5(5) = 0.36
 Line proc_loadavg Key /run15(6) = 0.30
 Line proc_loadavg Key /nproc(6) = 2
 Line proc_loadavg Key /nsched(7) = 710
+Line proc_loadavg Key /lastpid(8) = 28243
 Tag = proc_meminfo
 Jiffies per second = 100
 Seconds per jiffy = 0.010000

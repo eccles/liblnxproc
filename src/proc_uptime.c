@@ -76,7 +76,7 @@ _lnxproc_proc_uptime_new(_LNXPROC_BASE_T ** base, void *optional)
     if (ret) {
         return ret;
     }
-    ret = _lnxproc_limits_set(limits, 0, 2, " \n", 2);  /* row delimiters */
+    ret = _lnxproc_limits_set(limits, 0, 2, " \n\f", 3);        /* row delimiters */
     if (ret) {
         _LNXPROC_LIMITS_FREE(limits);
         return ret;
