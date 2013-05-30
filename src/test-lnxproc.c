@@ -623,6 +623,7 @@ main(int argc, char *argv[])
         TEST_MODULE(LNXPROC_PROC_PID_STAT, NULL, 0);
         TEST_MODULE(LNXPROC_PROC_PID_STAT, buf, 1 + strlen(buf));
         TEST_MODULE(LNXPROC_PROC_SOFTIRQS, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_STAT, NULL, 0);
         TEST_MODULE(LNXPROC_SYS_CPUFREQ, NULL, 0);
         TEST_MODULE(LNXPROC_SYS_DISKSECTORS, NULL, 0);
         TEST_MODULE(LNXPROC_SYS_DISKSECTORS, "sd*", 4);
@@ -697,6 +698,9 @@ main(int argc, char *argv[])
     }
     else if (!strcmp(argv[1], "proc_softirqs")) {
         TEST_MODULE(LNXPROC_PROC_SOFTIRQS, NULL, 0);
+    }
+    else if (!strcmp(argv[1], "proc_stat")) {
+        TEST_MODULE(LNXPROC_PROC_STAT, NULL, 0);
     }
     else if (!strcmp(argv[1], "sys_cpufreq")) {
         TEST_MODULE(LNXPROC_SYS_CPUFREQ, NULL, 0);
