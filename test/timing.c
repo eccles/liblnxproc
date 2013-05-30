@@ -169,6 +169,10 @@ main(int argc, char *argv[])
         if (testtype == 0) {
             TEST_MODULE(LNXPROC_PROC_PID_STAT, pid, 1 + strlen(pid));
         }
+        TEST_MODULE(LNXPROC_PROC_PID_STATUS, NULL, 0);
+        if (testtype == 0) {
+            TEST_MODULE(LNXPROC_PROC_PID_STATUS, pid, 1 + strlen(pid));
+        }
         TEST_MODULE(LNXPROC_PROC_SOFTIRQS, NULL, 0);
         TEST_MODULE(LNXPROC_PROC_STAT, NULL, 0);
         TEST_MODULE(LNXPROC_PROC_UPTIME, NULL, 0);
@@ -232,6 +236,12 @@ main(int argc, char *argv[])
         TEST_MODULE(LNXPROC_PROC_PID_STAT, NULL, 0);
         if (testtype == 0) {
             TEST_MODULE(LNXPROC_PROC_PID_STAT, pid, 1 + strlen(pid));
+        }
+    }
+    else if (!strcmp(argv[1], "proc_pid_status")) {
+        TEST_MODULE(LNXPROC_PROC_PID_STATUS, NULL, 0);
+        if (testtype == 0) {
+            TEST_MODULE(LNXPROC_PROC_PID_STATUS, pid, 1 + strlen(pid));
         }
     }
     else if (!strcmp(argv[1], "proc_softirqs")) {

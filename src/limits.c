@@ -152,7 +152,7 @@ _lnxproc_limits_set(_LNXPROC_LIMITS_T * limits, int pos, size_t expected,
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Chars is null");
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
-    if ( len < 1) {
+    if (len < 1) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Len = %d", len);
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
