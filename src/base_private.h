@@ -91,6 +91,7 @@ int _lnxproc_base_new(_LNXPROC_BASE_T ** base,
                       _LNXPROC_BASE_METHOD read,
                       size_t buflen, _LNXPROC_LIMITS_T * limits);
 
+int _lnxproc_base_size(_LNXPROC_BASE_T * baseptr, size_t * size);
 int _lnxproc_base_free(_LNXPROC_BASE_T ** baseptr);
 
 #define _LNXPROC_BASE_FREE(b) _lnxproc_base_free(&b)

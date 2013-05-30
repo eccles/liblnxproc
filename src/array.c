@@ -144,6 +144,32 @@ _lnxproc_array_new(_LNXPROC_ARRAY_T ** array, _LNXPROC_LIMITS_T * limits)
 }
 
 int
+_lnxproc_array_size(_LNXPROC_ARRAY_T * array, size_t * size)
+{
+    if (!size) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Size");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+    *size = 0;
+    if (!array) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Array");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+    *size += sizeof(*array);
+    size_t s;
+
+    if (array->limits) {
+        _lnxproc_limits_size(array->limits, &s);
+        *size += s;
+    }
+    if (array->vector) {
+        _lnxproc_vector_size(array->vector, &s);
+        *size += s;
+    }
+    return LNXPROC_OK;
+}
+
+int
 _lnxproc_array_free(_LNXPROC_ARRAY_T ** arrayptr)
 {
     _LNXPROC_DEBUG("Array %p\n", arrayptr);

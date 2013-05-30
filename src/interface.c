@@ -128,8 +128,42 @@ lnxproc_new(LNXPROC_MODULE_T ** moduleptr, size_t nmodule)
 }
 
 int
-lnxproc_set(LNXPROC_MODULE_T * module, size_t pos, LNXPROC_MODULE_TYPE_T type,
-            void *optional, size_t optlen)
+lnxproc_size(LNXPROC_MODULE_T * modules, size_t * size)
+{
+    if (!size) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Size");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+    *size = 0;
+    if (!modules) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Module");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+    *size += sizeof(LNXPROC_MODULE_T) +
+        (modules->nmodules * sizeof(_LNXPROC_MODULE_ROW_T));
+    int i;
+
+    for (i = 0; i < modules->nmodules; i++) {
+        _LNXPROC_MODULE_ROW_T *row = modules->row + i;
+
+        if (row->new) {
+            if (row->base) {
+                size_t s;
+
+                _lnxproc_base_size(row->base, &s);
+                *size += s;
+            }
+            if (row->optional) {
+                *size += row->optlen;
+            }
+        }
+    }
+    return LNXPROC_OK;
+}
+
+int
+lnxproc_set(LNXPROC_MODULE_T * module, size_t pos,
+            LNXPROC_MODULE_TYPE_T type, void *optional, size_t optlen)
 {
     if (!module) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Module");
@@ -156,8 +190,8 @@ lnxproc_set(LNXPROC_MODULE_T * module, size_t pos, LNXPROC_MODULE_TYPE_T type,
         p = memdup(optional, optlen);
 
         if (!p) {
-            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Module optional at %zd",
-                                 pos);
+            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC,
+                                 "Module optional at %zd", pos);
             return LNXPROC_ERROR_MALLOC;
         }
     }
@@ -165,7 +199,10 @@ lnxproc_set(LNXPROC_MODULE_T * module, size_t pos, LNXPROC_MODULE_TYPE_T type,
 
     memcpy(row, mymodules + type - 1, sizeof(_LNXPROC_MODULE_ROW_T));
 
-    row->optional = p;
+    if (p) {
+        row->optional = p;
+        row->optlen = optlen;
+    }
     return LNXPROC_OK;
 }
 
@@ -249,8 +286,8 @@ lnxproc_read(LNXPROC_MODULE_T * modules)
 
 int
 lnxproc_performance(LNXPROC_MODULE_T * modules,
-                    long *rawread_time, long *map_time, long *normalize_time,
-                    long *hash_time)
+                    long *rawread_time, long *map_time,
+                    long *normalize_time, long *hash_time, size_t * size)
 {
 
     *rawread_time = 0;
@@ -283,6 +320,9 @@ lnxproc_performance(LNXPROC_MODULE_T * modules,
             }
         }
     }
+    if (size) {
+        lnxproc_size(modules, size);
+    }
     return LNXPROC_OK;
 }
 
@@ -291,8 +331,8 @@ struct interface_env_t {
     void *data;
 };
 static int
-results_iterate(_LNXPROC_RESULTS_T * results, _LNXPROC_RESULTS_TABLE_T * entry,
-                void *data)
+results_iterate(_LNXPROC_RESULTS_T * results,
+                _LNXPROC_RESULTS_TABLE_T * entry, void *data)
 {
     struct interface_env_t *env = data;
     LNXPROC_INTERFACE_METHOD func = env->func;
@@ -365,8 +405,8 @@ lnxproc_print(LNXPROC_MODULE_T * modules)
 }
 
 int
-lnxproc_fetch(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type, char *key,
-              char *value, size_t valuelen)
+lnxproc_fetch(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type,
+              char *key, char *value, size_t valuelen)
 {
     if (!modules) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Modules");
@@ -390,8 +430,9 @@ lnxproc_fetch(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type, char *key,
                 if (base_data) {
                     _LNXPROC_RESULTS_TABLE_T *entry = NULL;
 
-                    int ret =
-                        _lnxproc_results_fetch(base_data->results, key, &entry);
+                    int ret = _lnxproc_results_fetch(base_data->results, key,
+                                                     &entry);
+
                     if (!ret) {
                         _lnxproc_results_table_valuestr(entry, value,
                                                         valuelen, 1);

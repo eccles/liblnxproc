@@ -36,6 +36,7 @@ _lnxproc_limits_print(_LNXPROC_LIMITS_T * limits)
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
+    printf("Size %zd\n", limits->size);
     printf("Dim %zd\n", limits->dim);
     int i;
 
@@ -127,16 +128,43 @@ _lnxproc_limits_new(_LNXPROC_LIMITS_T ** newlimits, size_t dim)
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Limits is not null");
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
+    size_t size =
+        sizeof(_LNXPROC_LIMITS_T) + (dim * sizeof(_LNXPROC_LIMITS_ROW_T));
     _LNXPROC_DEBUG("Malloc limits %zd\n", dim);
-    _LNXPROC_LIMITS_T *nlimits = Acquire(NULL,
-                                         sizeof(_LNXPROC_LIMITS_T) +
-                                         (dim * sizeof(_LNXPROC_LIMITS_ROW_T)));
+    _LNXPROC_LIMITS_T *nlimits = Acquire(NULL, size);
+
     if (!nlimits) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Limits");
         return LNXPROC_ERROR_MALLOC;
     }
     nlimits->dim = dim;
     *newlimits = nlimits;
+    return LNXPROC_OK;
+}
+
+int
+_lnxproc_limits_size(_LNXPROC_LIMITS_T * limits, size_t * size)
+{
+    if (!size) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Size");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+    *size = 0;
+    if (!limits) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Limits");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+    *size =
+        sizeof(_LNXPROC_LIMITS_T) +
+        (limits->dim * sizeof(_LNXPROC_LIMITS_ROW_T));
+    int i;
+
+    for (i = 0; i < limits->dim; i++) {
+        _LNXPROC_LIMITS_ROW_T *row = limits->row + i;
+
+        if (row->chars)
+            *size += strlen(row->chars) + 1;
+    }
     return LNXPROC_OK;
 }
 

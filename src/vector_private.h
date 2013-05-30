@@ -43,6 +43,7 @@ int _lnxproc_vector_free(_LNXPROC_VECTOR_T ** vectorptr);
 
 #define _LNXPROC_VECTOR_FREE(v) _lnxproc_vector_free(&v)
 
+int _lnxproc_vector_size(_LNXPROC_VECTOR_T * vector, size_t * size);
 int _lnxproc_vector_resize(_LNXPROC_VECTOR_T * vector, size_t size);
 
 int _lnxproc_vector_set_child(_LNXPROC_VECTOR_T * vector,

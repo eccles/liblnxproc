@@ -888,6 +888,53 @@ _lnxproc_base_new(_LNXPROC_BASE_T ** base,
     return LNXPROC_OK;
 }
 
+int
+_lnxproc_base_size(_LNXPROC_BASE_T * base, size_t * size)
+{
+    if (!size) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Size");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+    *size = 0;
+    if (!base) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+    *size += sizeof(*base);
+    int i;
+
+    for (i = 0; i < 2; i++) {
+        _LNXPROC_BASE_DATA_T *d = base->data + i;
+
+        if (d->lines)
+            *size += d->buflen;
+        if (d->array) {
+            size_t s;
+
+            _lnxproc_array_size(d->array, &s);
+            *size += s;
+        }
+        if (d->results) {
+            size_t s;
+
+            _lnxproc_results_size(d->results, &s);
+            *size += s;
+        }
+
+    }
+    for (i = 0; i < base->nfiles; i++) {
+        if (base->filenames[i])
+            *size += strlen(base->filenames[i]) + 1;
+    }
+    if (base->fileprefix)
+        *size += strlen(base->fileprefix) + 1;
+    if (base->fileglob)
+        *size += strlen(base->fileglob) + 1;
+    if (base->filesuffix)
+        *size += strlen(base->filesuffix) + 1;
+    return LNXPROC_OK;
+}
+
 static void
 base_data_free(_LNXPROC_BASE_DATA_T * data)
 {

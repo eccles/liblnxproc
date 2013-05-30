@@ -31,6 +31,7 @@ struct _lnxproc_module_row_t {
     _LNXPROC_METHOD new;
     _LNXPROC_BASE_T *base;
     void *optional;
+    size_t optlen;
 };
 typedef struct _lnxproc_module_row_t _LNXPROC_MODULE_ROW_T;
 

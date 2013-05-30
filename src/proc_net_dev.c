@@ -77,6 +77,7 @@ proc_net_dev_normalize(_LNXPROC_BASE_T * base)
     _lnxproc_results_init(results, nrows);
 
     char **maintitles = values[0];
+
 #ifdef DEBUG
     size_t nmain = vector->children[0]->length;
 
@@ -89,6 +90,7 @@ proc_net_dev_normalize(_LNXPROC_BASE_T * base)
     char **coltitles = values[1];
 
     size_t ncol = vector->children[1]->length;
+
 #ifdef DEBUG
     _LNXPROC_DEBUG("Ncol %zd\n", ncol);
     for (i = 0; i < ncol; i++) {

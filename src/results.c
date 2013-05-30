@@ -173,6 +173,38 @@ _lnxproc_results_new(_LNXPROC_RESULTS_T ** results, char *tag)
 }
 
 int
+_lnxproc_results_size(_LNXPROC_RESULTS_T * results, size_t * size)
+{
+    if (!size) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Size");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+    *size = 0;
+    if (!results) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Results");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+    *size += sizeof(*results);
+
+    if( results->tag ) 
+        *size += strlen(results->tag);
+
+    _LNXPROC_RESULTS_TABLE_T *table = results->table;
+
+    int i;
+    for (i = 0; i < results->size; i++) {
+        _LNXPROC_RESULTS_TABLE_T *entry = table + i;
+
+        *size += sizeof(*entry);
+
+        if (entry->valuetype == _LNXPROC_RESULTS_TABLE_VALUETYPE_STRREF) {
+            *size += strlen(entry->value.sptr);
+        }
+    }
+    return LNXPROC_OK;
+}
+
+int
 _lnxproc_results_free(_LNXPROC_RESULTS_T ** resultsptr)
 {
     _LNXPROC_DEBUG("Results %p\n", resultsptr);

@@ -49,7 +49,11 @@ lnxproc \- interface to reading the /proc/ & /sys filesystems
 .BI "                        long *" rawread_time ,
 .BI "                        long *" map_time , 
 .BI "                        long *" normalize_time ,
-.BI "                        long *" hash_time ");"
+.BI "                        long *" hash_time ,
+.BI "                        size_t *" size ");"
+
+.BI "int lnxproc_size(LNXPROC_MODULE_T *" modules ,
+.BI "                        size_t *" size ");"
 
 .BI "typedef (*LNXPROC_INTERFACE_METHOD)(char *" module , 
 .BI "                                    char *" key ,
@@ -286,8 +290,11 @@ print to stdout all data collected on the last call to
 .B lnxproc_read()
 .P
 .BR lnxproc_performance()
-prints to stdout the time taken to read and process the data in read, map,
-normalize and hash phases.
+returns the time taken to read and process the data in read, map,
+normalize and hash phases and (optionally) the memory consumed.
+.P
+.BR lnxproc_size()
+returns the memory consumed.
 .P
 .BR lnxproc_iterate()
 iterates over the whole datatset, executing the supplied function on every data

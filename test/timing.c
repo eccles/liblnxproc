@@ -54,6 +54,7 @@ test_module(LNXPROC_MODULE_T * modules, char *str)
             long map_time;
             long normalize_time;
             long hash_time;
+            size_t size;
             float sum_rawread_time = 0;
             float sum_map_time = 0;
             float sum_normalize_time = 0;
@@ -68,20 +69,21 @@ test_module(LNXPROC_MODULE_T * modules, char *str)
                     break;
                 }
                 lnxproc_performance(modules, &rawread_time, &map_time,
-                                    &normalize_time, &hash_time);
+                                    &normalize_time, &hash_time, NULL);
                 sum_rawread_time += rawread_time;
                 sum_map_time += map_time;
                 sum_normalize_time += normalize_time;
                 sum_hash_time += hash_time;
             }
+            lnxproc_size(modules, &size);
 
             struct timeval end = lnxproc_timeval();
             long timediff = lnxproc_timeval_diff(&start, &end);
 
-            printf("%s:Elapsed time = %.1f usecs (%.1f,%.1f,%.1f,%.1f)\n", str,
-                   (timediff * 1.0) / ntimes, sum_rawread_time / ntimes,
-                   sum_map_time / ntimes,
-                   sum_normalize_time / ntimes, sum_hash_time / ntimes);
+            printf("%s:Elapsed time = %.1f usecs (%.1f,%.1f,%.1f,%.1f,%zd)\n",
+                   str, (timediff * 1.0) / ntimes, sum_rawread_time / ntimes,
+                   sum_map_time / ntimes, sum_normalize_time / ntimes,
+                   sum_hash_time / ntimes, size);
         }
         else if (testtype == 1) {
             for (i = 0; i < 2; i++) {

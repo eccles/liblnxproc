@@ -40,6 +40,7 @@ int _lnxproc_array_free(_LNXPROC_ARRAY_T ** arrayptr);
 
 #define _LNXPROC_ARRAY_FREE(a) _lnxproc_array_free(&a)
 
+int _lnxproc_array_size(_LNXPROC_ARRAY_T * array, size_t * size);
 int _lnxproc_array_set(_LNXPROC_ARRAY_T * array, size_t idx[],
                        size_t dim, char *val);
 int _lnxproc_array_set_last(_LNXPROC_ARRAY_T * array,

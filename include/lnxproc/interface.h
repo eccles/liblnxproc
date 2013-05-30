@@ -67,6 +67,7 @@ extern "C" {
     typedef struct lnxproc_module_t LNXPROC_MODULE_T;
 
     int lnxproc_new(LNXPROC_MODULE_T ** moduleptr, size_t nmodule);
+    int lnxproc_size(LNXPROC_MODULE_T * module, size_t * size);
     int lnxproc_set(LNXPROC_MODULE_T * module, size_t pos,
                     LNXPROC_MODULE_TYPE_T type, void *optional, size_t optlen);
     int lnxproc_free(LNXPROC_MODULE_T ** modulesptr);
@@ -80,7 +81,8 @@ extern "C" {
     int lnxproc_performance(LNXPROC_MODULE_T * modules,
                             long *rawread_time,
                             long *map_time,
-                            long *normalize_time, long *hash_time);
+                            long *normalize_time, long *hash_time,
+                            size_t * size);
 
     typedef int (*LNXPROC_INTERFACE_METHOD) (char *mod, char *key, char *value,
                                              void *data);

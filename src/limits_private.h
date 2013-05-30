@@ -29,12 +29,14 @@ struct _lnxproc_limits_row_t {
 typedef struct _lnxproc_limits_row_t _LNXPROC_LIMITS_ROW_T;
 
 struct _lnxproc_limits_t {
+    size_t size;
     size_t dim;
     _LNXPROC_LIMITS_ROW_T row[];
 };
 typedef struct _lnxproc_limits_t _LNXPROC_LIMITS_T;
 
 int _lnxproc_limits_new(_LNXPROC_LIMITS_T ** newlimits, size_t dim);
+int _lnxproc_limits_size(_LNXPROC_LIMITS_T * limits, size_t * size);
 int _lnxproc_limits_set(_LNXPROC_LIMITS_T * limits, int pos,
                         size_t expected, char *chars, int len);
 

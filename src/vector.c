@@ -180,6 +180,46 @@ _lnxproc_vector_free(_LNXPROC_VECTOR_T ** vectorptr)
     return LNXPROC_OK;
 }
 
+struct vector_size_t {
+    size_t size;
+};
+static int
+vector_size_internal(_LNXPROC_VECTOR_T * vector, int idx, int depth, void *data)
+{
+    _LNXPROC_DEBUG("Vector %p Idx %d, Depth %d Data %p\n", vector, idx, depth,
+                   data);
+
+    struct vector_size_t *vsize = data;
+
+    vsize->size += sizeof(*vector);
+    if (vector->children) {
+        vsize->size += sizeof(vector->size * sizeof(*(vector->children)));
+    }
+    if (vector->values) {
+        vsize->size += sizeof(vector->size * sizeof(*(vector->values)));
+    }
+    return LNXPROC_OK;
+}
+
+int
+_lnxproc_vector_size(_LNXPROC_VECTOR_T * vector, size_t * size)
+{
+    if (!size) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Size");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+    *size = 0;
+    if (!vector) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Vector");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+    struct vector_size_t vsize = {.size = 0, };
+
+    _lnxproc_vector_iterate(vector, 0, 0, 1, &vsize, vector_size_internal);
+    *size = vsize.size;
+    return LNXPROC_OK;
+}
+
 int
 _lnxproc_vector_resize(_LNXPROC_VECTOR_T * vector, size_t size)
 {

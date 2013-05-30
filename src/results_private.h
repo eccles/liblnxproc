@@ -87,6 +87,7 @@ int _lnxproc_results_free(_LNXPROC_RESULTS_T ** resultsptr);
 
 #define _LNXPROC_RESULTS_FREE(r) _lnxproc_results_free(&r)
 
+int _lnxproc_results_size(_LNXPROC_RESULTS_T * results, size_t * size);
 int _lnxproc_results_print(_LNXPROC_RESULTS_T * results);
 int _lnxproc_results_hash(_LNXPROC_RESULTS_T * results);
 
