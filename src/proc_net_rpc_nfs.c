@@ -71,11 +71,11 @@ proc_net_rpc_nfs_normalize(_LNXPROC_BASE_T * base)
         "getattr", "lookup", "lookup_root", "remove", "rename", "link",
         "symlink", "create", "pathconf", "statfs", "readlink", "readdir",
         "server_caps", "delegreturn", "getacl", "setacl", "fs_locations",
-            "rel_lkowner",
+        "rel_lkowner",
         "secinfo", "exchange_id", "create_ses", "destroy_ses", "sequence",
-            "get_lease_t",
+        "get_lease_t",
         "reclaim_comp", "layoutget", "getdevinfo", "layoutcommit",
-            "layoutreturn", "getdevlist",
+        "layoutreturn", "getdevlist",
     };
     static const size_t nproc4titles =
         sizeof(proc4titles) / sizeof(proc4titles[0]);

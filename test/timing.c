@@ -159,6 +159,7 @@ main(int argc, char *argv[])
         TEST_MODULE(LNXPROC_PROC_MOUNTS, NULL, 0);
         TEST_MODULE(LNXPROC_PROC_NET_DEV, NULL, 0);
         TEST_MODULE(LNXPROC_PROC_NET_RPC_NFS, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_NET_RPC_NFSD, NULL, 0);
         TEST_MODULE(LNXPROC_PROC_OSRELEASE, NULL, 0);
         TEST_MODULE(LNXPROC_PROC_PARTITIONS, NULL, 0);
         TEST_MODULE(LNXPROC_PROC_PID_ENVIRON, NULL, 0);
@@ -227,6 +228,9 @@ main(int argc, char *argv[])
     }
     else if (!strcmp(argv[1], "proc_net_rpc_nfs")) {
         TEST_MODULE(LNXPROC_PROC_NET_RPC_NFS, NULL, 0);
+    }
+    else if (!strcmp(argv[1], "proc_net_rpc_nfsd")) {
+        TEST_MODULE(LNXPROC_PROC_NET_RPC_NFSD, NULL, 0);
     }
     else if (!strcmp(argv[1], "proc_osrelease")) {
         TEST_MODULE(LNXPROC_PROC_OSRELEASE, NULL, 0);
