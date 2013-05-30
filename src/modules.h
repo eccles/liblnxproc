@@ -35,6 +35,7 @@ int _lnxproc_proc_loadavg_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_meminfo_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_mounts_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_net_dev_new(_LNXPROC_BASE_T ** base, void *optional);
+int _lnxproc_proc_net_rpc_nfs_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_osrelease_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_partitions_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_pid_environ_new(_LNXPROC_BASE_T ** base, void *optional);

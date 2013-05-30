@@ -186,12 +186,13 @@ _lnxproc_results_size(_LNXPROC_RESULTS_T * results, size_t * size)
     }
     *size += sizeof(*results);
 
-    if( results->tag ) 
+    if (results->tag)
         *size += strlen(results->tag);
 
     _LNXPROC_RESULTS_TABLE_T *table = results->table;
 
     int i;
+
     for (i = 0; i < results->size; i++) {
         _LNXPROC_RESULTS_TABLE_T *entry = table + i;
 
