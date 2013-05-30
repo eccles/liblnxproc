@@ -39,6 +39,7 @@ int _lnxproc_proc_partitions_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_pid_environ_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_pid_io_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_pid_stat_new(_LNXPROC_BASE_T ** base, void *optional);
+int _lnxproc_proc_pid_statm_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_pid_status_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_softirqs_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_stat_new(_LNXPROC_BASE_T ** base, void *optional);

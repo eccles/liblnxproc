@@ -193,6 +193,20 @@ parameter must include the terminating NUL e.g.
 .B 1 + strlen(optional)
 \.
 .TP
+.B LNXPROC_PROC_PID_STATM
+reads the
+/proc/[1-9]*/statm
+files. 
+The 
+.B optional
+field is a glob pattern that can specify a subset of pids e.g. specifying
+.B '12345'
+will only return results for the pid 12345.
+.B optlen
+parameter must include the terminating NUL e.g. 
+.B 1 + strlen(optional)
+\.
+.TP
 .B LNXPROC_PROC_PID_STATUS
 reads the
 /proc/[1-9]*/status

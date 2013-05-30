@@ -624,6 +624,8 @@ main(int argc, char *argv[])
         TEST_MODULE(LNXPROC_PROC_PID_IO, buf, 1 + strlen(buf));
         TEST_MODULE(LNXPROC_PROC_PID_STAT, NULL, 0);
         TEST_MODULE(LNXPROC_PROC_PID_STAT, buf, 1 + strlen(buf));
+        TEST_MODULE(LNXPROC_PROC_PID_STATM, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_PID_STATM, buf, 1 + strlen(buf));
         TEST_MODULE(LNXPROC_PROC_PID_STATUS, NULL, 0);
         TEST_MODULE(LNXPROC_PROC_PID_STATUS, buf, 1 + strlen(buf));
         TEST_MODULE(LNXPROC_PROC_SOFTIRQS, NULL, 0);
@@ -705,6 +707,10 @@ main(int argc, char *argv[])
     else if (!strcmp(argv[1], "proc_pid_stat")) {
         TEST_MODULE(LNXPROC_PROC_PID_STAT, NULL, 0);
         TEST_MODULE(LNXPROC_PROC_PID_STAT, buf, 1 + strlen(buf));
+    }
+    else if (!strcmp(argv[1], "proc_pid_statm")) {
+        TEST_MODULE(LNXPROC_PROC_PID_STATM, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_PID_STATM, buf, 1 + strlen(buf));
     }
     else if (!strcmp(argv[1], "proc_pid_status")) {
         TEST_MODULE(LNXPROC_PROC_PID_STATUS, NULL, 0);

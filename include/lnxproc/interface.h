@@ -58,6 +58,7 @@ extern "C" {
         LNXPROC_PROC_VMSTAT,
         LNXPROC_PROC_PID_IO,
         LNXPROC_PROC_PID_STATUS,
+        LNXPROC_PROC_PID_STATM,
         LNXPROC_LAST,           // must be last
     };
     typedef enum lnxproc_module_type_t LNXPROC_MODULE_TYPE_T;
