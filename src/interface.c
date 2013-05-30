@@ -67,6 +67,8 @@ static _LNXPROC_MODULE_ROW_T mymodules[] = {
      NULL,.optional = NULL,},
     {.type = LNXPROC_PROC_STAT,.new = _lnxproc_proc_stat_new,.base =
      NULL,.optional = NULL,},
+    {.type = LNXPROC_PROC_UPTIME,.new = _lnxproc_proc_uptime_new,.base =
+     NULL,.optional = NULL,},
 };
 
 static size_t nmodules = sizeof(mymodules) / sizeof(mymodules[0]);
