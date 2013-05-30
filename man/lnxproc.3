@@ -103,7 +103,9 @@ indicates the index of the entry,
 indicates which module and corresponds to a particular file or files to be read from
 the /proc or /sys filesystems.
 
-The type field is an enumerated field. The following table shows each module
+The 
+.B type 
+field is an enumerated field. The following table shows each module
 type together with other characteristics:
 
 .TP
@@ -152,6 +154,20 @@ reads the /proc/partitions file.
 .B LNXPROC_PROC_PID_ENVIRON
 reads the
 /proc/[1-9]*/environ
+files. 
+The 
+.B optional
+field is a glob pattern that can specify a subset of pids e.g. specifying
+.B '12345'
+will only return results for the pid 12345.
+.B optlen
+parameter must include the terminating NUL e.g. 
+.B 1 + strlen(optional)
+\.
+.TP
+.B LNXPROC_PROC_PID_IO
+reads the
+/proc/[1-9]*/io
 files. 
 The 
 .B optional
@@ -307,15 +323,15 @@ TBD
 .TP
 TBD
 .SH NOTES
-.TP
 Currently the key field of the hashtable produced by all the modules of lnxproc has
 a hardwired limit of 48 characters. When adding a new module please ensure that any
-generated keys are are either not longer than this or increase the key length
-limit.
+generated keys are either not longer than this or increase the key length
+limit and recompile the library.
 .SH BUGS
 The 
 .B lnxproc
-library was tested on Ubuntu 12.04 and 13.04 using valgrind. 
+library was tested on Ubuntu 12.04 and 13.04 using valgrind and a standardised
+test data set. 
 The code is designed to work on earlier versions of the kernel. 
 Some modules may not work and such cases should be reported to the author.
 .SH EXAMPLE

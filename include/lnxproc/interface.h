@@ -28,6 +28,11 @@
 extern "C" {
 #endif
 
+/* 
+ * must be in same order as table in interface.c 
+ * only add to end of enum to preserve a consistent API
+ */
+
     enum lnxproc_module_type_t {
         LNXPROC_ALL = 0,
         LNXPROC_PROC_CGROUPS,
@@ -51,6 +56,7 @@ extern "C" {
         LNXPROC_PROC_STAT,
         LNXPROC_PROC_UPTIME,
         LNXPROC_PROC_VMSTAT,
+        LNXPROC_PROC_PID_IO,
         LNXPROC_LAST,           // must be last
     };
     typedef enum lnxproc_module_type_t LNXPROC_MODULE_TYPE_T;

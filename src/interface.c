@@ -28,6 +28,10 @@
 #include "interface_private.h"
 #include "modules.h"
 
+/*
+ * must be in same order as enum in interface.h
+ * only add to end to preserve consistent API
+ */
 static _LNXPROC_MODULE_ROW_T mymodules[] = {
     {.type = LNXPROC_PROC_CGROUPS,.new = _lnxproc_proc_cgroups_new,.base =
      NULL,.optional = NULL,},
@@ -70,6 +74,8 @@ static _LNXPROC_MODULE_ROW_T mymodules[] = {
     {.type = LNXPROC_PROC_UPTIME,.new = _lnxproc_proc_uptime_new,.base =
      NULL,.optional = NULL,},
     {.type = LNXPROC_PROC_VMSTAT,.new = _lnxproc_proc_vmstat_new,.base =
+     NULL,.optional = NULL,},
+    {.type = LNXPROC_PROC_PID_IO,.new = _lnxproc_proc_pid_io_new,.base =
      NULL,.optional = NULL,},
 };
 
