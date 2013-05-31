@@ -87,7 +87,7 @@ proc_net_rpc_nfsd_normalize(_LNXPROC_BASE_T * base)
 
     static const char *proc2titles[] = {
         "", "", "null", "getattr", "setattr", "root", "lookup", "readlink",
-            "read",
+        "read",
         "wrcache", "write", "create", "remove", "rename", "link", "symlink",
         "mkdir", "rmdir", "readdir", "fsstat",
     };
@@ -96,7 +96,7 @@ proc_net_rpc_nfsd_normalize(_LNXPROC_BASE_T * base)
 
     static const char *proc3titles[] = {
         "", "", "null", "getattr", "setattr", "lookup", "access", "readlink",
-            "read",
+        "read",
         "write", "create", "kdir", "symlink", "mknod", "remove", "rmdir",
         "rename", "link", "readdir", "readdirplus", "fsstat", "fsinfo",
         "pathconf", "commit",
