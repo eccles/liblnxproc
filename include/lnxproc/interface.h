@@ -62,6 +62,7 @@ extern "C" {
         LNXPROC_PROC_NET_DEV,
         LNXPROC_PROC_NET_RPC_NFS,
         LNXPROC_PROC_NET_RPC_NFSD,
+        LNXPROC_PROC_NET_SNMP,
         LNXPROC_LAST,           // must be last
     };
     typedef enum lnxproc_module_type_t LNXPROC_MODULE_TYPE_T;

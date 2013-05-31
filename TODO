@@ -2,16 +2,9 @@
 In no particular order:
 
     - autotools
-    - /proc/<pid>/status
-    - /proc/<pid>/statm
     - /proc/<pid>/smaps
     - /proc/sys/fs/file-nr
     - /proc/misc
-    - /proc/uptime
-    - /proc/stat
-    - /proc/net/rpc/nfs
-    - /proc/net/rpc/nfsd
-    - /proc/net/snmp
     - /proc/net/snmp6
     - /proc/net/snmp6
     - /proc/net/udp

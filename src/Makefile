@@ -10,7 +10,7 @@ LIB=liblnxproc
 BASESRCS=util.c error.c results.c limits.c vector.c array.c base.c interface.c
 PROCPIDSRCS=proc_pid_environ.c proc_pid_io.c proc_pid_stat.c proc_pid_statm.c proc_pid_status.c
 PROCNETRPCSRCS=proc_net_rpc_nfs.c proc_net_rpc_nfsd.c
-PROCNETSRCS=proc_net_dev.c $(PROCNETRPCSRCS)
+PROCNETSRCS=proc_net_dev.c $(PROCNETRPCSRCS) proc_net_snmp.c
 PROCSRCS=proc_buddyinfo.c proc_cgroups.c proc_cmdline.c proc_cpuinfo.c proc_diskstats.c \
 proc_domainname.c proc_hostname.c proc_interrupts.c proc_loadavg.c proc_meminfo.c \
 proc_mounts.c proc_osrelease.c proc_partitions.c proc_softirqs.c proc_stat.c \

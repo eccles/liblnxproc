@@ -87,6 +87,8 @@ static _LNXPROC_MODULE_ROW_T mymodules[] = {
      _lnxproc_proc_net_rpc_nfs_new,.base = NULL,.optional = NULL,},
     {.type = LNXPROC_PROC_NET_RPC_NFSD,.new =
      _lnxproc_proc_net_rpc_nfsd_new,.base = NULL,.optional = NULL,},
+    {.type = LNXPROC_PROC_NET_SNMP,.new = _lnxproc_proc_net_snmp_new,.base =
+     NULL,.optional = NULL,},
 };
 
 static size_t nmodules = sizeof(mymodules) / sizeof(mymodules[0]);

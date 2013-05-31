@@ -44,7 +44,8 @@ proc_net_rpc_nfs_normalize(_LNXPROC_BASE_T * base)
     _LNXPROC_ARRAY_T *array = base->current->array;
     _LNXPROC_VECTOR_T *vector = array->vector;
 
-    static const char *nettitles[] = { "", "packets", "udp", "tcp", "tcpconn", };
+    static const char *nettitles[] =
+        { "", "packets", "udp", "tcp", "tcpconn", };
     static const size_t nnettitles = sizeof(nettitles) / sizeof(nettitles[0]);
     static const char *rpctitles[] = { "", "calls", "retrans", "authrefrsh", };
     static const size_t nrpctitles = sizeof(rpctitles) / sizeof(rpctitles[0]);
@@ -57,7 +58,7 @@ proc_net_rpc_nfs_normalize(_LNXPROC_BASE_T * base)
     static const size_t nproc2titles =
         sizeof(proc2titles) / sizeof(proc2titles[0]);
     static const char *proc3titles[] =
-        { "","",  "null", "getattr", "setattr", "lookup", "access", "readlink",
+        { "", "", "null", "getattr", "setattr", "lookup", "access", "readlink",
         "read", "write", "create", "mkdir", "symlink", "mknod",
         "remove", "rmdir", "rename", "link", "readdir", "readdirplus",
         "fsstat", "fsinfo", "pathconf", "commit",
@@ -65,7 +66,7 @@ proc_net_rpc_nfs_normalize(_LNXPROC_BASE_T * base)
     static const size_t nproc3titles =
         sizeof(proc3titles) / sizeof(proc3titles[0]);
     static const char *proc4titles[] =
-        { "","",  "null", "read", "write", "commit", "open", "open_conf",
+        { "", "", "null", "read", "write", "commit", "open", "open_conf",
         "open_noat", "open_dgrd", "close", "setattr", "fsinfo", "renew",
         "setclntid", "confirm", "lock", "lockt", "locku", "access",
         "getattr", "lookup", "lookup_root", "remove", "rename", "link",
