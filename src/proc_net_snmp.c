@@ -160,7 +160,7 @@ _lnxproc_proc_net_snmp_new(_LNXPROC_BASE_T ** base, void *optional)
         _LNXPROC_LIMITS_FREE(limits);
         return ret;
     }
-    ret = _lnxproc_limits_set(limits, 1, 4, ": ", 3);   /* column delimiters */
+    ret = _lnxproc_limits_set(limits, 1, 4, ": ", 2);   /* column delimiters */
     if (ret) {
         _LNXPROC_LIMITS_FREE(limits);
         return ret;
