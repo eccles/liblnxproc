@@ -40,6 +40,7 @@ int _lnxproc_proc_net_rpc_nfs_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_net_rpc_nfsd_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_net_snmp_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_net_snmp6_new(_LNXPROC_BASE_T ** base, void *optional);
+int _lnxproc_proc_net_sockstat_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_osrelease_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_partitions_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_pid_environ_new(_LNXPROC_BASE_T ** base, void *optional);
