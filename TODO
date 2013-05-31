@@ -6,7 +6,6 @@ In no particular order:
     - /proc/sys/fs/file-nr
     - /proc/misc
     - /proc/net/snmp6
-    - /proc/net/snmp6
     - /proc/net/udp
     - /proc/net/udp6
     -

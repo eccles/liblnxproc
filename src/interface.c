@@ -293,7 +293,7 @@ lnxproc_read(LNXPROC_MODULE_T * modules)
 int
 lnxproc_performance(LNXPROC_MODULE_T * modules,
                     long *rawread_time, long *map_time,
-                    long *normalize_time, long *hash_time, size_t * size)
+                    long *normalize_time, long *hash_time)
 {
 
     *rawread_time = 0;
@@ -325,9 +325,6 @@ lnxproc_performance(LNXPROC_MODULE_T * modules,
                 }
             }
         }
-    }
-    if (size) {
-        lnxproc_size(modules, size);
     }
     return LNXPROC_OK;
 }

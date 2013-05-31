@@ -69,7 +69,7 @@ test_module(LNXPROC_MODULE_T * modules, char *str)
                     break;
                 }
                 lnxproc_performance(modules, &rawread_time, &map_time,
-                                    &normalize_time, &hash_time, NULL);
+                                    &normalize_time, &hash_time);
                 sum_rawread_time += rawread_time;
                 sum_map_time += map_time;
                 sum_normalize_time += normalize_time;
