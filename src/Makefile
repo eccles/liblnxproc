@@ -13,11 +13,13 @@ PROCPIDSRCS=proc_pid_environ.c proc_pid_io.c proc_pid_stat.c proc_pid_statm.c \
 proc_pid_status.c
 PROCNETRPCSRCS=proc_net_rpc_nfs.c proc_net_rpc_nfsd.c
 PROCNETSRCS=proc_net_dev.c proc_net_netstat.c $(PROCNETRPCSRCS) proc_net_snmp.c proc_net_snmp6.c proc_net_sockstat.c
+PROCSYSFSSRCS=proc_sys_fs_file-nr.c
+PROCSYSSRCS=$(PROCSYSFSSRCS)
 PROCSRCS=proc_buddyinfo.c proc_cgroups.c proc_cmdline.c proc_cpuinfo.c \
 proc_diskstats.c proc_domainname.c proc_hostname.c proc_interrupts.c \
 proc_loadavg.c proc_meminfo.c proc_mounts.c proc_osrelease.c proc_partitions.c \
 proc_softirqs.c proc_stat.c proc_uptime.c proc_vmstat.c \
-$(PROCNETSRCS) $(PROCPIDSRCS)
+$(PROCNETSRCS) $(PROCPIDSRCS) $(PROCSYSSRCS)
 SYSSRCS=sys_cpufreq.c sys_disksectors.c
 SRCS=$(BASESRCS) $(PROCSRCS) $(SYSSRCS)
 DIRS=

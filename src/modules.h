@@ -50,6 +50,7 @@ int _lnxproc_proc_pid_statm_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_pid_status_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_softirqs_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_stat_new(_LNXPROC_BASE_T ** base, void *optional);
+int _lnxproc_proc_sys_fs_file_nr_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_uptime_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_proc_vmstat_new(_LNXPROC_BASE_T ** base, void *optional);
 int _lnxproc_sys_cpufreq_new(_LNXPROC_BASE_T ** base, void *optional);

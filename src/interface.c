@@ -95,6 +95,8 @@ static _LNXPROC_MODULE_ROW_T mymodules[] = {
      NULL,.optional = NULL,},
     {.type = LNXPROC_PROC_NET_SOCKSTAT,.new =
      _lnxproc_proc_net_sockstat_new,.base = NULL,.optional = NULL,},
+    {.type = LNXPROC_PROC_SYS_FS_FILE_NR,.new =
+     _lnxproc_proc_sys_fs_file_nr_new,.base = NULL,.optional = NULL,},
 };
 
 static size_t nmodules = sizeof(mymodules) / sizeof(mymodules[0]);
