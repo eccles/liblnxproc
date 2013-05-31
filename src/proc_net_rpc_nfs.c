@@ -44,20 +44,20 @@ proc_net_rpc_nfs_normalize(_LNXPROC_BASE_T * base)
     _LNXPROC_ARRAY_T *array = base->current->array;
     _LNXPROC_VECTOR_T *vector = array->vector;
 
-    static const char *nettitles[] = { "packets", "udp", "tcp", "tcpconn", };
+    static const char *nettitles[] = { "", "packets", "udp", "tcp", "tcpconn", };
     static const size_t nnettitles = sizeof(nettitles) / sizeof(nettitles[0]);
-    static const char *rpctitles[] = { "calls", "retrans", "authrefrsh", };
+    static const char *rpctitles[] = { "", "calls", "retrans", "authrefrsh", };
     static const size_t nrpctitles = sizeof(rpctitles) / sizeof(rpctitles[0]);
 
     static const char *proc2titles[] =
-        { "null", "getattr", "setattr", "root", "lookup", "readlink",
+        { "", "", "null", "getattr", "setattr", "root", "lookup", "readlink",
         "read", "wrcache", "write", "create", "remove", "rename",
         "link", "symlink", "mkdir", "rmdir", "readdir", "fsstat",
     };
     static const size_t nproc2titles =
         sizeof(proc2titles) / sizeof(proc2titles[0]);
     static const char *proc3titles[] =
-        { "null", "getattr", "setattr", "lookup", "access", "readlink",
+        { "","",  "null", "getattr", "setattr", "lookup", "access", "readlink",
         "read", "write", "create", "mkdir", "symlink", "mknod",
         "remove", "rmdir", "rename", "link", "readdir", "readdirplus",
         "fsstat", "fsinfo", "pathconf", "commit",
@@ -65,7 +65,7 @@ proc_net_rpc_nfs_normalize(_LNXPROC_BASE_T * base)
     static const size_t nproc3titles =
         sizeof(proc3titles) / sizeof(proc3titles[0]);
     static const char *proc4titles[] =
-        { "null", "read", "write", "commit", "open", "open_conf",
+        { "","",  "null", "read", "write", "commit", "open", "open_conf",
         "open_noat", "open_dgrd", "close", "setattr", "fsinfo", "renew",
         "setclntid", "confirm", "lock", "lockt", "locku", "access",
         "getattr", "lookup", "lookup_root", "remove", "rename", "link",
@@ -130,29 +130,29 @@ proc_net_rpc_nfs_normalize(_LNXPROC_BASE_T * base)
             STRLCAT(buf, rowkey, n, sizeof(buf));
             STRLCAT(buf, "/", n, sizeof(buf));
             if (!strcmp(rowkey, "net")) {
-                if (j > nnettitles)
+                if (j >= nnettitles)
                     continue;
-                STRLCAT(buf, nettitles[j - 1], n, sizeof(buf));
+                STRLCAT(buf, nettitles[j], n, sizeof(buf));
             }
             else if (!strcmp(rowkey, "rpc")) {
-                if (j > nrpctitles)
+                if (j >= nrpctitles)
                     continue;
-                STRLCAT(buf, rpctitles[j - 1], n, sizeof(buf));
+                STRLCAT(buf, rpctitles[j], n, sizeof(buf));
             }
             else if (!strcmp(rowkey, "proc2")) {
-                if (j > nproc2titles)
+                if (j >= nproc2titles || j < 2)
                     continue;
-                STRLCAT(buf, proc2titles[j - 1], n, sizeof(buf));
+                STRLCAT(buf, proc2titles[j], n, sizeof(buf));
             }
             else if (!strcmp(rowkey, "proc3")) {
-                if (j > nproc3titles)
+                if (j >= nproc3titles || j < 2)
                     continue;
-                STRLCAT(buf, proc3titles[j - 1], n, sizeof(buf));
+                STRLCAT(buf, proc3titles[j], n, sizeof(buf));
             }
             else if (!strcmp(rowkey, "proc4")) {
-                if (j > nproc4titles)
+                if (j >= nproc4titles || j < 2)
                     continue;
-                STRLCAT(buf, proc4titles[j - 1], n, sizeof(buf));
+                STRLCAT(buf, proc4titles[j], n, sizeof(buf));
             }
             else {
                 continue;

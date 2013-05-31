@@ -28,21 +28,7 @@ rpc 457 0 0 0 0
 proc2 18 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 proc3 22 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 proc4 2 1 455
-proc4ops 59 0 0 0 1 
-0 0 0 0
- 0 18 3 0
- 0 0 0 2
- 0 0 0 0
- 0 0 15 0
- 3 0 0 0
- 0 0 435 0
- 0 0 0 2
- 2 0 0 0
- 0 0 0 0
- 0 0 0 0
- 0 0 0 0
- 0 0 0 0
- 0 0 0
+proc4ops 59 0 0 0 1 0 0 0 0 0 18 3 0 0 0 0 2 0 0 0 0 0 0 15 0 3 0 0 0 0 0 435 0 0 0 0 2 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 
 */
 
@@ -64,42 +50,42 @@ proc_net_rpc_nfsd_normalize(_LNXPROC_BASE_T * base)
     _LNXPROC_ARRAY_T *array = base->current->array;
     _LNXPROC_VECTOR_T *vector = array->vector;
 
-    static const char *nettitles[] = { "packets", "udp", "tcp", "tcpconn", };
+    static const char *nettitles[] = { "","packets", "udp", "tcp", "tcpconn", };
     static const size_t nnettitles = sizeof(nettitles) / sizeof(nettitles[0]);
     static const char *rpctitles[] =
-        { "calls", "badcalls", "badclnt", "badauth", "xdrcall", };
+        { "","calls", "badcalls", "badclnt", "badauth", "xdrcall", };
     static const size_t nrpctitles = sizeof(rpctitles) / sizeof(rpctitles[0]);
 
     static const char *ratitles[] = {
-        "size", "deep10", "deep20", "deep30", "deep40", "deep50", "deep60",
+        "","size", "deep10", "deep20", "deep30", "deep40", "deep50", "deep60",
         "deep70", "deep80", "deep90", "deep100", "notfound",
     };
 
     static const size_t nratitles = sizeof(ratitles) / sizeof(ratitles[0]);
 
     static const char *rctitles[] = {
-        "hits", "misses", "nocache",
+        "","hits", "misses", "nocache",
     };
     static const size_t nrctitles = sizeof(rctitles) / sizeof(rctitles[0]);
 
     static const char *iotitles[] = {
-        "null", "compound",
+        "","null", "compound",
     };
     static const size_t niotitles = sizeof(iotitles) / sizeof(iotitles[0]);
 
     static const char *thtitles[] = {
-        "threads", "ntimesmax", "hist00", "hist10", "hist20", "hist30",
+        "","threads", "ntimesmax", "hist00", "hist10", "hist20", "hist30",
         "hist40", "hist50", "hist60", "hist70", "hist80", "hist90",
     };
     static const size_t nthtitles = sizeof(thtitles) / sizeof(thtitles[0]);
 
     static const char *fhtitles[] = {
-        "lookup", "anon", "ncachedir", "ncachedir", "stale",
+        "","lookup", "anon", "ncachedir", "ncachedir", "stale",
     };
     static const size_t nfhtitles = sizeof(fhtitles) / sizeof(fhtitles[0]);
 
     static const char *proc2titles[] = {
-        "null", "getattr", "setattr", "root", "lookup", "readlink", "read",
+        "","","null", "getattr", "setattr", "root", "lookup", "readlink", "read",
         "wrcache", "write", "create", "remove", "rename", "link", "symlink",
         "mkdir", "rmdir", "readdir", "fsstat",
     };
@@ -107,7 +93,7 @@ proc_net_rpc_nfsd_normalize(_LNXPROC_BASE_T * base)
         sizeof(proc2titles) / sizeof(proc2titles[0]);
 
     static const char *proc3titles[] = {
-        "null", "getattr", "setattr", "lookup", "access", "readlink", "read",
+        "","","null", "getattr", "setattr", "lookup", "access", "readlink", "read",
         "write", "create", "kdir", "symlink", "mknod", "remove", "rmdir",
         "rename", "link", "readdir", "readdirplus", "fsstat", "fsinfo",
         "pathconf", "commit",
@@ -116,14 +102,14 @@ proc_net_rpc_nfsd_normalize(_LNXPROC_BASE_T * base)
         sizeof(proc3titles) / sizeof(proc3titles[0]);
 
     static const char *proc4titles[] = {
-        "null", "compound",
+        "","","null", "compound",
     };
     static const size_t nproc4titles =
         sizeof(proc4titles) / sizeof(proc4titles[0]);
 
     static const char *proc4opstitles[] = {
-        "null", "op0-unused", "op1-unused", "op2-future", "access", "close",
-            "commit",
+        "","","op0-unused", "op1-unused", "op2-future", "access", "close",
+        "commit",
         "create", "delegpurge", "delegreturn", "getattr", "getfh", "link",
         "lock", "lockt", "locku", "lookup", "lookup_root", "nverify",
         "open", "openattr", "open_conf", "open_dgrd", "putfh", "putpubfh",
@@ -189,59 +175,59 @@ proc_net_rpc_nfsd_normalize(_LNXPROC_BASE_T * base)
             STRLCAT(buf, rowkey, n, sizeof(buf));
             STRLCAT(buf, "/", n, sizeof(buf));
             if (!strcmp(rowkey, "net")) {
-                if (j > nnettitles)
+                if (j >= nnettitles)
                     continue;
-                STRLCAT(buf, nettitles[j - 1], n, sizeof(buf));
+                STRLCAT(buf, nettitles[j], n, sizeof(buf));
             }
             else if (!strcmp(rowkey, "rpc")) {
-                if (j > nrpctitles)
+                if (j >= nrpctitles)
                     continue;
-                STRLCAT(buf, rpctitles[j - 1], n, sizeof(buf));
+                STRLCAT(buf, rpctitles[j], n, sizeof(buf));
             }
             else if (!strcmp(rowkey, "ra")) {
-                if (j > nratitles)
+                if (j >= nratitles)
                     continue;
-                STRLCAT(buf, ratitles[j - 1], n, sizeof(buf));
+                STRLCAT(buf, ratitles[j], n, sizeof(buf));
             }
             else if (!strcmp(rowkey, "rc")) {
-                if (j > nrctitles)
+                if (j >= nrctitles)
                     continue;
-                STRLCAT(buf, rctitles[j - 1], n, sizeof(buf));
+                STRLCAT(buf, rctitles[j], n, sizeof(buf));
             }
             else if (!strcmp(rowkey, "io")) {
-                if (j > niotitles)
+                if (j >= niotitles)
                     continue;
-                STRLCAT(buf, iotitles[j - 1], n, sizeof(buf));
+                STRLCAT(buf, iotitles[j], n, sizeof(buf));
             }
             else if (!strcmp(rowkey, "th")) {
-                if (j > nthtitles)
+                if (j >= nthtitles)
                     continue;
-                STRLCAT(buf, thtitles[j - 1], n, sizeof(buf));
+                STRLCAT(buf, thtitles[j], n, sizeof(buf));
             }
             else if (!strcmp(rowkey, "fh")) {
-                if (j > nfhtitles)
+                if (j >= nfhtitles)
                     continue;
-                STRLCAT(buf, fhtitles[j - 1], n, sizeof(buf));
+                STRLCAT(buf, fhtitles[j], n, sizeof(buf));
             }
             else if (!strcmp(rowkey, "proc2")) {
-                if (j > nproc2titles || j == 1)
+                if (j >= nproc2titles || j < 2 )
                     continue;
-                STRLCAT(buf, proc2titles[j - 1], n, sizeof(buf));
+                STRLCAT(buf, proc2titles[j], n, sizeof(buf));
             }
             else if (!strcmp(rowkey, "proc3")) {
-                if (j > nproc3titles || j == 1)
+                if (j >= nproc3titles || j < 2 )
                     continue;
-                STRLCAT(buf, proc3titles[j - 1], n, sizeof(buf));
+                STRLCAT(buf, proc3titles[j], n, sizeof(buf));
             }
             else if (!strcmp(rowkey, "proc4")) {
-                if (j > nproc4titles || j == 1)
+                if (j >= nproc4titles || j < 2 )
                     continue;
-                STRLCAT(buf, proc4titles[j - 1], n, sizeof(buf));
+                STRLCAT(buf, proc4titles[j], n, sizeof(buf));
             }
             else if (!strcmp(rowkey, "proc4ops")) {
-                if (j > nproc4opstitles || j == 1)
+                if (j >= nproc4opstitles || j < 2 )
                     continue;
-                STRLCAT(buf, proc4opstitles[j - 1], n, sizeof(buf));
+                STRLCAT(buf, proc4opstitles[j], n, sizeof(buf));
             }
             else {
                 _LNXPROC_DEBUG("%d,%d:WARN rowkey '%s'\n", i, j, rowkey);
