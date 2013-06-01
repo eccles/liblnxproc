@@ -10,7 +10,7 @@ HDRS=$(PRIVHDRS) $(PROCHDRS) $(FUNCHDRS)
 LIB=liblnxproc
 BASESRCS=util.c error.c results.c limits.c vector.c array.c base.c interface.c
 PROCPIDSRCS=proc_pid_environ.c proc_pid_io.c proc_pid_stat.c proc_pid_statm.c \
-proc_pid_status.c
+proc_pid_status.c proc_pid_smaps.c 
 PROCNETRPCSRCS=proc_net_rpc_nfs.c proc_net_rpc_nfsd.c
 PROCNETSRCS=proc_net_dev.c proc_net_netstat.c $(PROCNETRPCSRCS) proc_net_snmp.c proc_net_snmp6.c proc_net_sockstat.c
 PROCSYSFSSRCS=proc_sys_fs_file-nr.c

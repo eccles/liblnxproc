@@ -629,6 +629,8 @@ main(int argc, char *argv[])
         TEST_MODULE(LNXPROC_PROC_PID_ENVIRON, buf, 1 + strlen(buf));
         TEST_MODULE(LNXPROC_PROC_PID_IO, NULL, 0);
         TEST_MODULE(LNXPROC_PROC_PID_IO, buf, 1 + strlen(buf));
+        TEST_MODULE(LNXPROC_PROC_PID_SMAPS, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_PID_SMAPS, buf, 1 + strlen(buf));
         TEST_MODULE(LNXPROC_PROC_PID_STAT, NULL, 0);
         TEST_MODULE(LNXPROC_PROC_PID_STAT, buf, 1 + strlen(buf));
         TEST_MODULE(LNXPROC_PROC_PID_STATM, NULL, 0);
@@ -732,6 +734,10 @@ main(int argc, char *argv[])
     else if (!strcmp(argv[1], "proc_pid_io")) {
         TEST_MODULE(LNXPROC_PROC_PID_IO, NULL, 0);
         TEST_MODULE(LNXPROC_PROC_PID_IO, buf, 1 + strlen(buf));
+    }
+    else if (!strcmp(argv[1], "proc_pid_smaps")) {
+        TEST_MODULE(LNXPROC_PROC_PID_SMAPS, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_PID_SMAPS, buf, 1 + strlen(buf));
     }
     else if (!strcmp(argv[1], "proc_pid_stat")) {
         TEST_MODULE(LNXPROC_PROC_PID_STAT, NULL, 0);

@@ -174,6 +174,10 @@ main(int argc, char *argv[])
         if (testtype == 0) {
             TEST_MODULE(LNXPROC_PROC_PID_IO, pid, 1 + strlen(pid));
         }
+        TEST_MODULE(LNXPROC_PROC_PID_SMAPS, NULL, 0);
+        if (testtype == 0) {
+            TEST_MODULE(LNXPROC_PROC_PID_SMAPS, pid, 1 + strlen(pid));
+        }
         TEST_MODULE(LNXPROC_PROC_PID_STAT, NULL, 0);
         if (testtype == 0) {
             TEST_MODULE(LNXPROC_PROC_PID_STAT, pid, 1 + strlen(pid));
@@ -265,6 +269,12 @@ main(int argc, char *argv[])
         TEST_MODULE(LNXPROC_PROC_PID_IO, NULL, 0);
         if (testtype == 0) {
             TEST_MODULE(LNXPROC_PROC_PID_IO, pid, 1 + strlen(pid));
+        }
+    }
+    else if (!strcmp(argv[1], "proc_pid_smaps")) {
+        TEST_MODULE(LNXPROC_PROC_PID_SMAPS, NULL, 0);
+        if (testtype == 0) {
+            TEST_MODULE(LNXPROC_PROC_PID_SMAPS, pid, 1 + strlen(pid));
         }
     }
     else if (!strcmp(argv[1], "proc_pid_stat")) {
