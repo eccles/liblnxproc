@@ -65,10 +65,16 @@ proc_pid_statm_normalize(_LNXPROC_BASE_T * base)
         "size", "resident", "share", "test", "lib",
         "data", "dt",
     };
+    char key[64];
+
+    int n1 = 0;
+
+    STRLCAT(key, "/", n1, sizeof(key));
 
     _lnxproc_results_init(results, nrows);
     for (i = 0; i < nrows; i++) {
-        char *rowkey = values[i][0];
+        char **value1 = (char **) values[i];
+        char *rowkey = value1[0];
 
         if (!rowkey)
             continue;
@@ -78,20 +84,20 @@ proc_pid_statm_normalize(_LNXPROC_BASE_T * base)
         _LNXPROC_DEBUG("%d:ncols %zd\n", i, ncols);
 
         _LNXPROC_DEBUG("%d:Rowkey value %s\n", i, rowkey);
+        int n2 = n1;
+
+        STRLCAT(key, rowkey, n2, sizeof(key));
+        STRLCAT(key, "/", n2, sizeof(key));
+
         for (j = 1; j < ncols; j++) {
-            char *val = values[i][j];
+            char *val = value1[j];
 
             if (!val)
                 continue;
 
-            char key[64];
+            int n3 = n2;
 
-            int keylen = 0;
-
-            STRLCAT(key, "/", keylen, sizeof(key));
-            STRLCAT(key, rowkey, keylen, sizeof(key));
-            STRLCAT(key, "/", keylen, sizeof(key));
-            STRLCAT(key, colkey[j - 1], keylen, sizeof(key));
+            STRLCAT(key, colkey[j - 1], n3, sizeof(key));
 
             int value = atoi(val) * results->page_size;
 

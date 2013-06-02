@@ -46,9 +46,16 @@ proc_pid_io_normalize(_LNXPROC_BASE_T * base)
 
     int i, j;
 
+    char buf[64];
+
+    int n1 = 0;
+
+    STRLCAT(buf, "/", n1, sizeof(buf));
+
     _lnxproc_results_init(results, npids);
     for (i = 0; i < npids; i++) {
-        char *pidkey = values[i][0][0];
+        char ***value1 = (char ***) values[i];
+        char *pidkey = value1[0][0];
 
         if (!pidkey)
             continue;
@@ -58,30 +65,33 @@ proc_pid_io_normalize(_LNXPROC_BASE_T * base)
 
         _LNXPROC_DEBUG("%d:first pidkey value '%s'\n", i, pidkey);
         _LNXPROC_DEBUG("%d:nrows = %zd\n", i, nrows);
-        for (j = 1; j < nrows; j++) {
 
-            char *key = values[i][j][0];
+        int n2 = n1;
+
+        STRLCAT(buf, pidkey, n2, sizeof(buf));
+        STRLCAT(buf, "/", n2, sizeof(buf));
+
+        for (j = 1; j < nrows; j++) {
+            char **value2 = (char **) value1[j];
+
+            char *key = value2[0];
 
             if (!key)
                 continue;
             _LNXPROC_DEBUG("%d,%d:key '%s'\n", i, j, key);
 
-            char buf[64];
-
-            int n = 0;
-
-            STRLCAT(buf, "/", n, sizeof(buf));
-            STRLCAT(buf, pidkey, n, sizeof(buf));
-            STRLCAT(buf, "/", n, sizeof(buf));
-            STRLCAT(buf, key, n, sizeof(buf));
-
-            _LNXPROC_DEBUG("%d,%d:hash key '%s'\n", i, j, buf);
-
-            char *val = values[i][j][1];
+            char *val = value2[1];
 
             if (!val)
                 continue;
             _LNXPROC_DEBUG("%d,%d:val '%s'\n", i, j, val);
+
+            int n3 = n2;
+
+            STRLCAT(buf, key, n3, sizeof(buf));
+
+            _LNXPROC_DEBUG("%d,%d:hash key '%s'\n", i, j, buf);
+
             _lnxproc_results_add_long(results, buf, atol(val));
         }
     }

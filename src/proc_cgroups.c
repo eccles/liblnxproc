@@ -57,29 +57,36 @@ proc_cgroups_normalize(_LNXPROC_BASE_T * base)
 
     int i, j;
 
+    char buf[64];
+
+    int n1 = 0;
+
+    STRLCAT(buf, "/", n1, sizeof(buf));
+
     _lnxproc_results_init(results, nrows);
     for (i = 1; i < nrows; i++) {
+        char **value1 = (char **) values[i];
         size_t ncols = array->vector->children[i]->length;
 
-        rowkey = values[i][0];
+        rowkey = value1[0];
         if (!rowkey)
             continue;
+
+        int n2 = n1;
+
+        STRLCAT(buf, rowkey, n2, sizeof(buf));
+        STRLCAT(buf, "/", n2, sizeof(buf));
 
         for (j = 1; j < ncols; j++) {
             colkey = values[0][j];
             if (!colkey)
                 continue;
-            val = values[i][j];
+            val = value1[j];
             if (!val)
                 continue;
-            char buf[64];
+            int n3 = n2;
 
-            int n = 0;
-
-            STRLCAT(buf, "/", n, sizeof(buf));
-            STRLCAT(buf, rowkey, n, sizeof(buf));
-            STRLCAT(buf, "/", n, sizeof(buf));
-            STRLCAT(buf, colkey, n, sizeof(buf));
+            STRLCAT(buf, colkey, n3, sizeof(buf));
             _lnxproc_results_add_int(results, buf, atoi(val));
         }
     }

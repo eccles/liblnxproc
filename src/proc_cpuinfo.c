@@ -44,21 +44,30 @@ proc_cpuinfo_normalize(_LNXPROC_BASE_T * base)
     _LNXPROC_DEBUG("Nrows %zd\n", nrows);
     char ***values = (char ***) vector->values;
 
-    int i, m, n;
-    char prockey[32] = "";
-    char key[64] = "";
+    int i;
+    char prockey[32];
+    int np1 = 0;
+    int np2 = 0;
+
+    STRLCAT(prockey, "/", np1, sizeof(prockey));
+
+    char key[64];
+    int n1 = 0;
+
+    STRLCAT(key, "/", n1, sizeof(key));
 
     _lnxproc_results_init(results, nrows);
     int first = 2;
 
     for (i = 0; i < nrows; i++) {
-        char *rowkey = values[i][0];
+        char **value1 = (char **) values[i];
+        char *rowkey = value1[0];
 
         if (!rowkey)
             continue;
         _LNXPROC_DEBUG("%d:rowkey '%s'\n", i, rowkey);
 
-        char *val = values[i][1];
+        char *val = value1[1];
 
         if (!val)
             continue;
@@ -66,10 +75,9 @@ proc_cpuinfo_normalize(_LNXPROC_BASE_T * base)
             val++;
 
         if (!strcmp(rowkey, "processor")) {
-            m = 0;
-            STRLCAT(prockey, "/", m, sizeof(prockey));
-            STRLCAT(prockey, val, m, sizeof(prockey));
-            STRLCAT(prockey, "/", m, sizeof(prockey));
+            np2 = np1;
+            STRLCAT(prockey, val, np2, sizeof(prockey));
+            STRLCAT(prockey, "/", np2, sizeof(prockey));
             first--;
             _LNXPROC_DEBUG("%d:first %d prockey '%s'\n", i, first, prockey);
         }
@@ -96,23 +104,22 @@ proc_cpuinfo_normalize(_LNXPROC_BASE_T * base)
                 !strcmp(rowkey, "vendor_id") || !strcmp(rowkey, "wp")) {
                 _LNXPROC_DEBUG("%d:first %d\n", i, first);
                 if (first > 0) {
-                    n = 0;
-                    STRLCAT(key, "/", n, sizeof(key));
-                    STRLCAT(key, rowkey, n, sizeof(key));
+                    int n2 = n1;
+
+                    STRLCAT(key, rowkey, n2, sizeof(key));
                     _LNXPROC_DEBUG("%d:key '%s'\n", i, key);
                     _LNXPROC_DEBUG("%d:val '%s'\n", i, val);
                     _lnxproc_results_add_stringref(results, key, val);
                 }
             }
             else {
-                n = 0;
+                int np3 = np2;
 
-                STRLCAT(key, prockey, n, sizeof(key));
-                STRLCAT(key, rowkey, n, sizeof(key));
-                _LNXPROC_DEBUG("%d:key '%s'\n", i, key);
+                STRLCAT(prockey, rowkey, np3, sizeof(prockey));
+                _LNXPROC_DEBUG("%d:key '%s'\n", i, prockey);
                 _LNXPROC_DEBUG("%d:val '%s'\n", i, val);
 
-                _lnxproc_results_add_stringref(results, key, val);
+                _lnxproc_results_add_stringref(results, prockey, val);
             }
         }
 

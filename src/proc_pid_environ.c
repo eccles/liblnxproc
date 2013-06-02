@@ -46,9 +46,16 @@ proc_pid_environ_normalize(_LNXPROC_BASE_T * base)
 
     int i, j, k;
 
+    char buf[64];
+
+    int n1 = 0;
+
+    STRLCAT(buf, "/", n1, sizeof(buf));
+
     _lnxproc_results_init(results, npids);
     for (i = 0; i < npids; i++) {
-        char *pidkey = values[i][0][0];
+        char ***value1 = (char ***) values[i];
+        char *pidkey = value1[0][0];
 
         if (!pidkey)
             continue;
@@ -58,31 +65,32 @@ proc_pid_environ_normalize(_LNXPROC_BASE_T * base)
 
         _LNXPROC_DEBUG("%d:first pidkey value '%s'\n", i, pidkey);
         _LNXPROC_DEBUG("%d:nrows = %zd\n", i, nrows);
+        int n2 = n1;
+
+        STRLCAT(buf, pidkey, n2, sizeof(buf));
+        STRLCAT(buf, "/", n2, sizeof(buf));
+
         for (j = 1; j < nrows; j++) {
             _LNXPROC_VECTOR_T *grandchild = child->children[j];
             size_t ncols = grandchild->length;
+            char **value2 = (char **) value1[j];
 
             _LNXPROC_DEBUG("%d,%d:ncols = %zd\n", i, j, ncols);
 
-            char *key = values[i][j][0];
+            char *key = value2[0];
 
             if (!key)
                 continue;
             _LNXPROC_DEBUG("%d,%d:key '%s'\n", i, j, key);
 
-            char buf[64];
+            int n3 = n2;
 
-            int n = 0;
-
-            STRLCAT(buf, "/", n, sizeof(buf));
-            STRLCAT(buf, pidkey, n, sizeof(buf));
-            STRLCAT(buf, "/", n, sizeof(buf));
-            STRLCAT(buf, key, n, sizeof(buf));
+            STRLCAT(buf, key, n3, sizeof(buf));
 
             _LNXPROC_DEBUG("%d,%d:hash key '%s'\n", i, j, buf);
 
             if (ncols < 3) {
-                char *val = values[i][j][1];
+                char *val = value2[1];
 
                 if (val) {
                     _LNXPROC_DEBUG("%d,%d:val '%s'\n", i, j, val);
@@ -95,7 +103,7 @@ proc_pid_environ_normalize(_LNXPROC_BASE_T * base)
             }
             else {
                 _LNXPROC_DEBUG("%d,%d:ncols = %zd\n", i, j, ncols);
-                char *val1 = values[i][j][1];
+                char *val1 = value2[1];
 
                 if (!val1)
                     continue;
@@ -103,7 +111,7 @@ proc_pid_environ_normalize(_LNXPROC_BASE_T * base)
                 char *val = NULL;
 
                 for (k = 2; k < ncols; k++) {
-                    val = values[i][j][k];
+                    val = value2[k];
 
                     if (!val)
                         continue;

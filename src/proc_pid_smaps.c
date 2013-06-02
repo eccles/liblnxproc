@@ -82,7 +82,14 @@ proc_pid_smaps_normalize(_LNXPROC_BASE_T * base)
 
     int i, j;
 
+    char hash[64];
+
+    int n1 = 0;
+
+    STRLCAT(hash, "/", n1, sizeof(hash));
+
     _lnxproc_results_init(results, npids);
+
     for (i = 0; i < npids; i++) {
         char ***value1 = (char ***) values[i];
         char *pidkey = value1[0][0];
@@ -211,13 +218,10 @@ proc_pid_smaps_normalize(_LNXPROC_BASE_T * base)
 /*
  *  write out results
  */
-        char hash[64];
+        int n2 = n1;
 
-        int m = 0;
-
-        STRLCAT(hash, "/", m, sizeof(hash));
-        STRLCAT(hash, pidkey, m, sizeof(hash));
-        STRLCAT(hash, "/", m, sizeof(hash));
+        STRLCAT(hash, pidkey, n2, sizeof(hash));
+        STRLCAT(hash, "/", n2, sizeof(hash));
 
         for (j = 0; j < nparams; j++) {
             char *key = fields[j];
@@ -230,8 +234,9 @@ proc_pid_smaps_normalize(_LNXPROC_BASE_T * base)
 
             _LNXPROC_DEBUG("%d,%d:val %ld\n", i, j, val);
 
-            n = m;
-            STRLCAT(hash, key, n, sizeof(hash));
+            int n3 = n2;
+
+            STRLCAT(hash, key, n3, sizeof(hash));
             _LNXPROC_DEBUG("%d,%d:hash '%s'\n", i, j, hash);
 
             _lnxproc_results_add_long(results, hash, val);

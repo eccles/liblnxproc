@@ -44,23 +44,27 @@ proc_meminfo_normalize(_LNXPROC_BASE_T * base)
     _LNXPROC_DEBUG("Nrows %zd\n", nrows);
     char ***values = (char ***) vector->values;
 
-    int i, n;
-    char hashkey[64] = "";
+    int i;
+    char hashkey[64];
+    int n1 = 0;
+
+    STRLCAT(hashkey, "/", n1, sizeof(hashkey));
 
     _lnxproc_results_init(results, nrows);
 
     for (i = 0; i < nrows; i++) {
-        char *key = values[i][0];
+        char **value1 = (char **) values[i];
+        char *key = value1[0];
 
         if (!key)
             continue;
         _LNXPROC_DEBUG("%d:key '%s'\n", i, key);
-        n = 0;
-        STRLCAT(hashkey, "/", n, sizeof(hashkey));
-        STRLCAT(hashkey, key, n, sizeof(hashkey));
+        int n2 = n1;
+
+        STRLCAT(hashkey, key, n2, sizeof(hashkey));
         _LNXPROC_DEBUG("%d:hashkey '%s'\n", i, hashkey);
 
-        char *val = values[i][1];
+        char *val = value1[1];
 
         if (!val)
             continue;

@@ -62,14 +62,14 @@ proc_interrupts_normalize(_LNXPROC_BASE_T * base)
 
     _lnxproc_results_init(results, nrows);
 
-    size_t n = vector->children[0]->length;
+    size_t ntitles = vector->children[0]->length;
 
-    _LNXPROC_DEBUG("N %zd\n", n);
+    _LNXPROC_DEBUG("Ntitles %zd\n", ntitles);
 
     char **titles = (char **) values[0];
     size_t ncpus = 0;
 
-    for (j = 0; j < n; j++) {
+    for (j = 0; j < ntitles; j++) {
         if (titles[j] && titles[j][0]) {
             ncpus++;
             _LNXPROC_DEBUG("%d,%d:title '%s'\n", 0, j, titles[j]);
@@ -77,30 +77,36 @@ proc_interrupts_normalize(_LNXPROC_BASE_T * base)
     }
     _LNXPROC_DEBUG("Ncpus %zd\n", ncpus);
 
+    int n1 = 0;
+    char hashkey[64];
+
+    STRLCAT(hashkey, "/", n1, sizeof(hashkey));
+
     for (i = 1; i < nrows; i++) {
+        char **value1 = (char **) values[i];
         size_t ncols = vector->children[i]->length;
 
         _LNXPROC_DEBUG("%d:Ncols %zd\n", i, ncols);
 
-        char *key = values[i][0];
+        char *key = value1[0];
 
         if (!key)
             continue;
 
-        int n = 0;
-        char hashkey[64];
+        int n2 = n1;
+
+        if (isdigit(key[0])) {
+            STRLCAT(hashkey, "INT", n2, sizeof(hashkey));
+        }
+        STRLCAT(hashkey, key, n2, sizeof(hashkey));
+        _LNXPROC_DEBUG("%d:hashkey %s\n", i, hashkey);
 
         if (ncols < ncpus) {
-            n = 0;
-            STRLCAT(hashkey, "/", n, sizeof(hashkey));
-            STRLCAT(hashkey, key, n, sizeof(hashkey));
-            _LNXPROC_DEBUG("%d:hashkey %s\n", i, hashkey);
 
-            char *val = values[i][1];
+            char *val = value1[1];
 
             if (!val)
                 continue;
-            _LNXPROC_DEBUG("%d:hashkey %s\n", i, hashkey);
             int v = atoi(val);
 
             _LNXPROC_DEBUG("%d:val %d\n", i, v);
@@ -114,7 +120,9 @@ proc_interrupts_normalize(_LNXPROC_BASE_T * base)
                 if (ret)
                     continue;
 
-                STRLCAT(hashkey, "-s", n, sizeof(hashkey));
+                int n3 = n2;
+
+                STRLCAT(hashkey, "-s", n3, sizeof(hashkey));
                 float value = (v - pentry->value.i) / tdiff;
 
                 _lnxproc_results_add_float(results, hashkey, value);
@@ -129,20 +137,16 @@ proc_interrupts_normalize(_LNXPROC_BASE_T * base)
         }
         else {
             for (j = 1; j < ncpus + 1; j++) {
-                char *val = values[i][j];
+                char *val = value1[j];
 
                 if (!val)
                     continue;
 
                 _LNXPROC_DEBUG("%d,%d:title %s\n", i, j - 1, titles[j - 1]);
-                n = 0;
-                STRLCAT(hashkey, "/", n, sizeof(hashkey));
-                if (isdigit(key[0])) {
-                    STRLCAT(hashkey, "INT", n, sizeof(hashkey));
-                }
-                STRLCAT(hashkey, key, n, sizeof(hashkey));
-                STRLCAT(hashkey, "/", n, sizeof(hashkey));
-                STRLCAT(hashkey, titles[j - 1], n, sizeof(hashkey));
+                int n3 = n2;
+
+                STRLCAT(hashkey, "/", n3, sizeof(hashkey));
+                STRLCAT(hashkey, titles[j - 1], n3, sizeof(hashkey));
                 _LNXPROC_DEBUG("%d,%d:hashkey %s\n", i, j, hashkey);
 
                 int v = atoi(val);
@@ -158,7 +162,7 @@ proc_interrupts_normalize(_LNXPROC_BASE_T * base)
                     if (ret)
                         continue;
 
-                    STRLCAT(hashkey, "-s", n, sizeof(hashkey));
+                    STRLCAT(hashkey, "-s", n3, sizeof(hashkey));
                     float value = (v - pentry->value.i) / tdiff;
 
                     _lnxproc_results_add_float(results, hashkey, value);

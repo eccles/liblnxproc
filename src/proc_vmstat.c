@@ -47,29 +47,33 @@ proc_vmstat_normalize(_LNXPROC_BASE_T * base)
 
     int i;
 
+    char buf[64];
+
+    int n1 = 0;
+
+    STRLCAT(buf, "/", n1, sizeof(buf));
+
     _lnxproc_results_init(results, nrows);
     for (i = 0; i < nrows; i++) {
+        char **value1 = (char **) values[i];
 
-        key = values[i][0];
+        key = value1[0];
 
         if (!key)
             continue;
 
         _LNXPROC_DEBUG("%d:key '%s'\n", i, key);
 
-        val = values[i][1];
+        val = value1[1];
 
         if (!val)
             continue;
 
         _LNXPROC_DEBUG("%d:Val '%s'\n", i, val);
 
-        char buf[64];
+        int n2 = n1;
 
-        int n = 0;
-
-        STRLCAT(buf, "/", n, sizeof(buf));
-        STRLCAT(buf, key, n, sizeof(buf));
+        STRLCAT(buf, key, n2, sizeof(buf));
         _LNXPROC_DEBUG("%d:HashKey '%s'\n", i, buf);
         _lnxproc_results_add_int(results, buf, atoi(val));
     }

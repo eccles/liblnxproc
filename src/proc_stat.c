@@ -123,38 +123,45 @@ proc_stat_normalize(_LNXPROC_BASE_T * base)
     static const size_t npagetitles =
         sizeof(pagetitles) / sizeof(pagetitles[0]);
 
+    char buf[64];
+
+    int n1 = 0;
+
+    STRLCAT(buf, "/", n1, sizeof(buf));
+
     _lnxproc_results_init(results, nrows);
     for (i = 0; i < nrows; i++) {
+        char **value1 = (char **) values[i];
         size_t ncols = array->vector->children[i]->length;
 
         _LNXPROC_DEBUG("%d:Ncols %zd\n", i, ncols);
 
-        key = values[i][0];
+        key = value1[0];
         if (!key)
             continue;
         _LNXPROC_DEBUG("%d:Key '%s'\n", i, key);
 
+        int n2 = n1;
+
+        STRLCAT(buf, key, n2, sizeof(buf));
+        STRLCAT(buf, "/", n2, sizeof(buf));
+
         for (j = 1; j < ncols; j++) {
-            val = values[i][j];
+            val = value1[j];
 
             if (!val)
                 continue;
 
             _LNXPROC_DEBUG("%d,%d:Val '%s'\n", i, j, val);
 
-            char buf[64];
+            int n3 = n2;
 
-            int n = 0;
-
-            STRLCAT(buf, "/", n, sizeof(buf));
-            STRLCAT(buf, key, n, sizeof(buf));
             if (!strncmp(key, "cpu", 3)) {
-                STRLCAT(buf, "/", n, sizeof(buf));
                 if (j > ncputitles) {
-                    INTCAT(buf, j - 1, n, sizeof(buf));
+                    INTCAT(buf, j - 1, n3, sizeof(buf));
                 }
                 else {
-                    STRLCAT(buf, cputitles[j - 1], n, sizeof(buf));
+                    STRLCAT(buf, cputitles[j - 1], n3, sizeof(buf));
                 }
                 _LNXPROC_DEBUG("%d,%d:hashKey %s\n", i, j, buf);
                 float t = atoi(val) * results->secs_per_jiffy;
@@ -163,36 +170,32 @@ proc_stat_normalize(_LNXPROC_BASE_T * base)
                 _lnxproc_results_add_float(results, buf, t);
             }
             else if (!strcmp(key, "intr")) {
-                STRLCAT(buf, "/", n, sizeof(buf));
-                INTCAT(buf, j - 1, n, sizeof(buf));
+                INTCAT(buf, j - 1, n3, sizeof(buf));
                 _LNXPROC_DEBUG("%d,%d:hashKey %s\n", i, j, buf);
                 _lnxproc_results_add_int(results, buf, atoi(val));
             }
             else if (!strcmp(key, "page")) {
-                STRLCAT(buf, "/", n, sizeof(buf));
                 if (j > npagetitles) {
-                    INTCAT(buf, j - 1, n, sizeof(buf));
+                    INTCAT(buf, j - 1, n3, sizeof(buf));
                 }
                 else {
-                    STRLCAT(buf, pagetitles[j - 1], n, sizeof(buf));
+                    STRLCAT(buf, pagetitles[j - 1], n3, sizeof(buf));
                 }
                 _LNXPROC_DEBUG("%d,%d:hashKey %s\n", i, j, buf);
                 _lnxproc_results_add_int(results, buf, atoi(val));
             }
             else if (!strcmp(key, "swap")) {
-                STRLCAT(buf, "/", n, sizeof(buf));
                 if (j > nswaptitles) {
-                    INTCAT(buf, j - 1, n, sizeof(buf));
+                    INTCAT(buf, j - 1, n3, sizeof(buf));
                 }
                 else {
-                    STRLCAT(buf, swaptitles[j - 1], n, sizeof(buf));
+                    STRLCAT(buf, swaptitles[j - 1], n3, sizeof(buf));
                 }
                 _LNXPROC_DEBUG("%d,%d:hashKey %s\n", i, j, buf);
                 _lnxproc_results_add_int(results, buf, atoi(val));
             }
             else {
-                STRLCAT(buf, "/", n, sizeof(buf));
-                INTCAT(buf, j - 1, n, sizeof(buf));
+                INTCAT(buf, j - 1, n3, sizeof(buf));
                 _LNXPROC_DEBUG("%d,%d:hashKey %s\n", i, j, buf);
                 _lnxproc_results_add_long(results, buf, atol(val));
             }

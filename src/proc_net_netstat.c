@@ -70,20 +70,28 @@ proc_net_netstat_normalize(_LNXPROC_BASE_T * base)
 
     _lnxproc_results_init(results, nrows);
 
+    char buf[64];
+
+    int n1 = 0;
+
+    STRLCAT(buf, "/", n1, sizeof(buf));
+
     for (i = 0; i < nrows; i += 2) {
+        char **value1 = (char **) values[i];
+        char **value2 = (char **) values[i + 1];
         size_t ncols1 = vector->children[i]->length;
         size_t ncols2 = vector->children[i + 1]->length;
 
         _LNXPROC_DEBUG("%d:Ncols1 %zd\n", i, ncols1);
         _LNXPROC_DEBUG("%d:Ncols2 %zd\n", i, ncols2);
 
-        rowkey1 = values[i][0];
+        rowkey1 = value1[0];
         if (!rowkey1)
             continue;
 
         _LNXPROC_DEBUG("%d:rowkey1 '%s'\n", i, rowkey1);
 
-        rowkey2 = values[i + 1][0];
+        rowkey2 = value2[0];
         if (!rowkey2)
             continue;
 
@@ -92,25 +100,25 @@ proc_net_netstat_normalize(_LNXPROC_BASE_T * base)
         if (strcmp(rowkey1, rowkey2))
             continue;
 
+        int n2 = n1;
+
+        STRLCAT(buf, rowkey1, n2, sizeof(buf));
+        STRLCAT(buf, "/", n2, sizeof(buf));
+
         for (j = 1; j < ((ncols1 > ncols2) ? ncols2 : ncols1); j++) {
-            key = values[i][j];
+            key = value1[j];
             if (!key)
                 continue;
             _LNXPROC_DEBUG("%d,%d:Key '%s'\n", i, j, key);
 
-            val = values[i + 1][j];
+            val = value2[j];
             if (!val)
                 continue;
             _LNXPROC_DEBUG("%d,%d:Val '%s'\n", i, j, val);
 
-            char buf[64];
+            int n3 = n2;
 
-            int n = 0;
-
-            STRLCAT(buf, "/", n, sizeof(buf));
-            STRLCAT(buf, rowkey1, n, sizeof(buf));
-            STRLCAT(buf, "/", n, sizeof(buf));
-            STRLCAT(buf, key, n, sizeof(buf));
+            STRLCAT(buf, key, n3, sizeof(buf));
             _LNXPROC_DEBUG("%d,%d:hashkey '%s'\n", i, j, buf);
             int current = atoi(val);
 
@@ -127,7 +135,7 @@ proc_net_netstat_normalize(_LNXPROC_BASE_T * base)
                 float rate = (current - pentry->value.i) / tdiff;
 
                 _LNXPROC_DEBUG("%d,%d:rate = %f\n", i, j, rate);
-                STRLCAT(buf, "-s", n, sizeof(buf));
+                STRLCAT(buf, "-s", n3, sizeof(buf));
                 _LNXPROC_DEBUG("%d,%d:hashkey '%s'\n", i, j, buf);
                 _lnxproc_results_add_float(results, buf, rate);
             }

@@ -170,9 +170,16 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
 
     _LNXPROC_RESULTS_TABLE_T *hash = NULL;
 
+    char key[64];
+
+    int n1 = 0;
+
+    STRLCAT(key, "/", n1, sizeof(key));
+
     _lnxproc_results_init(results, nrows);
     for (i = 0; i < nrows; i++) {
-        char *rowkey = values[i][0];
+        char **value1 = (char **) values[i];
+        char *rowkey = value1[0];
 
         if (!rowkey)
             continue;
@@ -181,23 +188,22 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
         size_t ncols1 = ncols > NCOLKEYS ? NCOLKEYS : ncols;
 
         _LNXPROC_DEBUG("%d:first Rowkey value %s\n", i, rowkey);
+        int n2 = n1;
+
+        STRLCAT(key, rowkey, n2, sizeof(key));
+        STRLCAT(key, "/", n2, sizeof(key));
 /*
  * first 2 columns are pid which is the hashkey
  */
         for (j = 2; j < ncols1; j++) {
-            char *val = values[i][j];
+            char *val = value1[j];
 
             if (!val)
                 continue;
 
-            char key[64];
+            int n3 = n2;
 
-            int keylen = 0;
-
-            STRLCAT(key, "/", keylen, sizeof(key));
-            STRLCAT(key, rowkey, keylen, sizeof(key));
-            STRLCAT(key, "/", keylen, sizeof(key));
-            STRLCAT(key, colkey[j], keylen, sizeof(key));
+            STRLCAT(key, colkey[j], n3, sizeof(key));
 
             if ((j == VSIZECOL) || (j == RLIMCOL)) {
                 int value = atoi(val) / 1024;
@@ -232,7 +238,7 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
                 hentry->value.f = value;
                 _LNXPROC_DEBUG("%d,%d:Store %s = %f\n", i, j, hentry->key,
                                value);
-                HASH_ADD(hh, hash, key, keylen, hentry);
+                HASH_ADD(hh, hash, key, n3, hentry);
             }
             else if ((j == ITREALVALUECOL) ||
                      (j == GUEST_TIMECOL) ||
@@ -273,21 +279,18 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
                        lnxproc_timeval_secs(&pdata->tv));
 
         for (i = 0; i < nrows; i++) {
-            char *rowkey = values[i][0];
+            char **value1 = (char **) values[i];
+            char *rowkey = value1[0];
 
             if (!rowkey)
                 continue;
 
             _LNXPROC_DEBUG("%d:second Rowkey value %s\n", i, rowkey);
 
-            char key[64];
+            int n2 = n1;
 
-            int n = 0;
-
-            STRLCAT(key, "/", n, sizeof(key));
-            STRLCAT(key, rowkey, n, sizeof(key));
-            STRLCAT(key, "/", n, sizeof(key));
-            STRLCAT(key, colkey[STARTTIMECOL], n, sizeof(key));
+            STRLCAT(key, rowkey, n2, sizeof(key));
+            STRLCAT(key, "/", n2, sizeof(key));
 
             _LNXPROC_RESULTS_TABLE_T *startentry = NULL;
 
@@ -301,6 +304,9 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
                                startentry->value.f);
                 _LNXPROC_RESULTS_TABLE_T *pentry = NULL;
 
+                int n3 = n2;
+
+                STRLCAT(key, colkey[STARTTIMECOL], n3, sizeof(key));
                 int ret = _lnxproc_results_fetch(presults, key, &pentry);
 
                 if (ret)
@@ -308,26 +314,25 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
 
                 _LNXPROC_DEBUG("%d:previous starttime for %s is %f\n", i,
                                rowkey, pentry->value.f);
+
                 if (pentry->value.f != startentry->value.f)
                     continue;
             }
 
             for (j = UTIMECOL; j <= CSTIMECOL; j++) {
-                int n = 0;
+                int n3 = n2;
 
-                STRLCAT(key, "/", n, sizeof(key));
-                STRLCAT(key, rowkey, n, sizeof(key));
-                STRLCAT(key, "/", n, sizeof(key));
-                STRLCAT(key, colkey[j], n, sizeof(key));
+                STRLCAT(key, colkey[j], n3, sizeof(key));
 
                 _LNXPROC_RESULTS_TABLE_T *pentry = NULL;
 
                 int ret = _lnxproc_results_fetch(presults, key, &pentry);
 
-                _LNXPROC_DEBUG("%d,%d:Prev value %s = %f\n", i, j, pentry->key,
-                               pentry->value.f);
                 if (ret)
                     continue;
+
+                _LNXPROC_DEBUG("%d,%d:Prev value %s = %f\n", i, j, pentry->key,
+                               pentry->value.f);
 
                 _LNXPROC_RESULTS_TABLE_T *hentry = NULL;
 
@@ -335,24 +340,20 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
                 if (!hentry)
                     continue;
 
-                char dkey[64];
-
-                n = 0;
-                STRLCAT(dkey, key, n, sizeof(dkey));
-                STRLCAT(dkey, "%", n, sizeof(dkey));
+                STRLCAT(key, "%", n3, sizeof(key));
 
                 float value = ((hentry->value.f - pentry->value.f) * 100.0)
                     / tdiff;
 
                 if (value < 0.0) {
                     _LNXPROC_DEBUG("%d,%d:WARN Usage %s = %f\n", i, j,
-                                   dkey, value);
+                                   key, value);
                 }
                 else {
-                    _LNXPROC_DEBUG("%d,%d:Usage %s = %f\n", i, j, dkey, value);
+                    _LNXPROC_DEBUG("%d,%d:Usage %s = %f\n", i, j, key, value);
                 }
 
-                _lnxproc_results_add_float(results, dkey, value);
+                _lnxproc_results_add_float(results, key, value);
             }
         }
     }

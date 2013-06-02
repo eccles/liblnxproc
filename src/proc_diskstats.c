@@ -95,7 +95,7 @@ Typical contents of /proc/diskstats::
 static void
 derived_values(int i, int j, _LNXPROC_RESULTS_T * results,
                _LNXPROC_RESULTS_T * presults, char *pkey,
-               float out, float tdiff)
+               int offset, size_t plen, float out, float tdiff)
 {
     if (tdiff > 0.0) {
         _LNXPROC_RESULTS_TABLE_T *pentry = NULL;
@@ -112,17 +112,13 @@ derived_values(int i, int j, _LNXPROC_RESULTS_T * results,
                        _lnxproc_results_table_valuestr(pentry, buf,
                                                        sizeof buf, 0));
 #endif
-        char dkey[64];
-
-        int n = 0;
-
-        STRLCAT(dkey, pkey, n, sizeof(dkey));
-        STRLCAT(dkey, "-s", n, sizeof(dkey));
+        STRLCAT(pkey, "-s", offset, plen);
+        _LNXPROC_DEBUG("pKey %1$p '%1$s'\n", pkey);
         float value = (out - pentry->value.f) / tdiff;
 
-        _lnxproc_results_add_float(results, dkey, value);
+        _lnxproc_results_add_float(results, pkey, value);
 #ifdef DEBUG
-        _LNXPROC_DEBUG("%d,%d:Curr %s = %f\n", i, j, dkey, value);
+        _LNXPROC_DEBUG("%d,%d:Curr %s = %f\n", i, j, pkey, value);
         if (value < 0.0) {
             _LNXPROC_DEBUG("WARN: diff < 0 (=%f)\n", value);
         }
@@ -206,14 +202,28 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
 
     int i;
 
+    char pkey[64];
+
+    int n1 = 0;
+
+    STRLCAT(pkey, "/", n1, sizeof(pkey));
+    _LNXPROC_DEBUG("pKey %1$p '%1$s'\n", pkey);
+
     _lnxproc_results_init(results, nrows);
     for (i = 0; i < nrows; i++) {
-        char *key = values[i][KEYCOL];
+        char **value1 = (char **) values[i];
+        char *key = value1[KEYCOL];
 
         if (!key)
             continue;
 
         _LNXPROC_DEBUG("%1$d:Key %2$p '%2$s'\n", i, key);
+
+        int n2 = n1;
+
+        STRLCAT(pkey, key, n2, sizeof(pkey));
+        STRLCAT(pkey, "/", n2, sizeof(pkey));
+        _LNXPROC_DEBUG("%2$d:pKey %1$p '%1$s'\n", pkey, i);
 
         float iodiff[nprecols];
 
@@ -224,18 +234,15 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
         for (j = 0; j < nprecols; j++) {        // ms_read, ms_write
             int k = precols[j];
 
-            char *val = values[i][k];
+            char *val = value1[k];
 
             if (val) {
                 float secs = pars[k].scale * atoi(val);
-                char pkey[64];
 
-                int n = 0;
+                int n3 = n2;
 
-                STRLCAT(pkey, "/", n, sizeof(pkey));
-                STRLCAT(pkey, key, n, sizeof(pkey));
-                STRLCAT(pkey, "/", n, sizeof(pkey));
-                STRLCAT(pkey, pars[k].name, n, sizeof(pkey));
+                STRLCAT(pkey, pars[k].name, n3, sizeof(pkey));
+                _LNXPROC_DEBUG("%2$d,%3$d:pKey %1$p '%1$s'\n", pkey, i, k);
 
                 _LNXPROC_DEBUG("%d,%d:Curr %s = %f\n", i, k, pkey, secs);
                 _lnxproc_results_add_float(results, pkey, secs);
@@ -256,22 +263,19 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
         }
 
         size_t ncols = current->vector->children[i]->length;
-        int n = ncols > numcols ? numcols : ncols;
+        int mincols = ncols > numcols ? numcols : ncols;
 
-        for (j = 0; j < n; j++) {
+        for (j = 0; j < mincols; j++) {
             if (j == KEYCOL || j == MS_READCOL || j == MS_WRITECOL)
                 continue;
             float out = 0.0;
-            char pkey[64];
 
-            int n = 0;
+            int n3 = n2;
 
-            STRLCAT(pkey, "/", n, sizeof(pkey));
-            STRLCAT(pkey, key, n, sizeof(pkey));
-            STRLCAT(pkey, "/", n, sizeof(pkey));
-            STRLCAT(pkey, pars[j].name, n, sizeof(pkey));
+            STRLCAT(pkey, pars[j].name, n3, sizeof(pkey));
+            _LNXPROC_DEBUG("%2$d,%3$d:pKey %1$p '%1$s'\n", pkey, i, j);
 
-            char *val = values[i][j];
+            char *val = value1[j];
 
             _LNXPROC_DEBUG("%d,%d:Curr value %s = %s\n", i, j, pkey, val);
             if (!val)
@@ -290,14 +294,17 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
                 continue;
 
             if ((j == READSCOL) || (j == MERGE_READCOL) || (j == S_READCOL)) {
-                derived_values(i, j, results, presults, pkey, out, iodiff[0]);
+                derived_values(i, j, results, presults, pkey, n3, sizeof(*pkey),
+                               out, iodiff[0]);
             }
             else if ((j == WRITESCOL) || (j == MERGE_WRITECOL)
                      || (j == S_WRITECOL)) {
-                derived_values(i, j, results, presults, pkey, out, iodiff[1]);
+                derived_values(i, j, results, presults, pkey, n3, sizeof(*pkey),
+                               out, iodiff[1]);
             }
             else if ((j == IOSCOL)) {
-                derived_values(i, j, results, presults, pkey, out, iodiff[2]);
+                derived_values(i, j, results, presults, pkey, n3, sizeof(*pkey),
+                               out, iodiff[2]);
             }
         }
     }

@@ -59,6 +59,11 @@ proc_softirqs_normalize(_LNXPROC_BASE_T * base)
 
     int i, j;
 
+    int n1 = 0;
+    char hashkey[64];
+
+    STRLCAT(hashkey, "/", n1, sizeof(hashkey));
+
     _lnxproc_results_init(results, nrows);
 
     size_t ncpus = vector->children[0]->length;
@@ -68,28 +73,29 @@ proc_softirqs_normalize(_LNXPROC_BASE_T * base)
     _LNXPROC_DEBUG("Ncpus %zd\n", ncpus);
 
     for (i = 1; i < nrows; i++) {
+        char **value1 = (char **) values[i];
 
-        char *key = values[i][0];
+        char *key = value1[0];
 
         if (!key)
             continue;
 
         _LNXPROC_DEBUG("%d:key %s\n", i, key);
-        int n = 0;
-        char hashkey[64];
+        int n2 = n1;
+
+        STRLCAT(hashkey, key, n2, sizeof(hashkey));
+        STRLCAT(hashkey, "/", n2, sizeof(hashkey));
 
         for (j = 1; j < ncpus + 1; j++) {
-            char *val = values[i][j];
+            char *val = value1[j];
 
             if (!val)
                 continue;
 
             _LNXPROC_DEBUG("%d,%d:title %s\n", i, j - 1, titles[j - 1]);
-            n = 0;
-            STRLCAT(hashkey, "/", n, sizeof(hashkey));
-            STRLCAT(hashkey, key, n, sizeof(hashkey));
-            STRLCAT(hashkey, "/", n, sizeof(hashkey));
-            STRLCAT(hashkey, titles[j - 1], n, sizeof(hashkey));
+            int n3 = n2;
+
+            STRLCAT(hashkey, titles[j - 1], n3, sizeof(hashkey));
             _LNXPROC_DEBUG("%d,%d:hashkey %s\n", i, j, hashkey);
 
             int v = atoi(val);
@@ -104,7 +110,7 @@ proc_softirqs_normalize(_LNXPROC_BASE_T * base)
                 if (ret)
                     continue;
 
-                STRLCAT(hashkey, "-s", n, sizeof(hashkey));
+                STRLCAT(hashkey, "-s", n3, sizeof(hashkey));
                 float value = (v - pentry->value.i) / tdiff;
 
                 _lnxproc_results_add_float(results, hashkey, value);

@@ -42,7 +42,10 @@ proc_sys_fs_file_nr_normalize(_LNXPROC_BASE_T * base)
 
     char buf[64];
     char *val;
-    int n;
+    int n1 = 0;
+    int n2 = 0;
+
+    STRLCAT(buf, "/", n1, sizeof(buf));
 
     size_t ncols = array->vector->length;
 
@@ -57,18 +60,16 @@ proc_sys_fs_file_nr_normalize(_LNXPROC_BASE_T * base)
         if (!val)
             continue;
 
-        n = 0;
+        n2 = n1;
 
-        STRLCAT(buf, "/", n, sizeof(buf));
-        STRLCAT(buf, fields[i], n, sizeof(buf));
+        STRLCAT(buf, fields[i], n2, sizeof(buf));
         _LNXPROC_DEBUG("Key %s, Value %s\n", buf, val);
         v = atoi(val);
         _lnxproc_results_add_int(results, buf, v);
 
     }
-    n = 0;
-    STRLCAT(buf, "/", n, sizeof(buf));
-    STRLCAT(buf, fields[3], n, sizeof(buf));
+    n2 = n1;
+    STRLCAT(buf, fields[3], n2, sizeof(buf));
     _LNXPROC_DEBUG("Key %s, Value %s\n", buf, val);
     v = atoi(values[0]) - atoi(values[1]);
     _lnxproc_results_add_int(results, buf, v);

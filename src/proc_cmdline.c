@@ -43,18 +43,21 @@ proc_cmdline_normalize(_LNXPROC_BASE_T * base)
     _lnxproc_results_init(results, ncols);
     int i;
 
+    char buf[64];
+
+    int n1 = 0;
+
+    STRLCAT(buf, "/", n1, sizeof(buf));
+
     for (i = 0; i < ncols; i++) {
         char *val = values[i];
 
         if (!val)
             continue;
 
-        char buf[64];
+        int n2 = n1;
 
-        int n = 0;
-
-        STRLCAT(buf, "/", n, sizeof(buf));
-        INTCAT(buf, i, n, sizeof(buf));
+        INTCAT(buf, i, n2, sizeof(buf));
         _LNXPROC_DEBUG("Key %s, Value %s\n", buf, val);
         _lnxproc_results_add_stringref(results, buf, val);
 

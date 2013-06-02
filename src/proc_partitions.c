@@ -56,26 +56,36 @@ proc_partitions_normalize(_LNXPROC_BASE_T * base)
 
     int i, j;
 
+    char buf[64];
+
+    int n1 = 0;
+
+    STRLCAT(buf, "/", n1, sizeof(buf));
+
     _lnxproc_results_init(results, nrows);
     char **titles = values[0];
 
     for (i = 1; i < nrows; i++) {
-        rowkey = values[i][3];
+        char **value1 = (char **) values[i];
+
+        rowkey = value1[3];
         if (!rowkey)
             continue;
         _LNXPROC_DEBUG("%d:Rowkey '%s'\n", i, rowkey);
+
+        int n2 = n1;
+
+        STRLCAT(buf, rowkey, n2, sizeof(buf));
+        STRLCAT(buf, "/", n2, sizeof(buf));
+
         for (j = 0; j < 3; j++) {
-            val = values[i][j];
+            val = value1[j];
             if (!val)
                 continue;
-            char buf[64];
 
-            int n = 0;
+            int n3 = n2;
 
-            STRLCAT(buf, "/", n, sizeof(buf));
-            STRLCAT(buf, rowkey, n, sizeof(buf));
-            STRLCAT(buf, "/", n, sizeof(buf));
-            STRLCAT(buf, titles[j], n, sizeof(buf));
+            STRLCAT(buf, titles[j], n3, sizeof(buf));
             _LNXPROC_DEBUG("%d,%d:key '%s'\n", i, j, buf);
             _LNXPROC_DEBUG("%d,%d:val '%s'\n", i, j, val);
             _lnxproc_results_add_int(results, buf, atoi(val));

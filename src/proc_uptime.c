@@ -41,23 +41,26 @@ proc_uptime_normalize(_LNXPROC_BASE_T * base)
     static const char *titles[] = { "uptime", "idle", };
 
     size_t ncols = array->vector->length;
-    size_t n = ncols > 2 ? 2 : ncols;
+    size_t mincol = ncols > 2 ? 2 : ncols;
 
     _lnxproc_results_init(results, ncols);
     int i;
 
-    for (i = 0; i < n; i++) {
+    char buf[64];
+
+    int n1 = 0;
+
+    STRLCAT(buf, "/", n1, sizeof(buf));
+
+    for (i = 0; i < mincol; i++) {
         char *val = values[i];
 
         if (!val)
             continue;
 
-        char buf[64];
+        int n2 = n1;
 
-        int n = 0;
-
-        STRLCAT(buf, "/", n, sizeof(buf));
-        STRLCAT(buf, titles[i], n, sizeof(buf));
+        STRLCAT(buf, titles[i], n2, sizeof(buf));
         _LNXPROC_DEBUG("Key %s, Value %s\n", buf, val);
         _lnxproc_results_add_float(results, buf, atof(val));
 

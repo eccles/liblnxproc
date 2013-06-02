@@ -59,28 +59,35 @@ proc_mounts_normalize(_LNXPROC_BASE_T * base)
     static const char *titles[] =
         { "spec", "file", "vfstype", "mntops", "freq", "passno", };
 
+    char buf[64];
+
+    int n1 = 0;
+
+    STRLCAT(buf, "/", n1, sizeof(buf));
+
     _lnxproc_results_init(results, nrows);
     for (i = 0; i < nrows; i++) {
+        char **value1 = (char **) values[i];
         size_t ncols = array->vector->children[i]->length;
 
         _LNXPROC_DEBUG("%d:Ncols %zd\n", i, ncols);
 
+        int n2 = n1;
+
+        INTCAT(buf, i, n2, sizeof(buf));
+        STRLCAT(buf, "/", n2, sizeof(buf));
+
         for (j = 0; j < ncols; j++) {
-            val = values[i][j];
+            val = value1[j];
 
             if (!val)
                 continue;
 
             _LNXPROC_DEBUG("%d,%d:Val %s\n", i, j, val);
 
-            char buf[64];
+            int n3 = n2;
 
-            int n = 0;
-
-            STRLCAT(buf, "/", n, sizeof(buf));
-            INTCAT(buf, i, n, sizeof(buf));
-            STRLCAT(buf, "/", n, sizeof(buf));
-            STRLCAT(buf, titles[j], n, sizeof(buf));
+            STRLCAT(buf, titles[j], n3, sizeof(buf));
             _LNXPROC_DEBUG("%d,%d:Key %s\n", i, j, buf);
             _lnxproc_results_add_stringref(results, buf, val);
         }

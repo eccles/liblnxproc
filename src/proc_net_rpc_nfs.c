@@ -105,55 +105,63 @@ proc_net_rpc_nfs_normalize(_LNXPROC_BASE_T * base)
 
     int i, j;
 
+    char buf[64];
+
+    int n1 = 0;
+
+    STRLCAT(buf, "/", n1, sizeof(buf));
+
     _lnxproc_results_init(results, nrows);
 
     for (i = 0; i < nrows; i++) {
+        char **value1 = (char **) values[i];
         size_t ncols = vector->children[i]->length;
 
         _LNXPROC_DEBUG("%d:Ncols %zd\n", i, ncols);
 
-        rowkey = values[i][0];
+        rowkey = value1[0];
         if (!rowkey)
             continue;
 
         _LNXPROC_DEBUG("%d:rowkey '%s'\n", i, rowkey);
+
+        int n2 = n1;
+
+        STRLCAT(buf, rowkey, n2, sizeof(buf));
+        STRLCAT(buf, "/", n2, sizeof(buf));
+
         for (j = 1; j < ncols; j++) {
-            val = values[i][j];
+            val = value1[j];
             if (!val)
                 continue;
             _LNXPROC_DEBUG("%d,%d:Val '%s'\n", i, j, val);
 
-            char buf[64];
+            int n3 = n2;
 
-            int n = 0;
-
-            STRLCAT(buf, "/", n, sizeof(buf));
-            STRLCAT(buf, rowkey, n, sizeof(buf));
-            STRLCAT(buf, "/", n, sizeof(buf));
             if (!strcmp(rowkey, "net")) {
                 if (j >= nnettitles)
                     continue;
-                STRLCAT(buf, nettitles[j], n, sizeof(buf));
+                STRLCAT(buf, nettitles[j], n3, sizeof(buf));
             }
             else if (!strcmp(rowkey, "rpc")) {
                 if (j >= nrpctitles)
                     continue;
-                STRLCAT(buf, rpctitles[j], n, sizeof(buf));
+                STRLCAT(buf, rpctitles[j], n3, sizeof(buf));
             }
             else if (!strcmp(rowkey, "proc2")) {
                 if (j >= nproc2titles || j < 2)
                     continue;
-                STRLCAT(buf, proc2titles[j], n, sizeof(buf));
+                STRLCAT(buf, proc2titles[j], n3, sizeof(buf));
             }
             else if (!strcmp(rowkey, "proc3")) {
                 if (j >= nproc3titles || j < 2)
                     continue;
-                STRLCAT(buf, proc3titles[j], n, sizeof(buf));
+                STRLCAT(buf, proc3titles[j], n3, sizeof(buf));
             }
             else if (!strcmp(rowkey, "proc4")) {
                 if (j >= nproc4titles || j < 2)
                     continue;
-                STRLCAT(buf, proc4titles[j], n, sizeof(buf));
+                STRLCAT(buf, proc4titles[j], n3, sizeof(buf));
             }
             else {
                 continue;
@@ -175,7 +183,7 @@ proc_net_rpc_nfs_normalize(_LNXPROC_BASE_T * base)
                 float rate = (current - pentry->value.i) / tdiff;
 
                 _LNXPROC_DEBUG("%d,%d:rate = %f\n", i, j, rate);
-                STRLCAT(buf, "-s", n, sizeof(buf));
+                STRLCAT(buf, "-s", n3, sizeof(buf));
                 _LNXPROC_DEBUG("%d,%d:hashkey '%s'\n", i, j, buf);
                 _lnxproc_results_add_float(results, buf, rate);
             }

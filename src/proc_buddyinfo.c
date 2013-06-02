@@ -50,58 +50,60 @@ proc_buddyinfo_normalize(_LNXPROC_BASE_T * base)
 
     int i, j;
 
+    char buf[64];
+    int n1 = 0;
+
+    STRLCAT(buf, "/", n1, sizeof(buf));
+
     _lnxproc_results_init(results, nrows);
     for (i = 0; i < nrows; i++) {
+        char **value1 = (char **) values[i];
         size_t ncols = array->vector->children[i]->length;
 
         _LNXPROC_DEBUG("%d:Ncols %zd\n", i, ncols);
 
-        char *rowkey = values[i][0];
+        char *rowkey = value1[0];
 
         if (!rowkey)
             continue;
         _LNXPROC_DEBUG("%d:Rowkey %s\n", i, rowkey);
-        char *rownum = values[i][1];
+        char *rownum = value1[1];
 
         if (!rownum)
             continue;
         _LNXPROC_DEBUG("%d:Rownum %s\n", i, rownum);
-        char *zone = values[i][3];
+        char *zone = value1[3];
 
         if (!rownum)
             continue;
         _LNXPROC_DEBUG("%d:Zone %s\n", i, zone);
 
-        char buf[64];
-        int n = 0;
+        int n2 = n1;
 
-        STRLCAT(buf, "/", n, sizeof(buf));
-        STRLCAT(buf, rowkey, n, sizeof(buf));
-        STRLCAT(buf, rownum, n, sizeof(buf));
-        STRLCAT(buf, "/", n, sizeof(buf));
-        STRLCAT(buf, zone, n, sizeof(buf));
-        STRLCAT(buf, "/", n, sizeof(buf));
+        STRLCAT(buf, rowkey, n2, sizeof(buf));
+        STRLCAT(buf, rownum, n2, sizeof(buf));
+        STRLCAT(buf, "/", n2, sizeof(buf));
+        STRLCAT(buf, zone, n2, sizeof(buf));
+        STRLCAT(buf, "/", n2, sizeof(buf));
         _LNXPROC_DEBUG("%d:base key %s\n", i, buf);
 
         for (j = 4; j < ncols; j++) {
 
             int k = j - 4;
 
-            val = values[i][j];
+            val = value1[j];
             if (!val || !val[0])
                 continue;
 
-            char key[64];
-            int m = 0;
+            int n3 = n2;
 
-            STRLCAT(key, buf, m, sizeof(key));
-            INTCAT(key, k, m, sizeof(key));
-            _LNXPROC_DEBUG("%d:key %s\n", i, key);
+            INTCAT(buf, k, n3, sizeof(buf));
+            _LNXPROC_DEBUG("%d:key %s\n", i, buf);
 
             _LNXPROC_DEBUG("%d,%d:value %s\n", i, j, val);
             int myval = (1 << k) * results->page_size * atoi(val);
 
-            _lnxproc_results_add_int(results, key, myval);
+            _lnxproc_results_add_int(results, buf, myval);
         }
     }
     return LNXPROC_OK;

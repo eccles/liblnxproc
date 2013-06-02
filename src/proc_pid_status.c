@@ -86,13 +86,24 @@ proc_pid_status_normalize(_LNXPROC_BASE_T * base)
     char ****values = (char ****) vector->values;
 
     int i, j, k;
+    char hash[64];
+
+    int n1 = 0;
+
+    STRLCAT(hash, "/", n1, sizeof(hash));
 
     _lnxproc_results_init(results, npids);
     for (i = 0; i < npids; i++) {
-        char *pidkey = values[i][0][0];
+        char ***value1 = (char ***) values[i];
+        char *pidkey = value1[0][0];
 
         if (!pidkey)
             continue;
+
+        int n2 = n1;
+
+        STRLCAT(hash, pidkey, n2, sizeof(hash));
+        STRLCAT(hash, "/", n2, sizeof(hash));
 
         _LNXPROC_VECTOR_T *child = vector->children[i];
         size_t nrows = child->length;
@@ -100,8 +111,9 @@ proc_pid_status_normalize(_LNXPROC_BASE_T * base)
         _LNXPROC_DEBUG("%d:pidkey '%s'\n", i, pidkey);
         _LNXPROC_DEBUG("%d:nrows = %zd\n", i, nrows);
         for (j = 1; j < nrows; j++) {
+            char **value2 = (char **) value1[j];
 
-            char *key = values[i][j][0];
+            char *key = value2[0];
 
             if (!key)
                 continue;
@@ -112,19 +124,9 @@ proc_pid_status_normalize(_LNXPROC_BASE_T * base)
 
             _LNXPROC_DEBUG("%d,%d:ncols = %zd\n", i, j, ncols);
 
-            char basehash[64];
+            int n3 = n2;
 
-            int n = 0;
-
-            STRLCAT(basehash, "/", n, sizeof(basehash));
-            STRLCAT(basehash, pidkey, n, sizeof(basehash));
-
-            char basehash1[64];
-
-            n = 0;
-            STRLCAT(basehash1, basehash, n, sizeof(basehash1));
-            STRLCAT(basehash1, "/", n, sizeof(basehash1));
-            STRLCAT(basehash1, key, n, sizeof(basehash1));
+            STRLCAT(hash, key, n3, sizeof(hash));
 
             if (!strcmp(key, "Name") ||
                 !strcmp(key, "State") ||
@@ -132,13 +134,13 @@ proc_pid_status_normalize(_LNXPROC_BASE_T * base)
                 !strncmp(key, "Mems_allowed", 12) ||
                 !strncmp(key, "Cap", 3) ||
                 !strncmp(key, "Shd", 3) || !strncmp(key, "Sig", 3)) {
-                _LNXPROC_DEBUG("%d,%d:hash key '%s'\n", i, j, basehash1);
-                char *val = values[i][j][1];
+                _LNXPROC_DEBUG("%d,%d:hash key '%s'\n", i, j, hash);
+                char *val = value2[1];
 
                 if (!val)
                     continue;
                 _LNXPROC_DEBUG("%d,%d:val '%s'\n", i, j, val);
-                _lnxproc_results_add_stringref(results, basehash1, val);
+                _lnxproc_results_add_stringref(results, hash, val);
             }
             else if (!strcmp(key, "Tgid") ||
                      !strcmp(key, "TracerPid") ||
@@ -150,32 +152,29 @@ proc_pid_status_normalize(_LNXPROC_BASE_T * base)
                      !strcmp(key, "voluntary_ctxt_switches") ||
                      !strcmp(key, "nonvoluntary_ctxt_switches") ||
                      !strncmp(key, "Vm", 2)) {
-                _LNXPROC_DEBUG("%d,%d:hash key '%s'\n", i, j, basehash1);
-                char *val = values[i][j][1];
+                _LNXPROC_DEBUG("%d,%d:hash key '%s'\n", i, j, hash);
+                char *val = value2[1];
 
                 if (!val)
                     continue;
                 _LNXPROC_DEBUG("%d,%d:val '%s'\n", i, j, val);
-                _lnxproc_results_add_int(results, basehash1, atoi(val));
+                _lnxproc_results_add_int(results, hash, atoi(val));
             }
             else if (!strcmp(key, "Uid")) {
                 static const char *uidtitle[] =
                     { "Uid", "Euid", "Suid", "Fuid", };
                 for (k = 1; k < ncols; k++) {
-                    char buf[64];
 
-                    n = 0;
+                    int n3 = n2;
 
-                    STRLCAT(buf, basehash, n, sizeof(buf));
-                    STRLCAT(buf, "/", n, sizeof(buf));
-                    STRLCAT(buf, uidtitle[k - 1], n, sizeof(buf));
-                    _LNXPROC_DEBUG("%d,%d,%d:hash key '%s'\n", i, j, k, buf);
-                    char *val = values[i][j][k];
+                    STRLCAT(hash, uidtitle[k - 1], n3, sizeof(hash));
+                    _LNXPROC_DEBUG("%d,%d,%d:hash key '%s'\n", i, j, k, hash);
+                    char *val = value2[k];
 
                     if (!val)
                         continue;
                     _LNXPROC_DEBUG("%d,%d,%d:val '%s'\n", i, j, k, val);
-                    _lnxproc_results_add_int(results, buf, atoi(val));
+                    _lnxproc_results_add_int(results, hash, atoi(val));
                 }
 
             }
@@ -183,57 +182,48 @@ proc_pid_status_normalize(_LNXPROC_BASE_T * base)
                 static const char *gidtitle[] =
                     { "Gid", "Egid", "Sgid", "Fgid", };
                 for (k = 1; k < ncols; k++) {
-                    char buf[64];
 
-                    n = 0;
+                    int n3 = n2;
 
-                    STRLCAT(buf, basehash, n, sizeof(buf));
-                    STRLCAT(buf, "/", n, sizeof(buf));
-                    STRLCAT(buf, gidtitle[k - 1], n, sizeof(buf));
-                    _LNXPROC_DEBUG("%d,%d,%d:hash key '%s'\n", i, j, k, buf);
-                    char *val = values[i][j][k];
+                    STRLCAT(hash, gidtitle[k - 1], n3, sizeof(hash));
+                    _LNXPROC_DEBUG("%d,%d,%d:hash key '%s'\n", i, j, k, hash);
+                    char *val = value2[k];
 
                     if (!val)
                         continue;
                     _LNXPROC_DEBUG("%d,%d,%d:val '%s'\n", i, j, k, val);
-                    _lnxproc_results_add_int(results, buf, atoi(val));
+                    _lnxproc_results_add_int(results, hash, atoi(val));
                 }
 
             }
             else if (!strcmp(key, "Groups")) {
                 for (k = 1; k < ncols; k++) {
-                    char buf[64];
+                    int n4 = n3;
 
-                    n = 0;
-
-                    STRLCAT(buf, basehash1, n, sizeof(buf));
-                    STRLCAT(buf, "/", n, sizeof(buf));
-                    INTCAT(buf, k - 1, n, sizeof(buf));
-                    _LNXPROC_DEBUG("%d,%d,%d:hash key '%s'\n", i, j, k, buf);
-                    char *val = values[i][j][k];
+                    STRLCAT(hash, "/", n4, sizeof(hash));
+                    INTCAT(hash, k - 1, n4, sizeof(hash));
+                    _LNXPROC_DEBUG("%d,%d,%d:hash key '%s'\n", i, j, k, hash);
+                    char *val = value2[k];
 
                     if (!val)
                         continue;
                     _LNXPROC_DEBUG("%d,%d,%d:val '%s'\n", i, j, k, val);
-                    _lnxproc_results_add_int(results, buf, atoi(val));
+                    _lnxproc_results_add_int(results, hash, atoi(val));
                 }
 
             }
             else {
                 /* unknown fields - should never execute this section */
                 for (k = 1; k < ncols; k++) {
-                    char buf[64];
+                    int n4 = n3;
 
-                    n = 0;
-
-                    STRLCAT(buf, basehash1, n, sizeof(buf));
-                    STRLCAT(buf, "/", n, sizeof(buf));
-                    INTCAT(buf, k - 1, n, sizeof(buf));
+                    STRLCAT(hash, "/", n4, sizeof(hash));
+                    INTCAT(hash, k - 1, n4, sizeof(hash));
 
                     _LNXPROC_DEBUG("%d,%d,%d:WARN hash key '%s'\n", i, j, k,
-                                   buf);
+                                   hash);
 
-                    char *val = values[i][j][k];
+                    char *val = value2[k];
 
                     if (!val)
                         continue;
