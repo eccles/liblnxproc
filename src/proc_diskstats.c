@@ -91,6 +91,7 @@ Typical contents of /proc/diskstats::
 #include "array_private.h"
 #include "results_private.h"
 #include "base_private.h"
+//#include "modules.h"
 
 static void
 derived_values(int i, int j, _LNXPROC_RESULTS_T * results,
@@ -282,7 +283,12 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
                 continue;
 
             if (j > NAMECOL) {
-                out = pars[j].scale * atoi(val);
+                if ((j == S_WRITECOL) || (j == S_READCOL)) {
+                    out = pars[j].scale * atoi(val);
+                }
+                else {
+                    out = pars[j].scale * atoi(val);
+                }
                 _lnxproc_results_add_float(results, pkey, out);
                 _LNXPROC_DEBUG("%d,%d:Curr %s = %f\n", i, j, pkey, out);
             }
@@ -290,6 +296,7 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
                 _lnxproc_results_add_stringref(results, pkey, val);
                 _LNXPROC_DEBUG("%d,%d:Curr %s = %s\n", i, j, pkey, val);
             }
+
             if (!presults)
                 continue;
 
@@ -314,9 +321,22 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
 int
 _lnxproc_proc_diskstats_new(_LNXPROC_BASE_T ** base, void *optional)
 {
+    int ret;
+/*
+    _LNXPROC_BASE_T *disksectors = NULL;
 
+    ret = _lnxproc_sys_disksectors_new(&disksectors, NULL);
+    if (ret) {
+        return ret;
+    }
+    ret = _lnxproc_base_read(disksectors);
+    if (ret) {
+        return ret;
+    }
+*/
     _LNXPROC_LIMITS_T *limits = NULL;
-    int ret = _lnxproc_limits_new(&limits, 2);
+
+    ret = _lnxproc_limits_new(&limits, 2);
 
     if (ret) {
         return ret;
