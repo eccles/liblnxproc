@@ -42,7 +42,7 @@ Acquire(void *p, size_t size)
     if (p) {
         a = p - offsetof(ALLOCATE_T, data);
         a->count++;
-        return a->data;
+        return p;
     }
     else {
 

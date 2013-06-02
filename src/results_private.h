@@ -84,6 +84,7 @@ typedef struct _lnxproc_results_t _LNXPROC_RESULTS_T;
 int _lnxproc_results_new(_LNXPROC_RESULTS_T ** newresults, char *tag);
 
 int _lnxproc_results_free(_LNXPROC_RESULTS_T ** resultsptr);
+void _lnxproc_results_release(void *arg);
 
 #define _LNXPROC_RESULTS_FREE(r) _lnxproc_results_free(&r)
 

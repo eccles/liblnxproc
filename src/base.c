@@ -726,17 +726,16 @@ _lnxproc_base_store_previous(_LNXPROC_BASE_T * base)
 }
 
 int
-_lnxproc_base_set_optional(_LNXPROC_BASE_T * base, void *optional, size_t len)
+_lnxproc_base_set_optional(_LNXPROC_BASE_T * base, void *optional,
+                           RELEASE_METHOD func)
 {
     if (!base) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
     DESTROY(base->optional);
-    if (optional && len > 0) {
-        base->optional = memdup(optional, len);
-        base->optlen = len;
-    }
+    base->optional = optional;
+    base->optrelease = func;
     return LNXPROC_OK;
 }
 
@@ -985,8 +984,6 @@ _lnxproc_base_size(_LNXPROC_BASE_T * base, size_t * size)
         *size += strlen(base->fileglob) + 1;
     if (base->filesuffix)
         *size += strlen(base->filesuffix) + 1;
-    if (base->optional)
-        *size += base->optlen;
     return LNXPROC_OK;
 }
 
@@ -1014,8 +1011,13 @@ _lnxproc_base_free(_LNXPROC_BASE_T ** baseptr)
         DESTROY(base->fileprefix);
         DESTROY(base->fileglob);
         DESTROY(base->filesuffix);
-        DESTROY(base->optional);
-
+        if (base->optrelease) {
+            _LNXPROC_DEBUG("Base optional %p\n", base->optional);
+            RELEASE(base->optional, base->optrelease);
+        }
+        else {
+            DESTROY(base->optional);
+        }
         _LNXPROC_DEBUG("Free Base\n");
         DESTROY(base);
         *baseptr = NULL;

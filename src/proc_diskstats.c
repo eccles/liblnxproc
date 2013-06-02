@@ -85,13 +85,14 @@ Typical contents of /proc/diskstats::
 #include <stdlib.h>
 #include <string.h>
 
+#include "reference.h"
 #include "strlcpy.h"
 #include "error_private.h"
 #include "limits_private.h"
 #include "array_private.h"
 #include "results_private.h"
 #include "base_private.h"
-//#include "modules.h"
+#include "modules.h"
 
 static void
 derived_values(int i, int j, _LNXPROC_RESULTS_T * results,
@@ -176,8 +177,8 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
  * TODO - get sector size from other LNXPROC module.
  * For now fix it at 512 bytes.
  */
-#define sectorsize 512
-#define sectorscale sectorsize/1024.0
+//#define sectorsize 512
+#define sectorscale 1.0/1024.0
     struct par_t {
         const char *name;
         const float scale;
@@ -226,6 +227,61 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
         STRLCAT(pkey, "/", n2, sizeof(pkey));
         _LNXPROC_DEBUG("%2$d:pKey %1$p '%1$s'\n", pkey, i);
 
+/* sort out sector size */
+        int n3 = n2;
+
+        int sectorsize = 0;
+
+        STRLCAT(pkey, "sector", n3, sizeof(pkey));
+        _LNXPROC_DEBUG("%2$d:pKey %1$p '%1$s'\n", pkey, i);
+        if (presults) {
+            _LNXPROC_RESULTS_TABLE_T *pentry = NULL;
+            int ret = _lnxproc_results_fetch(presults, pkey, &pentry);
+
+            if (!ret) {
+                sectorsize = pentry->value.i;
+                _LNXPROC_DEBUG("%d:previous sectorsize %d\n", i, sectorsize);
+                _lnxproc_results_add_int(results, pkey, sectorsize);
+            }
+
+        }
+        if (sectorsize == 0) {
+            _LNXPROC_RESULTS_T *disksectors = base->optional;
+
+            if (disksectors) {
+                char dkey[64];
+                int m1 = 0;
+
+                if (!strncmp(key, "sd", 2)) {
+                    strlcpy(dkey, key, 4);
+                }
+                else {
+                    STRLCAT(dkey, key, m1, sizeof(dkey));
+                }
+                _LNXPROC_DEBUG("%2$d:dKey %1$p '%1$s'\n", dkey, i);
+                _LNXPROC_RESULTS_TABLE_T *pentry = NULL;
+                int ret = _lnxproc_results_fetch(disksectors, dkey, &pentry);
+
+                if (ret) {
+                    sectorsize = 512;
+                    _LNXPROC_DEBUG("%d:default sectorsize %d\n", i, sectorsize);
+                }
+                else {
+                    sectorsize = pentry->value.i;
+                    _LNXPROC_DEBUG("%d:disksector sectorsize %d\n", i,
+                                   sectorsize);
+                }
+            }
+            else {
+                sectorsize = 512;
+                _LNXPROC_DEBUG("%d:default (no disksectors) sectorsize %d\n", i,
+                               sectorsize);
+            }
+            _lnxproc_results_add_int(results, pkey, sectorsize);
+        }
+        _LNXPROC_DEBUG("%d:sectorsize %d\n", i, sectorsize);
+
+/* sort out millisecond fields */
         float iodiff[nprecols];
 
         memset(iodiff, 0, sizeof iodiff);
@@ -283,11 +339,9 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
                 continue;
 
             if (j > NAMECOL) {
+                out = pars[j].scale * atoi(val);
                 if ((j == S_WRITECOL) || (j == S_READCOL)) {
-                    out = pars[j].scale * atoi(val);
-                }
-                else {
-                    out = pars[j].scale * atoi(val);
+                    out *= sectorsize;
                 }
                 _lnxproc_results_add_float(results, pkey, out);
                 _LNXPROC_DEBUG("%d,%d:Curr %s = %f\n", i, j, pkey, out);
@@ -314,7 +368,9 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
                                out, iodiff[2]);
             }
         }
+
     }
+    RELEASE(base->optional, base->optrelease);
     return LNXPROC_OK;
 }
 
@@ -323,7 +379,6 @@ _lnxproc_proc_diskstats_new(_LNXPROC_BASE_T ** base, void *optional)
 {
     int ret;
 
-/*
     _LNXPROC_BASE_T *disksectors = NULL;
 
     ret = _lnxproc_sys_disksectors_new(&disksectors, NULL);
@@ -334,7 +389,7 @@ _lnxproc_proc_diskstats_new(_LNXPROC_BASE_T ** base, void *optional)
     if (ret) {
         return ret;
     }
-*/
+
     _LNXPROC_LIMITS_T *limits = NULL;
 
     ret = _lnxproc_limits_new(&limits, 2);
@@ -360,7 +415,11 @@ _lnxproc_proc_diskstats_new(_LNXPROC_BASE_T ** base, void *optional)
                             proc_diskstats_normalize, NULL, 256, limits);
     if (!ret) {
         ret = _lnxproc_base_set_filenames(*base, filenames, 1);
+        _LNXPROC_RESULTS_T *res = Acquire(disksectors->current->results, 0);
+
+        ret = _lnxproc_base_set_optional(*base, res, _lnxproc_results_release);
     }
+    _LNXPROC_BASE_FREE(disksectors);
     _LNXPROC_LIMITS_FREE(limits);
     return ret;
 }

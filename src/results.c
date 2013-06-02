@@ -22,6 +22,7 @@
 
 #include "allocate.h"
 #include "strlcpy.h"
+#include "reference.h"
 #include "val2str.h"
 #include "error_private.h"
 #include "results_private.h"
@@ -145,7 +146,7 @@ _lnxproc_results_new(_LNXPROC_RESULTS_T ** results, char *tag)
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
-    _LNXPROC_RESULTS_T *p = Allocate(NULL, sizeof(_LNXPROC_RESULTS_T));
+    _LNXPROC_RESULTS_T *p = Acquire(NULL, sizeof(_LNXPROC_RESULTS_T));
 
     if (!p) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Results");
@@ -205,18 +206,20 @@ _lnxproc_results_size(_LNXPROC_RESULTS_T * results, size_t * size)
     return LNXPROC_OK;
 }
 
-int
-_lnxproc_results_free(_LNXPROC_RESULTS_T ** resultsptr)
+void
+_lnxproc_results_release(void *arg)
 {
-    _LNXPROC_DEBUG("Results %p\n", resultsptr);
+    _LNXPROC_DEBUG("Results %p\n", arg);
 
-    if (resultsptr && *resultsptr) {
+    if (arg) {
+        _LNXPROC_RESULTS_T *results = arg;
+
         _LNXPROC_DEBUG("Free Results\n");
-        _LNXPROC_RESULTS_T *results = *resultsptr;
 
+        _LNXPROC_DEBUG("Free Results tag %p\n", results->tag);
         DESTROY(results->tag);
+        _LNXPROC_DEBUG("Free Results hash %p\n", results->hash);
         HASH_CLEAR(hh, results->hash);
-        _LNXPROC_DEBUG("Table hash freed to %p\n", results->hash);
         _LNXPROC_RESULTS_TABLE_T *table = results->table;
 
         if (table) {
@@ -226,12 +229,27 @@ _lnxproc_results_free(_LNXPROC_RESULTS_T ** resultsptr)
                 _LNXPROC_RESULTS_TABLE_T *entry = table + i;
 
                 if (entry->valuetype == _LNXPROC_RESULTS_TABLE_VALUETYPE_STRREF) {
+                    _LNXPROC_DEBUG
+                        ("Free Results table[%1$d] string %2$p '%2$s'\n", i,
+                         entry->value.sptr);
                     DESTROY(entry->value.sptr);
                 }
             }
+            _LNXPROC_DEBUG("Free Results table %p\n", results->table);
             DESTROY(results->table);
         }
-        DESTROY(results);
+    }
+}
+
+int
+_lnxproc_results_free(_LNXPROC_RESULTS_T ** resultsptr)
+{
+    _LNXPROC_DEBUG("Results %p\n", resultsptr);
+
+    if (resultsptr && *resultsptr) {
+        _LNXPROC_RESULTS_T *results = *resultsptr;
+
+        RELEASE(results, _lnxproc_results_release);
         *resultsptr = NULL;
     }
 

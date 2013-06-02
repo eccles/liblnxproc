@@ -24,6 +24,7 @@
 #include <stddef.h>             // size_t
 #include <sys/time.h>           // struct timeval
 
+#include "reference.h"
 #include "util_private.h"
 #include "error_private.h"
 #include "limits_private.h"
@@ -77,7 +78,7 @@ struct _lnxproc_base_t {
     _LNXPROC_BASE_DATA_T *previous;
     _LNXPROC_BASE_DATA_T data[2];
     void *optional;
-    size_t optlen;
+    RELEASE_METHOD optrelease;
 };
 
 int _lnxproc_base_new(_LNXPROC_BASE_T ** base,
@@ -99,7 +100,8 @@ int _lnxproc_base_set_fileprefix(_LNXPROC_BASE_T * base, char *fileprefix);
 int _lnxproc_base_set_fileglob(_LNXPROC_BASE_T * base, char *fileglob);
 int _lnxproc_base_set_filesuffix(_LNXPROC_BASE_T * base, char *filesuffix);
 int _lnxproc_base_set_optional(_LNXPROC_BASE_T * base, void *optional,
-                               size_t optlen);
+                               RELEASE_METHOD optrelease);
+int _lnxproc_base_read(_LNXPROC_BASE_T * base);
 int _lnxproc_base_rawread(_LNXPROC_BASE_T * base);
 int _lnxproc_base_normalize(_LNXPROC_BASE_T * base);
 int _lnxproc_base_print(_LNXPROC_BASE_T * base);
