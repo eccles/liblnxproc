@@ -82,8 +82,10 @@ _lnxproc_proc_cmdline_new(_LNXPROC_BASE_T ** base, void *optional)
         return ret;
     }
     ret = _lnxproc_base_new(base, "proc_cmdline", _LNXPROC_BASE_TYPE_MEMOIZE,
-                            filenames, 1, NULL, NULL, NULL,
                             NULL, proc_cmdline_normalize, NULL, 64, limits);
+    if (!ret) {
+        ret = _lnxproc_base_set_filenames(*base, filenames, 1);
+    }
     _LNXPROC_LIMITS_FREE(limits);
     return ret;
 }

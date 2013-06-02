@@ -85,8 +85,10 @@ _lnxproc_proc_uptime_new(_LNXPROC_BASE_T ** base, void *optional)
         return ret;
     }
     ret = _lnxproc_base_new(base, "proc_uptime", _LNXPROC_BASE_TYPE_VANILLA,
-                            filenames, 1, NULL, NULL, NULL,
                             NULL, proc_uptime_normalize, NULL, 64, limits);
+    if (!ret) {
+        ret = _lnxproc_base_set_filenames(*base, filenames, 1);
+    }
     _LNXPROC_LIMITS_FREE(limits);
     return ret;
 }

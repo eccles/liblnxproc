@@ -150,8 +150,10 @@ _lnxproc_proc_softirqs_new(_LNXPROC_BASE_T ** base, void *optional)
     char *filenames[] = { "/proc/softirqs", };
     ret =
         _lnxproc_base_new(base, "proc_softirqs", _LNXPROC_BASE_TYPE_PREVIOUS,
-                          filenames, 1, NULL, NULL, NULL, NULL,
-                          proc_softirqs_normalize, NULL, 256, limits);
+                          NULL, proc_softirqs_normalize, NULL, 256, limits);
+    if (!ret) {
+        ret = _lnxproc_base_set_filenames(*base, filenames, 1);
+    }
     _LNXPROC_LIMITS_FREE(limits);
     return ret;
 }

@@ -103,8 +103,10 @@ _lnxproc_proc_vmstat_new(_LNXPROC_BASE_T ** base, void *optional)
 
     char *filenames[] = { "/proc/vmstat" };
     ret = _lnxproc_base_new(base, "proc_vmstat", _LNXPROC_BASE_TYPE_VANILLA,
-                            filenames, 1, NULL, NULL, NULL,
                             NULL, proc_vmstat_normalize, NULL, 256, limits);
+    if (!ret) {
+        ret = _lnxproc_base_set_filenames(*base, filenames, 1);
+    }
     _LNXPROC_LIMITS_FREE(limits);
     return ret;
 }

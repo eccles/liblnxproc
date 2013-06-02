@@ -211,8 +211,10 @@ _lnxproc_proc_net_snmp6_new(_LNXPROC_BASE_T ** base, void *optional)
 
     char *filenames[] = { "/proc/net/snmp6" };
     ret = _lnxproc_base_new(base, "proc_net_snmp6", _LNXPROC_BASE_TYPE_PREVIOUS,
-                            filenames, 1, NULL, NULL, NULL,
                             NULL, proc_net_snmp6_normalize, NULL, 256, limits);
+    if (!ret) {
+        ret = _lnxproc_base_set_filenames(*base, filenames, 1);
+    }
     _LNXPROC_LIMITS_FREE(limits);
     return ret;
 }

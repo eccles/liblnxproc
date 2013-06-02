@@ -322,6 +322,7 @@ int
 _lnxproc_proc_diskstats_new(_LNXPROC_BASE_T ** base, void *optional)
 {
     int ret;
+
 /*
     _LNXPROC_BASE_T *disksectors = NULL;
 
@@ -355,9 +356,11 @@ _lnxproc_proc_diskstats_new(_LNXPROC_BASE_T ** base, void *optional)
     char *filenames[] = { "/proc/diskstats" };
 
     ret = _lnxproc_base_new(base, "proc_diskstats",
-                            _LNXPROC_BASE_TYPE_PREVIOUS, filenames, 1, NULL,
-                            NULL, NULL, NULL, proc_diskstats_normalize, NULL,
-                            256, limits);
+                            _LNXPROC_BASE_TYPE_PREVIOUS, NULL,
+                            proc_diskstats_normalize, NULL, 256, limits);
+    if (!ret) {
+        ret = _lnxproc_base_set_filenames(*base, filenames, 1);
+    }
     _LNXPROC_LIMITS_FREE(limits);
     return ret;
 }

@@ -132,8 +132,10 @@ _lnxproc_proc_buddyinfo_new(_LNXPROC_BASE_T ** base, void *optional)
 
     char *filenames[] = { "/proc/buddyinfo" };
     ret = _lnxproc_base_new(base, "proc_buddyinfo", _LNXPROC_BASE_TYPE_VANILLA,
-                            filenames, 1, NULL, NULL, NULL,
                             NULL, proc_buddyinfo_normalize, NULL, 256, limits);
+    if (!ret) {
+        ret = _lnxproc_base_set_filenames(*base, filenames, 1);
+    }
     _LNXPROC_LIMITS_FREE(limits);
     return ret;
 }

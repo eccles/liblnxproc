@@ -76,27 +76,30 @@ struct _lnxproc_base_t {
     _LNXPROC_BASE_DATA_T *current;
     _LNXPROC_BASE_DATA_T *previous;
     _LNXPROC_BASE_DATA_T data[2];
+    void *optional;
+    size_t optlen;
 };
 
 int _lnxproc_base_new(_LNXPROC_BASE_T ** base,
                       char *tag,
                       _LNXPROC_BASE_TYPE_T type,
-                      char **filenames,
-                      size_t nfiles,
-                      char *fileprefix,
-                      char *fileglob,
-                      char *filesuffix,
                       _LNXPROC_BASE_METHOD rawread,
                       _LNXPROC_BASE_METHOD normalize,
                       _LNXPROC_BASE_METHOD read,
                       size_t buflen, _LNXPROC_LIMITS_T * limits);
 
-int _lnxproc_base_size(_LNXPROC_BASE_T * baseptr, size_t * size);
 int _lnxproc_base_free(_LNXPROC_BASE_T ** baseptr);
+int _lnxproc_base_size(_LNXPROC_BASE_T * baseptr, size_t * size);
 
 #define _LNXPROC_BASE_FREE(b) _lnxproc_base_free(&b)
 
-int _lnxproc_base_read(_LNXPROC_BASE_T * base);
+int _lnxproc_base_set_filenames(_LNXPROC_BASE_T * base, char **filenames,
+                                size_t nfiles);
+int _lnxproc_base_set_fileprefix(_LNXPROC_BASE_T * base, char *fileprefix);
+int _lnxproc_base_set_fileglob(_LNXPROC_BASE_T * base, char *fileglob);
+int _lnxproc_base_set_filesuffix(_LNXPROC_BASE_T * base, char *filesuffix);
+int _lnxproc_base_set_optional(_LNXPROC_BASE_T * base, void *optional,
+                               size_t optlen);
 int _lnxproc_base_rawread(_LNXPROC_BASE_T * base);
 int _lnxproc_base_normalize(_LNXPROC_BASE_T * base);
 int _lnxproc_base_print(_LNXPROC_BASE_T * base);

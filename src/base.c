@@ -28,6 +28,7 @@
 #include <unistd.h>             // read,close
 
 #include "allocate.h"
+#include "memdup.h"
 #include "strlcpy.h"
 #include "util_private.h"
 #include "error_private.h"
@@ -725,34 +726,97 @@ _lnxproc_base_store_previous(_LNXPROC_BASE_T * base)
 }
 
 int
-_lnxproc_base_new(_LNXPROC_BASE_T ** base,
-                  char *tag,
-                  _LNXPROC_BASE_TYPE_T type,
-                  char **filenames,
-                  size_t nfiles,
-                  char *fileprefix,
-                  char *fileglob,
-                  char *filesuffix,
-                  _LNXPROC_BASE_METHOD rawread,
-                  _LNXPROC_BASE_METHOD normalize,
-                  _LNXPROC_BASE_METHOD read,
-                  size_t buflen, _LNXPROC_LIMITS_T * limits)
+_lnxproc_base_set_optional(_LNXPROC_BASE_T * base, void *optional, size_t len)
 {
-    int ret;
+    if (!base) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+    DESTROY(base->optional);
+    if (optional && len > 0) {
+        base->optional = memdup(optional, len);
+        base->optlen = len;
+    }
+    return LNXPROC_OK;
+}
 
-    _LNXPROC_DEBUG("tag %s\n", tag);
-    _LNXPROC_DEBUG("nfiles %zd\n", nfiles);
-    _LNXPROC_DEBUG("filenames %p\n", filenames);
-    _LNXPROC_DEBUG("fileprefix %1$p '%1$s'\n", fileprefix);
-    _LNXPROC_DEBUG("fileglob %1$p '%1$s'\n", fileglob);
-    _LNXPROC_DEBUG("filesuffix %1$p '%1$s'\n", filesuffix);
-    _LNXPROC_DEBUG("rawread %p, normalize %p, read %p\n", rawread,
-                   normalize, read);
-    _LNXPROC_DEBUG("buflen %zd\n", buflen);
-    _LNXPROC_DEBUG("limits %p\n", limits);
-    _LNXPROC_DEBUG("sizeof ptr %lu\n", sizeof(void *));
-    _LNXPROC_DEBUG("sizeof LNXPROC_BASE_T %lu\n", sizeof(_LNXPROC_BASE_T));
+int
+_lnxproc_base_set_fileprefix(_LNXPROC_BASE_T * base, char *fileprefix)
+{
+    if (!base) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
 
+    char *testroot = getenv("LNXPROC_TESTROOT");
+
+    DESTROY(base->fileprefix);
+    if (fileprefix) {
+        if (testroot) {
+            char fname[FILENAME_MAX];
+
+            int n = 0;
+
+            STRLCAT(fname, testroot, n, sizeof fname);
+            STRLCAT(fname, fileprefix, n, sizeof fname);
+            base->fileprefix = strdup(fname);
+        }
+        else {
+            base->fileprefix = strdup(fileprefix);
+        }
+        if (!base->fileprefix) {
+            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Base fileprefix");
+            return LNXPROC_ERROR_MALLOC;
+        }
+    }
+
+    return LNXPROC_OK;
+}
+
+int
+_lnxproc_base_set_fileglob(_LNXPROC_BASE_T * base, char *fileglob)
+{
+    if (!base) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+
+    DESTROY(base->fileglob);
+    if (fileglob) {
+        base->fileglob = strdup(fileglob);
+        if (!base->fileglob) {
+            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Base fileglob");
+            return LNXPROC_ERROR_MALLOC;
+        }
+    }
+
+    return LNXPROC_OK;
+}
+
+int
+_lnxproc_base_set_filesuffix(_LNXPROC_BASE_T * base, char *filesuffix)
+{
+    if (!base) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+
+    DESTROY(base->filesuffix);
+    if (filesuffix) {
+        base->filesuffix = strdup(filesuffix);
+        if (!base->filesuffix) {
+            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Base filesuffix");
+            return LNXPROC_ERROR_MALLOC;
+        }
+    }
+
+    return LNXPROC_OK;
+}
+
+int
+_lnxproc_base_set_filenames(_LNXPROC_BASE_T * base,
+                            char **filenames, size_t nfiles)
+{
     if (!base) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
         return LNXPROC_ERROR_ILLEGAL_ARG;
@@ -762,10 +826,82 @@ _lnxproc_base_new(_LNXPROC_BASE_T ** base,
                              "Filenames %p Nfiles %zd", filenames, nfiles);
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
-    if (!filenames && !fileprefix && !filesuffix) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG,
-                             "Filenames %p Fileprefix %p Filesuffix %p",
-                             filenames, fileprefix, filesuffix);
+
+    if (base->filenames) {
+        _LNXPROC_DEBUG("Free Base filenames\n");
+        int i;
+
+        for (i = 0; i < base->nfiles; i++) {
+            DESTROY(base->filenames[i]);
+        }
+        DESTROY(base->filenames);
+    }
+
+    char *testroot = getenv("LNXPROC_TESTROOT");
+
+    base->nfiles = 0;
+    if (filenames) {
+        base->filenames = Allocate(NULL, nfiles * sizeof(char *));
+        if (!base->filenames) {
+            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Base filenames");
+            return LNXPROC_ERROR_MALLOC;
+        }
+        int i;
+
+        for (i = 0; i < nfiles; i++) {
+            if (testroot) {
+                char fname[FILENAME_MAX];
+
+                int n = 0;
+
+                STRLCAT(fname, testroot, n, sizeof fname);
+                STRLCAT(fname, filenames[i], n, sizeof fname);
+                base->filenames[i] = strdup(fname);
+            }
+            else {
+                base->filenames[i] = strdup(filenames[i]);
+            }
+            if (!base->filenames[i]) {
+                _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC,
+                                     "Base filenames %d", i);
+                int j;
+
+                for (j = i - 1; j >= 0; j--) {
+                    DESTROY(base->filenames[j]);
+                }
+                return LNXPROC_ERROR_MALLOC;
+            }
+            base->nfiles++;
+        }
+    }
+    else {
+        base->filenames = NULL;
+    }
+
+    return LNXPROC_OK;
+}
+
+int
+_lnxproc_base_new(_LNXPROC_BASE_T ** base,
+                  char *tag,
+                  _LNXPROC_BASE_TYPE_T type,
+                  _LNXPROC_BASE_METHOD rawread,
+                  _LNXPROC_BASE_METHOD normalize,
+                  _LNXPROC_BASE_METHOD read,
+                  size_t buflen, _LNXPROC_LIMITS_T * limits)
+{
+    int ret;
+
+    _LNXPROC_DEBUG("tag %s\n", tag);
+    _LNXPROC_DEBUG("rawread %p, normalize %p, read %p\n", rawread,
+                   normalize, read);
+    _LNXPROC_DEBUG("buflen %zd\n", buflen);
+    _LNXPROC_DEBUG("limits %p\n", limits);
+    _LNXPROC_DEBUG("sizeof ptr %lu\n", sizeof(void *));
+    _LNXPROC_DEBUG("sizeof LNXPROC_BASE_T %lu\n", sizeof(_LNXPROC_BASE_T));
+
+    if (!base) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
@@ -785,89 +921,6 @@ _lnxproc_base_new(_LNXPROC_BASE_T ** base,
 
     p->current = p->data + 0;
     p->previous = NULL;
-
-    char *testroot = getenv("LNXPROC_TESTROOT");
-
-    p->nfiles = 0;
-    if (filenames) {
-        p->filenames = Allocate(NULL, nfiles * sizeof(char *));
-        if (!p->filenames) {
-            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Base filenames");
-            _LNXPROC_BASE_FREE(p);
-            return LNXPROC_ERROR_MALLOC;
-        }
-        int i;
-
-        for (i = 0; i < nfiles; i++) {
-            if (testroot) {
-                char fname[FILENAME_MAX];
-
-                int n = 0;
-
-                STRLCAT(fname, testroot, n, sizeof fname);
-                STRLCAT(fname, filenames[i], n, sizeof fname);
-                p->filenames[i] = strdup(fname);
-            }
-            else {
-                p->filenames[i] = strdup(filenames[i]);
-            }
-            if (!p->filenames[i]) {
-                _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC,
-                                     "Base filenames %d", i);
-                _LNXPROC_BASE_FREE(p);
-                return LNXPROC_ERROR_MALLOC;
-            }
-            p->nfiles++;
-        }
-    }
-    else {
-        p->filenames = NULL;
-    }
-    if (fileprefix) {
-        if (testroot) {
-            char fname[FILENAME_MAX];
-
-            int n = 0;
-
-            STRLCAT(fname, testroot, n, sizeof fname);
-            STRLCAT(fname, fileprefix, n, sizeof fname);
-            p->fileprefix = strdup(fname);
-        }
-        else {
-            p->fileprefix = strdup(fileprefix);
-        }
-        if (!p->fileprefix) {
-            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Base fileprefix");
-            _LNXPROC_BASE_FREE(p);
-            return LNXPROC_ERROR_MALLOC;
-        }
-    }
-    else {
-        p->fileprefix = NULL;
-    }
-    if (fileglob) {
-        p->fileglob = strdup(fileglob);
-        if (!p->fileglob) {
-            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Base fileglob");
-            _LNXPROC_BASE_FREE(p);
-            return LNXPROC_ERROR_MALLOC;
-        }
-    }
-    else {
-        p->fileglob = NULL;
-    }
-    if (filesuffix) {
-        p->filesuffix = strdup(filesuffix);
-        if (!p->filesuffix) {
-            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Base filesuffix");
-            _LNXPROC_BASE_FREE(p);
-            return LNXPROC_ERROR_MALLOC;
-        }
-    }
-    else {
-        p->filesuffix = NULL;
-    }
-
     p->normalize = normalize;
     if (!read) {
         p->read = _lnxproc_base_read;
@@ -932,6 +985,8 @@ _lnxproc_base_size(_LNXPROC_BASE_T * base, size_t * size)
         *size += strlen(base->fileglob) + 1;
     if (base->filesuffix)
         *size += strlen(base->filesuffix) + 1;
+    if (base->optional)
+        *size += base->optlen;
     return LNXPROC_OK;
 }
 
@@ -955,18 +1010,11 @@ _lnxproc_base_free(_LNXPROC_BASE_T ** baseptr)
 
         base_data_free(base->current);
         base_data_free(base->previous);
-        if (base->filenames) {
-            _LNXPROC_DEBUG("Free Base filenames\n");
-            int i;
-
-            for (i = 0; i < base->nfiles; i++) {
-                DESTROY(base->filenames[i]);
-            }
-            DESTROY(base->filenames);
-        }
+        _lnxproc_base_set_filenames(base, NULL, 0);
         DESTROY(base->fileprefix);
         DESTROY(base->fileglob);
         DESTROY(base->filesuffix);
+        DESTROY(base->optional);
 
         _LNXPROC_DEBUG("Free Base\n");
         DESTROY(base);

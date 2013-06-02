@@ -101,9 +101,13 @@ _lnxproc_sys_disksectors_new(_LNXPROC_BASE_T ** base, void *optional)
     char *filesuffix = "queue/hw_sector_size";
 
     ret = _lnxproc_base_new(base, "sys_disksectors",
-                            _LNXPROC_BASE_TYPE_MEMOIZE, NULL, 0, fileprefix,
-                            fileglob, filesuffix, NULL,
+                            _LNXPROC_BASE_TYPE_MEMOIZE, NULL,
                             sys_disksectors_normalize, NULL, 256, limits);
+    if (!ret) {
+        _lnxproc_base_set_fileprefix(*base, fileprefix);
+        _lnxproc_base_set_fileglob(*base, fileglob);
+        _lnxproc_base_set_filesuffix(*base, filesuffix);
+    }
     _LNXPROC_LIMITS_FREE(limits);
     return ret;
 }

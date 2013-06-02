@@ -95,9 +95,12 @@ _lnxproc_proc_sys_fs_file_nr_new(_LNXPROC_BASE_T ** base, void *optional)
     }
     ret =
         _lnxproc_base_new(base, "proc_sys_fs_file-nr",
-                          _LNXPROC_BASE_TYPE_VANILLA, filenames, 1, NULL, NULL,
-                          NULL, NULL, proc_sys_fs_file_nr_normalize, NULL, 64,
+                          _LNXPROC_BASE_TYPE_VANILLA,
+                          NULL, proc_sys_fs_file_nr_normalize, NULL, 64,
                           limits);
+    if (!ret) {
+        ret = _lnxproc_base_set_filenames(*base, filenames, 1);
+    }
     _LNXPROC_LIMITS_FREE(limits);
     return ret;
 }

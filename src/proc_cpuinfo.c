@@ -151,8 +151,10 @@ _lnxproc_proc_cpuinfo_new(_LNXPROC_BASE_T ** base, void *optional)
     char *filenames[] = { "/proc/cpuinfo", };
     ret =
         _lnxproc_base_new(base, "proc_cpuinfo", _LNXPROC_BASE_TYPE_MEMOIZE,
-                          filenames, 1, NULL, NULL, NULL, NULL,
-                          proc_cpuinfo_normalize, NULL, 256, limits);
+                          NULL, proc_cpuinfo_normalize, NULL, 256, limits);
+    if (!ret) {
+        ret = _lnxproc_base_set_filenames(*base, filenames, 1);
+    }
     _LNXPROC_LIMITS_FREE(limits);
     return ret;
 }

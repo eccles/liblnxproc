@@ -50,10 +50,16 @@ _lnxproc_proc_domainname_new(_LNXPROC_BASE_T ** base, void *optional)
 {
 
     char *filenames[] = { "/proc/sys/kernel/domainname" };
-    return _lnxproc_base_new(base, "proc_domainname",
-                             _LNXPROC_BASE_TYPE_MEMOIZE, filenames, 1, NULL,
-                             NULL, NULL, NULL, proc_domainname_normalize, NULL,
-                             64, NULL);
+    int ret = _lnxproc_base_new(base, "proc_domainname",
+                                _LNXPROC_BASE_TYPE_MEMOIZE, NULL,
+                                proc_domainname_normalize,
+                                NULL,
+                                64, NULL);
+
+    if (!ret) {
+        ret = _lnxproc_base_set_filenames(*base, filenames, 1);
+    }
+    return ret;
 }
 
 /*

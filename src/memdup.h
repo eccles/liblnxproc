@@ -21,6 +21,8 @@
 #ifndef LIBLNXPROC_MEMDUP_H
 #define LIBLNXPROC_MEMDUP_H 1
 
+#include <string.h>             // memcpy
+
 static inline void *
 memdup(void *old, size_t len)
 {

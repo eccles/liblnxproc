@@ -276,8 +276,12 @@ _lnxproc_proc_pid_status_new(_LNXPROC_BASE_T ** base, void *optional)
 
     ret =
         _lnxproc_base_new(base, "proc_pid_status", _LNXPROC_BASE_TYPE_VANILLA,
-                          NULL, 0, fileprefix, fileglob, filesuffix, NULL,
-                          proc_pid_status_normalize, NULL, 256, limits);
+                          NULL, proc_pid_status_normalize, NULL, 256, limits);
+    if (!ret) {
+        _lnxproc_base_set_fileprefix(*base, fileprefix);
+        _lnxproc_base_set_fileglob(*base, fileglob);
+        _lnxproc_base_set_filesuffix(*base, filesuffix);
+    }
     _LNXPROC_LIMITS_FREE(limits);
     return ret;
 }
