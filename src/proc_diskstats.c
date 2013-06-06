@@ -92,6 +92,7 @@ Typical contents of /proc/diskstats::
 #include "array_private.h"
 #include "results_private.h"
 #include "base_private.h"
+#include "interface_private.h"
 #include "modules.h"
 
 static void
@@ -246,7 +247,7 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
 
         }
         if (sectorsize == 0) {
-            _LNXPROC_RESULTS_T *disksectors = base->optional;
+            _LNXPROC_RESULTS_T *disksectors = base->optional->results;
 
             if (disksectors) {
                 char dkey[64];
@@ -370,12 +371,11 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
         }
 
     }
-    RELEASE(base->optional, base->optrelease);
     return LNXPROC_OK;
 }
 
 int
-_lnxproc_proc_diskstats_new(_LNXPROC_BASE_T ** base, void *optional)
+_lnxproc_proc_diskstats_new(_LNXPROC_BASE_T ** base, LNXPROC_OPT_T * optional)
 {
     int ret;
 
@@ -415,9 +415,12 @@ _lnxproc_proc_diskstats_new(_LNXPROC_BASE_T ** base, void *optional)
                             proc_diskstats_normalize, NULL, 256, limits);
     if (!ret) {
         ret = _lnxproc_base_set_filenames(*base, filenames, 1);
-        _LNXPROC_RESULTS_T *res = Acquire(disksectors->current->results, 0);
+        LNXPROC_OPT_T *opt = NULL;
 
-        ret = _lnxproc_base_set_optional(*base, res, _lnxproc_results_release);
+        lnxproc_opt_new(&opt);
+        ret = _lnxproc_opt_set_results(opt, disksectors->current->results);
+        ret = _lnxproc_base_set_optional(*base, opt);
+        LNXPROC_OPT_FREE(opt);
     }
     _LNXPROC_BASE_FREE(disksectors);
     _LNXPROC_LIMITS_FREE(limits);

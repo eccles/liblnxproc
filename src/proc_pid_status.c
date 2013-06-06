@@ -68,7 +68,9 @@ nonvoluntary_ctxt_switches:	399
 #include "limits_private.h"
 #include "array_private.h"
 #include "results_private.h"
+#include "interface_private.h"
 #include "base_private.h"
+#include "modules.h"
 
 static int
 proc_pid_status_normalize(_LNXPROC_BASE_T * base)
@@ -237,7 +239,7 @@ proc_pid_status_normalize(_LNXPROC_BASE_T * base)
 }
 
 int
-_lnxproc_proc_pid_status_new(_LNXPROC_BASE_T ** base, void *optional)
+_lnxproc_proc_pid_status_new(_LNXPROC_BASE_T ** base, LNXPROC_OPT_T * optional)
 {
 
     _LNXPROC_LIMITS_T *limits = NULL;
@@ -265,8 +267,8 @@ _lnxproc_proc_pid_status_new(_LNXPROC_BASE_T ** base, void *optional)
     char *fileprefix = "/proc";
     char *fileglob;
 
-    if (optional) {
-        fileglob = optional;
+    if (optional && optional->fileglob) {
+        fileglob = optional->fileglob;
     }
     else {
         fileglob = "[1-9]*";

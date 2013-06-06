@@ -30,6 +30,7 @@
 #include "limits_private.h"
 #include "results_private.h"
 #include "array_private.h"
+#include "opt_private.h"
 
 struct _lnxproc_base_data_t {
     int id;
@@ -77,8 +78,7 @@ struct _lnxproc_base_t {
     _LNXPROC_BASE_DATA_T *current;
     _LNXPROC_BASE_DATA_T *previous;
     _LNXPROC_BASE_DATA_T data[2];
-    void *optional;
-    RELEASE_METHOD optrelease;
+    LNXPROC_OPT_T *optional;
 };
 
 int _lnxproc_base_new(_LNXPROC_BASE_T ** base,
@@ -99,8 +99,8 @@ int _lnxproc_base_set_filenames(_LNXPROC_BASE_T * base, char **filenames,
 int _lnxproc_base_set_fileprefix(_LNXPROC_BASE_T * base, char *fileprefix);
 int _lnxproc_base_set_fileglob(_LNXPROC_BASE_T * base, char *fileglob);
 int _lnxproc_base_set_filesuffix(_LNXPROC_BASE_T * base, char *filesuffix);
-int _lnxproc_base_set_optional(_LNXPROC_BASE_T * base, void *optional,
-                               RELEASE_METHOD optrelease);
+int _lnxproc_base_set_optional(_LNXPROC_BASE_T * base,
+                               LNXPROC_OPT_T * optional);
 int _lnxproc_base_read(_LNXPROC_BASE_T * base);
 int _lnxproc_base_rawread(_LNXPROC_BASE_T * base);
 int _lnxproc_base_normalize(_LNXPROC_BASE_T * base);

@@ -36,6 +36,7 @@
 #include "results_private.h"
 #include "array_private.h"
 #include "base_private.h"
+#include "opt_private.h"
 #include "limit_chr.h"
 
 char *
@@ -726,16 +727,17 @@ _lnxproc_base_store_previous(_LNXPROC_BASE_T * base)
 }
 
 int
-_lnxproc_base_set_optional(_LNXPROC_BASE_T * base, void *optional,
-                           RELEASE_METHOD func)
+_lnxproc_base_set_optional(_LNXPROC_BASE_T * base, LNXPROC_OPT_T * optional)
 {
     if (!base) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
-    DESTROY(base->optional);
+    if (base->optional) {
+        LNXPROC_OPT_FREE(base->optional);
+    }
+    lnxproc_opt_new(&optional);
     base->optional = optional;
-    base->optrelease = func;
     return LNXPROC_OK;
 }
 
@@ -1011,13 +1013,7 @@ _lnxproc_base_free(_LNXPROC_BASE_T ** baseptr)
         DESTROY(base->fileprefix);
         DESTROY(base->fileglob);
         DESTROY(base->filesuffix);
-        if (base->optrelease) {
-            _LNXPROC_DEBUG("Base optional %p\n", base->optional);
-            RELEASE(base->optional, base->optrelease);
-        }
-        else {
-            DESTROY(base->optional);
-        }
+        LNXPROC_OPT_FREE(base->optional);
         _LNXPROC_DEBUG("Free Base\n");
         DESTROY(base);
         *baseptr = NULL;

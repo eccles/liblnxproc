@@ -23,6 +23,7 @@
 
 #include <lnxproc/util.h>
 #include <lnxproc/error.h>
+#include <lnxproc/opt.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -77,7 +78,7 @@ extern "C" {
     int lnxproc_new(LNXPROC_MODULE_T ** moduleptr, size_t nmodule);
     int lnxproc_size(LNXPROC_MODULE_T * module, size_t * size);
     int lnxproc_set(LNXPROC_MODULE_T * module, size_t pos,
-                    LNXPROC_MODULE_TYPE_T type, void *optional, size_t optlen);
+                    LNXPROC_MODULE_TYPE_T type, LNXPROC_OPT_T * optional);
     int lnxproc_free(LNXPROC_MODULE_T ** modulesptr);
 
 #define LNXPROC_FREE(b) lnxproc_free(&b)

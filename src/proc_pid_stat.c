@@ -118,8 +118,72 @@ Description::
 #include "limits_private.h"
 #include "array_private.h"
 #include "results_private.h"
+#include "interface_private.h"
 #include "base_private.h"
+#include "modules.h"
 #include "uthash.h"
+
+struct my_list_t {
+    struct my_list_t *next;
+    int value;
+};
+struct my_hash_t {
+    int key;
+    struct my_list_t *head;
+    UT_hash_handle hh;
+};
+
+static struct my_hash_t *
+myhash_clear(struct my_hash_t *myhash)
+{
+    _LNXPROC_DEBUG("FREE %p\n", myhash);
+    if (myhash) {
+        struct my_hash_t *mhash, *tmp;
+
+        HASH_ITER(hh, myhash, mhash, tmp) {
+            _LNXPROC_DEBUG("FREE %p PGRP %d\n", mhash, mhash->key);
+            HASH_DEL(myhash, mhash);
+            struct my_list_t *head = mhash->head;
+
+            while (head) {
+                struct my_list_t *tmp = head->next;
+
+                _LNXPROC_DEBUG("FREE %p PID %d\n", head, head->value);
+                free(head);
+                head = tmp;
+            }
+            free(mhash);
+        }
+    }
+    return NULL;
+}
+
+static struct my_hash_t *
+myhash_add(struct my_hash_t *myhash, int key, int value)
+{
+    struct my_hash_t *mhash;
+
+    HASH_FIND_INT(myhash, &key, mhash);
+    if (!mhash) {
+        mhash = Allocate(NULL, sizeof(struct my_hash_t));
+        if (!mhash)
+            return myhash;
+        mhash->key = key;
+        _LNXPROC_DEBUG("ADD %p KEY %d\n", mhash, mhash->key);
+        HASH_ADD(hh, myhash, key, sizeof(mhash->key), mhash);
+    }
+    if (mhash) {
+        struct my_list_t *mlist = Allocate(NULL, sizeof(struct my_list_t));
+
+        if (!mlist)
+            return myhash;
+        mlist->value = value;
+        mlist->next = mhash->head;
+        mhash->head = mlist;
+        _LNXPROC_DEBUG("ADD %p VAL %d\n", mlist, mlist->value);
+    }
+    return myhash;
+}
 
 static int
 proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
@@ -153,6 +217,9 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
     };
 #define NCOLKEYS (sizeof(colkey) / sizeof(colkey[0]))
 
+#define PPIDCOL  4
+#define PGRPCOL  5
+#define TPGIDCOL  8
 #define UTIMECOL  14
 #define STIMECOL  15
 #define CUTIMECOL 16
@@ -170,6 +237,9 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
 
     _LNXPROC_RESULTS_TABLE_T *hash = NULL;
 
+    struct my_hash_t *pgrphash = NULL;
+    struct my_hash_t *ppidhash = NULL;
+
     char key[64];
 
     int n1 = 0;
@@ -179,18 +249,18 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
     _lnxproc_results_init(results, nrows);
     for (i = 0; i < nrows; i++) {
         char **value1 = (char **) values[i];
-        char *rowkey = value1[0];
+        char *pidkey = value1[0];
 
-        if (!rowkey)
+        if (!pidkey)
             continue;
 
         size_t ncols = array->vector->children[i]->length;
         size_t ncols1 = ncols > NCOLKEYS ? NCOLKEYS : ncols;
 
-        _LNXPROC_DEBUG("%d:first Rowkey value %s\n", i, rowkey);
+        _LNXPROC_DEBUG("%d:first Rowkey value %s\n", i, pidkey);
         int n2 = n1;
 
-        STRLCAT(key, rowkey, n2, sizeof(key));
+        STRLCAT(key, pidkey, n2, sizeof(key));
         STRLCAT(key, "/", n2, sizeof(key));
 /*
  * first 2 columns are pid which is the hashkey
@@ -250,6 +320,25 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
                 _lnxproc_results_add_float(results, key, value);
 
             }
+            else if (j == PGRPCOL) {
+                int pgrp = atoi(val);
+
+                _LNXPROC_DEBUG("%d,%d:%s PGRP %s int %d\n", i, j, key, val,
+                               pgrp);
+                _lnxproc_results_add_int(results, key, pgrp);
+                pgrphash = myhash_add(pgrphash, pgrp, atoi(pidkey));
+            }
+            else if (j == PPIDCOL) {
+                int ppid = atoi(val);
+
+                _LNXPROC_DEBUG("%d,%d:%s PPID %s int %d\n", i, j, key, val,
+                               ppid);
+                _lnxproc_results_add_int(results, key, ppid);
+                ppidhash = myhash_add(ppidhash, ppid, atoi(pidkey));
+            }
+            else if (j == TPGIDCOL) {
+                _lnxproc_results_add_int(results, key, atoi(val));
+            }
             else {
                 _lnxproc_results_add_stringref(results, key, val);
             }
@@ -280,16 +369,16 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
 
         for (i = 0; i < nrows; i++) {
             char **value1 = (char **) values[i];
-            char *rowkey = value1[0];
+            char *pidkey = value1[0];
 
-            if (!rowkey)
+            if (!pidkey)
                 continue;
 
-            _LNXPROC_DEBUG("%d:second Rowkey value %s\n", i, rowkey);
+            _LNXPROC_DEBUG("%d:second Rowkey value %s\n", i, pidkey);
 
             int n2 = n1;
 
-            STRLCAT(key, rowkey, n2, sizeof(key));
+            STRLCAT(key, pidkey, n2, sizeof(key));
             STRLCAT(key, "/", n2, sizeof(key));
 
             _LNXPROC_RESULTS_TABLE_T *startentry = NULL;
@@ -300,7 +389,7 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
  * Ignore previous entries with a different starttime
  */
             if (startentry) {
-                _LNXPROC_DEBUG("%d:current starttime for %s is %f\n", i, rowkey,
+                _LNXPROC_DEBUG("%d:current starttime for %s is %f\n", i, pidkey,
                                startentry->value.f);
                 _LNXPROC_RESULTS_TABLE_T *pentry = NULL;
 
@@ -313,7 +402,7 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
                     continue;
 
                 _LNXPROC_DEBUG("%d:previous starttime for %s is %f\n", i,
-                               rowkey, pentry->value.f);
+                               pidkey, pentry->value.f);
 
                 if (pentry->value.f != startentry->value.f)
                     continue;
@@ -365,12 +454,14 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
             free(entry);
         }
     }
+    pgrphash = myhash_clear(pgrphash);
+    ppidhash = myhash_clear(ppidhash);
 
     return LNXPROC_OK;
 }
 
 int
-_lnxproc_proc_pid_stat_new(_LNXPROC_BASE_T ** base, void *optional)
+_lnxproc_proc_pid_stat_new(_LNXPROC_BASE_T ** base, LNXPROC_OPT_T * optional)
 {
 
     _LNXPROC_LIMITS_T *limits = NULL;
@@ -393,8 +484,8 @@ _lnxproc_proc_pid_stat_new(_LNXPROC_BASE_T ** base, void *optional)
     char *fileprefix = "/proc";
     char *fileglob;
 
-    if (optional) {
-        fileglob = optional;
+    if (optional && optional->fileglob) {
+        fileglob = optional->fileglob;
     }
     else {
         fileglob = "[1-9]*";

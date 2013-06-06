@@ -106,7 +106,9 @@ UdpLite6SndbufErrors            	0
 #include "limits_private.h"
 #include "array_private.h"
 #include "results_private.h"
+#include "interface_private.h"
 #include "base_private.h"
+#include "modules.h"
 
 static int
 proc_net_snmp6_normalize(_LNXPROC_BASE_T * base)
@@ -189,7 +191,7 @@ proc_net_snmp6_normalize(_LNXPROC_BASE_T * base)
 }
 
 int
-_lnxproc_proc_net_snmp6_new(_LNXPROC_BASE_T ** base, void *optional)
+_lnxproc_proc_net_snmp6_new(_LNXPROC_BASE_T ** base, LNXPROC_OPT_T * optional)
 {
 
     _LNXPROC_LIMITS_T *limits = NULL;

@@ -21,41 +21,69 @@
 #ifndef LIBLNXPROC_MODULES_H
 #define LIBLNXPROC_MODULES_H 1
 
+#include "interface_private.h"
 #include "base_private.h"
 
-int _lnxproc_proc_buddyinfo_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_cgroups_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_cmdline_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_cpuinfo_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_diskstats_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_domainname_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_hostname_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_interrupts_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_loadavg_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_meminfo_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_mounts_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_net_dev_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_net_netstat_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_net_rpc_nfs_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_net_rpc_nfsd_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_net_snmp_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_net_snmp6_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_net_sockstat_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_osrelease_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_partitions_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_pid_environ_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_pid_io_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_pid_smaps_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_pid_stat_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_pid_statm_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_pid_status_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_softirqs_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_stat_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_sys_fs_file_nr_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_uptime_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_proc_vmstat_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_sys_cpufreq_new(_LNXPROC_BASE_T ** base, void *optional);
-int _lnxproc_sys_disksectors_new(_LNXPROC_BASE_T ** base, void *optional);
+int _lnxproc_proc_buddyinfo_new(_LNXPROC_BASE_T ** base,
+                                LNXPROC_OPT_T * optional);
+int _lnxproc_proc_cgroups_new(_LNXPROC_BASE_T ** base,
+                              LNXPROC_OPT_T * optional);
+int _lnxproc_proc_cmdline_new(_LNXPROC_BASE_T ** base,
+                              LNXPROC_OPT_T * optional);
+int _lnxproc_proc_cpuinfo_new(_LNXPROC_BASE_T ** base,
+                              LNXPROC_OPT_T * optional);
+int _lnxproc_proc_diskstats_new(_LNXPROC_BASE_T ** base,
+                                LNXPROC_OPT_T * optional);
+int _lnxproc_proc_domainname_new(_LNXPROC_BASE_T ** base,
+                                 LNXPROC_OPT_T * optional);
+int _lnxproc_proc_hostname_new(_LNXPROC_BASE_T ** base,
+                               LNXPROC_OPT_T * optional);
+int _lnxproc_proc_interrupts_new(_LNXPROC_BASE_T ** base,
+                                 LNXPROC_OPT_T * optional);
+int _lnxproc_proc_loadavg_new(_LNXPROC_BASE_T ** base,
+                              LNXPROC_OPT_T * optional);
+int _lnxproc_proc_meminfo_new(_LNXPROC_BASE_T ** base,
+                              LNXPROC_OPT_T * optional);
+int _lnxproc_proc_mounts_new(_LNXPROC_BASE_T ** base, LNXPROC_OPT_T * optional);
+int _lnxproc_proc_net_dev_new(_LNXPROC_BASE_T ** base,
+                              LNXPROC_OPT_T * optional);
+int _lnxproc_proc_net_netstat_new(_LNXPROC_BASE_T ** base,
+                                  LNXPROC_OPT_T * optional);
+int _lnxproc_proc_net_rpc_nfs_new(_LNXPROC_BASE_T ** base,
+                                  LNXPROC_OPT_T * optional);
+int _lnxproc_proc_net_rpc_nfsd_new(_LNXPROC_BASE_T ** base,
+                                   LNXPROC_OPT_T * optional);
+int _lnxproc_proc_net_snmp_new(_LNXPROC_BASE_T ** base,
+                               LNXPROC_OPT_T * optional);
+int _lnxproc_proc_net_snmp6_new(_LNXPROC_BASE_T ** base,
+                                LNXPROC_OPT_T * optional);
+int _lnxproc_proc_net_sockstat_new(_LNXPROC_BASE_T ** base,
+                                   LNXPROC_OPT_T * optional);
+int _lnxproc_proc_osrelease_new(_LNXPROC_BASE_T ** base,
+                                LNXPROC_OPT_T * optional);
+int _lnxproc_proc_partitions_new(_LNXPROC_BASE_T ** base,
+                                 LNXPROC_OPT_T * optional);
+int _lnxproc_proc_pid_environ_new(_LNXPROC_BASE_T ** base,
+                                  LNXPROC_OPT_T * optional);
+int _lnxproc_proc_pid_io_new(_LNXPROC_BASE_T ** base, LNXPROC_OPT_T * optional);
+int _lnxproc_proc_pid_smaps_new(_LNXPROC_BASE_T ** base,
+                                LNXPROC_OPT_T * optional);
+int _lnxproc_proc_pid_stat_new(_LNXPROC_BASE_T ** base,
+                               LNXPROC_OPT_T * optional);
+int _lnxproc_proc_pid_statm_new(_LNXPROC_BASE_T ** base,
+                                LNXPROC_OPT_T * optional);
+int _lnxproc_proc_pid_status_new(_LNXPROC_BASE_T ** base,
+                                 LNXPROC_OPT_T * optional);
+int _lnxproc_proc_softirqs_new(_LNXPROC_BASE_T ** base,
+                               LNXPROC_OPT_T * optional);
+int _lnxproc_proc_stat_new(_LNXPROC_BASE_T ** base, LNXPROC_OPT_T * optional);
+int _lnxproc_proc_sys_fs_file_nr_new(_LNXPROC_BASE_T ** base,
+                                     LNXPROC_OPT_T * optional);
+int _lnxproc_proc_uptime_new(_LNXPROC_BASE_T ** base, LNXPROC_OPT_T * optional);
+int _lnxproc_proc_vmstat_new(_LNXPROC_BASE_T ** base, LNXPROC_OPT_T * optional);
+int _lnxproc_sys_cpufreq_new(_LNXPROC_BASE_T ** base, LNXPROC_OPT_T * optional);
+int _lnxproc_sys_disksectors_new(_LNXPROC_BASE_T ** base,
+                                 LNXPROC_OPT_T * optional);
 
 #endif                          // LIBLNXPROC_MODULES_H
 /*

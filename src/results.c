@@ -131,19 +131,16 @@ _lnxproc_results_print(_LNXPROC_RESULTS_T * results)
 }
 
 int
-_lnxproc_results_new(_LNXPROC_RESULTS_T ** results, char *tag)
+_lnxproc_results_new(_LNXPROC_RESULTS_T ** resultsptr, char *tag)
 {
-    _LNXPROC_DEBUG("sizeof ptr %lu\n", sizeof(void *));
-    _LNXPROC_DEBUG("sizeof _LNXPROC_RESULTS_T %lu\n",
-                   sizeof(_LNXPROC_RESULTS_T));
-    if (!results) {
+    if (!resultsptr) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Results address");
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
-    if (*results) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Results not null");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+    if (*resultsptr) {
+        Acquire(*resultsptr, 0);
+        return LNXPROC_OK;
     }
 
     _LNXPROC_RESULTS_T *p = Acquire(NULL, sizeof(_LNXPROC_RESULTS_T));
@@ -168,7 +165,7 @@ _lnxproc_results_new(_LNXPROC_RESULTS_T ** results, char *tag)
     p->secs_per_jiffy = 1.0 / p->jiffies_per_sec;
     p->page_size = sysconf(_SC_PAGE_SIZE) / 1024;
 
-    *results = p;
+    *resultsptr = p;
     _LNXPROC_DEBUG("Successful\n");
     return LNXPROC_OK;
 }
@@ -246,11 +243,8 @@ _lnxproc_results_free(_LNXPROC_RESULTS_T ** resultsptr)
 {
     _LNXPROC_DEBUG("Results %p\n", resultsptr);
 
-    if (resultsptr && *resultsptr) {
-        _LNXPROC_RESULTS_T *results = *resultsptr;
-
-        RELEASE(results, _lnxproc_results_release);
-        *resultsptr = NULL;
+    if (resultsptr) {
+        RELEASE(*resultsptr, _lnxproc_results_release);
     }
 
     return LNXPROC_OK;
@@ -335,6 +329,31 @@ _lnxproc_results_hash(_LNXPROC_RESULTS_T * results)
         }
     }
 
+    return LNXPROC_OK;
+}
+
+int
+_lnxproc_results_last(_LNXPROC_RESULTS_T * results,
+                      _LNXPROC_RESULTS_TABLE_T ** entry)
+{
+    if (!results) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Results");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+    if (!entry) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Results entry");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+    if (*entry) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG,
+                             "Results entry contents not null");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+    if (!results->table) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Results table");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+    *entry = results->table + results->length - 1;
     return LNXPROC_OK;
 }
 

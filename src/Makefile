@@ -1,14 +1,16 @@
 RELDIR=..
 PUBHDIR=$(RELDIR)/include/lnxproc
 FUNCHDRS=limit_chr.h strlcpy.h memdup.h val2str.h allocate.h reference.h
-PUBBASEHDRS=lnxproc.h util.h error.h interface.h
+PUBBASEHDRS=lnxproc.h util.h error.h interface.h opt.h
 PROCHDRS=modules.h
 PUBHDRS=$(PUBBASEHDRS)
 PRIVHDRS=util_private.h base_private.h error_private.h interface_private.h \
-limits_private.h vector_private.h array_private.h results_private.h 
+limits_private.h vector_private.h array_private.h results_private.h \
+opt_private.h
 HDRS=$(PRIVHDRS) $(PROCHDRS) $(FUNCHDRS)
 LIB=liblnxproc
-BASESRCS=util.c error.c results.c limits.c vector.c array.c base.c interface.c
+BASESRCS=util.c error.c results.c limits.c vector.c array.c base.c interface.c \
+opt.c
 PROCPIDSRCS=proc_pid_environ.c proc_pid_io.c proc_pid_stat.c proc_pid_statm.c \
 proc_pid_status.c proc_pid_smaps.c 
 PROCNETRPCSRCS=proc_net_rpc_nfs.c proc_net_rpc_nfsd.c

@@ -227,12 +227,9 @@ limits_rows_free(void *ptr)
 int
 _lnxproc_limits_free(_LNXPROC_LIMITS_T ** limits)
 {
-    if (limits && *limits) {
-        _LNXPROC_LIMITS_T *mylimits = *limits;
-
-        _LNXPROC_DEBUG("Free Limits buffer %p\n", mylimits);
-        RELEASE(mylimits, limits_rows_free);
-        *limits = NULL;
+    if (limits) {
+        _LNXPROC_DEBUG("Free Limits buffer %p\n", *limits);
+        RELEASE(*limits, limits_rows_free);
     }
     return LNXPROC_OK;
 }

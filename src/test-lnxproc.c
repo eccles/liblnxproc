@@ -33,6 +33,8 @@ This file is part of liblnxproc.
 #include "base_private.h"
 #include "interface_private.h"
 #include "results_private.h"
+#include "opt_private.h"
+#include "interface_private.h"
 #include "modules.h"
 
 /*----------------------------------------------------------------------------*/
@@ -542,8 +544,15 @@ test_interface(void)
 
     int2str(getpid(), buf, sizeof buf);
 
+    LNXPROC_OPT_T *opt = NULL;
+
+    lnxproc_opt_new(&opt);
+    lnxproc_opt_set_fileglob(opt, buf);
+
     lnxproc_new(&modules, 1);
-    lnxproc_set(modules, 0, LNXPROC_PROC_PID_STAT, buf, 1 + strlen(buf));
+    lnxproc_set(modules, 0, LNXPROC_PROC_PID_STAT, opt);
+    LNXPROC_OPT_FREE(opt);
+
     lnxproc_read(modules);
     lnxproc_read(modules);
     lnxproc_read(modules);
@@ -551,9 +560,12 @@ test_interface(void)
     lnxproc_iterate(modules, interface_func, "PID_STAT");
     LNXPROC_FREE(modules);
 
-    strlcpy(buf, "sd*", sizeof buf);
+    lnxproc_opt_new(&opt);
+    lnxproc_opt_set_fileglob(opt, "sd*");
     lnxproc_new(&modules, 1);
-    lnxproc_set(modules, 0, LNXPROC_SYS_DISKSECTORS, buf, 1 + strlen(buf));
+    lnxproc_set(modules, 0, LNXPROC_SYS_DISKSECTORS, opt);
+    LNXPROC_FREE(modules);
+
     lnxproc_read(modules);
     lnxproc_read(modules);
     lnxproc_read(modules);
@@ -563,7 +575,7 @@ test_interface(void)
 }
 
 /*----------------------------------------------------------------------------*/
-#define TEST_MODULE(type,buf,len) do {\
+#define TEST_MODULE(type,opt) do {\
     char errbuf[128]; \
     LNXPROC_MODULE_T *modules = NULL; \
     int ret = lnxproc_new(&modules, 1); \
@@ -571,7 +583,7 @@ test_interface(void)
         printf(#type " Error '%s'\n", lnxproc_strerror(ret, errbuf, sizeof errbuf)); \
     } \
     else { \
-        ret = lnxproc_set(modules, 0, (type), (buf), (len)); \
+        ret = lnxproc_set(modules, 0, (type), (opt)); \
         if( ret ) { \
             printf(#type " Error '%s'\n", lnxproc_strerror(ret, errbuf, sizeof errbuf)); \
         } \
@@ -589,13 +601,20 @@ test_interface(void)
     } \
 } while(0)
 
+#define TEST_GLOB_MODULE(type,glob) do {\
+    LNXPROC_OPT_T *opt = NULL; \
+    lnxproc_opt_new(&opt); \
+    lnxproc_opt_set_fileglob(opt,(glob)); \
+    TEST_MODULE(type,opt); \
+    LNXPROC_OPT_FREE(opt); \
+} while(0)
 /*----------------------------------------------------------------------------*/
 int
 main(int argc, char *argv[])
 {
-    char buf[16];
+    char pid[16];
 
-    int2str(getpid(), buf, sizeof buf);
+    int2str(getpid(), pid, sizeof pid);
 
     if (argc < 2) {
         test_error();
@@ -605,46 +624,47 @@ main(int argc, char *argv[])
         test_limits();
         test_array();
         test_interface();
-        TEST_MODULE(LNXPROC_PROC_BUDDYINFO, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_CGROUPS, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_CMDLINE, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_CPUINFO, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_DISKSTATS, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_DOMAINNAME, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_HOSTNAME, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_INTERRUPTS, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_LOADAVG, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_MEMINFO, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_MOUNTS, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_NET_DEV, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_NET_NETSTAT, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_NET_RPC_NFS, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_NET_RPC_NFSD, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_NET_SNMP, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_NET_SNMP6, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_NET_SOCKSTAT, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_OSRELEASE, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_PARTITIONS, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_PID_ENVIRON, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_PID_ENVIRON, buf, 1 + strlen(buf));
-        TEST_MODULE(LNXPROC_PROC_PID_IO, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_PID_IO, buf, 1 + strlen(buf));
-        TEST_MODULE(LNXPROC_PROC_PID_SMAPS, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_PID_SMAPS, buf, 1 + strlen(buf));
-        TEST_MODULE(LNXPROC_PROC_PID_STAT, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_PID_STAT, buf, 1 + strlen(buf));
-        TEST_MODULE(LNXPROC_PROC_PID_STATM, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_PID_STATM, buf, 1 + strlen(buf));
-        TEST_MODULE(LNXPROC_PROC_PID_STATUS, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_PID_STATUS, buf, 1 + strlen(buf));
-        TEST_MODULE(LNXPROC_PROC_SOFTIRQS, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_STAT, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_SYS_FS_FILE_NR, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_UPTIME, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_VMSTAT, NULL, 0);
-        TEST_MODULE(LNXPROC_SYS_CPUFREQ, NULL, 0);
-        TEST_MODULE(LNXPROC_SYS_DISKSECTORS, NULL, 0);
-        TEST_MODULE(LNXPROC_SYS_DISKSECTORS, "sd*", 4);
+        TEST_MODULE(LNXPROC_PROC_BUDDYINFO, NULL);
+        TEST_MODULE(LNXPROC_PROC_CGROUPS, NULL);
+        TEST_MODULE(LNXPROC_PROC_CMDLINE, NULL);
+        TEST_MODULE(LNXPROC_PROC_CPUINFO, NULL);
+        TEST_MODULE(LNXPROC_PROC_DISKSTATS, NULL);
+        TEST_MODULE(LNXPROC_PROC_DOMAINNAME, NULL);
+        TEST_MODULE(LNXPROC_PROC_HOSTNAME, NULL);
+        TEST_MODULE(LNXPROC_PROC_INTERRUPTS, NULL);
+        TEST_MODULE(LNXPROC_PROC_LOADAVG, NULL);
+        TEST_MODULE(LNXPROC_PROC_MEMINFO, NULL);
+        TEST_MODULE(LNXPROC_PROC_MOUNTS, NULL);
+        TEST_MODULE(LNXPROC_PROC_NET_DEV, NULL);
+        TEST_MODULE(LNXPROC_PROC_NET_NETSTAT, NULL);
+        TEST_MODULE(LNXPROC_PROC_NET_RPC_NFS, NULL);
+        TEST_MODULE(LNXPROC_PROC_NET_RPC_NFSD, NULL);
+        TEST_MODULE(LNXPROC_PROC_NET_SNMP, NULL);
+        TEST_MODULE(LNXPROC_PROC_NET_SNMP6, NULL);
+        TEST_MODULE(LNXPROC_PROC_NET_SOCKSTAT, NULL);
+        TEST_MODULE(LNXPROC_PROC_OSRELEASE, NULL);
+        TEST_MODULE(LNXPROC_PROC_PARTITIONS, NULL);
+        TEST_MODULE(LNXPROC_PROC_PID_ENVIRON, NULL);
+
+        TEST_GLOB_MODULE(LNXPROC_PROC_PID_ENVIRON, pid);
+        TEST_MODULE(LNXPROC_PROC_PID_IO, NULL);
+        TEST_GLOB_MODULE(LNXPROC_PROC_PID_IO, pid);
+        TEST_MODULE(LNXPROC_PROC_PID_SMAPS, NULL);
+        TEST_GLOB_MODULE(LNXPROC_PROC_PID_SMAPS, pid);
+        TEST_MODULE(LNXPROC_PROC_PID_STAT, NULL);
+        TEST_GLOB_MODULE(LNXPROC_PROC_PID_STAT, pid);
+        TEST_MODULE(LNXPROC_PROC_PID_STATM, NULL);
+        TEST_GLOB_MODULE(LNXPROC_PROC_PID_STATM, pid);
+        TEST_MODULE(LNXPROC_PROC_PID_STATUS, NULL);
+        TEST_GLOB_MODULE(LNXPROC_PROC_PID_STATUS, pid);
+        TEST_MODULE(LNXPROC_PROC_SOFTIRQS, NULL);
+        TEST_MODULE(LNXPROC_PROC_STAT, NULL);
+        TEST_MODULE(LNXPROC_PROC_SYS_FS_FILE_NR, NULL);
+        TEST_MODULE(LNXPROC_PROC_UPTIME, NULL);
+        TEST_MODULE(LNXPROC_PROC_VMSTAT, NULL);
+        TEST_MODULE(LNXPROC_SYS_CPUFREQ, NULL);
+        TEST_MODULE(LNXPROC_SYS_DISKSECTORS, NULL);
+        TEST_GLOB_MODULE(LNXPROC_SYS_DISKSECTORS, "sd*");
     }
     else if (!strcmp(argv[1], "util")) {
         test_util();
@@ -668,110 +688,111 @@ main(int argc, char *argv[])
         test_interface();
     }
     else if (!strcmp(argv[1], "proc_buddyinfo")) {
-        TEST_MODULE(LNXPROC_PROC_BUDDYINFO, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_BUDDYINFO, NULL);
     }
     else if (!strcmp(argv[1], "proc_cgroups")) {
-        TEST_MODULE(LNXPROC_PROC_CGROUPS, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_CGROUPS, NULL);
     }
     else if (!strcmp(argv[1], "proc_cmdline")) {
-        TEST_MODULE(LNXPROC_PROC_CMDLINE, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_CMDLINE, NULL);
     }
     else if (!strcmp(argv[1], "proc_cpuinfo")) {
-        TEST_MODULE(LNXPROC_PROC_CPUINFO, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_CPUINFO, NULL);
     }
     else if (!strcmp(argv[1], "proc_diskstats")) {
-        TEST_MODULE(LNXPROC_PROC_DISKSTATS, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_DISKSTATS, NULL);
     }
     else if (!strcmp(argv[1], "proc_domainname")) {
-        TEST_MODULE(LNXPROC_PROC_DOMAINNAME, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_DOMAINNAME, NULL);
     }
     else if (!strcmp(argv[1], "proc_hostname")) {
-        TEST_MODULE(LNXPROC_PROC_HOSTNAME, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_HOSTNAME, NULL);
     }
     else if (!strcmp(argv[1], "proc_interrupts")) {
-        TEST_MODULE(LNXPROC_PROC_INTERRUPTS, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_INTERRUPTS, NULL);
     }
     else if (!strcmp(argv[1], "proc_loadavg")) {
-        TEST_MODULE(LNXPROC_PROC_LOADAVG, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_LOADAVG, NULL);
     }
     else if (!strcmp(argv[1], "proc_meminfo")) {
-        TEST_MODULE(LNXPROC_PROC_MEMINFO, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_MEMINFO, NULL);
     }
     else if (!strcmp(argv[1], "proc_mounts")) {
-        TEST_MODULE(LNXPROC_PROC_MOUNTS, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_MOUNTS, NULL);
     }
     else if (!strcmp(argv[1], "proc_net_dev")) {
-        TEST_MODULE(LNXPROC_PROC_NET_DEV, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_NET_DEV, NULL);
     }
     else if (!strcmp(argv[1], "proc_net_netstat")) {
-        TEST_MODULE(LNXPROC_PROC_NET_NETSTAT, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_NET_NETSTAT, NULL);
     }
     else if (!strcmp(argv[1], "proc_net_rpc_nfs")) {
-        TEST_MODULE(LNXPROC_PROC_NET_RPC_NFS, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_NET_RPC_NFS, NULL);
     }
     else if (!strcmp(argv[1], "proc_net_rpc_nfsd")) {
-        TEST_MODULE(LNXPROC_PROC_NET_RPC_NFSD, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_NET_RPC_NFSD, NULL);
     }
     else if (!strcmp(argv[1], "proc_net_snmp")) {
-        TEST_MODULE(LNXPROC_PROC_NET_SNMP, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_NET_SNMP, NULL);
     }
     else if (!strcmp(argv[1], "proc_net_snmp6")) {
-        TEST_MODULE(LNXPROC_PROC_NET_SNMP6, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_NET_SNMP6, NULL);
     }
     else if (!strcmp(argv[1], "proc_net_sockstat")) {
-        TEST_MODULE(LNXPROC_PROC_NET_SOCKSTAT, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_NET_SOCKSTAT, NULL);
     }
     else if (!strcmp(argv[1], "proc_osrelease")) {
-        TEST_MODULE(LNXPROC_PROC_OSRELEASE, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_OSRELEASE, NULL);
     }
     else if (!strcmp(argv[1], "proc_partitions")) {
-        TEST_MODULE(LNXPROC_PROC_PARTITIONS, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_PARTITIONS, NULL);
     }
     else if (!strcmp(argv[1], "proc_pid_environ")) {
-        TEST_MODULE(LNXPROC_PROC_PID_ENVIRON, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_PID_ENVIRON, buf, 1 + strlen(buf));
+        TEST_MODULE(LNXPROC_PROC_PID_ENVIRON, NULL);
+        TEST_GLOB_MODULE(LNXPROC_PROC_PID_ENVIRON, pid);
     }
     else if (!strcmp(argv[1], "proc_pid_io")) {
-        TEST_MODULE(LNXPROC_PROC_PID_IO, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_PID_IO, buf, 1 + strlen(buf));
+        TEST_MODULE(LNXPROC_PROC_PID_IO, NULL);
+        TEST_GLOB_MODULE(LNXPROC_PROC_PID_IO, pid);
     }
     else if (!strcmp(argv[1], "proc_pid_smaps")) {
-        TEST_MODULE(LNXPROC_PROC_PID_SMAPS, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_PID_SMAPS, buf, 1 + strlen(buf));
+        TEST_MODULE(LNXPROC_PROC_PID_SMAPS, NULL);
+        TEST_GLOB_MODULE(LNXPROC_PROC_PID_SMAPS, pid);
     }
     else if (!strcmp(argv[1], "proc_pid_stat")) {
-        TEST_MODULE(LNXPROC_PROC_PID_STAT, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_PID_STAT, buf, 1 + strlen(buf));
+
+        TEST_MODULE(LNXPROC_PROC_PID_STAT, NULL);
+        TEST_GLOB_MODULE(LNXPROC_PROC_PID_STAT, pid);
     }
     else if (!strcmp(argv[1], "proc_pid_statm")) {
-        TEST_MODULE(LNXPROC_PROC_PID_STATM, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_PID_STATM, buf, 1 + strlen(buf));
+        TEST_MODULE(LNXPROC_PROC_PID_STATM, NULL);
+        TEST_GLOB_MODULE(LNXPROC_PROC_PID_STATM, pid);
     }
     else if (!strcmp(argv[1], "proc_pid_status")) {
-        TEST_MODULE(LNXPROC_PROC_PID_STATUS, NULL, 0);
-        TEST_MODULE(LNXPROC_PROC_PID_STATUS, buf, 1 + strlen(buf));
+        TEST_MODULE(LNXPROC_PROC_PID_STATUS, NULL);
+        TEST_GLOB_MODULE(LNXPROC_PROC_PID_STATUS, pid);
     }
     else if (!strcmp(argv[1], "proc_softirqs")) {
-        TEST_MODULE(LNXPROC_PROC_SOFTIRQS, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_SOFTIRQS, NULL);
     }
     else if (!strcmp(argv[1], "proc_stat")) {
-        TEST_MODULE(LNXPROC_PROC_STAT, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_STAT, NULL);
     }
     else if (!strcmp(argv[1], "proc_sys_fs_file_nr")) {
-        TEST_MODULE(LNXPROC_PROC_SYS_FS_FILE_NR, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_SYS_FS_FILE_NR, NULL);
     }
     else if (!strcmp(argv[1], "proc_uptime")) {
-        TEST_MODULE(LNXPROC_PROC_UPTIME, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_UPTIME, NULL);
     }
     else if (!strcmp(argv[1], "proc_vmstat")) {
-        TEST_MODULE(LNXPROC_PROC_VMSTAT, NULL, 0);
+        TEST_MODULE(LNXPROC_PROC_VMSTAT, NULL);
     }
     else if (!strcmp(argv[1], "sys_cpufreq")) {
-        TEST_MODULE(LNXPROC_SYS_CPUFREQ, NULL, 0);
+        TEST_MODULE(LNXPROC_SYS_CPUFREQ, NULL);
     }
     else if (!strcmp(argv[1], "sys_disksectors")) {
-        TEST_MODULE(LNXPROC_SYS_DISKSECTORS, NULL, 0);
-        TEST_MODULE(LNXPROC_SYS_DISKSECTORS, "sd*", 4);
+        TEST_MODULE(LNXPROC_SYS_DISKSECTORS, NULL);
+        TEST_GLOB_MODULE(LNXPROC_SYS_DISKSECTORS, "sd*");
     }
     return 0;
 }

@@ -27,7 +27,9 @@ This file is part of liblnxproc.
 #include "array_private.h"
 #include "limits_private.h"
 #include "results_private.h"
+#include "opt_private.h"
 #include "base_private.h"
+#include "modules.h"
 
 struct env_t {
     _LNXPROC_RESULTS_T *results;
@@ -69,7 +71,7 @@ sys_disksectors_normalize(_LNXPROC_BASE_T * base)
 }
 
 int
-_lnxproc_sys_disksectors_new(_LNXPROC_BASE_T ** base, void *optional)
+_lnxproc_sys_disksectors_new(_LNXPROC_BASE_T ** base, LNXPROC_OPT_T * optional)
 {
 
     _LNXPROC_LIMITS_T *limits = NULL;
@@ -92,8 +94,8 @@ _lnxproc_sys_disksectors_new(_LNXPROC_BASE_T ** base, void *optional)
     char *fileprefix = "/sys/block";
     char *fileglob;
 
-    if (optional) {
-        fileglob = optional;
+    if (optional && optional->fileglob) {
+        fileglob = optional->fileglob;
     }
     else {
         fileglob = "*";

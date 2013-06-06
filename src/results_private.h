@@ -81,7 +81,7 @@ struct _lnxproc_results_t {
 };
 typedef struct _lnxproc_results_t _LNXPROC_RESULTS_T;
 
-int _lnxproc_results_new(_LNXPROC_RESULTS_T ** newresults, char *tag);
+int _lnxproc_results_new(_LNXPROC_RESULTS_T ** resultsptr, char *tag);
 
 int _lnxproc_results_free(_LNXPROC_RESULTS_T ** resultsptr);
 void _lnxproc_results_release(void *arg);
@@ -96,6 +96,8 @@ int _lnxproc_results_init(_LNXPROC_RESULTS_T * results, size_t nentries);
 
 int _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results, char *key,
                            _LNXPROC_RESULTS_TABLE_T ** entry);
+int _lnxproc_results_last(_LNXPROC_RESULTS_T * results,
+                          _LNXPROC_RESULTS_TABLE_T ** entry);
 
 int _lnxproc_results_add_int(_LNXPROC_RESULTS_T * results,
                              const char *key, const int value);

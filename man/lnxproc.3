@@ -34,8 +34,7 @@ lnxproc \- interface to reading the /proc/ & /sys filesystems
 .BI "int lnxproc_set(LNXPROC_MODULE_T *" module , 
 .BI "                size_t " pos , 
 .BI "                LNXPROC_MODULE_TYPE_T " type , 
-.BI "                void *" optional , 
-.BI "                size_t " optlen "); "
+.BI "                LNXPROC_OPT_T *" optional "); "
 
 .BI "int lnxproc_free(LNXPROC_MODULE_T **" modulesptr ");"
 
@@ -72,10 +71,20 @@ lnxproc \- interface to reading the /proc/ & /sys filesystems
 .BI "                             char *" buf, 
 .BI "                             size_t " buflen ");"
 
+.BI "int lnxproc_opt_new(LNXPROC_OPT_T **" optptr ");"
+
+.BI "int lnxproc_opt_set_fileglob(LNXPROC_OPT_T *" optptr ,
+.BI "                             char *" fileglob ");"
+
+.BI "int lnxproc_opt_free(LNXPROC_OPT_T **" optptr ");"
+
+.BI "LNXPROC_OPT_FREE(" b ")"
+
 .fi
 .sp
 Compile and link with \fI\-llnxproc\fP.
 .SH DESCRIPTION
+.SS Main functions
 .P
 .BR lnxproc_new ()
 creates a module containing
@@ -179,85 +188,77 @@ reads the /proc/partitions file.
 reads the
 /proc/[1-9]*/environ
 files. 
-The 
-.B optional
-field is a glob pattern that can specify a subset of pids e.g. specifying
-.B '12345'
-will only return results for the pid 12345.
-.B optlen
-parameter must include the terminating NUL e.g. 
-.B 1 + strlen(optional)
-\.
+A different fileglob pattern can be specified by creating a
+.B LNXPROC_OPT_T 
+object and initialising the 
+.B fileglob
+field using the
+.B lnxproc_opt_set_fileglob()
+function.
+For example the following code will only retrieve data for 
+.B pid 12345
+:
+\&
+.nf
+
+        LNXPROC_OPT_T *opt = NULL;
+        lnxproc_opt_new(&opt);
+        lnxproc_opt_set_fileglob(opt,"12345");
+        lnxproc_new(&modules, 1);
+        lnxproc_set(modules, 0, LNXPROC_PROC_PID_STAT, opt);
+        LNXPROC_OPT_FREE(opt);
+
+.fi
 .TP
 .B LNXPROC_PROC_PID_IO
 reads the
 /proc/[1-9]*/io
 files. 
-The 
+See 
+.B PROC_PID_ENVIRON
+above for explanation of usage of the 
 .B optional
-field is a glob pattern that can specify a subset of pids e.g. specifying
-.B '12345'
-will only return results for the pid 12345.
-.B optlen
-parameter must include the terminating NUL e.g. 
-.B 1 + strlen(optional)
-\.
+argument.
 .TP
 .B LNXPROC_PROC_PID_SMAPS
 reads the
 /proc/[1-9]*/smaps
 files. 
-The 
+See 
+.B PROC_PID_ENVIRON
+above for explanation of usage of the 
 .B optional
-field is a glob pattern that can specify a subset of pids e.g. specifying
-.B '12345'
-will only return results for the pid 12345.
-.B optlen
-parameter must include the terminating NUL e.g. 
-.B 1 + strlen(optional)
-\.
+argument.
 .TP
 .B LNXPROC_PROC_PID_STAT
 reads the
 /proc/[1-9]*/stat
 files. 
-The 
+See 
+.B PROC_PID_ENVIRON
+above for explanation of usage of the 
 .B optional
-field is a glob pattern that can specify a subset of pids e.g. specifying
-.B '12345'
-will only return results for the pid 12345.
-.B optlen
-parameter must include the terminating NUL e.g. 
-.B 1 + strlen(optional)
-\.
+argument.
 .TP
 .B LNXPROC_PROC_PID_STATM
 reads the
 /proc/[1-9]*/statm
 files. 
-The 
+See 
+.B PROC_PID_ENVIRON
+above for explanation of usage of the 
 .B optional
-field is a glob pattern that can specify a subset of pids e.g. specifying
-.B '12345'
-will only return results for the pid 12345.
-.B optlen
-parameter must include the terminating NUL e.g. 
-.B 1 + strlen(optional)
-\.
+argument.
 .TP
 .B LNXPROC_PROC_PID_STATUS
 reads the
 /proc/[1-9]*/status
 files. 
-The 
+See 
+.B PROC_PID_ENVIRON
+above for explanation of usage of the 
 .B optional
-field is a glob pattern that can specify a subset of pids e.g. specifying
-.B '12345'
-will only return results for the pid 12345.
-.B optlen
-parameter must include the terminating NUL e.g. 
-.B 1 + strlen(optional)
-\.
+argument.
 .TP
 .B LNXPROC_PROC_SOFTIRQS
 reads the /proc/softirqs file.
@@ -285,15 +286,23 @@ reads the
 /sys/block/*/queue/hw_sector_size
 files. This call is memoized \- second and
 subsequent reads always return the same values.
-The 
+See 
+.B PROC_PID_ENVIRON
+above for explanation of usage of the 
 .B optional
-field is a glob pattern that can specify a subset of disks e.g. specifying
-.B 'sd*'
-will only return results for local hard disks. The
-.B optlen
-parameter must include the terminating NUL e.g. 
-.B 1 + strlen(optional)
-\.
+argument.
+.P
+.BR lnxproc_free()
+frees all allocated memory for
+.B modules
+and nullifies the 
+.B modules 
+pointer.
+.P
+.BR LNXPROC_FREE()
+macro version of
+.B lnxproc_free()
+.SS Actions
 .P
 .BR lnxproc_read()
 reads all files corresponding to all
@@ -308,24 +317,13 @@ may be slow as the internal buffers are
 to accommodate the data read. Also any time-derived values such as % usage
 and/or rates are only calculated from the second call onwards. 
 .P
-.BR lnxproc_free()
-frees all allocated memory for
-.B modules
-and nullifies the 
-.B modules 
-pointer
-.P
-.BR LNXPROC_FREE()
-macro version of
-.B lnxproc_free()
-.P
 .BR lnxproc_print()
 print to stdout all data collected on the last call to
 .B lnxproc_read()
 .P
 .BR lnxproc_performance()
 returns the time taken to read and process the data in read, map,
-normalize and hash phases and (optionally) the memory consumed.
+normalize and hash phases.
 .P
 .BR lnxproc_size()
 returns the memory consumed.
@@ -336,6 +334,42 @@ point found.
 .P
 .BR lnxproc_fetch()
 fetches the data for the specified module and key.
+.SS Optional parameter handling
+.P
+.BR lnxproc_opt_new()
+creates a new optional argument that can be passed to the
+.B lnxproc_set()
+function. The value of the first argument should normally be NULL in 
+order to create a new 
+.B LNXPROC_OPT_T 
+object. If not, a new reference is acquired (i.e. the reference count for
+.B opt
+will be incremented) . Viz:
+\&
+.nf
+
+        LNXPROC_OPT_T *opt = NULL; // is NULL to create new object
+        lnxproc_opt_new(&opt);
+        ...
+        LNXPROC_OPT_FREE(opt);
+
+.fi
+.P
+.BR lnxproc_set_fileglob()
+sets the the optional fileglob pattern.
+.P
+.BR lnxproc_opt_free()
+frees all allocated memory for the specified 
+.B LNXPROC_OPT_T
+object
+and nullifies the 
+.B opt 
+pointer.
+.P
+.BR LNXPROC_OPT_FREE()
+macro version of
+.B lnxproc_opt_free()
+.SS Error handling
 .P
 .BR lnxproc_strerror()
 formats any return values as a string.
@@ -371,9 +405,7 @@ at time of writing ) use file globbing.
 .TP
 .B LNXPROC_ERROR_BASE_GLOB_FAILURE
 The globbing expression matcher has failed and has returned no files matched.
-Only some modules (
-.B LNXPROC_SYS_DISKSECTORS & LNXPROC_PID_STAT
-at time of writing ) use file globbing.
+Only some modules use file globbing.
 .TP
 .B LNXPROC_ERROR_NOT_FOUND
 Requested group/key does not exist in the data read from the /proc and/or
@@ -492,31 +524,35 @@ main(int argc, char *argv[])
     LNXPROC_FREE(modules);
 
     lnxproc_new(&modules, 1); // only read /proc/cgroups
-    lnxproc_set(modules, 0, LNXPROC_PROC_CGROUPS, NULL, 0);
+    lnxproc_set(modules, 0, LNXPROC_PROC_CGROUPS, NULL);
     test_module(modules, "proc_cgroups");
     LNXPROC_FREE(modules);
 
     lnxproc_new(&modules, 2); // read /proc/groups and 
                               // /proc/diskstats simultaneously
-    lnxproc_set(modules, 0, LNXPROC_PROC_CGROUPS, NULL, 0);
-    lnxproc_set(modules, 1, LNXPROC_PROC_DISKSTATS, NULL, 0);
+    lnxproc_set(modules, 0, LNXPROC_PROC_CGROUPS, NULL);
+    lnxproc_set(modules, 1, LNXPROC_PROC_DISKSTATS, NULL);
     test_module(modules, "proc_diskstats");
     LNXPROC_FREE(modules);
 
     lnxproc_new(&modules, 1); // Domainname - the value is memoized
-    lnxproc_set(modules, 0, LNXPROC_PROC_DOMAINNAME, NULL, 0);
+    lnxproc_set(modules, 0, LNXPROC_PROC_DOMAINNAME, NULL);
     test_module(modules, "proc_domainname");
     LNXPROC_FREE(modules);
 
     lnxproc_new(&modules, 1); // Get sector size for every disk 
                               // memoized
-    lnxproc_set(modules, 0, LNXPROC_SYS_DISKSECTORS, NULL, 0);
+    lnxproc_set(modules, 0, LNXPROC_SYS_DISKSECTORS, NULL);
     test_module(modules, "sys_disksectors");
     LNXPROC_FREE(modules);
 
+    LNXPROC_OPT_T *opt = NULL;
+    lnxproc_opt_new(&opt);
+    lnxproc_opt_set_fileglob(opt,"sd*");
     lnxproc_new(&modules, 1); // get sector size for esata disks
-    lnxproc_set(modules, 0, LNXPROC_SYS_DISKSECTORS, "sd*", 4);
+    lnxproc_set(modules, 0, LNXPROC_SYS_DISKSECTORS, opt);
     test_module(modules, "sys_sd_disksectors");
+    LNXPROC_OPT_FREE(opt);
     LNXPROC_FREE(modules);
 
     lnxproc_new(&modules, 1); // Read /proc/<pid>/stat file for 
@@ -525,14 +561,19 @@ main(int argc, char *argv[])
     test_module(modules, "proc_pid_stat");
     LNXPROC_FREE(modules);
 
-    char buf[32];
+    char pid[32];
 
-    snprintf(buf, sizeof buf, "%d", getpid());
+    snprintf(pid, sizeof pid, "%d", getpid());
+    lnxproc_opt_new(&opt);
+    lnxproc_opt_set_fileglob(opt,pid);
     lnxproc_new(&modules, 1); // Read /proc/<pid>/stat file for 
                               // this process
-    lnxproc_set(modules, 0, LNXPROC_PROC_PID_STAT, buf, 1 + strlen(buf));
-    snprintf(buf, sizeof buf, "proc_%d_stat", getpid());
+    lnxproc_set(modules, 0, LNXPROC_PROC_PID_STAT, opt);
+    LNXPROC_OPT_FREE(opt);
+    char buf[32];
+    snprintf(buf, sizeof buf, "proc_%s_stat", pid);
     test_module(modules, buf);
+    LNXPROC_OPT_FREE(opt);
     LNXPROC_FREE(modules);
 
     return 0;

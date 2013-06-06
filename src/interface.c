@@ -25,6 +25,7 @@
 #include "strlcpy.h"
 #include "error_private.h"
 #include "base_private.h"
+#include "opt_private.h"
 #include "interface_private.h"
 #include "modules.h"
 
@@ -170,7 +171,10 @@ lnxproc_size(LNXPROC_MODULE_T * modules, size_t * size)
                 *size += s;
             }
             if (row->optional) {
-                *size += row->optlen;
+                *size += sizeof(*row->optional);
+                if (row->optional->fileglob) {
+                    *size += 1 + strlen(row->optional->fileglob);
+                }
             }
         }
     }
@@ -179,7 +183,7 @@ lnxproc_size(LNXPROC_MODULE_T * modules, size_t * size)
 
 int
 lnxproc_set(LNXPROC_MODULE_T * module, size_t pos,
-            LNXPROC_MODULE_TYPE_T type, void *optional, size_t optlen)
+            LNXPROC_MODULE_TYPE_T type, LNXPROC_OPT_T * optional)
 {
     if (!module) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Module");
@@ -200,10 +204,10 @@ lnxproc_set(LNXPROC_MODULE_T * module, size_t pos,
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
-    void *p = NULL;
+    LNXPROC_OPT_T *p = NULL;
 
-    if (optional && optlen > 0) {
-        p = memdup(optional, optlen);
+    if (optional) {
+        lnxproc_opt_new(&p);
 
         if (!p) {
             _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC,
@@ -211,13 +215,15 @@ lnxproc_set(LNXPROC_MODULE_T * module, size_t pos,
             return LNXPROC_ERROR_MALLOC;
         }
     }
-    DESTROY(row->optional);
-
+    if (row->optional) {
+        DESTROY(row->optional->fileglob);
+        DESTROY(row->optional);
+    }
     memcpy(row, mymodules + type - 1, sizeof(_LNXPROC_MODULE_ROW_T));
 
     if (p) {
         row->optional = p;
-        row->optlen = optlen;
+        lnxproc_opt_set_fileglob(row->optional, optional->fileglob);
     }
     return LNXPROC_OK;
 }
@@ -234,7 +240,7 @@ lnxproc_free(LNXPROC_MODULE_T ** modulesptr)
             _LNXPROC_MODULE_ROW_T *row = modules->row + i;
 
             _LNXPROC_BASE_FREE(row->base);
-            DESTROY(row->optional);
+            lnxproc_opt_free(&row->optional);
         }
         DESTROY(modules);
         *modulesptr = NULL;
