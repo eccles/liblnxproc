@@ -42,7 +42,9 @@ elif [ "${OPT}" = "nodbg" ]
 then
     if [ "${0}" = "./testing.sh" -a $# -eq 0 ]
     then
-        ${BIN} $* &>testoutput
+        ${BIN} $* &>testoutput.raw
+        sort testoutput.raw > testoutput
+        rm testoutput.raw
         diff testoutput testdata
     else
         ${BIN} $*
