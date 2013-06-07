@@ -561,6 +561,19 @@ test_interface(void)
     LNXPROC_FREE(modules);
 
     lnxproc_opt_new(&opt);
+    lnxproc_opt_set_master(opt, "chrome");
+    lnxproc_new(&modules, 1);
+    lnxproc_set(modules, 0, LNXPROC_PROC_PID_STAT, opt);
+    LNXPROC_OPT_FREE(opt);
+
+    lnxproc_read(modules);
+    lnxproc_read(modules);
+    lnxproc_read(modules);
+    lnxproc_print(modules);
+    lnxproc_iterate(modules, interface_func, "PID_STAT");
+    LNXPROC_FREE(modules);
+
+    lnxproc_opt_new(&opt);
     lnxproc_opt_set_fileglob(opt, "sd*");
     lnxproc_new(&modules, 1);
     lnxproc_set(modules, 0, LNXPROC_SYS_DISKSECTORS, opt);
@@ -605,6 +618,14 @@ test_interface(void)
     LNXPROC_OPT_T *opt = NULL; \
     lnxproc_opt_new(&opt); \
     lnxproc_opt_set_fileglob(opt,(glob)); \
+    TEST_MODULE(type,opt); \
+    LNXPROC_OPT_FREE(opt); \
+} while(0)
+
+#define TEST_MASTER_MODULE(type,task) do {\
+    LNXPROC_OPT_T *opt = NULL; \
+    lnxproc_opt_new(&opt); \
+    lnxproc_opt_set_master(opt,(task)); \
     TEST_MODULE(type,opt); \
     LNXPROC_OPT_FREE(opt); \
 } while(0)
@@ -653,6 +674,7 @@ main(int argc, char *argv[])
         TEST_GLOB_MODULE(LNXPROC_PROC_PID_SMAPS, pid);
         TEST_MODULE(LNXPROC_PROC_PID_STAT, NULL);
         TEST_GLOB_MODULE(LNXPROC_PROC_PID_STAT, pid);
+        TEST_MASTER_MODULE(LNXPROC_PROC_PID_STAT, "chrome");
         TEST_MODULE(LNXPROC_PROC_PID_STATM, NULL);
         TEST_GLOB_MODULE(LNXPROC_PROC_PID_STATM, pid);
         TEST_MODULE(LNXPROC_PROC_PID_STATUS, NULL);
@@ -763,6 +785,7 @@ main(int argc, char *argv[])
 
         TEST_MODULE(LNXPROC_PROC_PID_STAT, NULL);
         TEST_GLOB_MODULE(LNXPROC_PROC_PID_STAT, pid);
+        TEST_MASTER_MODULE(LNXPROC_PROC_PID_STAT, "chrome");
     }
     else if (!strcmp(argv[1], "proc_pid_statm")) {
         TEST_MODULE(LNXPROC_PROC_PID_STATM, NULL);

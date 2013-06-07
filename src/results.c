@@ -603,6 +603,22 @@ _lnxproc_results_add_long(_LNXPROC_RESULTS_T * results, const char *key,
 }
 
 int
+_lnxproc_results_add_unsigned_long(_LNXPROC_RESULTS_T * results,
+                                   const char *key, const unsigned long value)
+{
+    _LNXPROC_RESULTS_TABLE_T *tentry;
+    int ret = prepare_entry(results, key, &tentry);
+
+    if (ret) {
+        return ret;
+    }
+
+    tentry->valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_UNSIGNED_LONG;
+    tentry->value.ul = value;
+    return LNXPROC_OK;
+}
+
+int
 _lnxproc_results_iterate(_LNXPROC_RESULTS_T * results,
                          _LNXPROC_RESULTS_ITERATE_FUNC func, void *data)
 {

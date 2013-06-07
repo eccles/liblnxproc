@@ -109,7 +109,7 @@ Description::
 */
 
 #include <stdio.h>
-#include <stdlib.h>
+#include <stdlib.h>             //strtoul
 #include <string.h>
 
 #include "allocate.h"
@@ -123,6 +123,10 @@ Description::
 #include "modules.h"
 #include "uthash.h"
 
+/*-----------------------------------------------------------------------------
+ * list handlers - used to store lists of pid records
+ * that correspond to a particular parent or process group
+ */
 struct my_list_t {
     struct my_list_t *next;
     int value;
@@ -133,6 +137,39 @@ struct my_hash_t {
     UT_hash_handle hh;
 };
 
+static struct my_list_t *
+mylist_clear(struct my_list_t *mylist)
+{
+    _LNXPROC_DEBUG("FREE %p\n", mylist);
+    while (mylist) {
+        struct my_list_t *tmp = mylist->next;
+
+        _LNXPROC_DEBUG("FREE %p PID %d\n", mylist, mylist->value);
+        free(mylist);
+        mylist = tmp;
+    }
+    return NULL;
+}
+
+static struct my_list_t *
+mylist_add(struct my_list_t *mylist, int value)
+{
+    struct my_list_t *mlist = Allocate(NULL, sizeof(struct my_list_t));
+
+    if (!mlist)
+        return mylist;
+    mlist->value = value;
+    mlist->next = mylist;
+    mylist = mlist;
+    _LNXPROC_DEBUG("ADD %p VAL %d\n", mlist, mlist->value);
+    return mylist;
+}
+
+/*-----------------------------------------------------------------------------
+ * A hash of lists. The key to the hash is a parent pid or process group.
+ * Each entry has a list of pid records corresponding to the children of a 
+ * pid or member of a particular process group.
+ */
 static struct my_hash_t *
 myhash_clear(struct my_hash_t *myhash)
 {
@@ -142,16 +179,8 @@ myhash_clear(struct my_hash_t *myhash)
 
         HASH_ITER(hh, myhash, mhash, tmp) {
             _LNXPROC_DEBUG("FREE %p PGRP %d\n", mhash, mhash->key);
+            mhash->head = mylist_clear(mhash->head);
             HASH_DEL(myhash, mhash);
-            struct my_list_t *head = mhash->head;
-
-            while (head) {
-                struct my_list_t *tmp = head->next;
-
-                _LNXPROC_DEBUG("FREE %p PID %d\n", head, head->value);
-                free(head);
-                head = tmp;
-            }
             free(mhash);
         }
     }
@@ -173,53 +202,39 @@ myhash_add(struct my_hash_t *myhash, int key, int value)
         HASH_ADD(hh, myhash, key, sizeof(mhash->key), mhash);
     }
     if (mhash) {
-        struct my_list_t *mlist = Allocate(NULL, sizeof(struct my_list_t));
-
-        if (!mlist)
-            return myhash;
-        mlist->value = value;
-        mlist->next = mhash->head;
-        mhash->head = mlist;
-        _LNXPROC_DEBUG("ADD %p VAL %d\n", mlist, mlist->value);
+        mhash->head = mylist_add(mhash->head, value);
     }
     return myhash;
 }
 
-static int
-proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
-{
-    _LNXPROC_BASE_DATA_T *data = base->current;
-    _LNXPROC_RESULTS_T *results = data->results;
-    _LNXPROC_ARRAY_T *array = data->array;
+/*-----------------------------------------------------------------------------
+ * Column names for each file read corresponding to a particular pid
+ */
+static const char *colkey[] = {
+    "pid", "pid", "comm", "state", "ppid",
+    "pgrp", "session", "tty_nr", "tpgid",
+    "flags", "minflt", "cminflt", "majflt",
+    "cmajflt", "utime", "stime", "cutime",
+    "cstime", "priority", "nice", "num_threads",
+    "itrealvalue", "starttime", "vsize", "rss",
+    "rlim", "startcode", "endcode", "startstack",
+    "kstkesp", "kstkeip", "signal", "blocked",
+    "sigignore", "sigcatch", "wchan", "nswap",
+    "cnswap", "exit_signal", "processor",
+    "rt_priority", "policy", "delay_blkio_ticks",
+    "guest_time", "cguest_time"
+};
 
-    size_t nrows = array->vector->length;
-
-    _LNXPROC_DEBUG("Current data is %d at %p\n", data->id, data);
-    _LNXPROC_DEBUG("Current results is at %p\n", results);
-    _LNXPROC_DEBUG("Nrows %zd\n", nrows);
-    char ***values = (char ***) array->vector->values;
-
-    int i, j;
-
-    static const char *colkey[] = {
-        "pid", "pid", "comm", "state", "ppid",
-        "pgrp", "session", "tty_nr", "tpgid",
-        "flags", "minflt", "cminflt", "majflt",
-        "cmajflt", "utime", "stime", "cutime",
-        "cstime", "priority", "nice", "num_threads",
-        "itrealvalue", "starttime", "vsize", "rss",
-        "rlim", "startcode", "endcode", "startstack",
-        "kstkesp", "kstkeip", "signal", "blocked",
-        "sigignore", "sigcatch", "wchan", "nswap",
-        "cnswap", "exit_signal", "processor",
-        "rt_priority", "policy", "delay_blkio_ticks",
-        "guest_time", "cguest_time"
-    };
 #define NCOLKEYS (sizeof(colkey) / sizeof(colkey[0]))
 
+#define COMMCOL  2
 #define PPIDCOL  4
 #define PGRPCOL  5
 #define TPGIDCOL  8
+#define MINFLTCOL  10
+#define CMINFLTCOL  11
+#define MAJFLTCOL  12
+#define CMAJFLTCOL  13
 #define UTIMECOL  14
 #define STIMECOL  15
 #define CUTIMECOL 16
@@ -235,231 +250,464 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
 #define CGUEST_TIMECOL 43
 #define DELAY_BLKIO_TICKSCOL 44
 
-    _LNXPROC_RESULTS_TABLE_T *hash = NULL;
-
-    struct my_hash_t *pgrphash = NULL;
-    struct my_hash_t *ppidhash = NULL;
-
+/*-----------------------------------------------------------------------------
+ * structure containing all objects needed for process the pid data. 
+ * This structure is a portable stack that is passed as an argument to all
+ * functions that need it.
+ */
+struct process_t {
+    _LNXPROC_VECTOR_T *vector;
     char key[64];
+    int n1;
+    float tdiff;
+    _LNXPROC_RESULTS_T *presults;
+    _LNXPROC_RESULTS_T *results;
+    _LNXPROC_RESULTS_TABLE_T *hash;
+    struct my_hash_t *ppidhash;
+    struct my_hash_t *pgrphash;
+    struct my_list_t *pidlist;
+};
 
-    int n1 = 0;
+/*-----------------------------------------------------------------------------
+ * Process a pid record at record 'i'. Converts values found into appropriate
+ * forms and stores them in the results table. Also stores values that are
+ * needed for later post processing.
+ */
+static void
+process_pid(int i, struct process_t *process)
+{
+    _LNXPROC_VECTOR_T *vector = process->vector;
+    char ***values = (char ***) vector->values;
+    char *key = process->key;
+    size_t keysize = sizeof(process->key);
+    int n1 = process->n1;
 
-    STRLCAT(key, "/", n1, sizeof(key));
+    _LNXPROC_RESULTS_T *results = process->results;
+    _LNXPROC_RESULTS_TABLE_T *hash = process->hash;
 
-    _lnxproc_results_init(results, nrows);
-    for (i = 0; i < nrows; i++) {
-        char **value1 = (char **) values[i];
-        char *pidkey = value1[0];
+    char **value1 = (char **) values[i];
+    char *pidkey = value1[0];
 
-        if (!pidkey)
-            continue;
+    if (!pidkey)
+        return;
 
-        size_t ncols = array->vector->children[i]->length;
-        size_t ncols1 = ncols > NCOLKEYS ? NCOLKEYS : ncols;
+    size_t ncols = vector->children[i]->length;
+    size_t ncols1 = ncols > NCOLKEYS ? NCOLKEYS : ncols;
 
-        _LNXPROC_DEBUG("%d:first Rowkey value %s\n", i, pidkey);
-        int n2 = n1;
+    _LNXPROC_DEBUG("%d:first Rowkey value %s\n", i, pidkey);
+    int n2 = n1;
 
-        STRLCAT(key, pidkey, n2, sizeof(key));
-        STRLCAT(key, "/", n2, sizeof(key));
+    STRLCAT(key, pidkey, n2, keysize);
+    STRLCAT(key, "/", n2, keysize);
 /*
  * first 2 columns are pid which is the hashkey
  */
-        for (j = 2; j < ncols1; j++) {
-            char *val = value1[j];
+    int j;
 
-            if (!val)
+    for (j = 2; j < ncols1; j++) {
+        char *val = value1[j];
+
+        if (!val)
+            continue;
+
+        int n3 = n2;
+
+        STRLCAT(key, colkey[j], n3, keysize);
+
+        if ((j == VSIZECOL) || (j == RLIMCOL)) {
+            unsigned long value = strtoul(val, 0, 10) / 1024;
+
+            _LNXPROC_DEBUG("%d,%d:%s value %s ul %lu\n", i, j, key, val, value);
+            _lnxproc_results_add_unsigned_long(results, key, value);
+        }
+        else if ((j == RSSCOL) || (j == NSWAPCOL) || (j == CNSWAPCOL)) {
+            long value = atoi(val) * results->page_size;
+
+            _LNXPROC_DEBUG("%d,%d:%s value %s long %ld\n", i, j, key,
+                           val, value);
+            _lnxproc_results_add_long(results, key, value);
+        }
+        else if ((j == UTIMECOL) ||
+                 (j == STIMECOL) || (j == CUTIMECOL) || (j == CSTIMECOL)
+                 || (j == STARTTIMECOL)) {
+            float value = strtoul(val, 0, 10) * results->secs_per_jiffy;
+
+            _LNXPROC_DEBUG("%d,%d:%s value %s float %f\n", i, j, key,
+                           val, value);
+            _lnxproc_results_add_float(results, key, value);
+
+/*
+ * Store values so that usage (%) can be calculated.
+ */
+            _LNXPROC_RESULTS_TABLE_T *hentry =
+                Allocate(NULL, sizeof(_LNXPROC_RESULTS_TABLE_T));
+            if (!hentry)
                 continue;
+            strlcpy(hentry->key, key, sizeof hentry->key);
+            hentry->valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_FLOAT;
+            hentry->value.f = value;
+            _LNXPROC_DEBUG("%d,%d:Store %s = %f\n", i, j, hentry->key, value);
+            HASH_ADD(hh, hash, key, n3, hentry);
+        }
+        else if ((j == ITREALVALUECOL) ||
+                 (j == GUEST_TIMECOL) ||
+                 (j == CGUEST_TIMECOL) || (j == DELAY_BLKIO_TICKSCOL)) {
+            float value = strtoul(val, 0, 10) * results->secs_per_jiffy;
 
-            int n3 = n2;
+            _LNXPROC_DEBUG("%d,%d:%s value %s float %f\n", i, j, key,
+                           val, value);
+            _lnxproc_results_add_float(results, key, value);
 
-            STRLCAT(key, colkey[j], n3, sizeof(key));
+        }
+        else if ((j == MINFLTCOL) ||
+                 (j == CMINFLTCOL) || (j == MAJFLTCOL) || (j == CMAJFLTCOL)) {
+            unsigned long value = strtoul(val, 0, 10);
 
-            if ((j == VSIZECOL) || (j == RLIMCOL)) {
-                int value = atoi(val) / 1024;
-
-                _LNXPROC_DEBUG("%d,%d:%s value %s int %d\n", i, j, key,
-                               val, value);
-                _lnxproc_results_add_int(results, key, value);
-            }
-            else if ((j == RSSCOL) || (j == NSWAPCOL) || (j == CNSWAPCOL)) {
-                long value = atoi(val) * results->page_size;
-
-                _LNXPROC_DEBUG("%d,%d:%s value %s long %ld\n", i, j, key,
-                               val, value);
-                _lnxproc_results_add_long(results, key, value);
-            }
-            else if ((j == UTIMECOL) ||
-                     (j == STIMECOL) ||
-                     (j == CUTIMECOL) ||
-                     (j == CSTIMECOL) || (j == STARTTIMECOL)) {
-                float value = atoi(val) * results->secs_per_jiffy;
-
-                _LNXPROC_DEBUG("%d,%d:%s value %s float %f\n", i, j, key,
-                               val, value);
-                _lnxproc_results_add_float(results, key, value);
-
-                _LNXPROC_RESULTS_TABLE_T *hentry =
-                    Allocate(NULL, sizeof(_LNXPROC_RESULTS_TABLE_T));
-                if (!hentry)
-                    continue;
-                strlcpy(hentry->key, key, sizeof hentry->key);
-                hentry->valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_FLOAT;
-                hentry->value.f = value;
-                _LNXPROC_DEBUG("%d,%d:Store %s = %f\n", i, j, hentry->key,
-                               value);
-                HASH_ADD(hh, hash, key, n3, hentry);
-            }
-            else if ((j == ITREALVALUECOL) ||
-                     (j == GUEST_TIMECOL) ||
-                     (j == CGUEST_TIMECOL) || (j == DELAY_BLKIO_TICKSCOL)) {
-                float value = atoi(val) * results->secs_per_jiffy;
-
-                _LNXPROC_DEBUG("%d,%d:%s value %s float %f\n", i, j, key,
-                               val, value);
-                _lnxproc_results_add_float(results, key, value);
-
-            }
-            else if (j == PGRPCOL) {
-                int pgrp = atoi(val);
-
-                _LNXPROC_DEBUG("%d,%d:%s PGRP %s int %d\n", i, j, key, val,
-                               pgrp);
-                _lnxproc_results_add_int(results, key, pgrp);
-                pgrphash = myhash_add(pgrphash, pgrp, atoi(pidkey));
-            }
-            else if (j == PPIDCOL) {
-                int ppid = atoi(val);
-
-                _LNXPROC_DEBUG("%d,%d:%s PPID %s int %d\n", i, j, key, val,
-                               ppid);
-                _lnxproc_results_add_int(results, key, ppid);
-                ppidhash = myhash_add(ppidhash, ppid, atoi(pidkey));
-            }
-            else if (j == TPGIDCOL) {
-                _lnxproc_results_add_int(results, key, atoi(val));
-            }
-            else {
-                _lnxproc_results_add_stringref(results, key, val);
-            }
+            _lnxproc_results_add_unsigned_long(results, key, value);
+        }
+        else if ((j == TPGIDCOL) || (j == PPIDCOL) || (j == PPIDCOL)) {
+            _lnxproc_results_add_int(results, key, atoi(val));
+        }
+        else {
+            _lnxproc_results_add_stringref(results, key, val);
         }
     }
-/*
- * different pids may appear at different positions in the array - so we have to
- * remember the locations of each pid entry in order to calculate usage etc.
+    process->hash = hash;
+}
+
+/*-----------------------------------------------------------------------------
+ * Calculate rates (per second) and usage (%)
  */
-    _LNXPROC_BASE_DATA_T *pdata = base->previous;
-    _LNXPROC_RESULTS_T *presults = NULL;
+static void
+process_rates(int i, struct process_t *process)
+{
+    _LNXPROC_VECTOR_T *vector = process->vector;
+    char ***values = (char ***) vector->values;
+    char *key = process->key;
+    size_t keysize = sizeof(process->key);
+    int n1 = process->n1;
+    float tdiff = process->tdiff;
+    _LNXPROC_RESULTS_T *presults = process->presults;
+    _LNXPROC_RESULTS_T *results = process->results;
+    _LNXPROC_RESULTS_TABLE_T *hash = process->hash;
 
-    float tdiff = 0.0;
+    char **value1 = (char **) values[i];
+    char *pidkey = value1[0];
 
-    if (pdata && pdata->array) {
-        _lnxproc_base_timeval_diff(base, &tdiff);
-        presults = pdata->results;
-        _LNXPROC_DEBUG("Previous data is %d at %p\n", pdata->id, pdata);
-        _LNXPROC_DEBUG("Previous results is at %p\n", presults);
+    if (!pidkey)
+        return;
+
+    _LNXPROC_DEBUG("%d:second Rowkey value %s\n", i, pidkey);
+
+    int n2 = n1;
+
+    STRLCAT(key, pidkey, n2, keysize);
+    STRLCAT(key, "/", n2, keysize);
+
+    _LNXPROC_RESULTS_TABLE_T *startentry = NULL;
+
+    HASH_FIND_STR(hash, key, startentry);
+
+/*
+ * Ignore previous entries with a different starttime
+ */
+    if (startentry) {
+        _LNXPROC_DEBUG("%d:current starttime for %s is %f\n", i, pidkey,
+                       startentry->value.f);
+        _LNXPROC_RESULTS_TABLE_T *pentry = NULL;
+
+        int n3 = n2;
+
+        STRLCAT(key, colkey[STARTTIMECOL], n3, keysize);
+        int ret = _lnxproc_results_fetch(presults, key, &pentry);
+
+        if (ret)
+            return;
+
+        _LNXPROC_DEBUG("%d:previous starttime for %s is %f\n", i,
+                       pidkey, pentry->value.f);
+
+        if (pentry->value.f != startentry->value.f)
+            return;
     }
 
-    _LNXPROC_DEBUG("Time difference = %f secs\n", tdiff);
-    if (tdiff > 0.0) {
-        _LNXPROC_DEBUG("Current timestamp is %f\n",
-                       lnxproc_timeval_secs(&data->tv));
-        _LNXPROC_DEBUG("Previous timestamp is %f\n",
-                       lnxproc_timeval_secs(&pdata->tv));
+    int j;
+
+    for (j = UTIMECOL; j <= CSTIMECOL; j++) {
+        int n3 = n2;
+
+        STRLCAT(key, colkey[j], n3, keysize);
+
+        _LNXPROC_RESULTS_TABLE_T *pentry = NULL;
+
+        int ret = _lnxproc_results_fetch(presults, key, &pentry);
+
+        if (ret)
+            continue;
+
+        _LNXPROC_DEBUG("%d,%d:Prev value %s = %f\n", i, j, pentry->key,
+                       pentry->value.f);
+
+        _LNXPROC_RESULTS_TABLE_T *hentry = NULL;
+
+        HASH_FIND_STR(hash, key, hentry);
+        if (!hentry)
+            continue;
+
+        STRLCAT(key, "%", n3, keysize);
+
+        float value = ((hentry->value.f - pentry->value.f) * 100.0)
+            / tdiff;
+
+        if (value < 0.0) {
+            _LNXPROC_DEBUG("%d,%d:WARN Usage %s = %f\n", i, j, key, value);
+        }
+        else {
+            _LNXPROC_DEBUG("%d,%d:Usage %s = %f\n", i, j, key, value);
+        }
+
+        _lnxproc_results_add_float(results, key, value);
+    }
+}
+
+/*-----------------------------------------------------------------------------
+ * Process one pid record - this function is recursive so that the complete
+ * tree of processes that are children and lower generations are found.
+ * Also visit all processes that belong to the same process group.
+ * The second column of the raw data is tagged so that multiple occurrences of
+ * the same pid in the hash tables are avoided.
+ */
+static void
+pid_iterate(int i,
+            char donetag,
+            struct process_t *process, void (*func) (int, struct process_t *))
+{
+    char ***values = (char ***) process->vector->values;
+    struct my_hash_t *ppidhash = process->ppidhash;
+    struct my_hash_t *pgrphash = process->pgrphash;
+
+    char **value1 = (char **) values[i];
+
+/*
+ * avoid records that have already been processed
+ */
+    char *tag = value1[1];
+
+    if (!tag)
+        return;
+
+    if (tag[0] == donetag)
+        return;
+    tag[0] = donetag;
+
+/*
+ * Execute processing on this pid
+ */
+    func(i, process);
+
+    char *pidkey = value1[0];
+
+    if (!pidkey)
+        return;
+
+    int pid = atoi(pidkey);
+    struct my_hash_t *mhash;
+
+/*
+ * Recursively process all children
+ */
+    HASH_FIND_INT(ppidhash, &pid, mhash);
+    if (mhash) {
+        struct my_list_t *mlist = mhash->head;
+
+        while (mlist) {
+            pid_iterate(mlist->value, donetag, process, func);
+            mlist = mlist->next;
+        }
+    }
+
+/*
+ * Recursively process all processes that belong to the same process group
+ */
+    HASH_FIND_INT(pgrphash, &pid, mhash);
+    if (mhash) {
+        struct my_list_t *mlist = mhash->head;
+
+        while (mlist) {
+            pid_iterate(mlist->value, donetag, process, func);
+            mlist = mlist->next;
+        }
+    }
+}
+
+/*-----------------------------------------------------------------------------
+ * Process all pids found. IF master is set then only process pids that 
+ * have the same process groups and the same ancestors (parents, grandparents
+ * etc....).
+ * Otherwise process all pids.
+ */
+static void
+pids_iterate(char *master,
+             char donetag,
+             struct process_t *process, void (*func) (int, struct process_t *))
+{
+
+    if (master) {
+        struct my_list_t *pidlist = process->pidlist;
+        struct my_list_t *pid = NULL;
+
+        for (pid = pidlist; pid; pid = pid->next) {
+            pid_iterate(pid->value, donetag, process, func);
+        }
+    }
+    else {
+        size_t nrows = process->vector->length;
+        int i;
 
         for (i = 0; i < nrows; i++) {
-            char **value1 = (char **) values[i];
+            func(i, process);
+        }
+    }
+}
+
+/*-----------------------------------------------------------------------------
+ * Process the raw data returned by the rawread function for this module
+ */
+static int
+proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
+{
+
+    struct process_t process;
+
+    _LNXPROC_BASE_DATA_T *data = base->current;
+
+    process.results = data->results;
+    _LNXPROC_ARRAY_T *array = data->array;
+
+    process.vector = array->vector;
+    LNXPROC_OPT_T *opt = base->optional;
+
+    _LNXPROC_DEBUG("Optional %p\n", opt);
+    char *master = NULL;
+
+    if (opt && opt->master) {
+        master = opt->master;
+    }
+    _LNXPROC_DEBUG("Master task '%s'\n", master);
+
+    size_t nrows = process.vector->length;
+
+    _LNXPROC_DEBUG("Current data is %d at %p\n", data->id, data);
+    _LNXPROC_DEBUG("Current results is at %p\n", process.results);
+    _LNXPROC_DEBUG("Nrows %zd\n", nrows);
+    char ***values = (char ***) process.vector->values;
+
+    _LNXPROC_BASE_DATA_T *pdata = base->previous;
+
+    process.presults = NULL;
+
+    process.tdiff = 0.0;
+
+    int i;
+
+    process.hash = NULL;
+
+    process.pgrphash = NULL;
+    process.ppidhash = NULL;
+    process.pidlist = NULL;
+
+/*
+ * If master task is specified then build lists of process groups and trees
+ * of ancestors for each pid.
+ */
+    if (master) {
+        for (i = 0; i < nrows; i++) {
+            char **value1 = values[i];
             char *pidkey = value1[0];
 
             if (!pidkey)
                 continue;
 
-            _LNXPROC_DEBUG("%d:second Rowkey value %s\n", i, pidkey);
+            char *val = value1[PGRPCOL];
 
-            int n2 = n1;
+            if (!val)
+                continue;
 
-            STRLCAT(key, pidkey, n2, sizeof(key));
-            STRLCAT(key, "/", n2, sizeof(key));
+            int pgrp = atoi(val);
 
-            _LNXPROC_RESULTS_TABLE_T *startentry = NULL;
+            _LNXPROC_DEBUG("%d:PID %d PGRP %d\n", i, atoi(pidkey), pgrp);
+            process.pgrphash = myhash_add(process.pgrphash, pgrp, i);
 
-            HASH_FIND_STR(hash, key, startentry);
+            val = value1[PPIDCOL];
 
-/*
- * Ignore previous entries with a different starttime
- */
-            if (startentry) {
-                _LNXPROC_DEBUG("%d:current starttime for %s is %f\n", i, pidkey,
-                               startentry->value.f);
-                _LNXPROC_RESULTS_TABLE_T *pentry = NULL;
+            if (!val)
+                continue;
+            int ppid = atoi(val);
 
-                int n3 = n2;
+            _LNXPROC_DEBUG("%d:PID %d PPID %d\n", i, atoi(pidkey), ppid);
 
-                STRLCAT(key, colkey[STARTTIMECOL], n3, sizeof(key));
-                int ret = _lnxproc_results_fetch(presults, key, &pentry);
+            process.ppidhash = myhash_add(process.ppidhash, ppid, i);
 
-                if (ret)
-                    continue;
-
-                _LNXPROC_DEBUG("%d:previous starttime for %s is %f\n", i,
-                               pidkey, pentry->value.f);
-
-                if (pentry->value.f != startentry->value.f)
-                    continue;
-            }
-
-            for (j = UTIMECOL; j <= CSTIMECOL; j++) {
-                int n3 = n2;
-
-                STRLCAT(key, colkey[j], n3, sizeof(key));
-
-                _LNXPROC_RESULTS_TABLE_T *pentry = NULL;
-
-                int ret = _lnxproc_results_fetch(presults, key, &pentry);
-
-                if (ret)
-                    continue;
-
-                _LNXPROC_DEBUG("%d,%d:Prev value %s = %f\n", i, j, pentry->key,
-                               pentry->value.f);
-
-                _LNXPROC_RESULTS_TABLE_T *hentry = NULL;
-
-                HASH_FIND_STR(hash, key, hentry);
-                if (!hentry)
-                    continue;
-
-                STRLCAT(key, "%", n3, sizeof(key));
-
-                float value = ((hentry->value.f - pentry->value.f) * 100.0)
-                    / tdiff;
-
-                if (value < 0.0) {
-                    _LNXPROC_DEBUG("%d,%d:WARN Usage %s = %f\n", i, j,
-                                   key, value);
-                }
-                else {
-                    _LNXPROC_DEBUG("%d,%d:Usage %s = %f\n", i, j, key, value);
-                }
-
-                _lnxproc_results_add_float(results, key, value);
+            val = value1[COMMCOL];
+            if (!val)
+                continue;
+            if (ppid == 1 && !strcmp(master, val)) {
+                process.pidlist = mylist_add(process.pidlist, i);
+                _LNXPROC_DEBUG("MASTERPID %d at %d\n", atoi(pidkey), i);
             }
         }
     }
-    if (hash) {
+
+    process.n1 = 0;
+    STRLCAT(process.key, "/", process.n1, sizeof(process.key));
+
+/*
+ * Convert raw values into the appropriate form and store in results table
+ */
+    _lnxproc_results_init(process.results, nrows);
+    pids_iterate(master, '-', &process, process_pid);
+
+/*
+ * different pids may appear at different positions in the array - so we have to
+ * remember the locations of each pid entry in order to calculate usage etc.
+ */
+    if (pdata && pdata->array) {
+        _lnxproc_base_timeval_diff(base, &process.tdiff);
+        process.presults = pdata->results;
+        _LNXPROC_DEBUG("Previous data is %d at %p\n", pdata->id, pdata);
+        _LNXPROC_DEBUG("Previous results is at %p\n", process.presults);
+    }
+
+    _LNXPROC_DEBUG("Time difference = %f secs\n", process.tdiff);
+    if (process.tdiff > 0.0) {
+        _LNXPROC_DEBUG("Current timestamp is %f\n",
+                       lnxproc_timeval_secs(&data->tv));
+        _LNXPROC_DEBUG("Previous timestamp is %f\n",
+                       lnxproc_timeval_secs(&pdata->tv));
+
+        pids_iterate(master, '+', &process, process_rates);
+    }
+/*
+ * Clean up all memory allocated
+ */
+    if (process.hash) {
         _LNXPROC_RESULTS_TABLE_T *entry, *tmp;
 
-        HASH_ITER(hh, hash, entry, tmp) {
-            HASH_DEL(hash, entry);
+        HASH_ITER(hh, process.hash, entry, tmp) {
+            HASH_DEL(process.hash, entry);
             free(entry);
         }
     }
-    pgrphash = myhash_clear(pgrphash);
-    ppidhash = myhash_clear(ppidhash);
+    process.pidlist = mylist_clear(process.pidlist);
+    process.pgrphash = myhash_clear(process.pgrphash);
+    process.ppidhash = myhash_clear(process.ppidhash);
 
     return LNXPROC_OK;
 }
 
+/*-----------------------------------------------------------------------------
+ * Create this module 
+ */
 int
 _lnxproc_proc_pid_stat_new(_LNXPROC_BASE_T ** base, LNXPROC_OPT_T * optional)
 {
@@ -475,7 +723,7 @@ _lnxproc_proc_pid_stat_new(_LNXPROC_BASE_T ** base, LNXPROC_OPT_T * optional)
         _LNXPROC_LIMITS_FREE(limits);
         return ret;
     }
-    ret = _lnxproc_limits_set(limits, 1, 4, " ", 1);    /* column delimiters */
+    ret = _lnxproc_limits_set(limits, 1, 4, "() ", 3);  /* column delimiters */
     if (ret) {
         _LNXPROC_LIMITS_FREE(limits);
         return ret;
@@ -493,12 +741,15 @@ _lnxproc_proc_pid_stat_new(_LNXPROC_BASE_T ** base, LNXPROC_OPT_T * optional)
 
     char *filesuffix = "stat";
 
-    ret = _lnxproc_base_new(base, "proc_pid_stat", _LNXPROC_BASE_TYPE_PREVIOUS,
-                            NULL, proc_pid_stat_normalize, NULL, 256, limits);
+    ret =
+        _lnxproc_base_new(base, "proc_pid_stat",
+                          _LNXPROC_BASE_TYPE_PREVIOUS, NULL,
+                          proc_pid_stat_normalize, NULL, 256, limits);
     if (!ret) {
         _lnxproc_base_set_fileprefix(*base, fileprefix);
         _lnxproc_base_set_fileglob(*base, fileglob);
         _lnxproc_base_set_filesuffix(*base, filesuffix);
+        _lnxproc_base_set_optional(*base, optional);
     }
     _LNXPROC_LIMITS_FREE(limits);
     return ret;

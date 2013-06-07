@@ -103,11 +103,13 @@ int _lnxproc_results_add_int(_LNXPROC_RESULTS_T * results,
                              const char *key, const int value);
 int _lnxproc_results_add_long(_LNXPROC_RESULTS_T * results,
                               const char *key, const long value);
-int _lnxproc_results_add_float(_LNXPROC_RESULTS_T * results,
-                               const char *key, const float value);
-int _lnxproc_results_add_string(_LNXPROC_RESULTS_T * results,
-                                const char *key, const char *value,
-                                size_t valuelen);
+int _lnxproc_results_add_unsigned_long(_LNXPROC_RESULTS_T * results,
+                                       const char *key,
+                                       const unsigned long value);
+int _lnxproc_results_add_float(_LNXPROC_RESULTS_T * results, const char *key,
+                               const float value);
+int _lnxproc_results_add_string(_LNXPROC_RESULTS_T * results, const char *key,
+                                const char *value, size_t valuelen);
 
 int _lnxproc_results_add_stringref(_LNXPROC_RESULTS_T * results,
                                    const char *key, const char *value);

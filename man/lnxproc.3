@@ -76,6 +76,9 @@ lnxproc \- interface to reading the /proc/ & /sys filesystems
 .BI "int lnxproc_opt_set_fileglob(LNXPROC_OPT_T *" optptr ,
 .BI "                             char *" fileglob ");"
 
+.BI "int lnxproc_opt_set_master(LNXPROC_OPT_T *" optptr ,
+.BI "                             char *" master ");"
+
 .BI "int lnxproc_opt_free(LNXPROC_OPT_T **" optptr ");"
 
 .BI "LNXPROC_OPT_FREE(" b ")"
@@ -84,6 +87,72 @@ lnxproc \- interface to reading the /proc/ & /sys filesystems
 .sp
 Compile and link with \fI\-llnxproc\fP.
 .SH DESCRIPTION
+.SS Overview
+This library provides a means of reading the various files in the /proc and 
+/sys filesystems provided by 
+.B Linux.
+The library consists of individual modules , each module corresponding to a
+particular file or set of files. All structures in the library are opaque and
+require constructor functions to initialise. The design is similar to that of
+the
+.B pthreads
+library.
+.P
+The interface consists of contructing a 
+.B LNXPROC_MODULE_T
+object and then specifying the characteristics of this object by one or more
+calls to the
+.B lnxproc_set_*()
+functions. The module so constructed is then initialised by the
+.B lnxproc_init()
+function which creates all the necessary structures for subsequent reads.
+To read values, execute the
+.B lnxproc_read()
+function.
+.P
+Each module can have differing characteristics. Some modules are 
+.B memoized
+i.e. second and subsequent reads of the module always return the same value.
+.P 
+Some modules return derived parameters such as % usage and/or rates. These 
+modules store the values of the previous read. These derived values are only
+available from the second read onwards.
+.P
+The library will 'grow' internal structures to accommodate the amount of
+data read. Consequently the first read issued will be quite slow. In general
+memory is *not* freed unless the user explicitly calls the appropriate 
+function or macro.
+.P
+To minimise sampling skew, the code is written such that the read of data 
+occurs as quickly as possible with the minimal of processing. Subsequent 
+processing to calculate derived parameters and convert values into
+standard units occurs afterwards. Mostly all parameters are converted to 
+a consistent set of units \- time is in 
+.B float
+seconds, usage is in 
+.B float %
+, rates are per second, memory is in
+.B KiB.
+.P
+Additionally some modules take an optional parameter(s). These parameters are
+defined on a
+.B LNXPROC_OPT_T
+object and is initialised by means of calls to the functions
+.B lnxproc_opt_set*().
+The optional parameters are not used in all modules. For example one can 
+specify the optional parameter
+.B fileglob
+to restrict data collection to a subset of pids (or only one particular pid)
+for any of the
+.B PROC_PID_*
+modules. Alos one can specify the
+.B master
+optional parameter fo rthe
+.B PROC_PID_STAT
+module to only collect data for all processes that are children/grandchildren
+etc. of a particular process.
+.sp
+See the example code below for examples.
 .SS Main functions
 .P
 .BR lnxproc_new ()
@@ -204,6 +273,7 @@ For example the following code will only retrieve data for
         LNXPROC_OPT_T *opt = NULL;
         lnxproc_opt_new(&opt);
         lnxproc_opt_set_fileglob(opt,"12345");
+        LNXPROC_MODULE_T * modules = NULL;
         lnxproc_new(&modules, 1);
         lnxproc_set(modules, 0, LNXPROC_PROC_PID_STAT, opt);
         LNXPROC_OPT_FREE(opt);
@@ -357,6 +427,23 @@ will be incremented) . Viz:
 .P
 .BR lnxproc_set_fileglob()
 sets the the optional fileglob pattern.
+.P
+.BR lnxproc_set_master()
+sets the the optional master task name. 
+This option is only currently used for the 
+.B PROC_PID_STAT
+module.
+The
+.B PROC_PID_STAT
+module will only collect data on pids that are children or belong to the same
+process group as the specified master task. The master task must be a daemon
+(i.e. the 
+.B PPID
+of the master task is 1). All children, grandchildren etc.. are processed.
+All processes that have the same process group as any of the pids is also
+included.
+The master task is matched against the second field in the /proc/<pid>/stat
+file with the '(' and ')' characters removed.
 .P
 .BR lnxproc_opt_free()
 frees all allocated memory for the specified 
@@ -519,6 +606,7 @@ main(int argc, char *argv[])
 {
     /* NB Omit return values for clarity */
 
+    LNXPROC_MODULE_T * modules = NULL;
     lnxproc_new(&modules, 0); // load all modules
     test_module(modules, "All");
     LNXPROC_FREE(modules);
@@ -551,13 +639,13 @@ main(int argc, char *argv[])
     lnxproc_opt_set_fileglob(opt,"sd*");
     lnxproc_new(&modules, 1); // get sector size for esata disks
     lnxproc_set(modules, 0, LNXPROC_SYS_DISKSECTORS, opt);
-    test_module(modules, "sys_sd_disksectors");
     LNXPROC_OPT_FREE(opt);
+    test_module(modules, "sys_sd_disksectors");
     LNXPROC_FREE(modules);
 
     lnxproc_new(&modules, 1); // Read /proc/<pid>/stat file for 
                               // every process
-    lnxproc_set(modules, 0, LNXPROC_PROC_PID_STAT, NULL, 0);
+    lnxproc_set(modules, 0, LNXPROC_PROC_PID_STAT, NULL);
     test_module(modules, "proc_pid_stat");
     LNXPROC_FREE(modules);
 
@@ -570,10 +658,20 @@ main(int argc, char *argv[])
                               // this process
     lnxproc_set(modules, 0, LNXPROC_PROC_PID_STAT, opt);
     LNXPROC_OPT_FREE(opt);
+
     char buf[32];
     snprintf(buf, sizeof buf, "proc_%s_stat", pid);
     test_module(modules, buf);
+    LNXPROC_FREE(modules);
+
+    lnxproc_opt_new(&opt);
+    lnxproc_opt_set_master(opt,"chrome");
+    lnxproc_new(&modules, 1); // Read /proc/<pid>/stat file for 
+                              // all chrome processes
+    lnxproc_set(modules, 0, LNXPROC_PROC_PID_STAT, opt);
     LNXPROC_OPT_FREE(opt);
+
+    test_module(modules, "proc_chrome_stat");
     LNXPROC_FREE(modules);
 
     return 0;

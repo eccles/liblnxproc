@@ -175,6 +175,9 @@ lnxproc_size(LNXPROC_MODULE_T * modules, size_t * size)
                 if (row->optional->fileglob) {
                     *size += 1 + strlen(row->optional->fileglob);
                 }
+                if (row->optional->master) {
+                    *size += 1 + strlen(row->optional->master);
+                }
             }
         }
     }
@@ -204,26 +207,15 @@ lnxproc_set(LNXPROC_MODULE_T * module, size_t pos,
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
-    LNXPROC_OPT_T *p = NULL;
-
-    if (optional) {
-        lnxproc_opt_new(&p);
-
-        if (!p) {
-            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC,
-                                 "Module optional at %zd", pos);
-            return LNXPROC_ERROR_MALLOC;
-        }
-    }
     if (row->optional) {
-        DESTROY(row->optional->fileglob);
-        DESTROY(row->optional);
+        LNXPROC_OPT_FREE(row->optional);
     }
+
     memcpy(row, mymodules + type - 1, sizeof(_LNXPROC_MODULE_ROW_T));
 
-    if (p) {
-        row->optional = p;
-        lnxproc_opt_set_fileglob(row->optional, optional->fileglob);
+    if (optional) {
+        lnxproc_opt_new(&optional);
+        row->optional = optional;
     }
     return LNXPROC_OK;
 }

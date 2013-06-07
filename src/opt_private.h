@@ -27,6 +27,8 @@
 struct lnxproc_opt_t {
     char *fileglob;
     _LNXPROC_RESULTS_T *results;
+    char *master;
+    int pgrp;
 };
 
 int _lnxproc_opt_set_results(LNXPROC_OPT_T * opt, _LNXPROC_RESULTS_T * results);

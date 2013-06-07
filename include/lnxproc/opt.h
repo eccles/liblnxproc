@@ -30,6 +30,8 @@ extern "C" {
     int lnxproc_opt_new(LNXPROC_OPT_T ** optptr);
     int lnxproc_opt_free(LNXPROC_OPT_T ** optptr);
     int lnxproc_opt_set_fileglob(LNXPROC_OPT_T * opt, char *fileglob);
+    int lnxproc_opt_set_master(LNXPROC_OPT_T * opt, char *master);
+    int lnxproc_opt_set_pgrp(LNXPROC_OPT_T * opt, int pgrp);
 
 #define LNXPROC_OPT_FREE(b) lnxproc_opt_free(&b)
 

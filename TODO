@@ -2,7 +2,7 @@
 In no particular order:
 
     - autotools
-    - filter pid files based on task name or other chracteristics
+    - filter pid files based on pid or other characteristics
     - chain other files when filter is true.
 
 

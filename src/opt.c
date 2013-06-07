@@ -51,6 +51,7 @@ lnxproc_opt_release(void *arg)
 
         DESTROY(opt->fileglob);
         _LNXPROC_RESULTS_FREE(opt->results);
+        DESTROY(opt->master);
     }
 }
 
@@ -71,7 +72,32 @@ lnxproc_opt_set_fileglob(LNXPROC_OPT_T * opt, char *fileglob)
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
     DESTROY(opt->fileglob);
-    opt->fileglob = strdup(fileglob);
+    if (fileglob)
+        opt->fileglob = strdup(fileglob);
+    return LNXPROC_OK;
+}
+
+int
+lnxproc_opt_set_master(LNXPROC_OPT_T * opt, char *master)
+{
+    if (!opt) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Option");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+    DESTROY(opt->master);
+    if (master)
+        opt->master = strdup(master);
+    return LNXPROC_OK;
+}
+
+int
+lnxproc_opt_set_pgrp(LNXPROC_OPT_T * opt, int pgrp)
+{
+    if (!opt) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Option");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+    opt->pgrp = pgrp;
     return LNXPROC_OK;
 }
 
