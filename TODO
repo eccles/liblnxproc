@@ -2,7 +2,11 @@
 In no particular order:
 
     - autotools
-    - filter pid files based on pid or other characteristics
-    - chain other files when filter is true.
+    - modify print functions to optional fd with differing levels of detail
+    - python interface
+    - master task - uses curses to show values on terminal like top
+    - slave task - samples module at given rate and outputs somewhere
+    - slave tasks manager
+    - shared memory to monitor slave tasks
 
 
