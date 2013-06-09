@@ -42,7 +42,9 @@ lnxproc \- interface to reading the /proc/ & /sys filesystems
 
 .BI "int lnxproc_read(LNXPROC_MODULE_T *" modules ");"
 
-.BI "int lnxproc_print(LNXPROC_MODULE_T *" modules ");"
+.BI "int lnxproc_print(LNXPROC_MODULE_T *" modules ,
+.BI "                        int " fd ,
+.BI "                        LNXPROC_PRINT_T " print ");"
 
 .BI "int lnxproc_performance(LNXPROC_MODULE_T *" modules ,
 .BI "                        long *" rawread_time ,
@@ -396,8 +398,22 @@ to accommodate the data read. Also any time-derived values such as % usage
 and/or rates are only calculated from the second call onwards. 
 .P
 .BR lnxproc_print()
-print to stdout all data collected on the last call to
-.B lnxproc_read()
+print to 
+.B fd
+all data collected on the last call to
+.B lnxproc_read().
+The 
+.B print 
+option can have the following options:
+.TP
+.B LNXPROC_PRINT_ALL
+Prints out all info.
+.TP
+.B LNXPROC_PRINT_VALUES
+Prints out essential info.
+.TP
+.B LNXPROC_PRINT_JSON
+Prints data in JSON format.
 .P
 .BR lnxproc_performance()
 returns the time taken to read and process the data in read, map,

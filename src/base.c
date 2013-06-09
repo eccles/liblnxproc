@@ -31,6 +31,7 @@
 #include "memdup.h"
 #include "strlcpy.h"
 #include "util_private.h"
+#include "print_private.h"
 #include "error_private.h"
 #include "limits_private.h"
 #include "results_private.h"
@@ -95,7 +96,7 @@ _lnxproc_base_print(_LNXPROC_BASE_T * base)
         printf("Buflen %zd\n", data->buflen);
         printf("Nbytes %d\n", data->nbytes);
         _lnxproc_array_print(data->array, 0);
-        _lnxproc_results_print(data->results);
+        _lnxproc_results_print(data->results, STDOUT_FILENO, LNXPROC_PRINT_ALL);
 
         if (base->previous) {
             data = base->previous;
@@ -112,7 +113,8 @@ _lnxproc_base_print(_LNXPROC_BASE_T * base)
             printf("Previous Buflen %zd\n", data->buflen);
             printf("Previous Nbytes %d\n", data->nbytes);
             _lnxproc_array_print(data->array, 0);
-            _lnxproc_results_print(data->results);
+            _lnxproc_results_print(data->results, STDOUT_FILENO,
+                                   LNXPROC_PRINT_ALL);
         }
         return LNXPROC_OK;
     }

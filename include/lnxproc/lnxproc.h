@@ -23,6 +23,7 @@ This file is part of liblnxproc.
 
 #include <lnxproc/util.h>
 #include <lnxproc/error.h>
+#include <lnxproc/print.h>
 #include <lnxproc/opt.h>
 #include <lnxproc/interface.h>
 

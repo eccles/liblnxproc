@@ -25,6 +25,7 @@ This file is part of liblnxproc.
 #include "strlcpy.h"
 #include "val2str.h"
 #include "error_private.h"
+#include "print_private.h"
 #include "util_private.h"
 #include "vector_private.h"
 #include "limits_private.h"
@@ -72,7 +73,7 @@ test_results(void)
 
     _lnxproc_results_new(&results, "Test");
 
-    _lnxproc_results_print(results);
+    _lnxproc_results_print(results, STDOUT_FILENO, LNXPROC_PRINT_ALL);
     _LNXPROC_RESULTS_FREE(results);
 
 }
@@ -522,6 +523,8 @@ test_interface(void)
 
     char errbuf[64];
     char buf[32];
+    char *pbuf;
+
     LNXPROC_MODULE_T *modules = NULL;
 
     lnxproc_new(&modules, 0);
@@ -529,16 +532,17 @@ test_interface(void)
     lnxproc_read(modules);
     lnxproc_read(modules);
     int ret = lnxproc_fetch(modules, LNXPROC_PROC_CGROUPS, "hierarchy", buf,
-                            sizeof buf);
+                            sizeof buf, &pbuf);
 
-    printf("PROC_CGROUPS key '%s' value '%s' Error '%s'\n", "hierarchy", buf,
+    printf("PROC_CGROUPS key '%s' value '%s' Error '%s'\n", "hierarchy", pbuf,
            lnxproc_strerror(ret, errbuf, sizeof errbuf));
     ret =
         lnxproc_fetch(modules, LNXPROC_PROC_CGROUPS, "/cpuset/hierarchy", buf,
-                      sizeof buf);
+                      sizeof buf, &pbuf);
     printf("PROC_CGROUPS key '%s' value '%s' Error '%s'\n", "/cpuset/hierarchy",
-           buf, lnxproc_strerror(ret, errbuf, sizeof errbuf));
-    lnxproc_print(modules);
+           pbuf, lnxproc_strerror(ret, errbuf, sizeof errbuf));
+    lnxproc_print(modules, STDOUT_FILENO, LNXPROC_PRINT_ALL);
+    lnxproc_print(modules, STDOUT_FILENO, LNXPROC_PRINT_JSON);
     lnxproc_iterate(modules, interface_func, "All");
     LNXPROC_FREE(modules);
 
@@ -556,7 +560,8 @@ test_interface(void)
     lnxproc_read(modules);
     lnxproc_read(modules);
     lnxproc_read(modules);
-    lnxproc_print(modules);
+    lnxproc_print(modules, STDOUT_FILENO, LNXPROC_PRINT_ALL);
+    lnxproc_print(modules, STDOUT_FILENO, LNXPROC_PRINT_JSON);
     lnxproc_iterate(modules, interface_func, "PID_STAT");
     LNXPROC_FREE(modules);
 
@@ -569,7 +574,8 @@ test_interface(void)
     lnxproc_read(modules);
     lnxproc_read(modules);
     lnxproc_read(modules);
-    lnxproc_print(modules);
+    lnxproc_print(modules, STDOUT_FILENO, LNXPROC_PRINT_ALL);
+    lnxproc_print(modules, STDOUT_FILENO, LNXPROC_PRINT_JSON);
     lnxproc_iterate(modules, interface_func, "PID_STAT");
     LNXPROC_FREE(modules);
 
@@ -582,7 +588,8 @@ test_interface(void)
     lnxproc_read(modules);
     lnxproc_read(modules);
     lnxproc_read(modules);
-    lnxproc_print(modules);
+    lnxproc_print(modules, STDOUT_FILENO, LNXPROC_PRINT_ALL);
+    lnxproc_print(modules, STDOUT_FILENO, LNXPROC_PRINT_JSON);
     lnxproc_iterate(modules, interface_func, "SYS_DISKSECTORS");
     LNXPROC_FREE(modules);
 }
@@ -608,7 +615,8 @@ test_interface(void)
                     printf(#type " Error '%s'\n", lnxproc_strerror(ret, errbuf, sizeof errbuf)); \
                 } \
             } \
-            lnxproc_print(modules); \
+            lnxproc_print(modules,STDOUT_FILENO,LNXPROC_PRINT_ALL); \
+            lnxproc_print(modules,STDOUT_FILENO,LNXPROC_PRINT_JSON); \
         } \
         LNXPROC_FREE(modules); \
     } \

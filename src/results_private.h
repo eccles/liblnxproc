@@ -21,6 +21,8 @@
 #ifndef LIBLNXPROC_RESULTS_PRIVATE_H
 #define LIBLNXPROC_RESULTS_PRIVATE_H 1
 
+#include "print_private.h"
+
 #ifdef DEBUG
 #define HASH_DEBUG 1
 #endif
@@ -66,8 +68,8 @@ struct _lnxproc_results_table_t {
 };
 typedef struct _lnxproc_results_table_t _LNXPROC_RESULTS_TABLE_T;
 
-char *_lnxproc_results_table_valuestr(_LNXPROC_RESULTS_TABLE_T * entry,
-                                      char *buf, size_t len, int copy);
+int _lnxproc_results_table_valuestr(_LNXPROC_RESULTS_TABLE_T * entry,
+                                    char *buf, size_t len, char **res);
 
 struct _lnxproc_results_t {
     char *tag;
@@ -89,7 +91,8 @@ void _lnxproc_results_release(void *arg);
 #define _LNXPROC_RESULTS_FREE(r) _lnxproc_results_free(&r)
 
 int _lnxproc_results_size(_LNXPROC_RESULTS_T * results, size_t * size);
-int _lnxproc_results_print(_LNXPROC_RESULTS_T * results);
+int _lnxproc_results_print(_LNXPROC_RESULTS_T * results, int fd,
+                           LNXPROC_PRINT_T print);
 int _lnxproc_results_hash(_LNXPROC_RESULTS_T * results);
 
 int _lnxproc_results_init(_LNXPROC_RESULTS_T * results, size_t nentries);

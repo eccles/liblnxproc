@@ -89,7 +89,7 @@ test_module(LNXPROC_MODULE_T * modules, char *str)
             for (i = 0; i < 2; i++) {
                 lnxproc_read(modules);
             }
-            lnxproc_print(modules);
+            lnxproc_print(modules, STDOUT_FILENO, LNXPROC_PRINT_ALL);
         }
     }
 }
@@ -220,32 +220,20 @@ main(int argc, char *argv[])
         TEST_MODULE(LNXPROC_PROC_OSRELEASE);
         TEST_MODULE(LNXPROC_PROC_PARTITIONS);
         TEST_MODULE(LNXPROC_PROC_PID_ENVIRON);
-        if (testtype == 0) {
-            TEST_PID_MODULE(LNXPROC_PROC_PID_ENVIRON);
-        }
+        TEST_PID_MODULE(LNXPROC_PROC_PID_ENVIRON);
         TEST_MODULE(LNXPROC_PROC_PID_IO);
-        if (testtype == 0) {
-            TEST_PID_MODULE(LNXPROC_PROC_PID_IO);
-        }
+        TEST_PID_MODULE(LNXPROC_PROC_PID_IO);
         TEST_MODULE(LNXPROC_PROC_PID_SMAPS);
-        if (testtype == 0) {
-            TEST_PID_MODULE(LNXPROC_PROC_PID_SMAPS);
-        }
+        TEST_PID_MODULE(LNXPROC_PROC_PID_SMAPS);
         TEST_MODULE(LNXPROC_PROC_PID_STAT);
-        if (testtype == 0) {
-            TEST_PID_MODULE(LNXPROC_PROC_PID_STAT);
-        }
+        TEST_PID_MODULE(LNXPROC_PROC_PID_STAT);
         TEST_MASTER_MODULE(LNXPROC_PROC_PID_STAT, "chrome");
         TEST_MOD_MODULE(LNXPROC_PROC_PID_STAT, "chrome",
                         LNXPROC_PROC_PID_STATM);
         TEST_MODULE(LNXPROC_PROC_PID_STATM);
-        if (testtype == 0) {
-            TEST_PID_MODULE(LNXPROC_PROC_PID_STATM);
-        }
+        TEST_PID_MODULE(LNXPROC_PROC_PID_STATM);
         TEST_MODULE(LNXPROC_PROC_PID_STATUS);
-        if (testtype == 0) {
-            TEST_PID_MODULE(LNXPROC_PROC_PID_STATUS);
-        }
+        TEST_PID_MODULE(LNXPROC_PROC_PID_STATUS);
         TEST_MODULE(LNXPROC_PROC_SOFTIRQS);
         TEST_MODULE(LNXPROC_PROC_STAT);
         TEST_MODULE(LNXPROC_PROC_SYS_FS_FILE_NR);
@@ -318,42 +306,30 @@ main(int argc, char *argv[])
     }
     else if (!strcmp(argv[1], "proc_pid_environ")) {
         TEST_MODULE(LNXPROC_PROC_PID_ENVIRON);
-        if (testtype == 0) {
-            TEST_PID_MODULE(LNXPROC_PROC_PID_ENVIRON);
-        }
+        TEST_PID_MODULE(LNXPROC_PROC_PID_ENVIRON);
     }
     else if (!strcmp(argv[1], "proc_pid_io")) {
         TEST_MODULE(LNXPROC_PROC_PID_IO);
-        if (testtype == 0) {
-            TEST_PID_MODULE(LNXPROC_PROC_PID_IO);
-        }
+        TEST_PID_MODULE(LNXPROC_PROC_PID_IO);
     }
     else if (!strcmp(argv[1], "proc_pid_smaps")) {
         TEST_MODULE(LNXPROC_PROC_PID_SMAPS);
-        if (testtype == 0) {
-            TEST_PID_MODULE(LNXPROC_PROC_PID_SMAPS);
-        }
+        TEST_PID_MODULE(LNXPROC_PROC_PID_SMAPS);
     }
     else if (!strcmp(argv[1], "proc_pid_stat")) {
         TEST_MODULE(LNXPROC_PROC_PID_STAT);
-        if (testtype == 0) {
-            TEST_PID_MODULE(LNXPROC_PROC_PID_STAT);
-        }
+        TEST_PID_MODULE(LNXPROC_PROC_PID_STAT);
         TEST_MASTER_MODULE(LNXPROC_PROC_PID_STAT, "chrome");
         TEST_MOD_MODULE(LNXPROC_PROC_PID_STAT, "chrome",
                         LNXPROC_PROC_PID_STATM);
     }
     else if (!strcmp(argv[1], "proc_pid_statm")) {
         TEST_MODULE(LNXPROC_PROC_PID_STATM);
-        if (testtype == 0) {
-            TEST_PID_MODULE(LNXPROC_PROC_PID_STATM);
-        }
+        TEST_PID_MODULE(LNXPROC_PROC_PID_STATM);
     }
     else if (!strcmp(argv[1], "proc_pid_status")) {
         TEST_MODULE(LNXPROC_PROC_PID_STATUS);
-        if (testtype == 0) {
-            TEST_PID_MODULE(LNXPROC_PROC_PID_STATUS);
-        }
+        TEST_PID_MODULE(LNXPROC_PROC_PID_STATUS);
     }
     else if (!strcmp(argv[1], "proc_softirqs")) {
         TEST_MODULE(LNXPROC_PROC_SOFTIRQS);

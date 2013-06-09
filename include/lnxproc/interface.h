@@ -23,6 +23,7 @@
 
 #include <lnxproc/util.h>
 #include <lnxproc/error.h>
+#include <lnxproc/print.h>
 #include <lnxproc/opt.h>
 
 #ifdef __cplusplus
@@ -85,7 +86,8 @@ extern "C" {
 
     int lnxproc_read(LNXPROC_MODULE_T * modules);
 
-    int lnxproc_print(LNXPROC_MODULE_T * modules);
+    int lnxproc_print(LNXPROC_MODULE_T * modules, int fd,
+                      LNXPROC_PRINT_T print);
 
     int lnxproc_performance(LNXPROC_MODULE_T * modules,
                             long *rawread_time,
@@ -98,7 +100,7 @@ extern "C" {
                         LNXPROC_INTERFACE_METHOD func, void *data);
 
     int lnxproc_fetch(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type,
-                      char *key, char *value, size_t valuelen);
+                      char *key, char *value, size_t valuelen, char **pbuf);
 
 #ifdef __cplusplus
 }                               // extern "C"

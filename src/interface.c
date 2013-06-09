@@ -24,6 +24,7 @@
 #include "memdup.h"
 #include "strlcpy.h"
 #include "error_private.h"
+#include "print_private.h"
 #include "base_private.h"
 #include "opt_private.h"
 #include "interface_private.h"
@@ -430,10 +431,11 @@ results_iterate(_LNXPROC_RESULTS_T * results,
     struct interface_env_t *env = data;
     LNXPROC_INTERFACE_METHOD func = env->func;
     char buf[32];
+    char *pbuf;
 
-    char *ret = _lnxproc_results_table_valuestr(entry, buf, sizeof buf, 0);
+    _lnxproc_results_table_valuestr(entry, buf, sizeof buf, &pbuf);
 
-    func(results->tag, entry->key, ret, env->data);
+    func(results->tag, entry->key, pbuf, env->data);
     return LNXPROC_OK;
 }
 
@@ -476,7 +478,7 @@ lnxproc_iterate(LNXPROC_MODULE_T * modules, LNXPROC_INTERFACE_METHOD func,
 }
 
 int
-lnxproc_print(LNXPROC_MODULE_T * modules)
+lnxproc_print(LNXPROC_MODULE_T * modules, int fd, LNXPROC_PRINT_T print)
 {
     if (!modules) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Modules");
@@ -494,11 +496,11 @@ lnxproc_print(LNXPROC_MODULE_T * modules)
                 _LNXPROC_BASE_DATA_T *base_data = base->current;
 
                 if (base_data) {
-                    _lnxproc_results_print(base_data->results);
+                    _lnxproc_results_print(base_data->results, fd, print);
                 }
                 if (row->optional) {
                     if (row->optional->module) {
-                        lnxproc_print(row->optional->module);
+                        lnxproc_print(row->optional->module, fd, print);
                     }
                 }
             }
@@ -509,7 +511,7 @@ lnxproc_print(LNXPROC_MODULE_T * modules)
 
 int
 lnxproc_fetch(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type,
-              char *key, char *value, size_t valuelen)
+              char *key, char *value, size_t valuelen, char **pbuf)
 {
     if (!modules) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Modules");
@@ -537,14 +539,14 @@ lnxproc_fetch(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type,
                                                  &entry);
 
                     if (!ret) {
-                        _lnxproc_results_table_valuestr(entry, value,
-                                                        valuelen, 1);
+                        _lnxproc_results_table_valuestr(entry, value, valuelen,
+                                                        pbuf);
                         return LNXPROC_OK;
                     }
                 }
                 if (row->optional && row->optional->module) {
                     ret = lnxproc_fetch(row->optional->module, LNXPROC_ALL,
-                                        key, value, valuelen);
+                                        key, value, valuelen, pbuf);
                     if (!ret) {
                         return LNXPROC_OK;
                     }

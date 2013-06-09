@@ -27,79 +27,212 @@
 #include "error_private.h"
 #include "results_private.h"
 
-char *
+int
 _lnxproc_results_table_valuestr(_LNXPROC_RESULTS_TABLE_T * entry, char *buf,
-                                size_t len, int copy)
+                                size_t len, char **res)
 {
-    char *ret = buf;
+    int ret = 0;
 
-    if (entry) {
+    if (res && entry) {
         switch (entry->valuetype) {
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_INT:
-            int2str(entry->value.i, buf, len);
+            ret = int2str(entry->value.i, buf, len);
+            *res = buf;
             break;
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_UNSIGNEDINT:
-            unsigned2str(entry->value.ui, buf, len);
+            ret = unsigned2str(entry->value.ui, buf, len);
+            *res = buf;
             break;
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_LONG:
-            long2str(entry->value.ui, buf, len);
+            ret = long2str(entry->value.ui, buf, len);
+            *res = buf;
             break;
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_UNSIGNED_LONG:
-            unsignedlong2str(entry->value.ul, buf, len);
+            ret = unsignedlong2str(entry->value.ul, buf, len);
+            *res = buf;
             break;
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_FLOAT:
-            float2str(entry->value.f, buf, len);
+            ret = float2str(entry->value.f, buf, len);
+            *res = buf;
             break;
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_STR:
-            if (copy) {
-                if (buf)
-                    strlcpy(buf, entry->value.s, len);
-            }
-            else {
-                ret = entry->value.s;
-            }
+            //ret = strlcpy(buf, entry->value.s, len);
+            *res = entry->value.s;
+            ret = strlen(*res);
             break;
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_STRREF:
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_STRREFS:
-            if (copy) {
-                if (buf)
-                    strlcpy(buf, entry->value.sptr, len);
-            }
-            else {
-                ret = entry->value.sptr;
-            }
+            ret = strlcpy(buf, entry->value.sptr, len);
+            *res = entry->value.sptr;
+            ret = strlen(*res);
             break;
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_PTR:
-            ptr2str(entry->value.ptr, buf, len);
+            ret = ptr2str(entry->value.ptr, buf, len);
+            *res = buf;
             break;
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_NONE:
-            if (buf)
-                strlcpy(buf, "None", len);
+            ret = strlcpy(buf, "None", len);
+            *res = buf;
             break;
         default:
             _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "valuetype %d",
                                  entry->valuetype);
             buf[0] = '\0';
+            *res = buf;
+            ret = 1;
             break;
         }
     }
     return ret;
 }
 
+static ssize_t
+writec(int fd, const char c)
+{
+    ssize_t nw;
+
+    do {
+        nw = write(fd, &c, 1);
+        if (nw < 0)
+            break;
+    } while (nw < 1);
+    return nw;
+}
+
+static ssize_t
+writen(int fd, const void *ptr, size_t n)
+{
+    ssize_t nl = 0;
+    ssize_t nw;
+
+    while (nl < n) {
+        nw = write(fd, ptr + nl, n - nl);
+        if (nw < 0) {
+            if (nl == 0)
+                return -1;
+            return nl;
+        }
+        nl += nw;
+    }
+    return n;
+}
+
+static ssize_t
+writestring(int fd, const char *str)
+{
+    return writen(fd, str, strlen(str));
+}
+
+/*
+static ssize_t
+writefmt(int fd, char *fmt, ...) WARN_FORMAT(2, 3);
+{
+    return writen(fd,buf,len);
+}
+*/
+struct rprint_t {
+    char tag[32];
+    int fd;
+    int pid;
+    int offset;
+};
+
 static int
 internal_print_func(_LNXPROC_RESULTS_T * results,
                     _LNXPROC_RESULTS_TABLE_T * entry, void *data)
 {
+    struct rprint_t *rprint = data;
     char buf[64];
+    char *pbuf;
 
-    printf("%s %s Key %s(%zd) = %s\n", (char *) data, results->tag, entry->key,
-           entry->keylen, _lnxproc_results_table_valuestr(entry, buf,
-                                                          sizeof buf, 0));
+    writestring(rprint->fd, rprint->tag);
+    writec(rprint->fd, ' ');
+    writestring(rprint->fd, results->tag);
+    writestring(rprint->fd, " Key ");
+    writen(rprint->fd, entry->key, entry->keylen);
+    writec(rprint->fd, '(');
+    int n = sizet2str(entry->keylen, buf, sizeof buf);
+
+    writen(rprint->fd, buf, n);
+    writestring(rprint->fd, ") = ");
+
+    int buflen = _lnxproc_results_table_valuestr(entry, buf, sizeof buf, &pbuf);
+
+    writen(rprint->fd, pbuf, buflen);
+    writec(rprint->fd, '\n');
+
     return LNXPROC_OK;
 }
 
+static int
+internal_json_func(_LNXPROC_RESULTS_T * results,
+                   _LNXPROC_RESULTS_TABLE_T * entry, void *data)
+{
+    struct rprint_t *rprint = data;
+    char buf[64];
+
+    if (rprint->pid < 0) {
+        char sep = entry->key[0];
+        char *off = index(entry->key + 1, sep);
+
+        rprint->offset = off - entry->key + 1;
+        rprint->pid = atoi(entry->key + 1);
+        writen(rprint->fd, "        ", 8);
+        writec(rprint->fd, '"');
+        int n = int2str(rprint->pid, buf, sizeof buf);
+
+        writen(rprint->fd, buf, n);
+        writec(rprint->fd, '"');
+        writen(rprint->fd, " : {\n", 5);
+    }
+    else {
+        int pid = atoi(entry->key + 1);
+
+        if (pid != rprint->pid) {
+            char sep = entry->key[0];
+            char *off = index(entry->key + 1, sep);
+
+            rprint->offset = off - entry->key + 1;
+            rprint->pid = pid;
+            writen(rprint->fd, "        },\n", 11);
+            writen(rprint->fd, "        ", 8);
+            writec(rprint->fd, '"');
+            int n = int2str(rprint->pid, buf, sizeof buf);
+
+            writen(rprint->fd, buf, n);
+            writec(rprint->fd, '"');
+            writen(rprint->fd, " : {\n", 5);
+        }
+    }
+
+    writen(rprint->fd, "            ", 12);
+    writec(rprint->fd, '"');
+    writen(rprint->fd, entry->key + rprint->offset,
+           entry->keylen - rprint->offset);
+    writec(rprint->fd, '"');
+    writen(rprint->fd, " : ", 3);
+    writec(rprint->fd, '"');
+
+    char *pbuf;
+    int buflen = _lnxproc_results_table_valuestr(entry, buf, sizeof buf, &pbuf);
+
+    writen(rprint->fd, pbuf, buflen);
+    writec(rprint->fd, '"');
+    writec(rprint->fd, ',');
+    writec(rprint->fd, '\n');
+
+    return LNXPROC_OK;
+}
+
+static int
+rowcmp(_LNXPROC_RESULTS_TABLE_T * r1, _LNXPROC_RESULTS_TABLE_T * r2)
+{
+    return strcmp(r1->key, r2->key);
+}
+
 int
-_lnxproc_results_print(_LNXPROC_RESULTS_T * results)
+_lnxproc_results_print(_LNXPROC_RESULTS_T * results, int fd,
+                       LNXPROC_PRINT_T print)
 {
     _LNXPROC_DEBUG("Results %p\n", results);
 
@@ -108,26 +241,83 @@ _lnxproc_results_print(_LNXPROC_RESULTS_T * results)
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
-    printf("Tag = %s\n", results->tag);
-    printf("Jiffies per second = %ld\n", results->jiffies_per_sec);
-    printf("Seconds per jiffy = %f\n", results->secs_per_jiffy);
-    printf("Page size = %ld\n", results->page_size);
-    printf("Table size = %zd\n", results->size);
-    printf("Table length = %zd\n", results->length);
-    _LNXPROC_DEBUG("Hash = %p\n", results->hash);
-    char buf[32];
+    if (print == LNXPROC_PRINT_ALL) {
+        char buf[32];
 
-    if (results->hash) {
-        strlcpy(buf, "Hash", sizeof buf);
+        writestring(fd, "Tag = ");
+        writestring(fd, results->tag);
+        writec(fd, '\n');
+
+        writestring(fd, "Jiffies per second = ");
+        int n = long2str(results->jiffies_per_sec, buf, sizeof buf);
+
+        writen(fd, buf, n);
+        writec(fd, '\n');
+
+        writestring(fd, "Seconds per jiffy = ");
+        n = float2str(results->secs_per_jiffy, buf, sizeof buf);
+        writen(fd, buf, n);
+        writec(fd, '\n');
+
+        writestring(fd, "Page size = ");
+        n = long2str(results->page_size, buf, sizeof buf);
+        writen(fd, buf, n);
+        writec(fd, '\n');
+
+        writestring(fd, "Table size = ");
+        n = sizet2str(results->size, buf, sizeof buf);
+        writen(fd, buf, n);
+        writec(fd, '\n');
+
+        writestring(fd, "Table length = ");
+        n = sizet2str(results->length, buf, sizeof buf);
+        writen(fd, buf, n);
+        writec(fd, '\n');
+
+    }
+
+    _LNXPROC_DEBUG("Hash = %p\n", results->hash);
+
+    struct rprint_t rprint = {
+        .fd = fd,
+        .pid = -1,
+    };
+
+    if (print == LNXPROC_PRINT_ALL) {
+        if (results->hash) {
+            strlcpy(rprint.tag, "Hash", sizeof rprint.tag);
+            _LNXPROC_RESULTS_TABLE_T *entry, *tmp;
+
+            HASH_ITER(hh, results->hash, entry, tmp) {
+                internal_print_func(results, entry, &rprint);
+            }
+        }
+    }
+    int ret = LNXPROC_OK;;
+    if (print == LNXPROC_PRINT_JSON) {
+        if (!results->hash) {
+            _lnxproc_results_hash(results);
+        }
+        HASH_SORT(results->hash, rowcmp);
+        writen(fd, "{\n    ", 6);
+        writec(fd, '"');
+        writestring(fd, results->tag);
+        writec(fd, '"');
+        writen(fd, " : {\n", 5);
         _LNXPROC_RESULTS_TABLE_T *entry, *tmp;
 
         HASH_ITER(hh, results->hash, entry, tmp) {
-            internal_print_func(results, entry, buf);
+            internal_json_func(results, entry, &rprint);
         }
+        //ret = _lnxproc_results_iterate(results, internal_json_func, &rprint);
+        writen(fd, "\n        }\n    }\n}\n", 19);
     }
-    strlcpy(buf, "Line", sizeof buf);
-    return _lnxproc_results_iterate(results, internal_print_func, buf);
+    else {
+        strlcpy(rprint.tag, "Line", sizeof rprint.tag);
 
+        ret = _lnxproc_results_iterate(results, internal_print_func, &rprint);
+    }
+    return ret;
 }
 
 int
@@ -316,15 +506,13 @@ _lnxproc_results_hash(_LNXPROC_RESULTS_T * results)
 
         _LNXPROC_DEBUG("Table %p\n", table);
         if (table) {
-            if (results->length > 10) {
-                int i;
+            int i;
 
-                for (i = 0; i < results->length; i++) {
-                    _LNXPROC_RESULTS_TABLE_T *entry = table + i;
+            for (i = 0; i < results->length; i++) {
+                _LNXPROC_RESULTS_TABLE_T *entry = table + i;
 
-                    _LNXPROC_DEBUG("%d key %s\n", i, entry->key);
-                    HASH_ADD(hh, results->hash, key, entry->keylen, entry);
-                }
+                _LNXPROC_DEBUG("%d key %s\n", i, entry->key);
+                HASH_ADD(hh, results->hash, key, entry->keylen, entry);
             }
         }
     }
@@ -397,10 +585,10 @@ _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results, char *key,
         *entry = tentry;
 #ifdef DEBUG
         char buf[64];
+        char *pbuf;
 
-        _LNXPROC_DEBUG("Value %s\n",
-                       _lnxproc_results_table_valuestr(tentry, buf, sizeof buf,
-                                                       0));
+        _lnxproc_results_table_valuestr(tentry, buf, sizeof buf, &pbuf);
+        _LNXPROC_DEBUG("Value %s\n", pbuf);
 #endif
         return LNXPROC_OK;
     }
@@ -418,10 +606,11 @@ _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results, char *key,
                 *entry = tentry;
 #ifdef DEBUG
                 char buf[64];
+                char *pbuf;
 
-                _LNXPROC_DEBUG("Value %s\n",
-                               _lnxproc_results_table_valuestr(tentry, buf,
-                                                               sizeof buf, 0));
+                _lnxproc_results_table_valuestr(tentry, buf, sizeof buf, &pbuf);
+
+                _LNXPROC_DEBUG("Value %s\n", pbuf);
 #endif
                 return LNXPROC_OK;
             }

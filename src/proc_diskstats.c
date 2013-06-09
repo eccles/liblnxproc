@@ -110,10 +110,11 @@ derived_values(int i, int j, _LNXPROC_RESULTS_T * results,
 
 #ifdef DEBUG
         char buf[64];
+        char *pbuf;
 
-        _LNXPROC_DEBUG("%d,%d:Prev %s = %s\n", i, j, pkey,
-                       _lnxproc_results_table_valuestr(pentry, buf,
-                                                       sizeof buf, 0));
+        _lnxproc_results_table_valuestr(pentry, buf, sizeof buf, &pbuf);
+
+        _LNXPROC_DEBUG("%d,%d:Prev %s = %s\n", i, j, pkey, pbuf);
 #endif
         STRLCAT(pkey, "-s", offset, plen);
         _LNXPROC_DEBUG("pKey %1$p '%1$s'\n", pkey);
