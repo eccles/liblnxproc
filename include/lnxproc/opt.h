@@ -33,6 +33,9 @@ extern "C" {
     int lnxproc_opt_set_master(LNXPROC_OPT_T * opt, char *master);
     int lnxproc_opt_set_pgrp(LNXPROC_OPT_T * opt, int pgrp);
 
+    typedef struct lnxproc_module_t LNXPROC_MODULE_T;
+    int lnxproc_opt_set_module(LNXPROC_OPT_T * opt, LNXPROC_MODULE_T * module);
+
 #define LNXPROC_OPT_FREE(b) lnxproc_opt_free(&b)
 
 #ifdef __cplusplus

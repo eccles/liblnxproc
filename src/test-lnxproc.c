@@ -618,6 +618,7 @@ test_interface(void)
     LNXPROC_OPT_T *opt = NULL; \
     lnxproc_opt_new(&opt); \
     lnxproc_opt_set_fileglob(opt,(glob)); \
+\
     TEST_MODULE(type,opt); \
     LNXPROC_OPT_FREE(opt); \
 } while(0)
@@ -626,6 +627,22 @@ test_interface(void)
     LNXPROC_OPT_T *opt = NULL; \
     lnxproc_opt_new(&opt); \
     lnxproc_opt_set_master(opt,(task)); \
+\
+    TEST_MODULE(type,opt); \
+    LNXPROC_OPT_FREE(opt); \
+} while(0)
+
+#define TEST_MOD_MODULE(type,task,subtype) do {\
+    LNXPROC_MODULE_T *sub = NULL; \
+    lnxproc_new(&sub, 1); \
+    lnxproc_set(sub, 0, (subtype), NULL); \
+\
+    LNXPROC_OPT_T *opt = NULL; \
+    lnxproc_opt_new(&opt); \
+    lnxproc_opt_set_module(opt,sub); \
+    lnxproc_opt_set_master(opt,(task)); \
+    LNXPROC_FREE(sub); \
+\
     TEST_MODULE(type,opt); \
     LNXPROC_OPT_FREE(opt); \
 } while(0)
@@ -675,6 +692,8 @@ main(int argc, char *argv[])
         TEST_MODULE(LNXPROC_PROC_PID_STAT, NULL);
         TEST_GLOB_MODULE(LNXPROC_PROC_PID_STAT, pid);
         TEST_MASTER_MODULE(LNXPROC_PROC_PID_STAT, "chrome");
+        TEST_MOD_MODULE(LNXPROC_PROC_PID_STAT, "chrome",
+                        LNXPROC_PROC_PID_STATM);
         TEST_MODULE(LNXPROC_PROC_PID_STATM, NULL);
         TEST_GLOB_MODULE(LNXPROC_PROC_PID_STATM, pid);
         TEST_MODULE(LNXPROC_PROC_PID_STATUS, NULL);
@@ -786,6 +805,8 @@ main(int argc, char *argv[])
         TEST_MODULE(LNXPROC_PROC_PID_STAT, NULL);
         TEST_GLOB_MODULE(LNXPROC_PROC_PID_STAT, pid);
         TEST_MASTER_MODULE(LNXPROC_PROC_PID_STAT, "chrome");
+        TEST_MOD_MODULE(LNXPROC_PROC_PID_STAT, "chrome",
+                        LNXPROC_PROC_PID_STATM);
     }
     else if (!strcmp(argv[1], "proc_pid_statm")) {
         TEST_MODULE(LNXPROC_PROC_PID_STATM, NULL);

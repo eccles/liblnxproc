@@ -24,6 +24,7 @@
 #include "reference.h"
 #include "error_private.h"
 #include "opt_private.h"
+#include "interface_private.h"
 
 int
 lnxproc_opt_new(LNXPROC_OPT_T ** optptr)
@@ -52,6 +53,7 @@ lnxproc_opt_release(void *arg)
         DESTROY(opt->fileglob);
         _LNXPROC_RESULTS_FREE(opt->results);
         DESTROY(opt->master);
+        LNXPROC_FREE(opt->module);
     }
 }
 
@@ -87,6 +89,21 @@ lnxproc_opt_set_master(LNXPROC_OPT_T * opt, char *master)
     DESTROY(opt->master);
     if (master)
         opt->master = strdup(master);
+    return LNXPROC_OK;
+}
+
+int
+lnxproc_opt_set_module(LNXPROC_OPT_T * opt, LNXPROC_MODULE_T * module)
+{
+    if (!opt) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Option");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+    LNXPROC_FREE(opt->module);
+    if (module) {
+        lnxproc_new(&module, module->nmodules);
+        opt->module = module;
+    }
     return LNXPROC_OK;
 }
 

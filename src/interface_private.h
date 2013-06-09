@@ -22,7 +22,7 @@
 #define LIBLNXPROC_INTERFACE_PRIVATE_H 1
 
 #include "base_private.h"
-#include "opt_private.h"
+#include <lnxproc/opt.h>
 #include <lnxproc/interface.h>
 
 typedef int (*_LNXPROC_METHOD) (_LNXPROC_BASE_T ** base,
@@ -40,6 +40,9 @@ struct lnxproc_module_t {
     size_t nmodules;
     _LNXPROC_MODULE_ROW_T row[];
 };
+
+int _lnxproc_create(LNXPROC_MODULE_T * modules);
+int _lnxproc_set_fileglob(LNXPROC_MODULE_T * modules, char *fileglob);
 
 #endif                          // LIBLNXPROC_INTERFACE_PRIVATE_H
 /*

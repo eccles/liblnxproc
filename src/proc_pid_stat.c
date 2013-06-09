@@ -131,11 +131,6 @@ struct my_list_t {
     struct my_list_t *next;
     int value;
 };
-struct my_hash_t {
-    int key;
-    struct my_list_t *head;
-    UT_hash_handle hh;
-};
 
 static struct my_list_t *
 mylist_clear(struct my_list_t *mylist)
@@ -165,11 +160,50 @@ mylist_add(struct my_list_t *mylist, int value)
     return mylist;
 }
 
+struct my_pidlist_t {
+    struct my_pidlist_t *next;
+    char *value;
+};
+
+static struct my_pidlist_t *
+mypidlist_clear(struct my_pidlist_t *mypidlist)
+{
+    _LNXPROC_DEBUG("FREE %p\n", mypidlist);
+    while (mypidlist) {
+        struct my_pidlist_t *tmp = mypidlist->next;
+
+        _LNXPROC_DEBUG("FREE %p PID %s\n", mypidlist, mypidlist->value);
+        free(mypidlist);
+        mypidlist = tmp;
+    }
+    return NULL;
+}
+
+static struct my_pidlist_t *
+mypidlist_add(struct my_pidlist_t *mypidlist, char *value)
+{
+    struct my_pidlist_t *mpidlist = Allocate(NULL, sizeof(struct my_pidlist_t));
+
+    if (!mpidlist)
+        return mypidlist;
+    mpidlist->value = value;
+    mpidlist->next = mypidlist;
+    mypidlist = mpidlist;
+    _LNXPROC_DEBUG("ADD %p VAL %s\n", mpidlist, mpidlist->value);
+    return mypidlist;
+}
+
 /*-----------------------------------------------------------------------------
  * A hash of lists. The key to the hash is a parent pid or process group.
  * Each entry has a list of pid records corresponding to the children of a 
  * pid or member of a particular process group.
  */
+struct my_hash_t {
+    int key;
+    struct my_list_t *head;
+    UT_hash_handle hh;
+};
+
 static struct my_hash_t *
 myhash_clear(struct my_hash_t *myhash)
 {
@@ -266,6 +300,7 @@ struct process_t {
     struct my_hash_t *ppidhash;
     struct my_hash_t *pgrphash;
     struct my_list_t *pidlist;
+    struct my_pidlist_t *allpidlist;
 };
 
 /*-----------------------------------------------------------------------------
@@ -290,6 +325,8 @@ process_pid(int i, struct process_t *process)
 
     if (!pidkey)
         return;
+
+    process->allpidlist = mypidlist_add(process->allpidlist, pidkey);
 
     size_t ncols = vector->children[i]->length;
     size_t ncols1 = ncols > NCOLKEYS ? NCOLKEYS : ncols;
@@ -589,11 +626,17 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
 
     _LNXPROC_DEBUG("Optional %p\n", opt);
     char *master = NULL;
+    LNXPROC_MODULE_T *sub = NULL;
 
-    if (opt && opt->master) {
-        master = opt->master;
+    if (opt) {
+        if (opt->master) {
+            master = opt->master;
+            if (opt->module)
+                sub = opt->module;
+        }
     }
     _LNXPROC_DEBUG("Master task '%s'\n", master);
+    _LNXPROC_DEBUG("Sub %p\n", sub);
 
     size_t nrows = process.vector->length;
 
@@ -615,6 +658,7 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
     process.pgrphash = NULL;
     process.ppidhash = NULL;
     process.pidlist = NULL;
+    process.allpidlist = NULL;
 
 /*
  * If master task is specified then build lists of process groups and trees
@@ -668,6 +712,28 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
     pids_iterate(master, '-', &process, process_pid);
 
 /*
+ * Construct new glob pattern
+ */
+    if (sub) {
+        char fileglob[1024];
+        struct my_pidlist_t *mpidlist = process.allpidlist;
+
+        int n = 0;
+
+        STRLCAT(fileglob, "{", n, sizeof fileglob);
+        while (mpidlist) {
+            STRLCAT(fileglob, mpidlist->value, n, sizeof fileglob);
+            STRLCAT(fileglob, ",", n, sizeof fileglob);
+            mpidlist = mpidlist->next;
+        }
+        n--;
+        STRLCAT(fileglob, "}", n, sizeof fileglob);
+        _LNXPROC_DEBUG("New fileglob '%s'\n", fileglob);
+        _lnxproc_set_fileglob(sub, fileglob);
+        lnxproc_read(sub);
+    }
+
+/*
  * different pids may appear at different positions in the array - so we have to
  * remember the locations of each pid entry in order to calculate usage etc.
  */
@@ -698,6 +764,7 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
             free(entry);
         }
     }
+    process.allpidlist = mypidlist_clear(process.allpidlist);
     process.pidlist = mylist_clear(process.pidlist);
     process.pgrphash = myhash_clear(process.pgrphash);
     process.ppidhash = myhash_clear(process.ppidhash);
@@ -728,6 +795,17 @@ _lnxproc_proc_pid_stat_new(_LNXPROC_BASE_T ** base, LNXPROC_OPT_T * optional)
         _LNXPROC_LIMITS_FREE(limits);
         return ret;
     }
+
+    _LNXPROC_DEBUG("Optional %p\n", optional);
+    LNXPROC_MODULE_T *sub = NULL;
+
+    if (optional) {
+        if (optional->master && optional->module) {
+            sub = optional->module;
+            _lnxproc_create(sub);
+        }
+    }
+    _LNXPROC_DEBUG("Sub %p\n", sub);
 
     char *fileprefix = "/proc";
     char *fileglob;

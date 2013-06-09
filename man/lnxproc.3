@@ -79,6 +79,9 @@ lnxproc \- interface to reading the /proc/ & /sys filesystems
 .BI "int lnxproc_opt_set_master(LNXPROC_OPT_T *" optptr ,
 .BI "                             char *" master ");"
 
+.BI "int lnxproc_opt_set_module(LNXPROC_OPT_T *" optptr ,
+.BI "                             LNXPROC_MODULE_T *" module ");"
+
 .BI "int lnxproc_opt_free(LNXPROC_OPT_T **" optptr ");"
 
 .BI "LNXPROC_OPT_FREE(" b ")"
@@ -134,10 +137,10 @@ seconds, usage is in
 , rates are per second, memory is in
 .B KiB.
 .P
-Additionally some modules take an optional parameter(s). These parameters are
-defined on a
+Additionally some modules take optional parameter(s). These parameters are
+defined in a
 .B LNXPROC_OPT_T
-object and is initialised by means of calls to the functions
+object and are initialised by means of calls to the functions
 .B lnxproc_opt_set*().
 The optional parameters are not used in all modules. For example one can 
 specify the optional parameter
@@ -145,12 +148,17 @@ specify the optional parameter
 to restrict data collection to a subset of pids (or only one particular pid)
 for any of the
 .B PROC_PID_*
-modules. Alos one can specify the
+modules. Also one can specify the
 .B master
-optional parameter fo rthe
+optional parameter for the
 .B PROC_PID_STAT
 module to only collect data for all processes that are children/grandchildren
 etc. of a particular process.
+If 
+.B master
+is specified, one can also 'chain' calls to another module by specifying the
+.B module
+optional parameter.
 .sp
 See the example code below for examples.
 .SS Main functions
@@ -445,6 +453,22 @@ included.
 The master task is matched against the second field in the /proc/<pid>/stat
 file with the '(' and ')' characters removed.
 .P
+.BR lnxproc_set_module()
+sets the the optional submodule for the
+.B PROC_PID_STAT
+module. 
+This option is only used when the option
+.B master
+is also set. Only data for pids that are matched for the specified
+.B master
+task are collected. For example one can specify the
+.B PROC_PID_STATM
+as a submodule. Only modules that take pids as a fileglob can be specified as a
+submodule of
+.B PROC_PID_STAT.
+i.e. any module with a type of
+.B PROC_PID_*.
+.P
 .BR lnxproc_opt_free()
 frees all allocated memory for the specified 
 .B LNXPROC_OPT_T
@@ -514,8 +538,10 @@ TBD
 .TP
 TBD
 .SH NOTES
-Currently the key field of the hashtable produced by all the modules of lnxproc has
-a hardwired limit of 48 characters. When adding a new module please ensure that any
+Currently the key field of the hashtable produced by all the modules of lnxproc
+has
+a hardwired limit of 48 characters. When adding a new module please ensure that
+any
 generated keys are either not longer than this or increase the key length
 limit and recompile the library.
 .SH BUGS
@@ -672,6 +698,22 @@ main(int argc, char *argv[])
     LNXPROC_OPT_FREE(opt);
 
     test_module(modules, "proc_chrome_stat");
+    LNXPROC_FREE(modules);
+
+    LNXPROC_MODULE_T * submodules = NULL;
+    lnxproc_new(&submodules, 1); // Read /proc/<pid>/statm file 
+    lnxproc_set(submodules, 0, LNXPROC_PROC_PID_STATM, NULL);
+    lnxproc_opt_new(&opt);
+    lnxproc_opt_set_master(opt,"chrome");
+    lnxproc_opt_set_module(opt,submodules);
+    LNXPROC_FREE(submodules);
+    lnxproc_new(&modules, 1); // Read /proc/<pid>/stat file for 
+                              // all chrome processes together
+                              // with /proc/<pid>/statm
+    lnxproc_set(modules, 0, LNXPROC_PROC_PID_STAT, opt);
+    LNXPROC_OPT_FREE(opt);
+
+    test_module(modules, "proc_chrome_stat_statm");
     LNXPROC_FREE(modules);
 
     return 0;

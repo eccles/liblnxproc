@@ -111,22 +111,28 @@ lnxproc_new(LNXPROC_MODULE_T ** moduleptr, size_t nmodule)
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Module address");
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
+
+    LNXPROC_MODULE_T *p = *moduleptr;
+
+    if (p) {
+        Acquire(p, 0);
+        return LNXPROC_OK;
+    }
+
     if (nmodules < 0) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Module: nmodules < 0");
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
 
-    LNXPROC_MODULE_T *p;
-
     if (nmodule == 0) {
-        p = Allocate(NULL,
-                     sizeof(LNXPROC_MODULE_T) +
-                     (nmodules * sizeof(_LNXPROC_MODULE_ROW_T)));
+        p = Acquire(NULL,
+                    sizeof(LNXPROC_MODULE_T) +
+                    (nmodules * sizeof(_LNXPROC_MODULE_ROW_T)));
     }
     else {
-        p = Allocate(NULL,
-                     sizeof(LNXPROC_MODULE_T) +
-                     (nmodule * sizeof(_LNXPROC_MODULE_ROW_T)));
+        p = Acquire(NULL,
+                    sizeof(LNXPROC_MODULE_T) +
+                    (nmodule * sizeof(_LNXPROC_MODULE_ROW_T)));
     }
 
     if (!p) {
@@ -178,6 +184,12 @@ lnxproc_size(LNXPROC_MODULE_T * modules, size_t * size)
                 if (row->optional->master) {
                     *size += 1 + strlen(row->optional->master);
                 }
+                if (row->optional->module) {
+                    size_t s;
+
+                    lnxproc_size(row->optional->module, &s);
+                    *size += s;
+                }
             }
         }
     }
@@ -220,12 +232,11 @@ lnxproc_set(LNXPROC_MODULE_T * module, size_t pos,
     return LNXPROC_OK;
 }
 
-int
-lnxproc_free(LNXPROC_MODULE_T ** modulesptr)
+static void
+lnxproc_release(void *arg)
 {
-    if (modulesptr && *modulesptr) {
-        LNXPROC_MODULE_T *modules = *modulesptr;
-
+    if (arg) {
+        LNXPROC_MODULE_T *modules = arg;
         int i;
 
         for (i = 0; i < modules->nmodules; i++) {
@@ -234,10 +245,81 @@ lnxproc_free(LNXPROC_MODULE_T ** modulesptr)
             _LNXPROC_BASE_FREE(row->base);
             lnxproc_opt_free(&row->optional);
         }
-        DESTROY(modules);
+    }
+}
+
+int
+lnxproc_free(LNXPROC_MODULE_T ** modulesptr)
+{
+    if (modulesptr && *modulesptr) {
+        LNXPROC_MODULE_T *modules = *modulesptr;
+
+        RELEASE(modules, lnxproc_release);
         *modulesptr = NULL;
     }
     return LNXPROC_OK;
+}
+
+int
+_lnxproc_create(LNXPROC_MODULE_T * modules)
+{
+
+    if (!modules) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Modules");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+
+    int i;
+    int ret;
+    int ret1 = LNXPROC_OK;
+
+    for (i = 0; i < modules->nmodules; i++) {
+        _LNXPROC_MODULE_ROW_T *row = modules->row + i;
+
+        if (row->new) {
+            if (!row->base) {
+                ret = row->new(&row->base, row->optional);
+
+                if (ret) {
+                    _LNXPROC_ERROR_DEBUG(ret, "Module %d Type %d", i,
+                                         row->type);
+                    ret1 = ret;
+                }
+            }
+        }
+    }
+    return ret1;
+}
+
+int
+_lnxproc_set_fileglob(LNXPROC_MODULE_T * modules, char *fileglob)
+{
+
+    if (!modules) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Modules");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+
+    int i;
+    int ret;
+    int ret1 = LNXPROC_OK;
+
+    for (i = 0; i < modules->nmodules; i++) {
+        _LNXPROC_MODULE_ROW_T *row = modules->row + i;
+
+        if (row->new) {
+            if (row->base) {
+                ret = _lnxproc_base_set_fileglob(row->base, fileglob);
+
+                if (ret) {
+                    _LNXPROC_ERROR_DEBUG(ret, "Module %d Type %d", i,
+                                         row->type);
+                    ret1 = ret;
+                }
+            }
+        }
+    }
+    return ret1;
 }
 
 int
@@ -382,6 +464,11 @@ lnxproc_iterate(LNXPROC_MODULE_T * modules, LNXPROC_INTERFACE_METHOD func,
                     _lnxproc_results_iterate(base_data->results,
                                              results_iterate, &env);
                 }
+                if (row->optional) {
+                    if (row->optional->module) {
+                        lnxproc_iterate(row->optional->module, func, data);
+                    }
+                }
             }
         }
     }
@@ -409,6 +496,11 @@ lnxproc_print(LNXPROC_MODULE_T * modules)
                 if (base_data) {
                     _lnxproc_results_print(base_data->results);
                 }
+                if (row->optional) {
+                    if (row->optional->module) {
+                        lnxproc_print(row->optional->module);
+                    }
+                }
             }
         }
     }
@@ -427,26 +519,33 @@ lnxproc_fetch(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type,
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Fetch buffer");
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
-    int i;
+    int i, ret;
 
     for (i = 0; i < modules->nmodules; i++) {
         _LNXPROC_MODULE_ROW_T *row = modules->row + i;
 
-        if (row->new && (row->type == type)) {
+        if (row->new && ((type == LNXPROC_ALL) || (row->type == type))) {
             _LNXPROC_BASE_T *base = row->base;
 
             if (base) {
                 _LNXPROC_BASE_DATA_T *base_data = base->current;
+                _LNXPROC_RESULTS_TABLE_T *entry = NULL;
 
                 if (base_data) {
-                    _LNXPROC_RESULTS_TABLE_T *entry = NULL;
 
-                    int ret = _lnxproc_results_fetch(base_data->results, key,
-                                                     &entry);
+                    ret = _lnxproc_results_fetch(base_data->results, key,
+                                                 &entry);
 
                     if (!ret) {
                         _lnxproc_results_table_valuestr(entry, value,
                                                         valuelen, 1);
+                        return LNXPROC_OK;
+                    }
+                }
+                if (row->optional && row->optional->module) {
+                    ret = lnxproc_fetch(row->optional->module, LNXPROC_ALL,
+                                        key, value, valuelen);
+                    if (!ret) {
                         return LNXPROC_OK;
                     }
                 }

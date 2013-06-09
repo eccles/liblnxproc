@@ -111,32 +111,61 @@ test_all(void)
     LNXPROC_MODULE_T *modules = NULL; \
     lnxproc_new(&modules, 1); \
     lnxproc_set(modules, 0, (type), NULL ); \
+\
+    test_module(modules, #type); \
+    LNXPROC_FREE(modules); \
+} while(0)
+
+#define TEST_GLOB_MODULE(type,option) do {\
+    LNXPROC_OPT_T *opt = NULL; \
+    lnxproc_opt_new(&opt); \
+    lnxproc_opt_set_fileglob(opt,(option)); \
+\
+    LNXPROC_MODULE_T *modules = NULL; \
+    lnxproc_new(&modules, 1); \
+    lnxproc_set(modules, 0, (type), opt ); \
+    LNXPROC_OPT_FREE(opt); \
+\
     test_module(modules, #type); \
     LNXPROC_FREE(modules); \
 } while(0)
 
 #define TEST_PID_MODULE(type) do {\
-    LNXPROC_OPT_T *opt = NULL; \
-    lnxproc_opt_new(&opt); \
-    lnxproc_opt_set_fileglob(opt,pid); \
-    LNXPROC_MODULE_T *modules = NULL; \
-    lnxproc_new(&modules, 1); \
-    lnxproc_set(modules, 0, (type), opt ); \
-    test_module(modules, #type); \
-    LNXPROC_FREE(modules); \
-    LNXPROC_OPT_FREE(opt); \
+    TEST_GLOB_MODULE(type,pid);\
 } while(0)
 
-#define TEST_OPT_MODULE(type,option) do {\
+#define TEST_MASTER_MODULE(type,task) do {\
     LNXPROC_OPT_T *opt = NULL; \
     lnxproc_opt_new(&opt); \
-    lnxproc_opt_set_fileglob(opt,(option)); \
+    lnxproc_opt_set_master(opt,(task)); \
+\
     LNXPROC_MODULE_T *modules = NULL; \
     lnxproc_new(&modules, 1); \
     lnxproc_set(modules, 0, (type), opt ); \
+    LNXPROC_OPT_FREE(opt); \
+\
     test_module(modules, #type); \
     LNXPROC_FREE(modules); \
+} while(0)
+
+#define TEST_MOD_MODULE(type,task,subtype) do {\
+    LNXPROC_MODULE_T *submodule = NULL; \
+    lnxproc_new(&submodule, 1); \
+    lnxproc_set(submodule, 0, (subtype), NULL ); \
+    LNXPROC_FREE(submodule); \
+\
+    LNXPROC_OPT_T *opt = NULL; \
+    lnxproc_opt_new(&opt); \
+    lnxproc_opt_set_module(opt,submodule); \
+    lnxproc_opt_set_master(opt,(task)); \
+\
+    LNXPROC_MODULE_T *modules = NULL; \
+    lnxproc_new(&modules, 1); \
+    lnxproc_set(modules, 0, (type), opt ); \
     LNXPROC_OPT_FREE(opt); \
+\
+    test_module(modules, #type); \
+    LNXPROC_FREE(modules); \
 } while(0)
 
 /*----------------------------------------------------------------------------*/
@@ -206,6 +235,9 @@ main(int argc, char *argv[])
         if (testtype == 0) {
             TEST_PID_MODULE(LNXPROC_PROC_PID_STAT);
         }
+        TEST_MASTER_MODULE(LNXPROC_PROC_PID_STAT, "chrome");
+        TEST_MOD_MODULE(LNXPROC_PROC_PID_STAT, "chrome",
+                        LNXPROC_PROC_PID_STATM);
         TEST_MODULE(LNXPROC_PROC_PID_STATM);
         if (testtype == 0) {
             TEST_PID_MODULE(LNXPROC_PROC_PID_STATM);
@@ -221,7 +253,7 @@ main(int argc, char *argv[])
         TEST_MODULE(LNXPROC_PROC_VMSTAT);
         TEST_MODULE(LNXPROC_SYS_CPUFREQ);
         TEST_MODULE(LNXPROC_SYS_DISKSECTORS);
-        TEST_OPT_MODULE(LNXPROC_SYS_DISKSECTORS, "sd*");
+        TEST_GLOB_MODULE(LNXPROC_SYS_DISKSECTORS, "sd*");
 
     }
     else if (!strcmp(argv[1], "proc_buddyinfo")) {
@@ -307,6 +339,9 @@ main(int argc, char *argv[])
         if (testtype == 0) {
             TEST_PID_MODULE(LNXPROC_PROC_PID_STAT);
         }
+        TEST_MASTER_MODULE(LNXPROC_PROC_PID_STAT, "chrome");
+        TEST_MOD_MODULE(LNXPROC_PROC_PID_STAT, "chrome",
+                        LNXPROC_PROC_PID_STATM);
     }
     else if (!strcmp(argv[1], "proc_pid_statm")) {
         TEST_MODULE(LNXPROC_PROC_PID_STATM);
@@ -340,7 +375,7 @@ main(int argc, char *argv[])
     }
     else if (!strcmp(argv[1], "sys_disksectors")) {
         TEST_MODULE(LNXPROC_SYS_DISKSECTORS);
-        TEST_OPT_MODULE(LNXPROC_SYS_DISKSECTORS, "sd*");
+        TEST_GLOB_MODULE(LNXPROC_SYS_DISKSECTORS, "sd*");
     }
     return 0;
 }

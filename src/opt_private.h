@@ -29,6 +29,7 @@ struct lnxproc_opt_t {
     _LNXPROC_RESULTS_T *results;
     char *master;
     int pgrp;
+    LNXPROC_MODULE_T *module;
 };
 
 int _lnxproc_opt_set_results(LNXPROC_OPT_T * opt, _LNXPROC_RESULTS_T * results);
