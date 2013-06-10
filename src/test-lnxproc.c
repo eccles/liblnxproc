@@ -542,7 +542,7 @@ test_interface(void)
     printf("PROC_CGROUPS key '%s' value '%s' Error '%s'\n", "/cpuset/hierarchy",
            pbuf, lnxproc_strerror(ret, errbuf, sizeof errbuf));
     lnxproc_print(modules, STDOUT_FILENO, LNXPROC_PRINT_ALL);
-    lnxproc_print(modules, STDOUT_FILENO, LNXPROC_PRINT_JSON);
+    //lnxproc_print(modules, STDOUT_FILENO, LNXPROC_PRINT_JSON);
     lnxproc_iterate(modules, interface_func, "All");
     LNXPROC_FREE(modules);
 
@@ -561,7 +561,7 @@ test_interface(void)
     lnxproc_read(modules);
     lnxproc_read(modules);
     lnxproc_print(modules, STDOUT_FILENO, LNXPROC_PRINT_ALL);
-    lnxproc_print(modules, STDOUT_FILENO, LNXPROC_PRINT_JSON);
+    //lnxproc_print(modules, STDOUT_FILENO, LNXPROC_PRINT_JSON);
     lnxproc_iterate(modules, interface_func, "PID_STAT");
     LNXPROC_FREE(modules);
 
@@ -575,7 +575,7 @@ test_interface(void)
     lnxproc_read(modules);
     lnxproc_read(modules);
     lnxproc_print(modules, STDOUT_FILENO, LNXPROC_PRINT_ALL);
-    lnxproc_print(modules, STDOUT_FILENO, LNXPROC_PRINT_JSON);
+    //lnxproc_print(modules, STDOUT_FILENO, LNXPROC_PRINT_JSON);
     lnxproc_iterate(modules, interface_func, "PID_STAT");
     LNXPROC_FREE(modules);
 
@@ -589,7 +589,7 @@ test_interface(void)
     lnxproc_read(modules);
     lnxproc_read(modules);
     lnxproc_print(modules, STDOUT_FILENO, LNXPROC_PRINT_ALL);
-    lnxproc_print(modules, STDOUT_FILENO, LNXPROC_PRINT_JSON);
+    //lnxproc_print(modules, STDOUT_FILENO, LNXPROC_PRINT_JSON);
     lnxproc_iterate(modules, interface_func, "SYS_DISKSECTORS");
     LNXPROC_FREE(modules);
 }
@@ -616,7 +616,6 @@ test_interface(void)
                 } \
             } \
             lnxproc_print(modules,STDOUT_FILENO,LNXPROC_PRINT_ALL); \
-            lnxproc_print(modules,STDOUT_FILENO,LNXPROC_PRINT_JSON); \
         } \
         LNXPROC_FREE(modules); \
     } \

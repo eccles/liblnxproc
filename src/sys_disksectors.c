@@ -23,6 +23,7 @@ This file is part of liblnxproc.
 #include <stdlib.h>
 #include <string.h>
 
+#include "strlcpy.h"
 #include "error_private.h"
 #include "array_private.h"
 #include "limits_private.h"
@@ -33,7 +34,7 @@ This file is part of liblnxproc.
 
 struct env_t {
     _LNXPROC_RESULTS_T *results;
-    char *key;
+    char key[32];
 };
 
 static int
@@ -44,7 +45,10 @@ iter_func(char *val, void *data, size_t idx[], size_t dim)
     struct env_t *env = data;
 
     if (idx[1] == 0) {
-        env->key = val;
+        int n = 0;
+
+        STRLCAT(env->key, "/", n, sizeof env->key);
+        STRLCAT(env->key, val, n, sizeof env->key);
     }
     else {
         _lnxproc_results_add_int(env->results, env->key, atoi(val));
@@ -61,7 +65,7 @@ sys_disksectors_normalize(_LNXPROC_BASE_T * base)
 
     struct env_t env = {
         .results = results,
-        .key = NULL,
+        .key = "",
     };
 
     _lnxproc_results_init(results, 2);

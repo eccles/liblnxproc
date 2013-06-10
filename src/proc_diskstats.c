@@ -175,11 +175,6 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
     static const int const precols[] = { MS_READCOL, MS_WRITECOL, MS_IOCOL, };
     static const int nprecols = sizeof(precols) / sizeof(precols[0]);
 
-/*
- * TODO - get sector size from other LNXPROC module.
- * For now fix it at 512 bytes.
- */
-//#define sectorsize 512
 #define sectorscale 1.0/1024.0
     struct par_t {
         const char *name;
@@ -254,8 +249,9 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
                 char dkey[64];
                 int m1 = 0;
 
+                STRLCAT(dkey, "/", m1, sizeof(dkey));
                 if (!strncmp(key, "sd", 2)) {
-                    strlcpy(dkey, key, 4);
+                    strlcpy(dkey + 1, key, 4);
                 }
                 else {
                     STRLCAT(dkey, key, m1, sizeof(dkey));
