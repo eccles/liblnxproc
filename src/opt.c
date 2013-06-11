@@ -27,7 +27,7 @@
 #include "interface_private.h"
 
 int
-lnxproc_opt_new(LNXPROC_OPT_T ** optptr)
+lnxproc_opt_new(LNXPROC_OPT_T **optptr)
 {
     if (!optptr) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Option address");
@@ -58,7 +58,7 @@ lnxproc_opt_release(void *arg)
 }
 
 int
-lnxproc_opt_free(LNXPROC_OPT_T ** optptr)
+lnxproc_opt_free(LNXPROC_OPT_T **optptr)
 {
     if (optptr) {
         RELEASE(*optptr, lnxproc_opt_release);
@@ -67,7 +67,7 @@ lnxproc_opt_free(LNXPROC_OPT_T ** optptr)
 }
 
 int
-lnxproc_opt_set_fileglob(LNXPROC_OPT_T * opt, char *fileglob)
+lnxproc_opt_set_fileglob(LNXPROC_OPT_T *opt, char *fileglob)
 {
     if (!opt) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Option");
@@ -80,7 +80,7 @@ lnxproc_opt_set_fileglob(LNXPROC_OPT_T * opt, char *fileglob)
 }
 
 int
-lnxproc_opt_set_master(LNXPROC_OPT_T * opt, char *master)
+lnxproc_opt_set_master(LNXPROC_OPT_T *opt, char *master)
 {
     if (!opt) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Option");
@@ -93,7 +93,7 @@ lnxproc_opt_set_master(LNXPROC_OPT_T * opt, char *master)
 }
 
 int
-lnxproc_opt_set_module(LNXPROC_OPT_T * opt, LNXPROC_MODULE_T * module)
+lnxproc_opt_set_module(LNXPROC_OPT_T *opt, LNXPROC_MODULE_T *module)
 {
     if (!opt) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Option");
@@ -108,7 +108,7 @@ lnxproc_opt_set_module(LNXPROC_OPT_T * opt, LNXPROC_MODULE_T * module)
 }
 
 int
-lnxproc_opt_set_pgrp(LNXPROC_OPT_T * opt, int pgrp)
+lnxproc_opt_set_pgrp(LNXPROC_OPT_T *opt, int pgrp)
 {
     if (!opt) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Option");
@@ -119,7 +119,7 @@ lnxproc_opt_set_pgrp(LNXPROC_OPT_T * opt, int pgrp)
 }
 
 int
-_lnxproc_opt_set_results(LNXPROC_OPT_T * opt, _LNXPROC_RESULTS_T * results)
+_lnxproc_opt_set_results(LNXPROC_OPT_T *opt, _LNXPROC_RESULTS_T *results)
 {
     if (!opt) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Option");

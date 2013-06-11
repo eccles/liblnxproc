@@ -32,7 +32,7 @@ Typical contents of file /proc/sys/kernel/hostname::
 #include "modules.h"
 
 static int
-proc_hostname_normalize(_LNXPROC_BASE_T * base)
+proc_hostname_normalize(_LNXPROC_BASE_T *base)
 {
     _lnxproc_results_init(base->current->results, 1);
     _lnxproc_results_add_stringref(base->current->results, "/value",
@@ -42,7 +42,7 @@ proc_hostname_normalize(_LNXPROC_BASE_T * base)
 }
 
 int
-_lnxproc_proc_hostname_new(_LNXPROC_BASE_T ** base, LNXPROC_OPT_T * optional)
+_lnxproc_proc_hostname_new(_LNXPROC_BASE_T **base, LNXPROC_OPT_T *optional)
 {
 
     char *filenames[] = { "/proc/sys/kernel/hostname", };

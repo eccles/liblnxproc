@@ -173,7 +173,7 @@ test_limits(void)
 
 /*----------------------------------------------------------------------------*/
 static int
-myvector_print(_LNXPROC_VECTOR_T * vector, int idx, int depth, void *data)
+myvector_print(_LNXPROC_VECTOR_T *vector, int idx, int depth, void *data)
 {
     printf("Vector %p Idx %d Depth %d\n", vector, idx, depth);
     return 0;

@@ -29,7 +29,7 @@ static const int ntimes = 1000;
 static int testtype = 0;        // timing test
 
 static void
-test_module(LNXPROC_MODULE_T * modules, char *str)
+test_module(LNXPROC_MODULE_T *modules, char *str)
 {
     if (modules) {
         char buf[96];

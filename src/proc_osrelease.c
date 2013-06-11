@@ -31,7 +31,7 @@ Typical contents of file /proc/sys/kernel/osrelease::
 #include "modules.h"
 
 static int
-proc_osrelease_normalize(_LNXPROC_BASE_T * base)
+proc_osrelease_normalize(_LNXPROC_BASE_T *base)
 {
     _lnxproc_results_init(base->current->results, 1);
     _lnxproc_results_add_stringref(base->current->results, "/value",
@@ -41,7 +41,7 @@ proc_osrelease_normalize(_LNXPROC_BASE_T * base)
 }
 
 int
-_lnxproc_proc_osrelease_new(_LNXPROC_BASE_T ** base, LNXPROC_OPT_T * optional)
+_lnxproc_proc_osrelease_new(_LNXPROC_BASE_T **base, LNXPROC_OPT_T *optional)
 {
 
     char *filenames[] = { "/proc/sys/kernel/osrelease", };

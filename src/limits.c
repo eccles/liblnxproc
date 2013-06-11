@@ -29,7 +29,7 @@
 #include "limits_private.h"
 
 int
-_lnxproc_limits_print(_LNXPROC_LIMITS_T * limits)
+_lnxproc_limits_print(_LNXPROC_LIMITS_T *limits)
 {
     if (!limits) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Limits");
@@ -97,7 +97,7 @@ _lnxproc_chars_print(char *chars, size_t nchars, char *buf, size_t buflen)
 }
 
 int
-_lnxproc_limit_print(_LNXPROC_LIMITS_ROW_T * row, char *buf, size_t buflen)
+_lnxproc_limit_print(_LNXPROC_LIMITS_ROW_T *row, char *buf, size_t buflen)
 {
     buf[0] = '\0';
 
@@ -118,7 +118,7 @@ _lnxproc_limit_print(_LNXPROC_LIMITS_ROW_T * row, char *buf, size_t buflen)
 }
 
 int
-_lnxproc_limits_new(_LNXPROC_LIMITS_T ** newlimits, size_t dim)
+_lnxproc_limits_new(_LNXPROC_LIMITS_T **newlimits, size_t dim)
 {
     if (!newlimits) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Limits address");
@@ -143,7 +143,7 @@ _lnxproc_limits_new(_LNXPROC_LIMITS_T ** newlimits, size_t dim)
 }
 
 int
-_lnxproc_limits_size(_LNXPROC_LIMITS_T * limits, size_t * size)
+_lnxproc_limits_size(_LNXPROC_LIMITS_T *limits, size_t * size)
 {
     if (!size) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Size");
@@ -169,7 +169,7 @@ _lnxproc_limits_size(_LNXPROC_LIMITS_T * limits, size_t * size)
 }
 
 int
-_lnxproc_limits_set(_LNXPROC_LIMITS_T * limits, int pos, size_t expected,
+_lnxproc_limits_set(_LNXPROC_LIMITS_T *limits, int pos, size_t expected,
                     char *chars, int len)
 {
     if (!limits) {
@@ -225,7 +225,7 @@ limits_rows_free(void *ptr)
 }
 
 int
-_lnxproc_limits_free(_LNXPROC_LIMITS_T ** limits)
+_lnxproc_limits_free(_LNXPROC_LIMITS_T **limits)
 {
     if (limits) {
         _LNXPROC_DEBUG("Free Limits buffer %p\n", *limits);

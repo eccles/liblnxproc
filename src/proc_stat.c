@@ -99,7 +99,7 @@ softirq 90796022 0 21051565 44290 15033485 9523416 0 1316048 21055421 165439 226
 #include "modules.h"
 
 static int
-proc_stat_normalize(_LNXPROC_BASE_T * base)
+proc_stat_normalize(_LNXPROC_BASE_T *base)
 {
     _LNXPROC_RESULTS_T *results = base->current->results;
     _LNXPROC_ARRAY_T *array = base->current->array;
@@ -207,7 +207,7 @@ proc_stat_normalize(_LNXPROC_BASE_T * base)
 }
 
 int
-_lnxproc_proc_stat_new(_LNXPROC_BASE_T ** base, LNXPROC_OPT_T * optional)
+_lnxproc_proc_stat_new(_LNXPROC_BASE_T **base, LNXPROC_OPT_T *optional)
 {
 
     _LNXPROC_LIMITS_T *limits = NULL;

@@ -76,30 +76,29 @@ extern "C" {
 
     typedef struct lnxproc_module_t LNXPROC_MODULE_T;
 
-    int lnxproc_new(LNXPROC_MODULE_T ** moduleptr, size_t nmodule);
-    int lnxproc_size(LNXPROC_MODULE_T * module, size_t * size);
-    int lnxproc_set(LNXPROC_MODULE_T * module, size_t pos,
-                    LNXPROC_MODULE_TYPE_T type, LNXPROC_OPT_T * optional);
-    int lnxproc_free(LNXPROC_MODULE_T ** modulesptr);
+    int lnxproc_new(LNXPROC_MODULE_T **moduleptr, size_t nmodule);
+    int lnxproc_size(LNXPROC_MODULE_T *module, size_t * size);
+    int lnxproc_set(LNXPROC_MODULE_T *module, size_t pos,
+                    LNXPROC_MODULE_TYPE_T type, LNXPROC_OPT_T *optional);
+    int lnxproc_free(LNXPROC_MODULE_T **modulesptr);
 
 #define LNXPROC_FREE(b) lnxproc_free(&b)
 
-    int lnxproc_read(LNXPROC_MODULE_T * modules);
+    int lnxproc_read(LNXPROC_MODULE_T *modules);
 
-    int lnxproc_print(LNXPROC_MODULE_T * modules, int fd,
-                      LNXPROC_PRINT_T print);
+    int lnxproc_print(LNXPROC_MODULE_T *modules, int fd, LNXPROC_PRINT_T print);
 
-    int lnxproc_performance(LNXPROC_MODULE_T * modules,
+    int lnxproc_performance(LNXPROC_MODULE_T *modules,
                             long *rawread_time,
                             long *map_time,
                             long *normalize_time, long *hash_time);
 
     typedef int (*LNXPROC_INTERFACE_METHOD) (char *mod, char *key, char *value,
                                              void *data);
-    int lnxproc_iterate(LNXPROC_MODULE_T * modules,
+    int lnxproc_iterate(LNXPROC_MODULE_T *modules,
                         LNXPROC_INTERFACE_METHOD func, void *data);
 
-    int lnxproc_fetch(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type,
+    int lnxproc_fetch(LNXPROC_MODULE_T *modules, LNXPROC_MODULE_TYPE_T type,
                       char *key, char *value, size_t valuelen, char **pbuf);
 
 #ifdef __cplusplus

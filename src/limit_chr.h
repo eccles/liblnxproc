@@ -31,7 +31,7 @@
  */
 
 static inline char *
-limit_chr(_LNXPROC_LIMITS_ROW_T * limit, char c)
+limit_chr(_LNXPROC_LIMITS_ROW_T *limit, char c)
 {
     if (limit) {
         int i;

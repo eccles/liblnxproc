@@ -32,7 +32,7 @@
 #include "array_private.h"
 
 static _LNXPROC_VECTOR_T *
-array_create(_LNXPROC_LIMITS_T * limits, int depth)
+array_create(_LNXPROC_LIMITS_T *limits, int depth)
 {
     _LNXPROC_DEBUG("limits %p\n", limits);
     _LNXPROC_DEBUG("dim %zd\n", limits->dim);
@@ -81,7 +81,7 @@ array_create(_LNXPROC_LIMITS_T * limits, int depth)
 }
 
 int
-_lnxproc_array_new(_LNXPROC_ARRAY_T ** array, _LNXPROC_LIMITS_T * limits)
+_lnxproc_array_new(_LNXPROC_ARRAY_T **array, _LNXPROC_LIMITS_T *limits)
 {
 
     _LNXPROC_DEBUG("Array * %p Limits %p\n", array, limits);
@@ -144,7 +144,7 @@ _lnxproc_array_new(_LNXPROC_ARRAY_T ** array, _LNXPROC_LIMITS_T * limits)
 }
 
 int
-_lnxproc_array_size(_LNXPROC_ARRAY_T * array, size_t * size)
+_lnxproc_array_size(_LNXPROC_ARRAY_T *array, size_t * size)
 {
     if (!size) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Size");
@@ -170,7 +170,7 @@ _lnxproc_array_size(_LNXPROC_ARRAY_T * array, size_t * size)
 }
 
 int
-_lnxproc_array_free(_LNXPROC_ARRAY_T ** arrayptr)
+_lnxproc_array_free(_LNXPROC_ARRAY_T **arrayptr)
 {
     _LNXPROC_DEBUG("Array %p\n", arrayptr);
 
@@ -207,8 +207,7 @@ _lnxproc_array_free(_LNXPROC_ARRAY_T ** arrayptr)
 #endif
 
 int
-_lnxproc_array_set(_LNXPROC_ARRAY_T * array, size_t idx[], size_t dim,
-                   char *val)
+_lnxproc_array_set(_LNXPROC_ARRAY_T *array, size_t idx[], size_t dim, char *val)
 {
 #ifdef DEBUG
     _LNXPROC_DEBUG("Array %p\n", array);
@@ -279,7 +278,7 @@ _lnxproc_array_set(_LNXPROC_ARRAY_T * array, size_t idx[], size_t dim,
 }
 
 int
-_lnxproc_array_set_last(_LNXPROC_ARRAY_T * array, size_t idx[], size_t dim,
+_lnxproc_array_set_last(_LNXPROC_ARRAY_T *array, size_t idx[], size_t dim,
                         char *val)
 {
 #ifdef DEBUG
@@ -366,7 +365,7 @@ _lnxproc_array_set_last(_LNXPROC_ARRAY_T * array, size_t idx[], size_t dim,
 }
 
 int
-_lnxproc_array_get(_LNXPROC_ARRAY_T * array, size_t idx[], size_t dim,
+_lnxproc_array_get(_LNXPROC_ARRAY_T *array, size_t idx[], size_t dim,
                    char **value)
 {
 #ifdef DEBUG
@@ -430,8 +429,8 @@ _lnxproc_array_get(_LNXPROC_ARRAY_T * array, size_t idx[], size_t dim,
 }
 
 int
-_lnxproc_array_diff(_LNXPROC_ARRAY_T * previous,
-                    _LNXPROC_ARRAY_T * current,
+_lnxproc_array_diff(_LNXPROC_ARRAY_T *previous,
+                    _LNXPROC_ARRAY_T *current,
                     size_t idx[], size_t dim, int *diff)
 {
     int ret;
@@ -462,7 +461,7 @@ struct array_iterate_t {
 };
 
 static int
-array_vector_iterate_func(_LNXPROC_VECTOR_T * vector, int idx, int depth,
+array_vector_iterate_func(_LNXPROC_VECTOR_T *vector, int idx, int depth,
                           void *data)
 {
 
@@ -496,7 +495,7 @@ array_vector_iterate_func(_LNXPROC_VECTOR_T * vector, int idx, int depth,
 }
 
 int
-_lnxproc_array_iterate(_LNXPROC_ARRAY_T * array,
+_lnxproc_array_iterate(_LNXPROC_ARRAY_T *array,
                        void *data, int allocated,
                        _LNXPROC_ARRAY_ITERATE_FUNC func)
 {
@@ -573,7 +572,7 @@ array_print_internal(char *val, void *data, size_t idx[], size_t dim)
 }
 
 int
-_lnxproc_array_print(_LNXPROC_ARRAY_T * array, int allocated)
+_lnxproc_array_print(_LNXPROC_ARRAY_T *array, int allocated)
 {
 
     _LNXPROC_DEBUG("Array %p Alloc %d\n", array, allocated);

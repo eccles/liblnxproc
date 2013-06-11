@@ -28,7 +28,7 @@
 #include "results_private.h"
 
 int
-_lnxproc_results_table_valuestr(_LNXPROC_RESULTS_TABLE_T * entry, char *buf,
+_lnxproc_results_table_valuestr(_LNXPROC_RESULTS_TABLE_T *entry, char *buf,
                                 size_t len, char **res)
 {
     int ret = 0;
@@ -138,8 +138,8 @@ struct rprint_t {
 };
 
 static int
-internal_print_func(_LNXPROC_RESULTS_T * results,
-                    _LNXPROC_RESULTS_TABLE_T * entry, void *data)
+internal_print_func(_LNXPROC_RESULTS_T *results,
+                    _LNXPROC_RESULTS_TABLE_T *entry, void *data)
 {
     struct rprint_t *rprint = data;
     char buf[64];
@@ -165,8 +165,8 @@ internal_print_func(_LNXPROC_RESULTS_T * results,
 }
 
 static int
-internal_json_func(_LNXPROC_RESULTS_T * results,
-                   _LNXPROC_RESULTS_TABLE_T * entry, void *data)
+internal_json_func(_LNXPROC_RESULTS_T *results,
+                   _LNXPROC_RESULTS_TABLE_T *entry, void *data)
 {
     struct rprint_t *rprint = data;
     char buf[64];
@@ -225,13 +225,13 @@ internal_json_func(_LNXPROC_RESULTS_T * results,
 }
 
 static int
-rowcmp(_LNXPROC_RESULTS_TABLE_T * r1, _LNXPROC_RESULTS_TABLE_T * r2)
+rowcmp(_LNXPROC_RESULTS_TABLE_T *r1, _LNXPROC_RESULTS_TABLE_T *r2)
 {
     return strcmp(r1->key, r2->key);
 }
 
 int
-_lnxproc_results_print(_LNXPROC_RESULTS_T * results, int fd,
+_lnxproc_results_print(_LNXPROC_RESULTS_T *results, int fd,
                        LNXPROC_PRINT_T print)
 {
     _LNXPROC_DEBUG("Results %p\n", results);
@@ -321,7 +321,7 @@ _lnxproc_results_print(_LNXPROC_RESULTS_T * results, int fd,
 }
 
 int
-_lnxproc_results_new(_LNXPROC_RESULTS_T ** resultsptr, char *tag)
+_lnxproc_results_new(_LNXPROC_RESULTS_T **resultsptr, char *tag)
 {
     if (!resultsptr) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Results address");
@@ -361,7 +361,7 @@ _lnxproc_results_new(_LNXPROC_RESULTS_T ** resultsptr, char *tag)
 }
 
 int
-_lnxproc_results_size(_LNXPROC_RESULTS_T * results, size_t * size)
+_lnxproc_results_size(_LNXPROC_RESULTS_T *results, size_t * size)
 {
     if (!size) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Size");
@@ -429,7 +429,7 @@ _lnxproc_results_release(void *arg)
 }
 
 int
-_lnxproc_results_free(_LNXPROC_RESULTS_T ** resultsptr)
+_lnxproc_results_free(_LNXPROC_RESULTS_T **resultsptr)
 {
     _LNXPROC_DEBUG("Results %p\n", resultsptr);
 
@@ -441,7 +441,7 @@ _lnxproc_results_free(_LNXPROC_RESULTS_T ** resultsptr)
 }
 
 static int
-allocate_results_table(_LNXPROC_RESULTS_T * results, size_t nentries)
+allocate_results_table(_LNXPROC_RESULTS_T *results, size_t nentries)
 {
     _LNXPROC_DEBUG("Table %p nentries %zd\n", results->table, nentries);
     _LNXPROC_DEBUG("Sizeof table entry %zd\n",
@@ -475,7 +475,7 @@ allocate_results_table(_LNXPROC_RESULTS_T * results, size_t nentries)
 }
 
 int
-_lnxproc_results_init(_LNXPROC_RESULTS_T * results, size_t nentries)
+_lnxproc_results_init(_LNXPROC_RESULTS_T *results, size_t nentries)
 {
     if (!results) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Results");
@@ -498,7 +498,7 @@ _lnxproc_results_init(_LNXPROC_RESULTS_T * results, size_t nentries)
 }
 
 int
-_lnxproc_results_hash(_LNXPROC_RESULTS_T * results)
+_lnxproc_results_hash(_LNXPROC_RESULTS_T *results)
 {
     if (results) {
         HASH_CLEAR(hh, results->hash);
@@ -521,8 +521,8 @@ _lnxproc_results_hash(_LNXPROC_RESULTS_T * results)
 }
 
 int
-_lnxproc_results_last(_LNXPROC_RESULTS_T * results,
-                      _LNXPROC_RESULTS_TABLE_T ** entry)
+_lnxproc_results_last(_LNXPROC_RESULTS_T *results,
+                      _LNXPROC_RESULTS_TABLE_T **entry)
 {
     if (!results) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Results");
@@ -546,8 +546,8 @@ _lnxproc_results_last(_LNXPROC_RESULTS_T * results,
 }
 
 int
-_lnxproc_results_fetch(_LNXPROC_RESULTS_T * results, char *key,
-                       _LNXPROC_RESULTS_TABLE_T ** entry)
+_lnxproc_results_fetch(_LNXPROC_RESULTS_T *results, char *key,
+                       _LNXPROC_RESULTS_TABLE_T **entry)
 {
     _LNXPROC_DEBUG("Results %p\n", results);
 
@@ -620,8 +620,8 @@ _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results, char *key,
 }
 
 static int
-prepare_entry(_LNXPROC_RESULTS_T * results, const char *key,
-              _LNXPROC_RESULTS_TABLE_T ** tentry)
+prepare_entry(_LNXPROC_RESULTS_T *results, const char *key,
+              _LNXPROC_RESULTS_TABLE_T **tentry)
 {
     if (!results) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Results");
@@ -672,7 +672,7 @@ prepare_entry(_LNXPROC_RESULTS_T * results, const char *key,
 }
 
 int
-_lnxproc_results_add_float(_LNXPROC_RESULTS_T * results, const char *key,
+_lnxproc_results_add_float(_LNXPROC_RESULTS_T *results, const char *key,
                            const float value)
 {
     _LNXPROC_RESULTS_TABLE_T *tentry;
@@ -688,7 +688,7 @@ _lnxproc_results_add_float(_LNXPROC_RESULTS_T * results, const char *key,
 }
 
 int
-_lnxproc_results_add_string(_LNXPROC_RESULTS_T * results, const char *key,
+_lnxproc_results_add_string(_LNXPROC_RESULTS_T *results, const char *key,
                             const char *value, size_t valuelen)
 {
     _LNXPROC_RESULTS_TABLE_T *tentry;
@@ -720,7 +720,7 @@ _lnxproc_results_add_string(_LNXPROC_RESULTS_T * results, const char *key,
 }
 
 int
-_lnxproc_results_add_stringref(_LNXPROC_RESULTS_T * results, const char *key,
+_lnxproc_results_add_stringref(_LNXPROC_RESULTS_T *results, const char *key,
                                const char *value)
 {
     if (!value) {
@@ -740,7 +740,7 @@ _lnxproc_results_add_stringref(_LNXPROC_RESULTS_T * results, const char *key,
 }
 
 int
-_lnxproc_results_add_ptr(_LNXPROC_RESULTS_T * results, const char *key,
+_lnxproc_results_add_ptr(_LNXPROC_RESULTS_T *results, const char *key,
                          const void *value)
 {
     if (!value) {
@@ -760,7 +760,7 @@ _lnxproc_results_add_ptr(_LNXPROC_RESULTS_T * results, const char *key,
 }
 
 int
-_lnxproc_results_add_int(_LNXPROC_RESULTS_T * results, const char *key,
+_lnxproc_results_add_int(_LNXPROC_RESULTS_T *results, const char *key,
                          const int value)
 {
     _LNXPROC_RESULTS_TABLE_T *tentry;
@@ -776,7 +776,7 @@ _lnxproc_results_add_int(_LNXPROC_RESULTS_T * results, const char *key,
 }
 
 int
-_lnxproc_results_add_long(_LNXPROC_RESULTS_T * results, const char *key,
+_lnxproc_results_add_long(_LNXPROC_RESULTS_T *results, const char *key,
                           const long value)
 {
     _LNXPROC_RESULTS_TABLE_T *tentry;
@@ -792,7 +792,7 @@ _lnxproc_results_add_long(_LNXPROC_RESULTS_T * results, const char *key,
 }
 
 int
-_lnxproc_results_add_unsigned_long(_LNXPROC_RESULTS_T * results,
+_lnxproc_results_add_unsigned_long(_LNXPROC_RESULTS_T *results,
                                    const char *key, const unsigned long value)
 {
     _LNXPROC_RESULTS_TABLE_T *tentry;
@@ -808,7 +808,7 @@ _lnxproc_results_add_unsigned_long(_LNXPROC_RESULTS_T * results,
 }
 
 int
-_lnxproc_results_iterate(_LNXPROC_RESULTS_T * results,
+_lnxproc_results_iterate(_LNXPROC_RESULTS_T *results,
                          _LNXPROC_RESULTS_ITERATE_FUNC func, void *data)
 {
     if (!results) {

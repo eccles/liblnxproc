@@ -46,7 +46,7 @@ proc4ops 59 0 0 0 1 0 0 0 0 0 18 3 0 0 0 0 2 0 0 0 0 0 0 15 0 3 0 0 0 0 0 435 0 
 #include "modules.h"
 
 static int
-proc_net_rpc_nfsd_normalize(_LNXPROC_BASE_T * base)
+proc_net_rpc_nfsd_normalize(_LNXPROC_BASE_T *base)
 {
     _LNXPROC_RESULTS_T *results = base->current->results;
     _LNXPROC_ARRAY_T *array = base->current->array;
@@ -275,8 +275,7 @@ proc_net_rpc_nfsd_normalize(_LNXPROC_BASE_T * base)
 }
 
 int
-_lnxproc_proc_net_rpc_nfsd_new(_LNXPROC_BASE_T ** base,
-                               LNXPROC_OPT_T * optional)
+_lnxproc_proc_net_rpc_nfsd_new(_LNXPROC_BASE_T **base, LNXPROC_OPT_T *optional)
 {
 
     _LNXPROC_LIMITS_T *limits = NULL;

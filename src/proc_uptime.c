@@ -34,7 +34,7 @@ BOOT_IMAGE=/vmlinuz-3.8.0-21-generic root=/dev/mapper/ubuntu-root ro quiet splas
 #include "modules.h"
 
 static int
-proc_uptime_normalize(_LNXPROC_BASE_T * base)
+proc_uptime_normalize(_LNXPROC_BASE_T *base)
 {
     _LNXPROC_RESULTS_T *results = base->current->results;
     _LNXPROC_ARRAY_T *array = base->current->array;
@@ -71,7 +71,7 @@ proc_uptime_normalize(_LNXPROC_BASE_T * base)
 }
 
 int
-_lnxproc_proc_uptime_new(_LNXPROC_BASE_T ** base, LNXPROC_OPT_T * optional)
+_lnxproc_proc_uptime_new(_LNXPROC_BASE_T **base, LNXPROC_OPT_T *optional)
 {
 
     char *filenames[] = { "/proc/uptime", };

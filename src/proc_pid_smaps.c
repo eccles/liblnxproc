@@ -68,7 +68,7 @@ VmFlags: rd mr mw me dw ac
 #include "modules.h"
 
 static int
-proc_pid_smaps_normalize(_LNXPROC_BASE_T * base)
+proc_pid_smaps_normalize(_LNXPROC_BASE_T *base)
 {
     _LNXPROC_BASE_DATA_T *data = base->current;
     _LNXPROC_RESULTS_T *results = data->results;
@@ -249,7 +249,7 @@ proc_pid_smaps_normalize(_LNXPROC_BASE_T * base)
 }
 
 int
-_lnxproc_proc_pid_smaps_new(_LNXPROC_BASE_T ** base, LNXPROC_OPT_T * optional)
+_lnxproc_proc_pid_smaps_new(_LNXPROC_BASE_T **base, LNXPROC_OPT_T *optional)
 {
 
     _LNXPROC_LIMITS_T *limits = NULL;

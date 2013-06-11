@@ -25,8 +25,8 @@
 #include <lnxproc/opt.h>
 #include <lnxproc/interface.h>
 
-typedef int (*_LNXPROC_METHOD) (_LNXPROC_BASE_T ** base,
-                                LNXPROC_OPT_T * optional);
+typedef int (*_LNXPROC_METHOD) (_LNXPROC_BASE_T **base,
+                                LNXPROC_OPT_T *optional);
 
 struct _lnxproc_module_row_t {
     LNXPROC_MODULE_TYPE_T type;
@@ -41,8 +41,8 @@ struct lnxproc_module_t {
     _LNXPROC_MODULE_ROW_T row[];
 };
 
-int _lnxproc_create(LNXPROC_MODULE_T * modules);
-int _lnxproc_set_fileglob(LNXPROC_MODULE_T * modules, char *fileglob);
+int _lnxproc_create(LNXPROC_MODULE_T *modules);
+int _lnxproc_set_fileglob(LNXPROC_MODULE_T *modules, char *fileglob);
 
 #endif                          // LIBLNXPROC_INTERFACE_PRIVATE_H
 /*

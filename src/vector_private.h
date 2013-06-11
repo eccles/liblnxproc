@@ -25,7 +25,6 @@
 #define LIBLNXPROC_VECTOR_PRIVATE_H 1
 
 typedef struct _lnxproc_vector_t _LNXPROC_VECTOR_T;
-
 struct _lnxproc_vector_t {
     size_t length;
     size_t size;
@@ -35,45 +34,42 @@ struct _lnxproc_vector_t {
     _LNXPROC_VECTOR_T **children;
     char **values;
 };
-typedef struct _lnxproc_vector_t _LNXPROC_VECTOR_T;
 
-int _lnxproc_vector_new(_LNXPROC_VECTOR_T ** vec, size_t size, int recursive);
+int _lnxproc_vector_new(_LNXPROC_VECTOR_T **vec, size_t size, int recursive);
 
-int _lnxproc_vector_free(_LNXPROC_VECTOR_T ** vectorptr);
+int _lnxproc_vector_free(_LNXPROC_VECTOR_T **vectorptr);
 
 #define _LNXPROC_VECTOR_FREE(v) _lnxproc_vector_free(&v)
 
-int _lnxproc_vector_size(_LNXPROC_VECTOR_T * vector, size_t * size);
-int _lnxproc_vector_resize(_LNXPROC_VECTOR_T * vector, size_t size);
+int _lnxproc_vector_size(_LNXPROC_VECTOR_T *vector, size_t * size);
+int _lnxproc_vector_resize(_LNXPROC_VECTOR_T *vector, size_t size);
 
-int _lnxproc_vector_set_child(_LNXPROC_VECTOR_T * vector,
-                              size_t idx, _LNXPROC_VECTOR_T * child);
-int _lnxproc_vector_set_value(_LNXPROC_VECTOR_T * vector,
-                              size_t idx, char *val);
+int _lnxproc_vector_set_child(_LNXPROC_VECTOR_T *vector,
+                              size_t idx, _LNXPROC_VECTOR_T *child);
+int _lnxproc_vector_set_value(_LNXPROC_VECTOR_T *vector, size_t idx, char *val);
 
-int _lnxproc_vector_set_last_child(_LNXPROC_VECTOR_T * vector,
-                                   size_t idx, _LNXPROC_VECTOR_T * child);
-int _lnxproc_vector_set_last_value(_LNXPROC_VECTOR_T * vector,
+int _lnxproc_vector_set_last_child(_LNXPROC_VECTOR_T *vector,
+                                   size_t idx, _LNXPROC_VECTOR_T *child);
+int _lnxproc_vector_set_last_value(_LNXPROC_VECTOR_T *vector,
                                    size_t idx, char *val);
 
-int _lnxproc_vector_set_length(_LNXPROC_VECTOR_T * vector, size_t idx);
+int _lnxproc_vector_set_length(_LNXPROC_VECTOR_T *vector, size_t idx);
 
-int _lnxproc_vector_child(_LNXPROC_VECTOR_T * vector,
-                          size_t idx, _LNXPROC_VECTOR_T ** child);
-int _lnxproc_vector_value(_LNXPROC_VECTOR_T * vector, size_t idx, char **value);
+int _lnxproc_vector_child(_LNXPROC_VECTOR_T *vector,
+                          size_t idx, _LNXPROC_VECTOR_T **child);
+int _lnxproc_vector_value(_LNXPROC_VECTOR_T *vector, size_t idx, char **value);
 
 typedef
-int (*_LNXPROC_VECTOR_ITERATE_FUNC) (_LNXPROC_VECTOR_T *
-                                     vector, int idx, int depth, void *data);
+int (*_LNXPROC_VECTOR_ITERATE_FUNC) (_LNXPROC_VECTOR_T *vector, int idx,
+                                     int depth, void *data);
 
-int _lnxproc_vector_iterate(_LNXPROC_VECTOR_T * vector,
+int _lnxproc_vector_iterate(_LNXPROC_VECTOR_T *vector,
                             int idx,
                             int depth,
                             int allocated,
                             void *data, _LNXPROC_VECTOR_ITERATE_FUNC func);
 
-int _lnxproc_vector_print(_LNXPROC_VECTOR_T * vector,
-                          int allocated, void *data);
+int _lnxproc_vector_print(_LNXPROC_VECTOR_T *vector, int allocated, void *data);
 
 #endif                          // LIBLNXPROC_VECTOR_PRIVATE_H
 /*

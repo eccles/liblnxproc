@@ -34,7 +34,7 @@ This file is part of liblnxproc.
 #include "modules.h"
 
 static int
-proc_interrupts_normalize(_LNXPROC_BASE_T * base)
+proc_interrupts_normalize(_LNXPROC_BASE_T *base)
 {
     _LNXPROC_BASE_DATA_T *data = base->current;
     _LNXPROC_RESULTS_T *results = data->results;
@@ -184,7 +184,7 @@ proc_interrupts_normalize(_LNXPROC_BASE_T * base)
 }
 
 int
-_lnxproc_proc_interrupts_new(_LNXPROC_BASE_T ** base, LNXPROC_OPT_T * optional)
+_lnxproc_proc_interrupts_new(_LNXPROC_BASE_T **base, LNXPROC_OPT_T *optional)
 {
 
     _LNXPROC_LIMITS_T *limits = NULL;

@@ -106,7 +106,7 @@ static _LNXPROC_MODULE_ROW_T mymodules[] = {
 static size_t nmodules = sizeof(mymodules) / sizeof(mymodules[0]);
 
 int
-lnxproc_new(LNXPROC_MODULE_T ** moduleptr, size_t nmodule)
+lnxproc_new(LNXPROC_MODULE_T **moduleptr, size_t nmodule)
 {
     if (!moduleptr) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Module address");
@@ -152,7 +152,7 @@ lnxproc_new(LNXPROC_MODULE_T ** moduleptr, size_t nmodule)
 }
 
 int
-lnxproc_size(LNXPROC_MODULE_T * modules, size_t * size)
+lnxproc_size(LNXPROC_MODULE_T *modules, size_t * size)
 {
     if (!size) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Size");
@@ -198,8 +198,8 @@ lnxproc_size(LNXPROC_MODULE_T * modules, size_t * size)
 }
 
 int
-lnxproc_set(LNXPROC_MODULE_T * module, size_t pos,
-            LNXPROC_MODULE_TYPE_T type, LNXPROC_OPT_T * optional)
+lnxproc_set(LNXPROC_MODULE_T *module, size_t pos,
+            LNXPROC_MODULE_TYPE_T type, LNXPROC_OPT_T *optional)
 {
     if (!module) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Module");
@@ -250,7 +250,7 @@ lnxproc_release(void *arg)
 }
 
 int
-lnxproc_free(LNXPROC_MODULE_T ** modulesptr)
+lnxproc_free(LNXPROC_MODULE_T **modulesptr)
 {
     if (modulesptr && *modulesptr) {
         LNXPROC_MODULE_T *modules = *modulesptr;
@@ -262,7 +262,7 @@ lnxproc_free(LNXPROC_MODULE_T ** modulesptr)
 }
 
 int
-_lnxproc_create(LNXPROC_MODULE_T * modules)
+_lnxproc_create(LNXPROC_MODULE_T *modules)
 {
 
     if (!modules) {
@@ -293,7 +293,7 @@ _lnxproc_create(LNXPROC_MODULE_T * modules)
 }
 
 int
-_lnxproc_set_fileglob(LNXPROC_MODULE_T * modules, char *fileglob)
+_lnxproc_set_fileglob(LNXPROC_MODULE_T *modules, char *fileglob)
 {
 
     if (!modules) {
@@ -324,7 +324,7 @@ _lnxproc_set_fileglob(LNXPROC_MODULE_T * modules, char *fileglob)
 }
 
 int
-lnxproc_read(LNXPROC_MODULE_T * modules)
+lnxproc_read(LNXPROC_MODULE_T *modules)
 {
 
     if (!modules) {
@@ -382,7 +382,7 @@ lnxproc_read(LNXPROC_MODULE_T * modules)
 }
 
 int
-lnxproc_performance(LNXPROC_MODULE_T * modules,
+lnxproc_performance(LNXPROC_MODULE_T *modules,
                     long *rawread_time, long *map_time,
                     long *normalize_time, long *hash_time)
 {
@@ -425,8 +425,8 @@ struct interface_env_t {
     void *data;
 };
 static int
-results_iterate(_LNXPROC_RESULTS_T * results,
-                _LNXPROC_RESULTS_TABLE_T * entry, void *data)
+results_iterate(_LNXPROC_RESULTS_T *results,
+                _LNXPROC_RESULTS_TABLE_T *entry, void *data)
 {
     struct interface_env_t *env = data;
     LNXPROC_INTERFACE_METHOD func = env->func;
@@ -440,7 +440,7 @@ results_iterate(_LNXPROC_RESULTS_T * results,
 }
 
 int
-lnxproc_iterate(LNXPROC_MODULE_T * modules, LNXPROC_INTERFACE_METHOD func,
+lnxproc_iterate(LNXPROC_MODULE_T *modules, LNXPROC_INTERFACE_METHOD func,
                 void *data)
 {
     if (!modules) {
@@ -478,7 +478,7 @@ lnxproc_iterate(LNXPROC_MODULE_T * modules, LNXPROC_INTERFACE_METHOD func,
 }
 
 int
-lnxproc_print(LNXPROC_MODULE_T * modules, int fd, LNXPROC_PRINT_T print)
+lnxproc_print(LNXPROC_MODULE_T *modules, int fd, LNXPROC_PRINT_T print)
 {
     if (!modules) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Modules");
@@ -510,7 +510,7 @@ lnxproc_print(LNXPROC_MODULE_T * modules, int fd, LNXPROC_PRINT_T print)
 }
 
 int
-lnxproc_fetch(LNXPROC_MODULE_T * modules, LNXPROC_MODULE_TYPE_T type,
+lnxproc_fetch(LNXPROC_MODULE_T *modules, LNXPROC_MODULE_TYPE_T type,
               char *key, char *value, size_t valuelen, char **pbuf)
 {
     if (!modules) {

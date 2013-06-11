@@ -32,7 +32,7 @@ struct lnxproc_opt_t {
     LNXPROC_MODULE_T *module;
 };
 
-int _lnxproc_opt_set_results(LNXPROC_OPT_T * opt, _LNXPROC_RESULTS_T * results);
+int _lnxproc_opt_set_results(LNXPROC_OPT_T *opt, _LNXPROC_RESULTS_T *results);
 
 #endif                          // LIBLNXPROC_OPT_PRIVATE_H
 /*

@@ -36,9 +36,6 @@ timing-prf: timing.c
 testing-prf: timing-prf
 	ln -f $^ $@
 
-check: $(SRCS)
-	$(RELDIR)/check.sh $(SRCS)
-
 clean:
 	rm -f $(TSKS) $(LTSKS) $(SHS) *~ *.orig core* vgcore* x y z
 

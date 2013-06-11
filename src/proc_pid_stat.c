@@ -611,7 +611,7 @@ pids_iterate(char *master,
  * Process the raw data returned by the rawread function for this module
  */
 static int
-proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
+proc_pid_stat_normalize(_LNXPROC_BASE_T *base)
 {
 
     struct process_t process;
@@ -776,7 +776,7 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T * base)
  * Create this module 
  */
 int
-_lnxproc_proc_pid_stat_new(_LNXPROC_BASE_T ** base, LNXPROC_OPT_T * optional)
+_lnxproc_proc_pid_stat_new(_LNXPROC_BASE_T **base, LNXPROC_OPT_T *optional)
 {
 
     _LNXPROC_LIMITS_T *limits = NULL;

@@ -39,7 +39,7 @@ Node 0, zone   Normal  85168  42417  24240  18985   8333   1863    343    136   
 #include "modules.h"
 
 static int
-proc_buddyinfo_normalize(_LNXPROC_BASE_T * base)
+proc_buddyinfo_normalize(_LNXPROC_BASE_T *base)
 {
     _LNXPROC_RESULTS_T *results = base->current->results;
     _LNXPROC_ARRAY_T *array = base->current->array;
@@ -112,7 +112,7 @@ proc_buddyinfo_normalize(_LNXPROC_BASE_T * base)
 }
 
 int
-_lnxproc_proc_buddyinfo_new(_LNXPROC_BASE_T ** base, LNXPROC_OPT_T * optional)
+_lnxproc_proc_buddyinfo_new(_LNXPROC_BASE_T **base, LNXPROC_OPT_T *optional)
 {
 
     _LNXPROC_LIMITS_T *limits = NULL;

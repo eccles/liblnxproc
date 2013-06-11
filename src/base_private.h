@@ -59,7 +59,7 @@ typedef enum _lnxproc_base_type_t _LNXPROC_BASE_TYPE_T;
 char *_lnxproc_base_typestr(_LNXPROC_BASE_TYPE_T type, char *buf, size_t len);
 
 typedef struct _lnxproc_base_t _LNXPROC_BASE_T;
-typedef int (*_LNXPROC_BASE_METHOD) (_LNXPROC_BASE_T * base);
+typedef int (*_LNXPROC_BASE_METHOD) (_LNXPROC_BASE_T *base);
 
 struct _lnxproc_base_t {
     _LNXPROC_BASE_METHOD rawread;
@@ -81,34 +81,33 @@ struct _lnxproc_base_t {
     LNXPROC_OPT_T *optional;
 };
 
-int _lnxproc_base_new(_LNXPROC_BASE_T ** base,
+int _lnxproc_base_new(_LNXPROC_BASE_T **base,
                       char *tag,
                       _LNXPROC_BASE_TYPE_T type,
                       _LNXPROC_BASE_METHOD rawread,
                       _LNXPROC_BASE_METHOD normalize,
                       _LNXPROC_BASE_METHOD read,
-                      size_t buflen, _LNXPROC_LIMITS_T * limits);
+                      size_t buflen, _LNXPROC_LIMITS_T *limits);
 
-int _lnxproc_base_free(_LNXPROC_BASE_T ** baseptr);
-int _lnxproc_base_size(_LNXPROC_BASE_T * baseptr, size_t * size);
+int _lnxproc_base_free(_LNXPROC_BASE_T **baseptr);
+int _lnxproc_base_size(_LNXPROC_BASE_T *baseptr, size_t * size);
 
 #define _LNXPROC_BASE_FREE(b) _lnxproc_base_free(&b)
 
-int _lnxproc_base_set_filenames(_LNXPROC_BASE_T * base, char **filenames,
+int _lnxproc_base_set_filenames(_LNXPROC_BASE_T *base, char **filenames,
                                 size_t nfiles);
-int _lnxproc_base_set_fileprefix(_LNXPROC_BASE_T * base, char *fileprefix);
-int _lnxproc_base_set_fileglob(_LNXPROC_BASE_T * base, char *fileglob);
-int _lnxproc_base_set_filesuffix(_LNXPROC_BASE_T * base, char *filesuffix);
-int _lnxproc_base_set_optional(_LNXPROC_BASE_T * base,
-                               LNXPROC_OPT_T * optional);
-int _lnxproc_base_read(_LNXPROC_BASE_T * base);
-int _lnxproc_base_rawread(_LNXPROC_BASE_T * base);
-int _lnxproc_base_normalize(_LNXPROC_BASE_T * base);
-int _lnxproc_base_print(_LNXPROC_BASE_T * base);
-int _lnxproc_base_store_previous(_LNXPROC_BASE_T * base);
-int _lnxproc_base_memoize(_LNXPROC_BASE_T * base);
-int _lnxproc_base_unmemoize(_LNXPROC_BASE_T * base);
-int _lnxproc_base_timeval_diff(_LNXPROC_BASE_T * base, float *tdiff);
+int _lnxproc_base_set_fileprefix(_LNXPROC_BASE_T *base, char *fileprefix);
+int _lnxproc_base_set_fileglob(_LNXPROC_BASE_T *base, char *fileglob);
+int _lnxproc_base_set_filesuffix(_LNXPROC_BASE_T *base, char *filesuffix);
+int _lnxproc_base_set_optional(_LNXPROC_BASE_T *base, LNXPROC_OPT_T *optional);
+int _lnxproc_base_read(_LNXPROC_BASE_T *base);
+int _lnxproc_base_rawread(_LNXPROC_BASE_T *base);
+int _lnxproc_base_normalize(_LNXPROC_BASE_T *base);
+int _lnxproc_base_print(_LNXPROC_BASE_T *base);
+int _lnxproc_base_store_previous(_LNXPROC_BASE_T *base);
+int _lnxproc_base_memoize(_LNXPROC_BASE_T *base);
+int _lnxproc_base_unmemoize(_LNXPROC_BASE_T *base);
+int _lnxproc_base_timeval_diff(_LNXPROC_BASE_T *base, float *tdiff);
 
 #endif                          // LIBLNXPROC_BASE_PRIVATE_H
 /*

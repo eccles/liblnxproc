@@ -57,7 +57,7 @@ iter_func(char *val, void *data, size_t idx[], size_t dim)
 }
 
 static int
-sys_disksectors_normalize(_LNXPROC_BASE_T * base)
+sys_disksectors_normalize(_LNXPROC_BASE_T *base)
 {
 
     _LNXPROC_RESULTS_T *results = base->current->results;
@@ -75,7 +75,7 @@ sys_disksectors_normalize(_LNXPROC_BASE_T * base)
 }
 
 int
-_lnxproc_sys_disksectors_new(_LNXPROC_BASE_T ** base, LNXPROC_OPT_T * optional)
+_lnxproc_sys_disksectors_new(_LNXPROC_BASE_T **base, LNXPROC_OPT_T *optional)
 {
 
     _LNXPROC_LIMITS_T *limits = NULL;

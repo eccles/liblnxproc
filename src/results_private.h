@@ -57,7 +57,7 @@ enum _lnxproc_results_table_valuetype_t {
     _LNXPROC_RESULTS_TABLE_VALUETYPE_PTR,
 };
 typedef enum _lnxproc_results_table_valuetype_t
- _LNXPROC_RESULTS_TABLE_VALUETYPE_T;
+    _LNXPROC_RESULTS_TABLE_VALUETYPE_T;
 
 struct _lnxproc_results_table_t {
     size_t keylen;
@@ -68,7 +68,7 @@ struct _lnxproc_results_table_t {
 };
 typedef struct _lnxproc_results_table_t _LNXPROC_RESULTS_TABLE_T;
 
-int _lnxproc_results_table_valuestr(_LNXPROC_RESULTS_TABLE_T * entry,
+int _lnxproc_results_table_valuestr(_LNXPROC_RESULTS_TABLE_T *entry,
                                     char *buf, size_t len, char **res);
 
 struct _lnxproc_results_t {
@@ -83,47 +83,47 @@ struct _lnxproc_results_t {
 };
 typedef struct _lnxproc_results_t _LNXPROC_RESULTS_T;
 
-int _lnxproc_results_new(_LNXPROC_RESULTS_T ** resultsptr, char *tag);
+int _lnxproc_results_new(_LNXPROC_RESULTS_T **resultsptr, char *tag);
 
-int _lnxproc_results_free(_LNXPROC_RESULTS_T ** resultsptr);
+int _lnxproc_results_free(_LNXPROC_RESULTS_T **resultsptr);
 void _lnxproc_results_release(void *arg);
 
 #define _LNXPROC_RESULTS_FREE(r) _lnxproc_results_free(&r)
 
-int _lnxproc_results_size(_LNXPROC_RESULTS_T * results, size_t * size);
-int _lnxproc_results_print(_LNXPROC_RESULTS_T * results, int fd,
+int _lnxproc_results_size(_LNXPROC_RESULTS_T *results, size_t * size);
+int _lnxproc_results_print(_LNXPROC_RESULTS_T *results, int fd,
                            LNXPROC_PRINT_T print);
-int _lnxproc_results_hash(_LNXPROC_RESULTS_T * results);
+int _lnxproc_results_hash(_LNXPROC_RESULTS_T *results);
 
-int _lnxproc_results_init(_LNXPROC_RESULTS_T * results, size_t nentries);
+int _lnxproc_results_init(_LNXPROC_RESULTS_T *results, size_t nentries);
 
-int _lnxproc_results_fetch(_LNXPROC_RESULTS_T * results, char *key,
-                           _LNXPROC_RESULTS_TABLE_T ** entry);
-int _lnxproc_results_last(_LNXPROC_RESULTS_T * results,
-                          _LNXPROC_RESULTS_TABLE_T ** entry);
+int _lnxproc_results_fetch(_LNXPROC_RESULTS_T *results, char *key,
+                           _LNXPROC_RESULTS_TABLE_T **entry);
+int _lnxproc_results_last(_LNXPROC_RESULTS_T *results,
+                          _LNXPROC_RESULTS_TABLE_T **entry);
 
-int _lnxproc_results_add_int(_LNXPROC_RESULTS_T * results,
+int _lnxproc_results_add_int(_LNXPROC_RESULTS_T *results,
                              const char *key, const int value);
-int _lnxproc_results_add_long(_LNXPROC_RESULTS_T * results,
+int _lnxproc_results_add_long(_LNXPROC_RESULTS_T *results,
                               const char *key, const long value);
-int _lnxproc_results_add_unsigned_long(_LNXPROC_RESULTS_T * results,
+int _lnxproc_results_add_unsigned_long(_LNXPROC_RESULTS_T *results,
                                        const char *key,
                                        const unsigned long value);
-int _lnxproc_results_add_float(_LNXPROC_RESULTS_T * results, const char *key,
+int _lnxproc_results_add_float(_LNXPROC_RESULTS_T *results, const char *key,
                                const float value);
-int _lnxproc_results_add_string(_LNXPROC_RESULTS_T * results, const char *key,
+int _lnxproc_results_add_string(_LNXPROC_RESULTS_T *results, const char *key,
                                 const char *value, size_t valuelen);
 
-int _lnxproc_results_add_stringref(_LNXPROC_RESULTS_T * results,
+int _lnxproc_results_add_stringref(_LNXPROC_RESULTS_T *results,
                                    const char *key, const char *value);
 
-int _lnxproc_results_add_ptr(_LNXPROC_RESULTS_T * results,
+int _lnxproc_results_add_ptr(_LNXPROC_RESULTS_T *results,
                              const char *key, const void *value);
 
-typedef int (*_LNXPROC_RESULTS_ITERATE_FUNC) (_LNXPROC_RESULTS_T * results,
-                                              _LNXPROC_RESULTS_TABLE_T *
-                                              entry, void *data);
-int _lnxproc_results_iterate(_LNXPROC_RESULTS_T * results,
+typedef int (*_LNXPROC_RESULTS_ITERATE_FUNC) (_LNXPROC_RESULTS_T *results,
+                                              _LNXPROC_RESULTS_TABLE_T *entry,
+                                              void *data);
+int _lnxproc_results_iterate(_LNXPROC_RESULTS_T *results,
                              _LNXPROC_RESULTS_ITERATE_FUNC func, void *data);
 
 #endif                          // LIBLNXPROC_RESULTS_PRIVATE_H

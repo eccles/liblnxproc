@@ -35,8 +35,7 @@ vector_malloc_children(size_t size)
 }
 
 static _LNXPROC_VECTOR_T **
-vector_realloc_children(_LNXPROC_VECTOR_T ** old, size_t oldsize,
-                        size_t addsize)
+vector_realloc_children(_LNXPROC_VECTOR_T **old, size_t oldsize, size_t addsize)
 {
     _LNXPROC_DEBUG("Old %p oldsize %zd addsize %zd\n", old, oldsize, addsize);
 
@@ -95,7 +94,7 @@ vector_realloc_values(char **old, size_t oldsize, size_t addsize)
 }
 
 int
-_lnxproc_vector_new(_LNXPROC_VECTOR_T ** vector, size_t size, int recursive)
+_lnxproc_vector_new(_LNXPROC_VECTOR_T **vector, size_t size, int recursive)
 {
 
     _LNXPROC_DEBUG("sizeof ptr %lu\n", sizeof(void *));
@@ -155,7 +154,7 @@ _lnxproc_vector_new(_LNXPROC_VECTOR_T ** vector, size_t size, int recursive)
 }
 
 int
-_lnxproc_vector_free(_LNXPROC_VECTOR_T ** vectorptr)
+_lnxproc_vector_free(_LNXPROC_VECTOR_T **vectorptr)
 {
     _LNXPROC_DEBUG("Vector %p\n", vectorptr);
 
@@ -184,7 +183,7 @@ struct vector_size_t {
     size_t size;
 };
 static int
-vector_size_internal(_LNXPROC_VECTOR_T * vector, int idx, int depth, void *data)
+vector_size_internal(_LNXPROC_VECTOR_T *vector, int idx, int depth, void *data)
 {
     _LNXPROC_DEBUG("Vector %p Idx %d, Depth %d Data %p\n", vector, idx, depth,
                    data);
@@ -202,7 +201,7 @@ vector_size_internal(_LNXPROC_VECTOR_T * vector, int idx, int depth, void *data)
 }
 
 int
-_lnxproc_vector_size(_LNXPROC_VECTOR_T * vector, size_t * size)
+_lnxproc_vector_size(_LNXPROC_VECTOR_T *vector, size_t * size)
 {
     if (!size) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Size");
@@ -221,7 +220,7 @@ _lnxproc_vector_size(_LNXPROC_VECTOR_T * vector, size_t * size)
 }
 
 int
-_lnxproc_vector_resize(_LNXPROC_VECTOR_T * vector, size_t size)
+_lnxproc_vector_resize(_LNXPROC_VECTOR_T *vector, size_t size)
 {
     _LNXPROC_DEBUG("Vector %p Size %zd\n", vector, size);
 
@@ -283,8 +282,8 @@ _lnxproc_vector_resize(_LNXPROC_VECTOR_T * vector, size_t size)
 }
 
 int
-_lnxproc_vector_child(_LNXPROC_VECTOR_T * vector, size_t idx,
-                      _LNXPROC_VECTOR_T ** child)
+_lnxproc_vector_child(_LNXPROC_VECTOR_T *vector, size_t idx,
+                      _LNXPROC_VECTOR_T **child)
 {
     _LNXPROC_DEBUG("Vector %p Idx %zd\n", vector, idx);
 
@@ -316,7 +315,7 @@ _lnxproc_vector_child(_LNXPROC_VECTOR_T * vector, size_t idx,
 }
 
 int
-_lnxproc_vector_value(_LNXPROC_VECTOR_T * vector, size_t idx, char **value)
+_lnxproc_vector_value(_LNXPROC_VECTOR_T *vector, size_t idx, char **value)
 {
     _LNXPROC_DEBUG("Vector %p Idx %zd\n", vector, idx);
 
@@ -349,8 +348,8 @@ _lnxproc_vector_value(_LNXPROC_VECTOR_T * vector, size_t idx, char **value)
 }
 
 int
-_lnxproc_vector_set_child(_LNXPROC_VECTOR_T * vector, size_t idx,
-                          _LNXPROC_VECTOR_T * child)
+_lnxproc_vector_set_child(_LNXPROC_VECTOR_T *vector, size_t idx,
+                          _LNXPROC_VECTOR_T *child)
 {
     _LNXPROC_DEBUG("Vector %p Idx %zd Child %p\n", vector, idx, child);
 
@@ -400,7 +399,7 @@ _lnxproc_vector_set_child(_LNXPROC_VECTOR_T * vector, size_t idx,
 }
 
 int
-_lnxproc_vector_set_value(_LNXPROC_VECTOR_T * vector, size_t idx, char *val)
+_lnxproc_vector_set_value(_LNXPROC_VECTOR_T *vector, size_t idx, char *val)
 {
     _LNXPROC_DEBUG("Vector %p Idx %zd Val %p '%s'\n", vector, idx, val, val);
 
@@ -446,8 +445,8 @@ _lnxproc_vector_set_value(_LNXPROC_VECTOR_T * vector, size_t idx, char *val)
 }
 
 int
-_lnxproc_vector_set_last_child(_LNXPROC_VECTOR_T * vector, size_t idx,
-                               _LNXPROC_VECTOR_T * child)
+_lnxproc_vector_set_last_child(_LNXPROC_VECTOR_T *vector, size_t idx,
+                               _LNXPROC_VECTOR_T *child)
 {
     _LNXPROC_DEBUG("Vector %p Idx %zd Child %p\n", vector, idx, child);
 
@@ -462,8 +461,7 @@ _lnxproc_vector_set_last_child(_LNXPROC_VECTOR_T * vector, size_t idx,
 }
 
 int
-_lnxproc_vector_set_last_value(_LNXPROC_VECTOR_T * vector, size_t idx,
-                               char *val)
+_lnxproc_vector_set_last_value(_LNXPROC_VECTOR_T *vector, size_t idx, char *val)
 {
     _LNXPROC_DEBUG("Vector %p Idx %zd Val %p\n", vector, idx, val);
 
@@ -478,7 +476,7 @@ _lnxproc_vector_set_last_value(_LNXPROC_VECTOR_T * vector, size_t idx,
 }
 
 int
-_lnxproc_vector_set_length(_LNXPROC_VECTOR_T * vector, size_t idx)
+_lnxproc_vector_set_length(_LNXPROC_VECTOR_T *vector, size_t idx)
 {
     _LNXPROC_DEBUG("Vector %p Idx %zd\n", vector, idx);
 
@@ -499,7 +497,7 @@ _lnxproc_vector_set_length(_LNXPROC_VECTOR_T * vector, size_t idx)
 }
 
 int
-_lnxproc_vector_iterate(_LNXPROC_VECTOR_T * vector,
+_lnxproc_vector_iterate(_LNXPROC_VECTOR_T *vector,
                         int idx, int depth, int allocated, void *data,
                         _LNXPROC_VECTOR_ITERATE_FUNC func)
 {
@@ -550,8 +548,7 @@ vector_print_depth(int depth)
 }
 
 static int
-vector_print_internal(_LNXPROC_VECTOR_T * vector, int idx, int depth,
-                      void *data)
+vector_print_internal(_LNXPROC_VECTOR_T *vector, int idx, int depth, void *data)
 {
     _LNXPROC_DEBUG("Vector %p Idx %d, Depth %d Data %p\n", vector, idx, depth,
                    data);
@@ -595,7 +592,7 @@ vector_print_internal(_LNXPROC_VECTOR_T * vector, int idx, int depth,
 }
 
 int
-_lnxproc_vector_print(_LNXPROC_VECTOR_T * vector, int allocated, void *data)
+_lnxproc_vector_print(_LNXPROC_VECTOR_T *vector, int allocated, void *data)
 {
     _LNXPROC_DEBUG("Vector %p Data %p\n", vector, data);
 

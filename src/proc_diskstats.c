@@ -96,8 +96,8 @@ Typical contents of /proc/diskstats::
 #include "modules.h"
 
 static void
-derived_values(int i, int j, _LNXPROC_RESULTS_T * results,
-               _LNXPROC_RESULTS_T * presults, char *pkey,
+derived_values(int i, int j, _LNXPROC_RESULTS_T *results,
+               _LNXPROC_RESULTS_T *presults, char *pkey,
                int offset, size_t plen, float out, float tdiff)
 {
     if (tdiff > 0.0) {
@@ -131,7 +131,7 @@ derived_values(int i, int j, _LNXPROC_RESULTS_T * results,
 }
 
 static int
-proc_diskstats_normalize(_LNXPROC_BASE_T * base)
+proc_diskstats_normalize(_LNXPROC_BASE_T *base)
 {
     _LNXPROC_BASE_DATA_T *data = base->current;
     _LNXPROC_RESULTS_T *results = data->results;
@@ -372,7 +372,7 @@ proc_diskstats_normalize(_LNXPROC_BASE_T * base)
 }
 
 int
-_lnxproc_proc_diskstats_new(_LNXPROC_BASE_T ** base, LNXPROC_OPT_T * optional)
+_lnxproc_proc_diskstats_new(_LNXPROC_BASE_T **base, LNXPROC_OPT_T *optional)
 {
     int ret;
 

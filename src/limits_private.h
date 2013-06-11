@@ -35,20 +35,20 @@ struct _lnxproc_limits_t {
 };
 typedef struct _lnxproc_limits_t _LNXPROC_LIMITS_T;
 
-int _lnxproc_limits_new(_LNXPROC_LIMITS_T ** newlimits, size_t dim);
-int _lnxproc_limits_size(_LNXPROC_LIMITS_T * limits, size_t * size);
-int _lnxproc_limits_set(_LNXPROC_LIMITS_T * limits, int pos,
+int _lnxproc_limits_new(_LNXPROC_LIMITS_T **newlimits, size_t dim);
+int _lnxproc_limits_size(_LNXPROC_LIMITS_T *limits, size_t * size);
+int _lnxproc_limits_set(_LNXPROC_LIMITS_T *limits, int pos,
                         size_t expected, char *chars, int len);
 
-int _lnxproc_limits_free(_LNXPROC_LIMITS_T ** limits);
+int _lnxproc_limits_free(_LNXPROC_LIMITS_T **limits);
 
 #define _LNXPROC_LIMITS_FREE(ll) _lnxproc_limits_free(&ll)
 
 int _lnxproc_chars_print(char *chars, size_t nchars, char *buf, size_t buflen);
 
-int _lnxproc_limit_print(_LNXPROC_LIMITS_ROW_T * limit,
+int _lnxproc_limit_print(_LNXPROC_LIMITS_ROW_T *limit,
                          char *buf, size_t buflen);
-int _lnxproc_limits_print(_LNXPROC_LIMITS_T * limits);
+int _lnxproc_limits_print(_LNXPROC_LIMITS_T *limits);
 
 #endif                          // LIBLNXPROC_LIMITS_PRIVATE_H
 /*
