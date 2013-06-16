@@ -172,7 +172,8 @@ proc_diskstats_normalize(_LNXPROC_BASE_T *base)
 #define IOSCOL 11
 #define MS_IOCOL 12
 #define MS_WEIGHTEDCOL 13
-    static const int const precols[] = { MS_READCOL, MS_WRITECOL, MS_IOCOL, };
+    static const int const precols[] =
+        { MS_READCOL, MS_WRITECOL, MS_IOCOL, MS_WEIGHTEDCOL, };
     static const int nprecols = sizeof(precols) / sizeof(precols[0]);
 
 #define sectorscale 1.0/1024.0
@@ -321,8 +322,17 @@ proc_diskstats_normalize(_LNXPROC_BASE_T *base)
         int mincols = ncols > numcols ? numcols : ncols;
 
         for (j = 0; j < mincols; j++) {
-            if (j == KEYCOL || j == MS_READCOL || j == MS_WRITECOL)
+            if (j == KEYCOL)
                 continue;
+            int k;
+
+            for (k = 0; k < nprecols; k++) {
+                if (j == precols[k])
+                    break;
+            }
+            if (k < nprecols)
+                continue;
+
             float out = 0.0;
 
             int n3 = n2;
