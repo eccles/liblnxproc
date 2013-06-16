@@ -54,11 +54,9 @@ liblnxproc_new(PyObject * self, PyObject * args)
     if (ret) {
         char buf[96];
 
-        PyErr_SetString(LiblnxprocError, lnxproc_strerror(ret, buf, sizeof buf);
-                        return NULL;
-                        }
-                        return Py_BuildValue("i", ret);
-                        }
+    PyErr_SetString(LiblnxprocError, lnxproc_strerror(ret, buf, sizeof buf);
+                        return NULL;}
+                    return Py_BuildValue("i", ret);}
 
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
