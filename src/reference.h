@@ -75,7 +75,7 @@ Release(void *p, RELEASE_METHOD func)
     return NULL;
 }
 
-#define RELEASE(p,f) p = Release(p,f)
+#define RELEASE(p,f) p = Release((p),f)
 
 #endif                          // LIBLNXPROC_REFERENCE_H
 /*

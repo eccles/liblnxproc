@@ -43,7 +43,7 @@ then
     if [ "${0}" = "./testing.sh" -a $# -eq 0 ]
     then
         ${BIN} $* &>testoutput.raw
-        sort testoutput.raw > testoutput
+        grep -v '^Timestamp' testoutput.raw | sort > testoutput
         rm testoutput.raw
         diff testoutput testdata
     else

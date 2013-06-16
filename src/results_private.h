@@ -21,6 +21,8 @@
 #ifndef LIBLNXPROC_RESULTS_PRIVATE_H
 #define LIBLNXPROC_RESULTS_PRIVATE_H 1
 
+#include <sys/time.h>           // struct timeval
+
 #include "print_private.h"
 
 #ifdef DEBUG
@@ -72,6 +74,7 @@ int _lnxproc_results_table_valuestr(_LNXPROC_RESULTS_TABLE_T *entry,
                                     char *buf, size_t len, char **res);
 
 struct _lnxproc_results_t {
+    struct timeval tv;
     char *tag;
     long jiffies_per_sec;
     float secs_per_jiffy;

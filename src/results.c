@@ -21,6 +21,7 @@
 #include <unistd.h>             //sysconf
 
 #include "allocate.h"
+#include "io.h"
 #include "strlcpy.h"
 #include "reference.h"
 #include "val2str.h"
@@ -86,55 +87,14 @@ _lnxproc_results_table_valuestr(_LNXPROC_RESULTS_TABLE_T *entry, char *buf,
     return ret;
 }
 
-static ssize_t
-writec(int fd, const char c)
-{
-    ssize_t nw;
-
-    do {
-        nw = write(fd, &c, 1);
-        if (nw < 0)
-            break;
-    } while (nw < 1);
-    return nw;
-}
-
-static ssize_t
-writen(int fd, const void *ptr, size_t n)
-{
-    ssize_t nl = 0;
-    ssize_t nw;
-
-    while (nl < n) {
-        nw = write(fd, ptr + nl, n - nl);
-        if (nw < 0) {
-            if (nl == 0)
-                return -1;
-            return nl;
-        }
-        nl += nw;
-    }
-    return n;
-}
-
-static ssize_t
-writestring(int fd, const char *str)
-{
-    return writen(fd, str, strlen(str));
-}
-
-/*
-static ssize_t
-writefmt(int fd, char *fmt, ...) WARN_FORMAT(2, 3);
-{
-    return writen(fd,buf,len);
-}
-*/
+#define NDEPTH 6
 struct rprint_t {
     char tag[32];
     int fd;
-    int pid;
-    int offset;
+    char *offset[NDEPTH];
+    int len[NDEPTH];
+    char *key;
+    int depth;
 };
 
 static int
@@ -171,55 +131,100 @@ internal_json_func(_LNXPROC_RESULTS_T *results,
     struct rprint_t *rprint = data;
     char buf[64];
 
-    if (rprint->pid < 0) {
-        char sep = entry->key[0];
-        char *off = index(entry->key + 1, sep);
+    char sep = entry->key[0];
 
-        rprint->offset = off - entry->key + 1;
-        rprint->pid = atoi(entry->key + 1);
-        writen(rprint->fd, "        ", 8);
-        writec(rprint->fd, '"');
-        int n = int2str(rprint->pid, buf, sizeof buf);
+    _LNXPROC_DEBUG("----> Separator '%c' \n", sep);
 
-        writen(rprint->fd, buf, n);
-        writec(rprint->fd, '"');
-        writen(rprint->fd, " : {\n", 5);
+    char *key = entry->key + 1;
+    int keylen = entry->keylen - 1;
+
+#ifdef DEBUG
+    _LNXPROC_DEBUG("Key '%s'(%d)\n", key, keylen);
+#endif
+
+    char *offset[NDEPTH];
+    int len[NDEPTH];
+
+    offset[0] = key;
+    int depth = 0;
+
+    int j = 0;
+    int i = 0;
+
+    while (i < keylen) {
+        if (key[i] == sep) {
+            len[depth++] = i - j;
+            _LNXPROC_DEBUG("Len[%d] = %d\n", depth - 1, len[depth - 1]);
+            i++;
+            j = i;
+            offset[depth] = key + i;
+            _LNXPROC_DEBUG("Offset[%d] = %ld\n", depth, offset[depth] - key);
+        }
+        else {
+            i++;
+        }
+    }
+    len[depth++] = i - j;
+    _LNXPROC_DEBUG("Len[%d] = %d\n", depth - 1, len[depth - 1]);
+    _LNXPROC_DEBUG("Depth %d\n", depth);
+
+    if (rprint->key) {
+        if (depth < rprint->depth) {
+            for (i = rprint->depth; i > depth; i--) {
+                writen(rprint->fd, "},\n", 3);
+            }
+        }
+        int d = depth > rprint->depth ? rprint->depth : depth;
+
+        for (i = 0; i < d - 1; i++) {
+            if (len[i] != rprint->len[i] ||
+                memcmp(offset[i], rprint->offset[i], len[i])) {
+                int j;
+
+                for (j = i; j < d - 1; j++) {
+                    writen(rprint->fd, "},\n", 3);
+                }
+                for (j = i; j < d - 1; j++) {
+                    writec(rprint->fd, '"');
+                    _LNXPROC_DEBUG("%1$d:Offset %2$ld Len %3$d key '%4$*3$s'\n",
+                                   j, offset[j] - key, len[j], offset[j]);
+                    writen(rprint->fd, offset[j], len[j]);
+                    writen(rprint->fd, "\" : {\n", 6);
+                }
+            }
+        }
+        for (; i < depth - 1; i++) {
+            writec(rprint->fd, '"');
+            _LNXPROC_DEBUG("%1$d:Offset %2$ld Len %3$d key '%4$*3$s'\n", i,
+                           offset[i] - key, len[i], offset[i]);
+            writen(rprint->fd, offset[i], len[i]);
+            writen(rprint->fd, "\" : {\n", 6);
+        }
     }
     else {
-        int pid = atoi(entry->key + 1);
-
-        if (pid != rprint->pid) {
-            char sep = entry->key[0];
-            char *off = index(entry->key + 1, sep);
-
-            rprint->offset = off - entry->key + 1;
-            rprint->pid = pid;
-            writen(rprint->fd, "        },\n", 11);
-            writen(rprint->fd, "        ", 8);
+        for (i = 0; i < depth - 1; i++) {
             writec(rprint->fd, '"');
-            int n = int2str(rprint->pid, buf, sizeof buf);
-
-            writen(rprint->fd, buf, n);
-            writec(rprint->fd, '"');
-            writen(rprint->fd, " : {\n", 5);
+            _LNXPROC_DEBUG("%1$d:Offset %2$ld Len %3$d key '%4$*3$s'\n", i,
+                           offset[i] - key, len[i], offset[i]);
+            writen(rprint->fd, offset[i], len[i]);
+            writen(rprint->fd, "\" : {\n", 6);
         }
     }
 
-    writen(rprint->fd, "            ", 12);
+    rprint->key = key;
+    rprint->depth = depth;
+    memcpy(rprint->offset, offset, sizeof(offset));
+    memcpy(rprint->len, len, sizeof(len));
+
     writec(rprint->fd, '"');
-    writen(rprint->fd, entry->key + rprint->offset,
-           entry->keylen - rprint->offset);
-    writec(rprint->fd, '"');
-    writen(rprint->fd, " : ", 3);
-    writec(rprint->fd, '"');
+    writen(rprint->fd, offset[depth - 1], len[depth - 1]);
+    writen(rprint->fd, "\" : \"", 5);
 
     char *pbuf;
     int buflen = _lnxproc_results_table_valuestr(entry, buf, sizeof buf, &pbuf);
 
     writen(rprint->fd, pbuf, buflen);
-    writec(rprint->fd, '"');
-    writec(rprint->fd, ',');
-    writec(rprint->fd, '\n');
+    writen(rprint->fd, "\",\n", 3);
 
     return LNXPROC_OK;
 }
@@ -243,6 +248,11 @@ _lnxproc_results_print(_LNXPROC_RESULTS_T *results, int fd,
 
     if (print == LNXPROC_PRINT_ALL) {
         char buf[32];
+
+        writen(fd, "Timestamp ", 10);
+        lnxproc_timeval_print(&results->tv, buf, sizeof buf);
+        writestring(fd, buf);
+        writec(fd, '\n');
 
         writestring(fd, "Tag = ");
         writestring(fd, results->tag);
@@ -280,7 +290,8 @@ _lnxproc_results_print(_LNXPROC_RESULTS_T *results, int fd,
 
     struct rprint_t rprint = {
         .fd = fd,
-        .pid = -1,
+        .key = NULL,
+        .depth = 0,
     };
 
     if (print == LNXPROC_PRINT_ALL) {
@@ -298,19 +309,24 @@ _lnxproc_results_print(_LNXPROC_RESULTS_T *results, int fd,
         if (!results->hash) {
             _lnxproc_results_hash(results);
         }
-        HASH_SORT(results->hash, rowcmp);
-        writen(fd, "{\n    ", 6);
         writec(fd, '"');
         writestring(fd, results->tag);
-        writec(fd, '"');
-        writen(fd, " : {\n", 5);
+        writen(fd, "\" : {\n", 6);
+
+        char buf[32];
+
+        writen(fd, "\"timestamp\" : \"", 15);
+        lnxproc_timeval_print(&results->tv, buf, sizeof buf);
+        writestring(fd, buf);
+        writen(fd, "\",\n", 3);
+
         _LNXPROC_RESULTS_TABLE_T *entry, *tmp;
 
         HASH_ITER(hh, results->hash, entry, tmp) {
             internal_json_func(results, entry, &rprint);
         }
-        //ret = _lnxproc_results_iterate(results, internal_json_func, &rprint);
-        writen(fd, "\n        }\n    }\n}\n", 19);
+        writen(fd, "}}}}}}}}", rprint.depth);
+        writen(fd, ",\n", 2);
     }
     else {
         strlcpy(rprint.tag, "Line", sizeof rprint.tag);
@@ -514,6 +530,7 @@ _lnxproc_results_hash(_LNXPROC_RESULTS_T *results)
                 _LNXPROC_DEBUG("%d key %s\n", i, entry->key);
                 HASH_ADD(hh, results->hash, key, entry->keylen, entry);
             }
+            HASH_SORT(results->hash, rowcmp);
         }
     }
 

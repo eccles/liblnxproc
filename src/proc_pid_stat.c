@@ -747,9 +747,9 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T *base)
     _LNXPROC_DEBUG("Time difference = %f secs\n", process.tdiff);
     if (process.tdiff > 0.0) {
         _LNXPROC_DEBUG("Current timestamp is %f\n",
-                       lnxproc_timeval_secs(&data->tv));
+                       lnxproc_timeval_secs(&data->results->tv));
         _LNXPROC_DEBUG("Previous timestamp is %f\n",
-                       lnxproc_timeval_secs(&pdata->tv));
+                       lnxproc_timeval_secs(&pdata->results->tv));
 
         pids_iterate(master, '+', &process, process_rates);
     }

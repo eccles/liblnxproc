@@ -86,9 +86,6 @@ _lnxproc_base_print(_LNXPROC_BASE_T *base)
         _LNXPROC_BASE_DATA_T *data = base->current;
 
         printf("CURRENT at %p(%d)\n", data, data->id);
-        printf("Timestamp %lu.%06lu\n",
-               (unsigned long) data->tv.tv_sec,
-               (unsigned long) data->tv.tv_usec);
         printf("Rawread duration %ld usecs\n", data->rawread_time);
         printf("Map duration %ld usecs\n", data->map_time);
         printf("Normalize duration %ld usecs\n", data->normalize_time);
@@ -101,9 +98,6 @@ _lnxproc_base_print(_LNXPROC_BASE_T *base)
         if (base->previous) {
             data = base->previous;
             printf("PREVIOUS at %p(%d)\n", data, data->id);
-            printf("Previous Timestamp %lu.%06lu\n",
-                   (unsigned long) data->tv.tv_sec,
-                   (unsigned long) data->tv.tv_usec);
             printf("Previous Rawread duration %ld usecs\n", data->rawread_time);
             printf("Previous Map duration %ld usecs\n", data->map_time);
             printf("Previous Hash duration %ld usecs\n", data->hash_time);
@@ -435,13 +429,14 @@ _lnxproc_base_rawread(_LNXPROC_BASE_T *base)
             return ret;
         }
 
-        data->tv = lnxproc_timeval();
-        data->rawread_time = lnxproc_timeval_diff(&start, &data->tv);
+        data->results->tv = lnxproc_timeval();
+        data->rawread_time = lnxproc_timeval_diff(&start, &data->results->tv);
 #ifdef DEBUG
         char buf[32];
 
         _LNXPROC_DEBUG("Current timestamp %s\n",
-                       lnxproc_timeval_print(&data->tv, buf, sizeof buf));
+                       lnxproc_timeval_print(&data->results->tv, buf,
+                                             sizeof buf));
 #endif
     }
     else {
@@ -676,13 +671,6 @@ _base_data_new(_LNXPROC_BASE_DATA_T *data, int id, char *tag,
 {
     _LNXPROC_DEBUG("New base data at %p index %d\n", data, id);
     data->id = id;
-    data->tv = lnxproc_timeval();
-#ifdef DEBUG
-    char buf[32];
-
-    _LNXPROC_DEBUG("Current timestamp %s\n",
-                   lnxproc_timeval_print(&data->tv, buf, sizeof buf));
-#endif
 
     int ret = base_new_rawread_buffer(data, buflen);
 
@@ -1096,7 +1084,8 @@ _lnxproc_base_timeval_diff(_LNXPROC_BASE_T *base, float *tdiff)
     }
 
     *tdiff =
-        1.e-6 * lnxproc_timeval_diff(&base->current->tv, &base->previous->tv);
+        1.e-6 * lnxproc_timeval_diff(&base->current->results->tv,
+                                     &base->previous->results->tv);
     return LNXPROC_OK;
 }
 

@@ -22,7 +22,6 @@
 #define LIBLNXPROC_BASE_PRIVATE_H 1
 
 #include <stddef.h>             // size_t
-#include <sys/time.h>           // struct timeval
 
 #include "reference.h"
 #include "util_private.h"
@@ -38,7 +37,6 @@ struct _lnxproc_base_data_t {
     long map_time;
     long hash_time;
     long normalize_time;
-    struct timeval tv;
     char *lines;
     size_t buflen;
     int nbytes;

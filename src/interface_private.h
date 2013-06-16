@@ -29,6 +29,7 @@ typedef int (*_LNXPROC_METHOD) (_LNXPROC_BASE_T **base,
                                 LNXPROC_OPT_T *optional);
 
 struct _lnxproc_module_row_t {
+    const char *tag;
     LNXPROC_MODULE_TYPE_T type;
     _LNXPROC_METHOD new;
     _LNXPROC_BASE_T *base;

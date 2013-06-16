@@ -1,6 +1,6 @@
 RELDIR=..
 PUBHDIR=$(RELDIR)/include/lnxproc
-FUNCHDRS=limit_chr.h strlcpy.h memdup.h val2str.h allocate.h reference.h
+FUNCHDRS=limit_chr.h strlcpy.h memdup.h val2str.h allocate.h reference.h io.h
 PUBBASEHDRS=lnxproc.h util.h error.h interface.h opt.h print.h
 PROCHDRS=modules.h
 PUBHDRS=$(PUBBASEHDRS)

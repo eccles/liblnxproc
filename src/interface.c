@@ -21,6 +21,7 @@
 #include <string.h>             //memcpy
 
 #include "allocate.h"
+#include "io.h"
 #include "memdup.h"
 #include "strlcpy.h"
 #include "error_private.h"
@@ -35,71 +36,71 @@
  * only add to end to preserve consistent API
  */
 static _LNXPROC_MODULE_ROW_T mymodules[] = {
-    {.type = LNXPROC_PROC_CGROUPS,.new = _lnxproc_proc_cgroups_new,.base =
-     NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_DISKSTATS,.new = _lnxproc_proc_diskstats_new,.base =
-     NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_DOMAINNAME,.new = _lnxproc_proc_domainname_new,.base =
-     NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_HOSTNAME,.new = _lnxproc_proc_hostname_new,.base =
-     NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_OSRELEASE,.new = _lnxproc_proc_osrelease_new,.base =
-     NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_PID_ENVIRON,.new =
+    {.tag = "proc_cgroups",.type = LNXPROC_PROC_CGROUPS,.new =
+     _lnxproc_proc_cgroups_new,.base = NULL,.optional = NULL,},
+    {.tag = "proc_diskstats",.type = LNXPROC_PROC_DISKSTATS,.new =
+     _lnxproc_proc_diskstats_new,.base = NULL,.optional = NULL,},
+    {.tag = "proc_domainname",.type = LNXPROC_PROC_DOMAINNAME,.new =
+     _lnxproc_proc_domainname_new,.base = NULL,.optional = NULL,},
+    {.tag = "proc_hostname",.type = LNXPROC_PROC_HOSTNAME,.new =
+     _lnxproc_proc_hostname_new,.base = NULL,.optional = NULL,},
+    {.tag = "proc_osrelease",.type = LNXPROC_PROC_OSRELEASE,.new =
+     _lnxproc_proc_osrelease_new,.base = NULL,.optional = NULL,},
+    {.tag = "proc_pid_environ",.type = LNXPROC_PROC_PID_ENVIRON,.new =
      _lnxproc_proc_pid_environ_new,.base = NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_PID_STAT,.new = _lnxproc_proc_pid_stat_new,.base =
-     NULL,.optional = NULL,},
-    {.type = LNXPROC_SYS_CPUFREQ,.new = _lnxproc_sys_cpufreq_new,.base =
-     NULL,.optional = NULL,},
-    {.type = LNXPROC_SYS_DISKSECTORS,.new = _lnxproc_sys_disksectors_new,.base =
-     NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_BUDDYINFO,.new = _lnxproc_proc_buddyinfo_new,.base =
-     NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_CMDLINE,.new = _lnxproc_proc_cmdline_new,.base =
-     NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_CPUINFO,.new = _lnxproc_proc_cpuinfo_new,.base =
-     NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_INTERRUPTS,.new = _lnxproc_proc_interrupts_new,.base =
-     NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_LOADAVG,.new = _lnxproc_proc_loadavg_new,.base =
-     NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_MEMINFO,.new = _lnxproc_proc_meminfo_new,.base =
-     NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_MOUNTS,.new = _lnxproc_proc_mounts_new,.base =
-     NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_PARTITIONS,.new = _lnxproc_proc_partitions_new,.base =
-     NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_SOFTIRQS,.new = _lnxproc_proc_softirqs_new,.base =
-     NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_STAT,.new = _lnxproc_proc_stat_new,.base =
-     NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_UPTIME,.new = _lnxproc_proc_uptime_new,.base =
-     NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_VMSTAT,.new = _lnxproc_proc_vmstat_new,.base =
-     NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_PID_IO,.new = _lnxproc_proc_pid_io_new,.base =
-     NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_PID_STATUS,.new = _lnxproc_proc_pid_status_new,.base =
-     NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_PID_STATM,.new = _lnxproc_proc_pid_statm_new,.base =
-     NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_NET_DEV,.new = _lnxproc_proc_net_dev_new,.base =
-     NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_NET_RPC_NFS,.new =
+    {.tag = "proc_pid_stat",.type = LNXPROC_PROC_PID_STAT,.new =
+     _lnxproc_proc_pid_stat_new,.base = NULL,.optional = NULL,},
+    {.tag = "sys_cpufreq",.type = LNXPROC_SYS_CPUFREQ,.new =
+     _lnxproc_sys_cpufreq_new,.base = NULL,.optional = NULL,},
+    {.tag = "sys_disksectors",.type = LNXPROC_SYS_DISKSECTORS,.new =
+     _lnxproc_sys_disksectors_new,.base = NULL,.optional = NULL,},
+    {.tag = "proc_buddyinfo",.type = LNXPROC_PROC_BUDDYINFO,.new =
+     _lnxproc_proc_buddyinfo_new,.base = NULL,.optional = NULL,},
+    {.tag = "proc_cmdline",.type = LNXPROC_PROC_CMDLINE,.new =
+     _lnxproc_proc_cmdline_new,.base = NULL,.optional = NULL,},
+    {.tag = "proc_cpuinfo",.type = LNXPROC_PROC_CPUINFO,.new =
+     _lnxproc_proc_cpuinfo_new,.base = NULL,.optional = NULL,},
+    {.tag = "proc_interrupts",.type = LNXPROC_PROC_INTERRUPTS,.new =
+     _lnxproc_proc_interrupts_new,.base = NULL,.optional = NULL,},
+    {.tag = "proc_loadavg",.type = LNXPROC_PROC_LOADAVG,.new =
+     _lnxproc_proc_loadavg_new,.base = NULL,.optional = NULL,},
+    {.tag = "proc_meminfo",.type = LNXPROC_PROC_MEMINFO,.new =
+     _lnxproc_proc_meminfo_new,.base = NULL,.optional = NULL,},
+    {.tag = "proc_mounts",.type = LNXPROC_PROC_MOUNTS,.new =
+     _lnxproc_proc_mounts_new,.base = NULL,.optional = NULL,},
+    {.tag = "proc_partitions",.type = LNXPROC_PROC_PARTITIONS,.new =
+     _lnxproc_proc_partitions_new,.base = NULL,.optional = NULL,},
+    {.tag = "proc_softirqs",.type = LNXPROC_PROC_SOFTIRQS,.new =
+     _lnxproc_proc_softirqs_new,.base = NULL,.optional = NULL,},
+    {.tag = "proc_stat",.type = LNXPROC_PROC_STAT,.new =
+     _lnxproc_proc_stat_new,.base = NULL,.optional = NULL,},
+    {.tag = "proc_uptime",.type = LNXPROC_PROC_UPTIME,.new =
+     _lnxproc_proc_uptime_new,.base = NULL,.optional = NULL,},
+    {.tag = "proc_vmstat",.type = LNXPROC_PROC_VMSTAT,.new =
+     _lnxproc_proc_vmstat_new,.base = NULL,.optional = NULL,},
+    {.tag = "proc_pid_io",.type = LNXPROC_PROC_PID_IO,.new =
+     _lnxproc_proc_pid_io_new,.base = NULL,.optional = NULL,},
+    {.tag = "proc_pid_status",.type = LNXPROC_PROC_PID_STATUS,.new =
+     _lnxproc_proc_pid_status_new,.base = NULL,.optional = NULL,},
+    {.tag = "proc_pid_statm",.type = LNXPROC_PROC_PID_STATM,.new =
+     _lnxproc_proc_pid_statm_new,.base = NULL,.optional = NULL,},
+    {.tag = "proc_net_dev",.type = LNXPROC_PROC_NET_DEV,.new =
+     _lnxproc_proc_net_dev_new,.base = NULL,.optional = NULL,},
+    {.tag = "proc_net_rpc_nfs",.type = LNXPROC_PROC_NET_RPC_NFS,.new =
      _lnxproc_proc_net_rpc_nfs_new,.base = NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_NET_RPC_NFSD,.new =
+    {.tag = "proc_net_rpc_nfsd",.type = LNXPROC_PROC_NET_RPC_NFSD,.new =
      _lnxproc_proc_net_rpc_nfsd_new,.base = NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_NET_SNMP,.new = _lnxproc_proc_net_snmp_new,.base =
-     NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_NET_NETSTAT,.new =
+    {.tag = "proc_net_snmp",.type = LNXPROC_PROC_NET_SNMP,.new =
+     _lnxproc_proc_net_snmp_new,.base = NULL,.optional = NULL,},
+    {.tag = "proc_net_netstat",.type = LNXPROC_PROC_NET_NETSTAT,.new =
      _lnxproc_proc_net_netstat_new,.base = NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_NET_SNMP6,.new = _lnxproc_proc_net_snmp6_new,.base =
-     NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_NET_SOCKSTAT,.new =
+    {.tag = "proc_net_snmp6",.type = LNXPROC_PROC_NET_SNMP6,.new =
+     _lnxproc_proc_net_snmp6_new,.base = NULL,.optional = NULL,},
+    {.tag = "proc_net_sockstat",.type = LNXPROC_PROC_NET_SOCKSTAT,.new =
      _lnxproc_proc_net_sockstat_new,.base = NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_SYS_FS_FILE_NR,.new =
+    {.tag = "proc_sys_fs_file_nr",.type = LNXPROC_PROC_SYS_FS_FILE_NR,.new =
      _lnxproc_proc_sys_fs_file_nr_new,.base = NULL,.optional = NULL,},
-    {.type = LNXPROC_PROC_PID_SMAPS,.new =
+    {.tag = "proc_pid_smaps",.type = LNXPROC_PROC_PID_SMAPS,.new =
      _lnxproc_proc_pid_smaps_new,.base = NULL,.optional = NULL,},
 };
 
@@ -194,6 +195,28 @@ lnxproc_size(LNXPROC_MODULE_T *modules, size_t * size)
             }
         }
     }
+    return LNXPROC_OK;
+}
+
+int
+lnxproc_tag(LNXPROC_MODULE_T *module, size_t pos, const char **tag)
+{
+    if (!tag) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Tag");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+    *tag = NULL;
+    if (!module) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Module");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+    if (pos < 0 || pos >= module->nmodules) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Pos = %zd", pos);
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+    _LNXPROC_MODULE_ROW_T *row = module->row + pos;
+
+    *tag = row->tag;
     return LNXPROC_OK;
 }
 
@@ -486,6 +509,9 @@ lnxproc_print(LNXPROC_MODULE_T *modules, int fd, LNXPROC_PRINT_T print)
     }
     int i;
 
+    if (print == LNXPROC_PRINT_JSON) {
+        writen(fd, "\n{\n", 3);
+    }
     for (i = 0; i < modules->nmodules; i++) {
         _LNXPROC_MODULE_ROW_T *row = modules->row + i;
 
@@ -506,6 +532,9 @@ lnxproc_print(LNXPROC_MODULE_T *modules, int fd, LNXPROC_PRINT_T print)
             }
         }
     }
+    if (print == LNXPROC_PRINT_JSON) {
+        writen(fd, "}\n", 2);
+    }
     return LNXPROC_OK;
 }
 
@@ -517,10 +546,16 @@ lnxproc_fetch(LNXPROC_MODULE_T *modules, LNXPROC_MODULE_TYPE_T type,
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Modules");
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
+    if (!pbuf) {
+        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Modules");
+        return LNXPROC_ERROR_ILLEGAL_ARG;
+    }
+    *pbuf = NULL;
     if (!value || valuelen < 2) {
         _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Fetch buffer");
         return LNXPROC_ERROR_ILLEGAL_ARG;
     }
+
     int i, ret;
 
     for (i = 0; i < modules->nmodules; i++) {

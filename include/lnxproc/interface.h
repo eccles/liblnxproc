@@ -80,6 +80,7 @@ extern "C" {
     int lnxproc_size(LNXPROC_MODULE_T *module, size_t * size);
     int lnxproc_set(LNXPROC_MODULE_T *module, size_t pos,
                     LNXPROC_MODULE_TYPE_T type, LNXPROC_OPT_T *optional);
+    int lnxproc_tag(LNXPROC_MODULE_T *module, size_t pos, const char **tag);
     int lnxproc_free(LNXPROC_MODULE_T **modulesptr);
 
 #define LNXPROC_FREE(b) lnxproc_free(&b)
