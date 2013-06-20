@@ -409,6 +409,7 @@ _lnxproc_base_rawread(_LNXPROC_BASE_T *base)
     }
 
     _LNXPROC_BASE_DATA_T *data = base->current;
+    _LNXPROC_RESULTS_T *results = data->results;
 
     if (base->rawread) {
         int ret;
@@ -417,6 +418,7 @@ _lnxproc_base_rawread(_LNXPROC_BASE_T *base)
             if (base->count > 0) {
                 ret = _lnxproc_base_store_previous(base);
                 if (ret) {
+                    results->error = ret;
                     return ret;
                 }
             }
@@ -426,22 +428,23 @@ _lnxproc_base_rawread(_LNXPROC_BASE_T *base)
 
         ret = base->rawread(base);
         if (ret) {
+            results->error = ret;
             return ret;
         }
 
-        data->results->tv = lnxproc_timeval();
-        data->rawread_time = lnxproc_timeval_diff(&start, &data->results->tv);
+        results->tv = lnxproc_timeval();
+        data->rawread_time = lnxproc_timeval_diff(&start, &results->tv);
 #ifdef DEBUG
         char buf[32];
 
         _LNXPROC_DEBUG("Current timestamp %s\n",
-                       lnxproc_timeval_print(&data->results->tv, buf,
-                                             sizeof buf));
+                       lnxproc_timeval_print(&results->tv, buf, sizeof buf));
 #endif
     }
     else {
         data->rawread_time = 0.0;
     }
+    results->error = LNXPROC_OK;
     return LNXPROC_OK;
 }
 
@@ -604,10 +607,15 @@ _lnxproc_base_normalize(_LNXPROC_BASE_T *base)
     int ret;
 
     _LNXPROC_BASE_DATA_T *data = base->current;
+    _LNXPROC_RESULTS_T *results = data->results;
 
     if (base->normalize) {
 
-        base_map(base);
+        ret = base_map(base);
+        if (ret) {
+            results->error = ret;
+            return ret;
+        }
 
         _LNXPROC_DEBUG("Execute normalize method\n");
         struct timeval start = lnxproc_timeval();
@@ -617,6 +625,7 @@ _lnxproc_base_normalize(_LNXPROC_BASE_T *base)
 
         data->normalize_time = lnxproc_timeval_diff(&start, &end);
         if (ret) {
+            results->error = ret;
             return ret;
         }
         start = end;
@@ -626,6 +635,7 @@ _lnxproc_base_normalize(_LNXPROC_BASE_T *base)
         if (base->type == _LNXPROC_BASE_TYPE_MEMOIZE) {
             ret = _lnxproc_base_memoize(base);
             if (ret) {
+                results->error = ret;
                 return ret;
             }
         }
@@ -638,6 +648,7 @@ _lnxproc_base_normalize(_LNXPROC_BASE_T *base)
         data->hash_time = 0.0;
         data->normalize_time = 0.0;
     }
+    results->error = LNXPROC_OK;
     return LNXPROC_OK;
 }
 

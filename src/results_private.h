@@ -74,6 +74,7 @@ int _lnxproc_results_table_valuestr(_LNXPROC_RESULTS_TABLE_T *entry,
                                     char *buf, size_t len, char **res);
 
 struct _lnxproc_results_t {
+    int error;
     struct timeval tv;
     char *tag;
     long jiffies_per_sec;

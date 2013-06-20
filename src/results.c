@@ -254,13 +254,18 @@ _lnxproc_results_print(_LNXPROC_RESULTS_T *results, int fd,
         writestring(fd, buf);
         writec(fd, '\n');
 
+        writen(fd, "Error ", 6);
+        int n = int2str(results->error, buf, sizeof buf);
+
+        writen(fd, buf, n);
+        writec(fd, '\n');
+
         writestring(fd, "Tag = ");
         writestring(fd, results->tag);
         writec(fd, '\n');
 
         writestring(fd, "Jiffies per second = ");
-        int n = long2str(results->jiffies_per_sec, buf, sizeof buf);
-
+        n = long2str(results->jiffies_per_sec, buf, sizeof buf);
         writen(fd, buf, n);
         writec(fd, '\n');
 
@@ -318,6 +323,12 @@ _lnxproc_results_print(_LNXPROC_RESULTS_T *results, int fd,
         writen(fd, "\"timestamp\" : \"", 15);
         lnxproc_timeval_print(&results->tv, buf, sizeof buf);
         writestring(fd, buf);
+        writen(fd, "\",\n", 3);
+
+        writen(fd, "\"error\" : \"", 11);
+        int n = int2str(results->error, buf, sizeof buf);
+
+        writen(fd, buf, n);
         writen(fd, "\",\n", 3);
 
         _LNXPROC_RESULTS_TABLE_T *entry, *tmp;
