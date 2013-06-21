@@ -18,6 +18,7 @@
  *
  */
 
+#include <ctype.h>             //isdigit
 #include <unistd.h>             //sysconf
 
 #include "allocate.h"
@@ -80,7 +81,41 @@ _lnxproc_results_table_valuestr(_LNXPROC_RESULTS_TABLE_T *entry, char *buf,
                                  entry->valuetype);
             buf[0] = '\0';
             *res = buf;
-            ret = 1;
+            ret = LNXPROC_ERROR_ILLEGAL_ARG;
+            break;
+        }
+    }
+    return ret;
+}
+
+static int
+_lnxproc_results_table_valuenumeric(_LNXPROC_RESULTS_TABLE_T *entry, int *numeric)
+{
+    int ret = 0;
+
+    if (numeric && entry) {
+        switch (entry->valuetype) {
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_INT:
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_UNSIGNEDINT:
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_LONG:
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_UNSIGNED_LONG:
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_FLOAT:
+            *numeric = 1;
+            break;
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_STR:
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_STRREF:
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_STRREFS:
+            *numeric = 0;
+            break;
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_PTR:
+            *numeric = 1;
+            break;
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_NONE:
+        default:
+            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "valuetype %d",
+                                 entry->valuetype);
+            *numeric = -1;
+            ret = LNXPROC_ERROR_ILLEGAL_ARG;
             break;
         }
     }
@@ -124,6 +159,27 @@ internal_print_func(_LNXPROC_RESULTS_T *results,
     return LNXPROC_OK;
 }
 
+static int
+isnumericstring(char *str, size_t len)
+{
+    if( len < 1 )
+        return 0;
+
+    char *c = str;
+    if( *c != '-' && *c != '+' && !isdigit(*c)) {
+        return 0;
+    }
+    c++;
+
+    char *d = str + len;
+    while( c < d ) {
+        if( !isdigit(*c)) {
+            return 0;
+        }
+        c++;
+    }
+    return 1;
+}
 static int
 internal_json_func(_LNXPROC_RESULTS_T *results,
                    _LNXPROC_RESULTS_TABLE_T *entry, void *data)
@@ -185,29 +241,47 @@ internal_json_func(_LNXPROC_RESULTS_T *results,
                     writen(rprint->fd, "},\n", 3);
                 }
                 for (j = i; j < d - 1; j++) {
-                    writec(rprint->fd, '"');
                     _LNXPROC_DEBUG("%1$d:Offset %2$ld Len %3$d key '%4$*3$s'\n",
                                    j, offset[j] - key, len[j], offset[j]);
+                    int numeric = isnumericstring(offset[j],len[j]);
+                    if( !numeric) {
+                        writec(rprint->fd, '"');
+                    }
                     writen(rprint->fd, offset[j], len[j]);
-                    writen(rprint->fd, "\" : {\n", 6);
+                    if( !numeric) {
+                        writec(rprint->fd, '"');
+                    }
+                    writen(rprint->fd, " : {\n", 5);
                 }
             }
         }
         for (; i < depth - 1; i++) {
-            writec(rprint->fd, '"');
             _LNXPROC_DEBUG("%1$d:Offset %2$ld Len %3$d key '%4$*3$s'\n", i,
                            offset[i] - key, len[i], offset[i]);
+            int numeric = isnumericstring(offset[i],len[i]);
+            if( !numeric) {
+                writec(rprint->fd, '"');
+            }
             writen(rprint->fd, offset[i], len[i]);
-            writen(rprint->fd, "\" : {\n", 6);
+            if( !numeric) {
+                writec(rprint->fd, '"');
+            }
+            writen(rprint->fd, " : {\n", 5);
         }
     }
     else {
         for (i = 0; i < depth - 1; i++) {
-            writec(rprint->fd, '"');
             _LNXPROC_DEBUG("%1$d:Offset %2$ld Len %3$d key '%4$*3$s'\n", i,
                            offset[i] - key, len[i], offset[i]);
+            int numeric = isnumericstring(offset[i],len[i]);
+            if( !numeric) {
+                writec(rprint->fd, '"');
+            }
             writen(rprint->fd, offset[i], len[i]);
-            writen(rprint->fd, "\" : {\n", 6);
+            if( !numeric) {
+                writec(rprint->fd, '"');
+            }
+            writen(rprint->fd, " : {\n", 5);
         }
     }
 
@@ -216,15 +290,28 @@ internal_json_func(_LNXPROC_RESULTS_T *results,
     memcpy(rprint->offset, offset, sizeof(offset));
     memcpy(rprint->len, len, sizeof(len));
 
-    writec(rprint->fd, '"');
+    int numeric = isnumericstring(offset[depth-1],len[depth-1]);
+    if( !numeric) {
+        writec(rprint->fd, '"');
+    }
     writen(rprint->fd, offset[depth - 1], len[depth - 1]);
-    writen(rprint->fd, "\" : \"", 5);
+    if( !numeric) {
+        writec(rprint->fd, '"');
+    }
+    writen(rprint->fd, " : ", 3);
 
     char *pbuf;
     int buflen = _lnxproc_results_table_valuestr(entry, buf, sizeof buf, &pbuf);
+    _lnxproc_results_table_valuenumeric(entry, &numeric);
 
+    if( numeric == 0 ) {
+        writec(rprint->fd, '"');
+    }
     writen(rprint->fd, pbuf, buflen);
-    writen(rprint->fd, "\",\n", 3);
+    if( numeric == 0 ) {
+        writec(rprint->fd, '"');
+    }
+    writen(rprint->fd, " ,\n", 3);
 
     return LNXPROC_OK;
 }
@@ -320,16 +407,16 @@ _lnxproc_results_print(_LNXPROC_RESULTS_T *results, int fd,
 
         char buf[32];
 
-        writen(fd, "\"timestamp\" : \"", 15);
+        writen(fd, "\"timestamp\" : ", 14);
         lnxproc_timeval_print(&results->tv, buf, sizeof buf);
         writestring(fd, buf);
-        writen(fd, "\",\n", 3);
+        writen(fd, " ,\n", 3);
 
-        writen(fd, "\"error\" : \"", 11);
+        writen(fd, "\"error\" : ", 10);
         int n = int2str(results->error, buf, sizeof buf);
 
         writen(fd, buf, n);
-        writen(fd, "\",\n", 3);
+        writen(fd, " ,\n", 3);
 
         _LNXPROC_RESULTS_TABLE_T *entry, *tmp;
 
