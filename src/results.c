@@ -18,7 +18,7 @@
  *
  */
 
-#include <ctype.h>             //isdigit
+#include <ctype.h>              //isdigit
 #include <unistd.h>             //sysconf
 
 #include "allocate.h"
@@ -89,7 +89,8 @@ _lnxproc_results_table_valuestr(_LNXPROC_RESULTS_TABLE_T *entry, char *buf,
 }
 
 static int
-_lnxproc_results_table_valuenumeric(_LNXPROC_RESULTS_TABLE_T *entry, int *numeric)
+_lnxproc_results_table_valuenumeric(_LNXPROC_RESULTS_TABLE_T *entry,
+                                    int *numeric)
 {
     int ret = 0;
 
@@ -162,24 +163,27 @@ internal_print_func(_LNXPROC_RESULTS_T *results,
 static int
 isnumericstring(char *str, size_t len)
 {
-    if( len < 1 )
+    if (len < 1)
         return 0;
 
     char *c = str;
-    if( *c != '-' && *c != '+' && !isdigit(*c)) {
+
+    if (*c != '-' && *c != '+' && !isdigit(*c)) {
         return 0;
     }
     c++;
 
     char *d = str + len;
-    while( c < d ) {
-        if( !isdigit(*c)) {
+
+    while (c < d) {
+        if (!isdigit(*c)) {
             return 0;
         }
         c++;
     }
     return 1;
 }
+
 static int
 internal_json_func(_LNXPROC_RESULTS_T *results,
                    _LNXPROC_RESULTS_TABLE_T *entry, void *data)
@@ -243,12 +247,13 @@ internal_json_func(_LNXPROC_RESULTS_T *results,
                 for (j = i; j < d - 1; j++) {
                     _LNXPROC_DEBUG("%1$d:Offset %2$ld Len %3$d key '%4$*3$s'\n",
                                    j, offset[j] - key, len[j], offset[j]);
-                    int numeric = isnumericstring(offset[j],len[j]);
-                    if( !numeric) {
+                    int numeric = isnumericstring(offset[j], len[j]);
+
+                    if (!numeric) {
                         writec(rprint->fd, '"');
                     }
                     writen(rprint->fd, offset[j], len[j]);
-                    if( !numeric) {
+                    if (!numeric) {
                         writec(rprint->fd, '"');
                     }
                     writen(rprint->fd, " : {\n", 5);
@@ -258,12 +263,13 @@ internal_json_func(_LNXPROC_RESULTS_T *results,
         for (; i < depth - 1; i++) {
             _LNXPROC_DEBUG("%1$d:Offset %2$ld Len %3$d key '%4$*3$s'\n", i,
                            offset[i] - key, len[i], offset[i]);
-            int numeric = isnumericstring(offset[i],len[i]);
-            if( !numeric) {
+            int numeric = isnumericstring(offset[i], len[i]);
+
+            if (!numeric) {
                 writec(rprint->fd, '"');
             }
             writen(rprint->fd, offset[i], len[i]);
-            if( !numeric) {
+            if (!numeric) {
                 writec(rprint->fd, '"');
             }
             writen(rprint->fd, " : {\n", 5);
@@ -273,12 +279,13 @@ internal_json_func(_LNXPROC_RESULTS_T *results,
         for (i = 0; i < depth - 1; i++) {
             _LNXPROC_DEBUG("%1$d:Offset %2$ld Len %3$d key '%4$*3$s'\n", i,
                            offset[i] - key, len[i], offset[i]);
-            int numeric = isnumericstring(offset[i],len[i]);
-            if( !numeric) {
+            int numeric = isnumericstring(offset[i], len[i]);
+
+            if (!numeric) {
                 writec(rprint->fd, '"');
             }
             writen(rprint->fd, offset[i], len[i]);
-            if( !numeric) {
+            if (!numeric) {
                 writec(rprint->fd, '"');
             }
             writen(rprint->fd, " : {\n", 5);
@@ -290,25 +297,27 @@ internal_json_func(_LNXPROC_RESULTS_T *results,
     memcpy(rprint->offset, offset, sizeof(offset));
     memcpy(rprint->len, len, sizeof(len));
 
-    int numeric = isnumericstring(offset[depth-1],len[depth-1]);
-    if( !numeric) {
+    int numeric = isnumericstring(offset[depth - 1], len[depth - 1]);
+
+    if (!numeric) {
         writec(rprint->fd, '"');
     }
     writen(rprint->fd, offset[depth - 1], len[depth - 1]);
-    if( !numeric) {
+    if (!numeric) {
         writec(rprint->fd, '"');
     }
     writen(rprint->fd, " : ", 3);
 
     char *pbuf;
     int buflen = _lnxproc_results_table_valuestr(entry, buf, sizeof buf, &pbuf);
+
     _lnxproc_results_table_valuenumeric(entry, &numeric);
 
-    if( numeric == 0 ) {
+    if (numeric == 0) {
         writec(rprint->fd, '"');
     }
     writen(rprint->fd, pbuf, buflen);
-    if( numeric == 0 ) {
+    if (numeric == 0) {
         writec(rprint->fd, '"');
     }
     writen(rprint->fd, " ,\n", 3);
