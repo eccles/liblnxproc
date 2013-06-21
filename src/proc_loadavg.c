@@ -64,7 +64,12 @@ proc_loadavg_normalize(_LNXPROC_BASE_T *base)
 
         STRLCAT(buf, titles[i], n2, sizeof(buf));
         _LNXPROC_DEBUG("Key %s, Value %s\n", buf, val);
-        _lnxproc_results_add_stringref(results, buf, val);
+        if (i < 3) {
+            _lnxproc_results_add_float(results, buf, atof(val));
+        }
+        else {
+            _lnxproc_results_add_int(results, buf, atoi(val));
+        }
 
     }
     return LNXPROC_OK;
