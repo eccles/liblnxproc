@@ -18,15 +18,46 @@ This file is part of liblnxproc.
 
 typical contents of /proc/mounts file::
 
-   subsys_name hierarchy num_mounts enabled
-   cpuset     1     4 1
-   cpu        2     4 1
-   cpuacct    3     4 1
-   memory     4     4 1
-   devices    5     4 1
-   freezer    6     4 1
-   blkio      7     4 1
-   perf_event 8     1 1
+rootfs / rootfs rw 0 0
+sysfs /sys sysfs rw,nosuid,nodev,noexec,relatime 0 0
+proc /proc proc rw,nosuid,nodev,noexec,relatime 0 0
+udev /dev devtmpfs rw,relatime,size=8191108k,nr_inodes=2047777,mode=755 0 0
+devpts /dev/pts devpts rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000 0 0
+tmpfs /run tmpfs rw,nosuid,noexec,relatime,size=1641696k,mode=755 0 0
+/dev/mapper/ubuntu-root / ext4 rw,relatime,errors=remount-ro,data=ordered 0 0
+none /sys/fs/cgroup tmpfs rw,relatime,size=4k,mode=755 0 0
+none /sys/fs/fuse/connections fusectl rw,relatime 0 0
+none /sys/kernel/debug debugfs rw,relatime 0 0
+none /sys/kernel/security securityfs rw,relatime 0 0
+none /sys/firmware/efi/efivars efivarfs rw,relatime 0 0
+tmpfs /tmp tmpfs rw,nosuid,nodev,noatime 0 0
+none /run/lock tmpfs rw,nosuid,nodev,noexec,relatime,size=5120k 0 0
+cgroup /sys/fs/cgroup/cpuset cgroup rw,relatime,cpuset 0 0
+none /run/shm tmpfs rw,nosuid,nodev,relatime 0 0
+none /run/user tmpfs rw,nosuid,nodev,noexec,relatime,size=102400k,mode=755 0 0
+cgroup /sys/fs/cgroup/cpu cgroup rw,relatime,cpu 0 0
+cgroup /sys/fs/cgroup/cpuacct cgroup rw,relatime,cpuacct 0 0
+cgroup /sys/fs/cgroup/memory cgroup rw,relatime,memory 0 0
+cgroup /sys/fs/cgroup/devices cgroup rw,relatime,devices 0 0
+cgroup /sys/fs/cgroup/freezer cgroup rw,relatime,freezer 0 0
+cgroup /sys/fs/cgroup/blkio cgroup rw,relatime,blkio 0 0
+cgroup /sys/fs/cgroup/perf_event cgroup rw,relatime,perf_event 0 0
+cgroup /sys/fs/cgroup/hugetlb cgroup rw,relatime,hugetlb 0 0
+/dev/sda2 /boot ext2 rw,relatime,errors=continue 0 0
+/dev/sda1 /boot/efi vfat rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro 0 0
+/dev/mapper/vm-chroot /srv/chroot ext4 rw,relatime,errors=remount-ro,data=ordered 0 0
+/dev/mapper/vg-images /var/lib/libvirt ext4 rw,noatime,data=ordered 0 0
+/dev/mapper/vg-home /home ext4 rw,relatime,errors=remount-ro,data=ordered 0 0
+binfmt_misc /proc/sys/fs/binfmt_misc binfmt_misc rw,nosuid,nodev,noexec,relatime 0 0
+rpc_pipefs /run/rpc_pipefs rpc_pipefs rw,relatime 0 0
+nfsd /proc/fs/nfsd nfsd rw,relatime 0 0
+/dev/mapper/vm-chroot /var/lib/schroot/mount/quantal_i386-2067f996-115f-4d50-8c79-0ce81663e317 ext4 rw,relatime,errors=remount-ro,data=ordered 0 0
+proc /var/lib/schroot/mount/quantal_i386-2067f996-115f-4d50-8c79-0ce81663e317/proc proc rw,nosuid,nodev,noexec,relatime 0 0
+sysfs /var/lib/schroot/mount/quantal_i386-2067f996-115f-4d50-8c79-0ce81663e317/sys sysfs rw,nosuid,nodev,noexec,relatime 0 0
+udev /var/lib/schroot/mount/quantal_i386-2067f996-115f-4d50-8c79-0ce81663e317/dev devtmpfs rw,relatime,size=8191108k,nr_inodes=2047777,mode=755 0 0
+devpts /var/lib/schroot/mount/quantal_i386-2067f996-115f-4d50-8c79-0ce81663e317/dev/pts devpts rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000 0 0
+/dev/mapper/vg-home /var/lib/schroot/mount/quantal_i386-2067f996-115f-4d50-8c79-0ce81663e317/home ext4 rw,relatime,errors=remount-ro,data=ordered 0 0
+tmpfs /var/lib/schroot/mount/quantal_i386-2067f996-115f-4d50-8c79-0ce81663e317/tmp tmpfs rw,nosuid,nodev,noatime 0 0
 
 */
 
@@ -91,7 +122,12 @@ proc_mounts_normalize(_LNXPROC_BASE_T *base)
 
             STRLCAT(buf, titles[j], n3, sizeof(buf));
             _LNXPROC_DEBUG("%d,%d:Key %s\n", i, j, buf);
-            _lnxproc_results_add_stringref(results, buf, val);
+            if (j > 3) {
+                _lnxproc_results_add_int(results, buf, atoi(val));
+            }
+            else {
+                _lnxproc_results_add_stringref(results, buf, val);
+            }
         }
     }
     return LNXPROC_OK;
