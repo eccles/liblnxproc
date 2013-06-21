@@ -157,8 +157,8 @@ proc_diskstats_normalize(_LNXPROC_BASE_T *base)
     _LNXPROC_DEBUG("Nrows %zd\n", nrows);
     char ***values = (char ***) current->vector->values;
 
-#define MAJORKEYCOL 0
-#define MINORKEYCOL 1
+#define MAJORCOL 0
+#define MINORCOL 1
 #define NAMECOL 2
 #define KEYCOL NAMECOL
 #define READSCOL 3
@@ -355,7 +355,7 @@ proc_diskstats_normalize(_LNXPROC_BASE_T *base)
                 _LNXPROC_DEBUG("%d,%d:Curr %s = %f\n", i, j, pkey, out);
             }
             else {
-                _lnxproc_results_add_stringref(results, pkey, val);
+                _lnxproc_results_add_int(results, pkey, atoi(val));
                 _LNXPROC_DEBUG("%d,%d:Curr %s = %s\n", i, j, pkey, val);
             }
 
