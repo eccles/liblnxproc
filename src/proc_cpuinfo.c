@@ -85,25 +85,59 @@ proc_cpuinfo_normalize(_LNXPROC_BASE_T *base)
         }
 
         else {
-            if (!strcmp(rowkey, "address sizes") ||
-                !strcmp(rowkey, "bogomips") ||
-                !strcmp(rowkey, "cache_alignment") ||
-                !strcmp(rowkey, "cache size") ||
-                !strcmp(rowkey, "clflush size") ||
-                !strcmp(rowkey, "cpu cores") ||
-                !strcmp(rowkey, "cpu family") ||
-                !strcmp(rowkey, "cpu MHz") ||
-                !strcmp(rowkey, "cpuid level") ||
-                !strcmp(rowkey, "flags") ||
-                !strcmp(rowkey, "fpu") ||
-                !strcmp(rowkey, "fpu_exception") ||
-                !strcmp(rowkey, "model") ||
-                !strcmp(rowkey, "model name") ||
-                !strcmp(rowkey, "microcode") ||
-                !strcmp(rowkey, "power management") ||
-                !strcmp(rowkey, "siblings") ||
-                !strcmp(rowkey, "stepping") ||
-                !strcmp(rowkey, "vendor_id") || !strcmp(rowkey, "wp")) {
+            if (!strcmp(rowkey, "apicid") ||
+                !strcmp(rowkey, "initial apicid") ||
+                !strcmp(rowkey, "physical id") || !strcmp(rowkey, "core id")) {
+                int np3 = np2;
+
+                STRLCAT(prockey, rowkey, np3, sizeof(prockey));
+                _LNXPROC_DEBUG("%d:key '%s'\n", i, prockey);
+                int v = atoi(val);
+
+                _LNXPROC_DEBUG("%d:val %d\n", i, v);
+
+                _lnxproc_results_add_int(results, prockey, v);
+            }
+            else if (!strcmp(rowkey, "bogomips") || !strcmp(rowkey, "cpu MHz")) {
+                if (first > 0) {
+                    int n2 = n1;
+
+                    STRLCAT(key, rowkey, n2, sizeof(key));
+                    _LNXPROC_DEBUG("%d:key '%s'\n", i, key);
+                    float f = atof(val);
+
+                    _LNXPROC_DEBUG("%d:val %f\n", i, f);
+                    _lnxproc_results_add_float(results, key, f);
+                }
+            }
+            else if (!strcmp(rowkey, "cpu cores") ||
+                     !strcmp(rowkey, "cache_alignment") ||
+                     !strcmp(rowkey, "cache size") ||
+                     !strcmp(rowkey, "clflush size") ||
+                     !strcmp(rowkey, "cpuid level") ||
+                     !strcmp(rowkey, "model") ||
+                     !strcmp(rowkey, "siblings") ||
+                     !strcmp(rowkey, "stepping") ||
+                     !strcmp(rowkey, "cpu family")) {
+                if (first > 0) {
+                    int n2 = n1;
+
+                    STRLCAT(key, rowkey, n2, sizeof(key));
+                    _LNXPROC_DEBUG("%d:key '%s'\n", i, key);
+                    int v = atoi(val);
+
+                    _LNXPROC_DEBUG("%d:val %d\n", i, v);
+                    _lnxproc_results_add_int(results, key, v);
+                }
+            }
+            else if (!strcmp(rowkey, "address sizes") ||
+                     !strcmp(rowkey, "flags") ||
+                     !strcmp(rowkey, "fpu") ||
+                     !strcmp(rowkey, "fpu_exception") ||
+                     !strcmp(rowkey, "model name") ||
+                     !strcmp(rowkey, "microcode") ||
+                     !strcmp(rowkey, "power management") ||
+                     !strcmp(rowkey, "vendor_id") || !strcmp(rowkey, "wp")) {
                 _LNXPROC_DEBUG("%d:first %d\n", i, first);
                 if (first > 0) {
                     int n2 = n1;
