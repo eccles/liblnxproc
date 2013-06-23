@@ -57,6 +57,12 @@ _lnxproc_results_table_valuestr(_LNXPROC_RESULTS_TABLE_T *entry, char *buf,
             ret = float2str(entry->value.f, buf, len);
             *res = buf;
             break;
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_FIXED:
+            ret =
+                fixed2str(entry->value.f, entry->width, entry->precision, buf,
+                          len);
+            *res = buf;
+            break;
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_STR:
             *res = entry->value.s;
             ret = strlen(*res);
@@ -103,6 +109,7 @@ _lnxproc_results_table_valuenumeric(_LNXPROC_RESULTS_TABLE_T *entry,
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_LONG:
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_UNSIGNED_LONG:
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_FLOAT:
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_FIXED:
             *numeric = 1;
             break;
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_STR:
@@ -334,7 +341,7 @@ _lnxproc_results_print(_LNXPROC_RESULTS_T *results, int fd,
         writec(fd, '\n');
 
         writestring(fd, "Seconds per jiffy = ");
-        n = float2str(results->secs_per_jiffy, buf, sizeof buf);
+        n = fixed2str(results->secs_per_jiffy, 5, 3, buf, sizeof buf);
         writen(fd, buf, n);
         writec(fd, '\n');
 
@@ -776,6 +783,25 @@ _lnxproc_results_add_float(_LNXPROC_RESULTS_T *results, const char *key,
     }
 
     tentry->valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_FLOAT;
+    tentry->value.f = value;
+    return LNXPROC_OK;
+}
+
+int
+_lnxproc_results_add_fixed(_LNXPROC_RESULTS_T *results, const char *key,
+                           const float value, const int width,
+                           const int precision)
+{
+    _LNXPROC_RESULTS_TABLE_T *tentry;
+    int ret = prepare_entry(results, key, &tentry);
+
+    if (ret) {
+        return ret;
+    }
+
+    tentry->width = width;
+    tentry->precision = precision;
+    tentry->valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_FIXED;
     tentry->value.f = value;
     return LNXPROC_OK;
 }

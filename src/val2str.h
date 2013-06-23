@@ -26,17 +26,26 @@
 /*-----------------------------------------------------------------------------
  * string conversions
  */
-#define SNPRINTF(buf,len,fmt,value) do {\
+#define SNPRINTF(buf,len,fmt, args... ) do {\
     int n = 0;\
 \
     if ((buf) && (len) > 2) {\
-        n = snprintf((buf), (len), (fmt), (value));\
+        n = snprintf((buf), (len), (fmt), ##args);\
         if (n >= (len)) {\
             n = (len) - 1;\
         }\
     }\
     return n;\
 } while(0)
+
+static inline int
+fixed2str(float value, int width, int prec, char *buf, size_t len)
+{
+    SNPRINTF(buf, len, "%*.*f", width, prec, value);
+}
+
+#define FIXEDCAT(dest,width, prec,src,offset,size) \
+        offset += fixed2str((src), (prec), (dest) + (offset), (size) - (offset))
 
 static inline int
 float2str(float value, char *buf, size_t len)

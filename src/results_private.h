@@ -57,12 +57,15 @@ enum _lnxproc_results_table_valuetype_t {
     _LNXPROC_RESULTS_TABLE_VALUETYPE_STRREF,
     _LNXPROC_RESULTS_TABLE_VALUETYPE_STRREFS,
     _LNXPROC_RESULTS_TABLE_VALUETYPE_PTR,
+    _LNXPROC_RESULTS_TABLE_VALUETYPE_FIXED,
 };
 typedef enum _lnxproc_results_table_valuetype_t
     _LNXPROC_RESULTS_TABLE_VALUETYPE_T;
 
 struct _lnxproc_results_table_t {
     size_t keylen;
+    int width;
+    int precision;
     char key[_LNXPROC_RESULTS_TABLE_KEYLEN];
     _LNXPROC_RESULTS_TABLE_VALUETYPE_T valuetype;
     _LNXPROC_RESULTS_TABLE_VALUE_T value;
@@ -115,6 +118,9 @@ int _lnxproc_results_add_unsigned_long(_LNXPROC_RESULTS_T *results,
                                        const unsigned long value);
 int _lnxproc_results_add_float(_LNXPROC_RESULTS_T *results, const char *key,
                                const float value);
+int _lnxproc_results_add_fixed(_LNXPROC_RESULTS_T *results, const char *key,
+                               const float value, const int width,
+                               const int precision);
 int _lnxproc_results_add_string(_LNXPROC_RESULTS_T *results, const char *key,
                                 const char *value, size_t valuelen);
 
