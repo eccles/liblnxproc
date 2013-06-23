@@ -272,7 +272,7 @@ internal_json_func(_LNXPROC_RESULTS_T *results,
     memcpy(rprint->offset, offset, sizeof(offset));
     memcpy(rprint->len, len, sizeof(len));
 
-    writekey(rprint, offset[depth-1], len[depth-1]);
+    writekey(rprint, offset[depth - 1], len[depth - 1]);
 
     char *pbuf;
     int buflen = _lnxproc_results_table_valuestr(entry, buf, sizeof buf, &pbuf);
