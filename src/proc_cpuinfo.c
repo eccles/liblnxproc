@@ -107,7 +107,7 @@ proc_cpuinfo_normalize(_LNXPROC_BASE_T *base)
                     float f = atof(val);
 
                     _LNXPROC_DEBUG("%d:val %f\n", i, f);
-                    _lnxproc_results_add_float(results, key, f);
+                    _lnxproc_results_add_fixed(results, key, f, 0, 1);
                 }
             }
             else if (!strcmp(rowkey, "cpu cores") ||
