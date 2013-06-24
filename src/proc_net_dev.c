@@ -151,9 +151,9 @@ proc_net_dev_normalize(_LNXPROC_BASE_T *base)
             STRLCAT(buf, "/", n3, sizeof(buf));
             STRLCAT(buf, coltitles[j], n3, sizeof(buf));
             _LNXPROC_DEBUG("%d,%d:hashkey '%s'\n", i, j, buf);
-            int current = atoi(val);
+            unsigned long current = atoi(val);
 
-            _lnxproc_results_add_int(results, buf, current);
+            _lnxproc_results_add_unsigned_long(results, buf, current);
             if (tdiff > 0.0) {
                 _LNXPROC_RESULTS_TABLE_T *pentry = NULL;
 
@@ -161,9 +161,9 @@ proc_net_dev_normalize(_LNXPROC_BASE_T *base)
 
                 if (ret)
                     continue;
-                _LNXPROC_DEBUG("%d,%d:previous value for %s is %d\n", i, j,
-                               buf, pentry->value.i);
-                float rate = (current - pentry->value.i) / tdiff;
+                _LNXPROC_DEBUG("%d,%d:previous value for %s is %lu\n", i, j,
+                               buf, pentry->value.ul);
+                float rate = (current - pentry->value.ul) / tdiff;
 
                 _LNXPROC_DEBUG("%d,%d:rate = %f\n", i, j, rate);
                 STRLCAT(buf, "-s", n3, sizeof(buf));
