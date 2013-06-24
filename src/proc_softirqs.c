@@ -100,10 +100,10 @@ proc_softirqs_normalize(_LNXPROC_BASE_T *base)
             STRLCAT(hashkey, titles[j - 1], n3, sizeof(hashkey));
             _LNXPROC_DEBUG("%d,%d:hashkey %s\n", i, j, hashkey);
 
-            int v = atoi(val);
+            unsigned long v = strtoul(val, NULL, 0);
 
-            _LNXPROC_DEBUG("%d,%d:val %d\n", i, j, v);
-            _lnxproc_results_add_int(results, hashkey, v);
+            _LNXPROC_DEBUG("%d,%d:val %lu\n", i, j, v);
+            _lnxproc_results_add_unsigned_long(results, hashkey, v);
             if (tdiff > 0.0) {
                 _LNXPROC_RESULTS_TABLE_T *pentry = NULL;
 
@@ -113,9 +113,9 @@ proc_softirqs_normalize(_LNXPROC_BASE_T *base)
                     continue;
 
                 STRLCAT(hashkey, "-s", n3, sizeof(hashkey));
-                float value = (v - pentry->value.i) / tdiff;
+                float value = (v - pentry->value.ul) / tdiff;
 
-                _lnxproc_results_add_float(results, hashkey, value);
+                _lnxproc_results_add_fixed(results, hashkey, value, 0, 2);
 #ifdef DEBUG
                 _LNXPROC_DEBUG("%d,%d:Curr %s = %f\n", i, j, hashkey, value);
                 if (value < 0.0) {
