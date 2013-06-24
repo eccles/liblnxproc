@@ -168,7 +168,7 @@ proc_net_dev_normalize(_LNXPROC_BASE_T *base)
                 _LNXPROC_DEBUG("%d,%d:rate = %f\n", i, j, rate);
                 STRLCAT(buf, "-s", n3, sizeof(buf));
                 _LNXPROC_DEBUG("%d,%d:hashkey '%s'\n", i, j, buf);
-                _lnxproc_results_add_float(results, buf, rate);
+                _lnxproc_results_add_fixed(results, buf, rate, 0, 1);
             }
         }
     }
