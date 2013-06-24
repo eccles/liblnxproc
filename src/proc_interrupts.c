@@ -127,7 +127,7 @@ proc_interrupts_normalize(_LNXPROC_BASE_T *base)
                 STRLCAT(hashkey, "-s", n3, sizeof(hashkey));
                 float value = (v - pentry->value.i) / tdiff;
 
-                _lnxproc_results_add_float(results, hashkey, value);
+                _lnxproc_results_add_fixed(results, hashkey, value, 0, 1);
 #ifdef DEBUG
                 _LNXPROC_DEBUG("%d:Curr %s = %f\n", i, hashkey, value);
                 if (value < 0.0) {
@@ -167,7 +167,7 @@ proc_interrupts_normalize(_LNXPROC_BASE_T *base)
                     STRLCAT(hashkey, "-s", n3, sizeof(hashkey));
                     float value = (v - pentry->value.i) / tdiff;
 
-                    _lnxproc_results_add_float(results, hashkey, value);
+                    _lnxproc_results_add_fixed(results, hashkey, value, 0, 1);
 #ifdef DEBUG
                     _LNXPROC_DEBUG("%d,%d:Curr %s = %f\n", i, j, hashkey,
                                    value);
