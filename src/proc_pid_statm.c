@@ -101,10 +101,11 @@ proc_pid_statm_normalize(_LNXPROC_BASE_T *base)
 
             STRLCAT(key, colkey[j - 1], n3, sizeof(key));
 
-            int value = atoi(val) * results->page_size;
+            unsigned long value = strtoul(val, NULL, 0) * results->page_size;
 
-            _LNXPROC_DEBUG("%d,%d:%s value %s int %d\n", i, j, key, val, value);
-            _lnxproc_results_add_int(results, key, value);
+            _LNXPROC_DEBUG("%d,%d:%s value %s int %lu\n", i, j, key, val,
+                           value);
+            _lnxproc_results_add_unsigned_long(results, key, value);
         }
     }
 
