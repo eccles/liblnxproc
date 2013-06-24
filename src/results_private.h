@@ -49,7 +49,7 @@ typedef union _lnxproc_results_table_value_t _LNXPROC_RESULTS_TABLE_VALUE_T;
 enum _lnxproc_results_table_valuetype_t {
     _LNXPROC_RESULTS_TABLE_VALUETYPE_NONE = 0,
     _LNXPROC_RESULTS_TABLE_VALUETYPE_INT,
-    _LNXPROC_RESULTS_TABLE_VALUETYPE_UNSIGNEDINT,
+    _LNXPROC_RESULTS_TABLE_VALUETYPE_UNSIGNED_INT,
     _LNXPROC_RESULTS_TABLE_VALUETYPE_LONG,
     _LNXPROC_RESULTS_TABLE_VALUETYPE_UNSIGNED_LONG,
     _LNXPROC_RESULTS_TABLE_VALUETYPE_FLOAT,
@@ -111,8 +111,11 @@ int _lnxproc_results_last(_LNXPROC_RESULTS_T *results,
 
 int _lnxproc_results_add_int(_LNXPROC_RESULTS_T *results,
                              const char *key, const int value);
-int _lnxproc_results_add_long(_LNXPROC_RESULTS_T *results,
-                              const char *key, const long value);
+int _lnxproc_results_add_unsigned_int(_LNXPROC_RESULTS_T *results,
+                                      const char *key,
+                                      const unsigned int value);
+int _lnxproc_results_add_long(_LNXPROC_RESULTS_T *results, const char *key,
+                              const long value);
 int _lnxproc_results_add_unsigned_long(_LNXPROC_RESULTS_T *results,
                                        const char *key,
                                        const unsigned long value);

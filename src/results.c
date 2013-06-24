@@ -41,7 +41,7 @@ _lnxproc_results_table_valuestr(_LNXPROC_RESULTS_TABLE_T *entry, char *buf,
             ret = int2str(entry->value.i, buf, len);
             *res = buf;
             break;
-        case _LNXPROC_RESULTS_TABLE_VALUETYPE_UNSIGNEDINT:
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_UNSIGNED_INT:
             ret = unsigned2str(entry->value.ui, buf, len);
             *res = buf;
             break;
@@ -105,7 +105,7 @@ _lnxproc_results_table_valuenumeric(_LNXPROC_RESULTS_TABLE_T *entry,
     if (numeric && entry) {
         switch (entry->valuetype) {
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_INT:
-        case _LNXPROC_RESULTS_TABLE_VALUETYPE_UNSIGNEDINT:
+        case _LNXPROC_RESULTS_TABLE_VALUETYPE_UNSIGNED_INT:
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_LONG:
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_UNSIGNED_LONG:
         case _LNXPROC_RESULTS_TABLE_VALUETYPE_FLOAT:
@@ -907,6 +907,22 @@ _lnxproc_results_add_long(_LNXPROC_RESULTS_T *results, const char *key,
 
     tentry->valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_LONG;
     tentry->value.l = value;
+    return LNXPROC_OK;
+}
+
+int
+_lnxproc_results_add_unsigned_int(_LNXPROC_RESULTS_T *results,
+                                  const char *key, const unsigned int value)
+{
+    _LNXPROC_RESULTS_TABLE_T *tentry;
+    int ret = prepare_entry(results, key, &tentry);
+
+    if (ret) {
+        return ret;
+    }
+
+    tentry->valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_UNSIGNED_INT;
+    tentry->value.ui = value;
     return LNXPROC_OK;
 }
 
