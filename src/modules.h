@@ -24,6 +24,7 @@
 #include "interface_private.h"
 #include "base_private.h"
 
+int _lnxproc_ntp_drift_new(_LNXPROC_BASE_T **base, LNXPROC_OPT_T *optional);
 int _lnxproc_proc_buddyinfo_new(_LNXPROC_BASE_T **base,
                                 LNXPROC_OPT_T *optional);
 int _lnxproc_proc_cgroups_new(_LNXPROC_BASE_T **base, LNXPROC_OPT_T *optional);

@@ -686,6 +686,7 @@ main(int argc, char *argv[])
         test_limits();
         test_array();
         test_interface();
+        test_module(LNXPROC_NTP_DRIFT, NULL);
         test_module(LNXPROC_PROC_BUDDYINFO, NULL);
         test_module(LNXPROC_PROC_CGROUPS, NULL);
         test_module(LNXPROC_PROC_CMDLINE, NULL);
@@ -751,6 +752,9 @@ main(int argc, char *argv[])
     }
     else if (!strcmp(argv[1], "interface")) {
         test_interface();
+    }
+    else if (!strcmp(argv[1], "ntp_drift")) {
+        test_module(LNXPROC_NTP_DRIFT, NULL);
     }
     else if (!strcmp(argv[1], "proc_buddyinfo")) {
         test_module(LNXPROC_PROC_BUDDYINFO, NULL);

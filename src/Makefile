@@ -11,6 +11,7 @@ HDRS=$(PRIVHDRS) $(PROCHDRS) $(FUNCHDRS)
 LIB=liblnxproc
 BASESRCS=util.c error.c results.c limits.c vector.c array.c base.c interface.c \
 opt.c
+MISCSRCS=ntp_drift.c
 PROCPIDSRCS=proc_pid_environ.c proc_pid_io.c proc_pid_stat.c proc_pid_statm.c \
 proc_pid_status.c proc_pid_smaps.c 
 PROCNETRPCSRCS=proc_net_rpc_nfs.c proc_net_rpc_nfsd.c
@@ -23,7 +24,7 @@ proc_loadavg.c proc_meminfo.c proc_mounts.c proc_osrelease.c proc_partitions.c \
 proc_softirqs.c proc_stat.c proc_uptime.c proc_vmstat.c \
 $(PROCNETSRCS) $(PROCPIDSRCS) $(PROCSYSSRCS)
 SYSSRCS=sys_cpufreq.c sys_disksectors.c
-SRCS=$(BASESRCS) $(PROCSRCS) $(SYSSRCS)
+SRCS=$(BASESRCS) $(PROCSRCS) $(SYSSRCS) $(MISCSRCS)
 DIRS=
 BIN=test-lnxproc
 

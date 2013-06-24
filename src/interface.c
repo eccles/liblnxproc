@@ -102,6 +102,8 @@ static _LNXPROC_MODULE_ROW_T mymodules[] = {
      _lnxproc_proc_sys_fs_file_nr_new,.base = NULL,.optional = NULL,},
     {.tag = "proc_pid_smaps",.type = LNXPROC_PROC_PID_SMAPS,.new =
      _lnxproc_proc_pid_smaps_new,.base = NULL,.optional = NULL,},
+    {.tag = "ntp_drift",.type = LNXPROC_NTP_DRIFT,.new =
+     _lnxproc_ntp_drift_new,.base = NULL,.optional = NULL,},
 };
 
 static size_t nmodules = sizeof(mymodules) / sizeof(mymodules[0]);

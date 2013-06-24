@@ -199,6 +199,7 @@ main(int argc, char *argv[])
     if (argc < 2) {
 
         test_all();
+        TEST_MODULE(LNXPROC_NTP_DRIFT);
         TEST_MODULE(LNXPROC_PROC_BUDDYINFO);
         TEST_MODULE(LNXPROC_PROC_CGROUPS);
         TEST_MODULE(LNXPROC_PROC_CMDLINE);
@@ -243,6 +244,9 @@ main(int argc, char *argv[])
         TEST_MODULE(LNXPROC_SYS_DISKSECTORS);
         TEST_GLOB_MODULE(LNXPROC_SYS_DISKSECTORS, "sd*");
 
+    }
+    else if (!strcmp(argv[1], "ntp_drift")) {
+        TEST_MODULE(LNXPROC_NTP_DRIFT);
     }
     else if (!strcmp(argv[1], "proc_buddyinfo")) {
         TEST_MODULE(LNXPROC_PROC_BUDDYINFO);
