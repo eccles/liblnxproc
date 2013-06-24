@@ -179,7 +179,7 @@ proc_pid_smaps_normalize(_LNXPROC_BASE_T *base)
 /*
  * sum all fields
  */
-        long sums[nparams];
+        unsigned long sums[nparams];
 
         memset(sums, 0, nparams * sizeof(long));
 
@@ -212,9 +212,9 @@ proc_pid_smaps_normalize(_LNXPROC_BASE_T *base)
             _LNXPROC_DEBUG("%d,%d,%d:val = '%s'\n", i, j, 1, val);
 
             if (n < nparams) {
-                sums[n] += atoi(val);
+                sums[n] += strtoul(val, NULL, 0);
 
-                _LNXPROC_DEBUG("%d,%d:sums[%d] %ld\n", i, j, n, sums[n]);
+                _LNXPROC_DEBUG("%d,%d:sums[%d] %lu\n", i, j, n, sums[n]);
             }
         }
 /*
@@ -232,16 +232,16 @@ proc_pid_smaps_normalize(_LNXPROC_BASE_T *base)
             if (!strcmp("VmFlags", key))
                 continue;
 
-            long val = sums[j];
+            unsigned long val = sums[j];
 
-            _LNXPROC_DEBUG("%d,%d:val %ld\n", i, j, val);
+            _LNXPROC_DEBUG("%d,%d:val %lu\n", i, j, val);
 
             int n3 = n2;
 
             STRLCAT(hash, key, n3, sizeof(hash));
             _LNXPROC_DEBUG("%d,%d:hash '%s'\n", i, j, hash);
 
-            _lnxproc_results_add_long(results, hash, val);
+            _lnxproc_results_add_unsigned_long(results, hash, val);
         }
     }
 
