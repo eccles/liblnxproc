@@ -19,7 +19,7 @@ This file is part of liblnxproc.
 */
 
 #include <stdio.h>
-#include <stdlib.h>
+#include <stdlib.h>             //strtoul()
 #include <string.h>
 
 #include "strlcpy.h"
@@ -72,7 +72,9 @@ proc_meminfo_normalize(_LNXPROC_BASE_T *base)
             continue;
 
         _LNXPROC_DEBUG("%d:val '%s'\n", i, val);
-        _lnxproc_results_add_int(results, hashkey, atoi(val));
+        unsigned long v = strtoul(val, NULL, 0);
+
+        _lnxproc_results_add_unsigned_long(results, hashkey, v);
 
     }
     return LNXPROC_OK;
