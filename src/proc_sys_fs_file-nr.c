@@ -54,7 +54,8 @@ proc_sys_fs_file_nr_normalize(_LNXPROC_BASE_T *base)
     _LNXPROC_DEBUG("Ncols %zd\n", ncols);
 
     _lnxproc_results_init(results, ncols);
-    int i, v;
+    int i;
+    unsigned long v;
 
     for (i = 0; i < 3; i++) {
         val = values[i];
@@ -66,15 +67,15 @@ proc_sys_fs_file_nr_normalize(_LNXPROC_BASE_T *base)
 
         STRLCAT(buf, fields[i], n2, sizeof(buf));
         _LNXPROC_DEBUG("Key %s, Value %s\n", buf, val);
-        v = atoi(val);
-        _lnxproc_results_add_int(results, buf, v);
+        v = strtoul(val, NULL, 0);
+        _lnxproc_results_add_unsigned_long(results, buf, v);
 
     }
     n2 = n1;
     STRLCAT(buf, fields[3], n2, sizeof(buf));
     _LNXPROC_DEBUG("Key %s, Value %s\n", buf, val);
-    v = atoi(values[0]) - atoi(values[1]);
-    _lnxproc_results_add_int(results, buf, v);
+    v = strtoul(values[0], NULL, 0) - strtoul(values[1], NULL, 0);
+    _lnxproc_results_add_unsigned_long(results, buf, v);
 
     return LNXPROC_OK;
 }
