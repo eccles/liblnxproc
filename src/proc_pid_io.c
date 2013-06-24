@@ -94,7 +94,8 @@ proc_pid_io_normalize(_LNXPROC_BASE_T *base)
 
             _LNXPROC_DEBUG("%d,%d:hash key '%s'\n", i, j, buf);
 
-            _lnxproc_results_add_long(results, buf, atol(val));
+            _lnxproc_results_add_unsigned_long(results, buf,
+                                               strtoul(val, NULL, 0));
         }
     }
     return LNXPROC_OK;
