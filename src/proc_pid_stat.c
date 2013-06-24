@@ -352,7 +352,7 @@ process_pid(int i, struct process_t *process)
         STRLCAT(key, colkey[j], n3, keysize);
 
         if ((j == VSIZECOL) || (j == RLIMCOL)) {
-            unsigned long value = strtoul(val, 0, 10) / 1024;
+            unsigned long value = strtoul(val, NULL, 0) / 1024;
 
             _LNXPROC_DEBUG("%d,%d:%s value %s ul %lu\n", i, j, key, val, value);
             _lnxproc_results_add_unsigned_long(results, key, value);
@@ -367,11 +367,11 @@ process_pid(int i, struct process_t *process)
         else if ((j == UTIMECOL) ||
                  (j == STIMECOL) || (j == CUTIMECOL) || (j == CSTIMECOL)
                  || (j == STARTTIMECOL)) {
-            float value = strtoul(val, 0, 10) * results->secs_per_jiffy;
+            float value = strtoul(val, NULL, 0) * results->secs_per_jiffy;
 
             _LNXPROC_DEBUG("%d,%d:%s value %s float %f\n", i, j, key,
                            val, value);
-            _lnxproc_results_add_float(results, key, value);
+            _lnxproc_results_add_fixed(results, key, value, 0, 3);
 
 /*
  * Store values so that usage (%) can be calculated.
@@ -389,16 +389,16 @@ process_pid(int i, struct process_t *process)
         else if ((j == ITREALVALUECOL) ||
                  (j == GUEST_TIMECOL) ||
                  (j == CGUEST_TIMECOL) || (j == DELAY_BLKIO_TICKSCOL)) {
-            float value = strtoul(val, 0, 10) * results->secs_per_jiffy;
+            float value = strtoul(val, NULL, 0) * results->secs_per_jiffy;
 
             _LNXPROC_DEBUG("%d,%d:%s value %s float %f\n", i, j, key,
                            val, value);
-            _lnxproc_results_add_float(results, key, value);
+            _lnxproc_results_add_fixed(results, key, value, 0, 3);
 
         }
         else if ((j == MINFLTCOL) ||
                  (j == CMINFLTCOL) || (j == MAJFLTCOL) || (j == CMAJFLTCOL)) {
-            unsigned long value = strtoul(val, 0, 10);
+            unsigned long value = strtoul(val, NULL, 0);
 
             _lnxproc_results_add_unsigned_long(results, key, value);
         }
@@ -503,7 +503,7 @@ process_rates(int i, struct process_t *process)
             _LNXPROC_DEBUG("%d,%d:Usage %s = %f\n", i, j, key, value);
         }
 
-        _lnxproc_results_add_float(results, key, value);
+        _lnxproc_results_add_fixed(results, key, value, 0, 1);
     }
 }
 
