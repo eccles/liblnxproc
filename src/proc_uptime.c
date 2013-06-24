@@ -64,7 +64,7 @@ proc_uptime_normalize(_LNXPROC_BASE_T *base)
 
         STRLCAT(buf, titles[i], n2, sizeof(buf));
         _LNXPROC_DEBUG("Key %s, Value %s\n", buf, val);
-        _lnxproc_results_add_float(results, buf, atof(val));
+        _lnxproc_results_add_fixed(results, buf, atof(val), 0, 1);
 
     }
     return LNXPROC_OK;
