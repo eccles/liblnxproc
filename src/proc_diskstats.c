@@ -100,6 +100,11 @@ derived_values(int i, int j, _LNXPROC_RESULTS_T *results,
                _LNXPROC_RESULTS_T *presults, char *pkey,
                int offset, size_t plen, float out, float tdiff)
 {
+    _LNXPROC_DEBUG("pKey %1$p '%1$s'\n", pkey);
+    _LNXPROC_DEBUG("offset %d\n", offset);
+    _LNXPROC_DEBUG("plen %zd\n", plen);
+    _LNXPROC_DEBUG("out %f\n", out);
+    _LNXPROC_DEBUG("tdiff %f\n", tdiff);
     if (tdiff > 0.0) {
         _LNXPROC_RESULTS_TABLE_T *pentry = NULL;
 
@@ -120,9 +125,9 @@ derived_values(int i, int j, _LNXPROC_RESULTS_T *results,
         _LNXPROC_DEBUG("pKey %1$p '%1$s'\n", pkey);
         float value = (out - pentry->value.f) / tdiff;
 
-        _lnxproc_results_add_float(results, pkey, value);
+        _lnxproc_results_add_fixed(results, pkey, value, 0, 1);
 #ifdef DEBUG
-        _LNXPROC_DEBUG("%d,%d:Curr %s = %f\n", i, j, pkey, value);
+        _LNXPROC_DEBUG("%d,%d:Rate %s = %f\n", i, j, pkey, value);
         if (value < 0.0) {
             _LNXPROC_DEBUG("WARN: diff < 0 (=%f)\n", value);
         }
@@ -185,7 +190,7 @@ proc_diskstats_normalize(_LNXPROC_BASE_T *base)
     static const struct par_t pars[] = {
         {.name = "major",},
         {.name = "minor",},
-        {.name = "name ",},
+        {.name = "name",},
         {.name = "reads",.scale = 1.0,},
         {.name = "merge_read",.scale = 1.0,},
         {.name = "s_read",.scale = sectorscale,},
@@ -301,7 +306,7 @@ proc_diskstats_normalize(_LNXPROC_BASE_T *base)
                 _LNXPROC_DEBUG("%2$d,%3$d:pKey %1$p '%1$s'\n", pkey, i, k);
 
                 _LNXPROC_DEBUG("%d,%d:Curr %s = %f\n", i, k, pkey, secs);
-                _lnxproc_results_add_float(results, pkey, secs);
+                _lnxproc_results_add_fixed(results, pkey, secs, 0, 1);
                 if (!presults)
                     continue;
                 _LNXPROC_RESULTS_TABLE_T *pentry = NULL;
@@ -314,25 +319,37 @@ proc_diskstats_normalize(_LNXPROC_BASE_T *base)
                 _LNXPROC_DEBUG("%d,%d:Prev %s = %f\n", i, k, pentry->key,
                                pentry->value.f);
                 iodiff[j] = secs - pentry->value.f;
-                _LNXPROC_DEBUG("%d:iodiff %s = %f\n", i, pkey, iodiff[j]);
+                _LNXPROC_DEBUG("%d,%d:iodiff %s = %f\n", i, j, pkey, iodiff[j]);
             }
         }
 
         size_t ncols = current->vector->children[i]->length;
         int mincols = ncols > numcols ? numcols : ncols;
 
+        _LNXPROC_DEBUG("%d:mincols %d\n", i, mincols);
+
         for (j = 0; j < mincols; j++) {
-            if (j == KEYCOL)
+            _LNXPROC_DEBUG("%d,%d:'%s'\n", i, j, pars[j].name);
+            if (j == KEYCOL) {
+                _LNXPROC_DEBUG("%d,%d:Ignore '%s'\n", i, j, pars[j].name);
                 continue;
+            }
+
             int k;
 
             for (k = 0; k < nprecols; k++) {
-                if (j == precols[k])
+                if (j == precols[k]) {
+                    _LNXPROC_DEBUG("%d,%d:Ignore '%s'\n", i, j, pars[j].name);
                     break;
+                }
             }
-            if (k < nprecols)
+            if (k < nprecols) {
+                _LNXPROC_DEBUG("%d,%d:Ignore '%s'\n", i, j,
+                               pars[precols[k]].name);
                 continue;
+            }
 
+            _LNXPROC_DEBUG("%d,%d:Process '%s'\n", i, j, pars[j].name);
             float out = 0.0;
 
             int n3 = n2;
@@ -351,7 +368,7 @@ proc_diskstats_normalize(_LNXPROC_BASE_T *base)
                 if ((j == S_WRITECOL) || (j == S_READCOL)) {
                     out *= sectorsize;
                 }
-                _lnxproc_results_add_float(results, pkey, out);
+                _lnxproc_results_add_fixed(results, pkey, out, 0, 1);
                 _LNXPROC_DEBUG("%d,%d:Curr %s = %f\n", i, j, pkey, out);
             }
             else {
@@ -363,16 +380,16 @@ proc_diskstats_normalize(_LNXPROC_BASE_T *base)
                 continue;
 
             if ((j == READSCOL) || (j == MERGE_READCOL) || (j == S_READCOL)) {
-                derived_values(i, j, results, presults, pkey, n3, sizeof(*pkey),
+                derived_values(i, j, results, presults, pkey, n3, sizeof(pkey),
                                out, iodiff[0]);
             }
             else if ((j == WRITESCOL) || (j == MERGE_WRITECOL)
                      || (j == S_WRITECOL)) {
-                derived_values(i, j, results, presults, pkey, n3, sizeof(*pkey),
+                derived_values(i, j, results, presults, pkey, n3, sizeof(pkey),
                                out, iodiff[1]);
             }
             else if ((j == IOSCOL)) {
-                derived_values(i, j, results, presults, pkey, n3, sizeof(*pkey),
+                derived_values(i, j, results, presults, pkey, n3, sizeof(pkey),
                                out, iodiff[2]);
             }
         }

@@ -623,6 +623,7 @@ test_module(LNXPROC_MODULE_TYPE_T type, LNXPROC_OPT_T *opt)
                     printf("%s: Error '%s'\n", tag,
                            lnxproc_strerror(ret, errbuf, sizeof errbuf));
                 }
+                sleep(10);
             }
             lnxproc_print(modules, STDOUT_FILENO, LNXPROC_PRINT_JSON);
             lnxproc_print(modules, STDOUT_FILENO, LNXPROC_PRINT_ALL);
