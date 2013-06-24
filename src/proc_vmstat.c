@@ -77,7 +77,7 @@ proc_vmstat_normalize(_LNXPROC_BASE_T *base)
 
         STRLCAT(buf, key, n2, sizeof(buf));
         _LNXPROC_DEBUG("%d:HashKey '%s'\n", i, buf);
-        _lnxproc_results_add_int(results, buf, atoi(val));
+        _lnxproc_results_add_unsigned_long(results, buf, strtoul(val, NULL, 0));
     }
     return LNXPROC_OK;
 }
