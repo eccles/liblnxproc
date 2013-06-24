@@ -90,7 +90,8 @@ proc_partitions_normalize(_LNXPROC_BASE_T *base)
             STRLCAT(buf, titles[j], n3, sizeof(buf));
             _LNXPROC_DEBUG("%d,%d:key '%s'\n", i, j, buf);
             _LNXPROC_DEBUG("%d,%d:val '%s'\n", i, j, val);
-            _lnxproc_results_add_int(results, buf, atoi(val));
+            _lnxproc_results_add_unsigned_long(results, buf,
+                                               strtoul(val, NULL, 0));
         }
     }
     return LNXPROC_OK;
