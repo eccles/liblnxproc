@@ -166,15 +166,16 @@ proc_stat_normalize(_LNXPROC_BASE_T *base)
                     STRLCAT(buf, cputitles[j - 1], n3, sizeof(buf));
                 }
                 _LNXPROC_DEBUG("%d,%d:hashKey %s\n", i, j, buf);
-                float t = atoi(val) * results->secs_per_jiffy;
+                float t = strtoul(val, NULL, 0) * results->secs_per_jiffy;
 
                 _LNXPROC_DEBUG("%d,%d:value %f\n", i, j, t);
-                _lnxproc_results_add_float(results, buf, t);
+                _lnxproc_results_add_fixed(results, buf, t, 0, 2);
             }
             else if (!strcmp(key, "intr")) {
                 INTCAT(buf, j - 1, n3, sizeof(buf));
                 _LNXPROC_DEBUG("%d,%d:hashKey %s\n", i, j, buf);
-                _lnxproc_results_add_int(results, buf, atoi(val));
+                _lnxproc_results_add_unsigned_long(results, buf,
+                                                   strtoul(val, NULL, 0));
             }
             else if (!strcmp(key, "page")) {
                 if (j > npagetitles) {
@@ -184,7 +185,8 @@ proc_stat_normalize(_LNXPROC_BASE_T *base)
                     STRLCAT(buf, pagetitles[j - 1], n3, sizeof(buf));
                 }
                 _LNXPROC_DEBUG("%d,%d:hashKey %s\n", i, j, buf);
-                _lnxproc_results_add_int(results, buf, atoi(val));
+                _lnxproc_results_add_unsigned_long(results, buf,
+                                                   strtoul(val, NULL, 0));
             }
             else if (!strcmp(key, "swap")) {
                 if (j > nswaptitles) {
@@ -194,12 +196,14 @@ proc_stat_normalize(_LNXPROC_BASE_T *base)
                     STRLCAT(buf, swaptitles[j - 1], n3, sizeof(buf));
                 }
                 _LNXPROC_DEBUG("%d,%d:hashKey %s\n", i, j, buf);
-                _lnxproc_results_add_int(results, buf, atoi(val));
+                _lnxproc_results_add_unsigned_long(results, buf,
+                                                   strtoul(val, NULL, 0));
             }
             else {
                 INTCAT(buf, j - 1, n3, sizeof(buf));
                 _LNXPROC_DEBUG("%d,%d:hashKey %s\n", i, j, buf);
-                _lnxproc_results_add_long(results, buf, atol(val));
+                _lnxproc_results_add_unsigned_long(results, buf,
+                                                   strtoul(val, NULL, 0));
             }
         }
     }
