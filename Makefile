@@ -13,8 +13,12 @@ INCDIR=include
 HDRDIR=include/lnxproc
 DATADIR=proc sys var
 DIRS=$(SRCDIR) $(TESTDIR) $(INCDIR)
-all:
+all install:
 	for d in $(DIRS); do (cd $$d; $(MAKE) $@ ); done
+
+check: all
+	cd $(TESTDIR) && ./testing.sh nodbg
+	@echo "*** All tests passed ***"
 
 clean:
 	for d in $(DIRS); do (cd $$d; $(MAKE) $@ ); done
@@ -37,6 +41,8 @@ $(distdir)/$(TESTDIR):
 	cp $(TESTDIR)/Makefile $@
 	cp $(TESTDIR)/*.c $@
 	cp $(TESTDIR)/*.sh $@
+	cp $(TESTDIR)/testdata $@
+	cp $(TESTDIR)/testoutput $@
 	for d in $(DATADIR); do (cp -r $(TESTDIR)/$$d $@ ); done
 
 $(distdir)/$(INCDIR):
@@ -69,11 +75,12 @@ FORCE:
 distcheck: $(distdir).tar.gz
 	gzip -cd $(distdir).tar.gz | tar xvf -
 	cd $(distdir) && $(MAKE) all
+	cd $(distdir) && $(MAKE) check
 	cd $(distdir) && $(MAKE) clean
 	rm -rf $(distdir)
 	@echo "*** Package $(distdir).tar.gz is ready for distribution ***"
 
 	
-.PHONY: FORCE all clean dist distcheck
+.PHONY: FORCE all check clean dist distcheck install
 
 # vim: noexpandtab

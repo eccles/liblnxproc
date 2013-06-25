@@ -59,6 +59,9 @@ OBJSPRF=$(SRCS:.c=-prf.o)
 all: $(BIN) $(BIN)-dbg $(BIN)-prf
 	for d in $(DIRS); do (cd $$d; $(MAKE) $@ ); done
 
+install:
+	@echo "*** $@ not implemented yet ***"
+
 $(LIB).so: $(OBJS)
 	$(CC) $(SOFLAGS) -o $@ $^
 

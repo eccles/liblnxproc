@@ -14,6 +14,9 @@ LDFLAGSPRF=../src/liblnxproc-prf.a -pg
 
 all: $(TSKS) $(LTSKS) $(SHS)
 
+install:
+	@echo "*** $@ not implemented yet ***"
+
 timing: timing.c
 	$(CC) $(CCFLAGS) -o $@ $^ $(LDFLAGS)
 
