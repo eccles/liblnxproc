@@ -9,8 +9,12 @@ INCDIR=include
 HDRDIR=include/lnxproc
 DATADIR=proc sys var
 DIRS=$(SRCDIR) $(TESTDIR) $(INCDIR)
-all clean:
+all:
 	for d in $(DIRS); do (cd $$d; $(MAKE) $@ ); done
+
+clean:
+	for d in $(DIRS); do (cd $$d; $(MAKE) $@ ); done
+	rm -rf $(distdir) $(distdir).tar.gz x y z
 
 dist: $(distdir).tar.gz
 
