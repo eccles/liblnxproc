@@ -2,7 +2,11 @@ package = liblnxproc
 version = 0.0.1
 tarname = $(package)
 distdir = $(tarname)-$(version)
+#--------------------------------------------------------------------
 
+FILES=CREDITS LICENSE.txt NOTES README README.md TODO
+SCRIPTS=format.sh genchanges.sh splint.conf submit.sh
+MANDIR=man
 SRCDIR=src
 TESTDIR=test
 INCDIR=include
@@ -14,7 +18,7 @@ all:
 
 clean:
 	for d in $(DIRS); do (cd $$d; $(MAKE) $@ ); done
-	rm -rf $(distdir) $(distdir).tar.gz x y z
+	-rm -rf $(distdir) $(distdir).tar.gz x y z
 
 dist: $(distdir).tar.gz
 
@@ -22,25 +26,54 @@ $(distdir).tar.gz: $(distdir)
 	tar chof - $(distdir) | gzip -9 -c > $@
 	rm -rf $(distdir)
 
-$(distdir):
-	mkdir -p $(distdir)
-	cp Makefile $(distdir)
-	mkdir -p $(distdir)/$(SRCDIR)
-	cp $(SRCDIR)/Makefile $(distdir)/$(SRCDIR)
-	cp $(SRCDIR)/*.[ch] $(distdir)/$(SRCDIR)
-	cp $(SRCDIR)/*.sh $(distdir)/$(SRCDIR)
-	mkdir -p $(distdir)/$(TESTDIR)
-	cp $(TESTDIR)/Makefile $(distdir)/$(TESTDIR)
-	cp $(TESTDIR)/*.c $(distdir)/$(TESTDIR)
-	cp $(TESTDIR)/*.sh $(distdir)/$(TESTDIR)
-	for d in $(DATADIR); do (cp -r $(TESTDIR)/$$d $(distdir)/$(TESTDIR);\
-                          ); done
-	mkdir -p $(distdir)/$(INCDIR)
-	cp $(INCDIR)/Makefile $(distdir)/$(INCDIR)
-	mkdir -p $(distdir)/$(HDRDIR)
-	cp $(HDRDIR)/Makefile $(distdir)/$(HDRDIR)
-	cp $(HDRDIR)/*.h $(distdir)/$(HDRDIR)
+$(distdir)/$(SRCDIR):
+	mkdir -p $@
+	cp $(SRCDIR)/Makefile $@
+	cp $(SRCDIR)/*.[ch] $@
+	cp $(SRCDIR)/*.sh $@
 
-.PHONY: all clean dist
+$(distdir)/$(TESTDIR):
+	mkdir -p $@
+	cp $(TESTDIR)/Makefile $@
+	cp $(TESTDIR)/*.c $@
+	cp $(TESTDIR)/*.sh $@
+	for d in $(DATADIR); do (cp -r $(TESTDIR)/$$d $@ ); done
+
+$(distdir)/$(INCDIR):
+	mkdir -p $@
+	cp $(INCDIR)/Makefile $@
+	cp $(INCDIR)/*.h $@
+
+$(distdir)/$(HDRDIR):
+	mkdir -p $@
+	cp $(HDRDIR)/Makefile $@
+	cp $(HDRDIR)/*.h $@
+
+$(distdir)/$(MANDIR):
+	mkdir -p $@
+	cp $(MANDIR)/* $@
+
+$(distdir): FORCE \
+            $(distdir)/$(SRCDIR)\
+            $(distdir)/$(MANDIR)\
+            $(distdir)/$(TESTDIR)\
+            $(distdir)/$(INCDIR)\
+            $(distdir)/$(HDRDIR)
+	mkdir -p $@
+	cp Makefile $(FILES) $(SCRIPTS) $@
+
+FORCE:
+	-rm $(distdir).tar.gz >/dev/null 2>&1
+	-rm -rf $(distdir) >/dev/null 2>&1
+
+distcheck: $(distdir).tar.gz
+	gzip -cd $(distdir).tar.gz | tar xvf -
+	cd $(distdir) && $(MAKE) all
+	cd $(distdir) && $(MAKE) clean
+	rm -rf $(distdir)
+	@echo "*** Package $(distdir).tar.gz is ready for distribution ***"
+
+	
+.PHONY: FORCE all clean dist distcheck
 
 # vim: noexpandtab

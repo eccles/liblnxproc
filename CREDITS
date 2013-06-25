@@ -1,6 +1,10 @@
 Credits
 -------
 
-Thanks to Troy D Hanson <tdk@tkhanson.net> for 'uthash.h' - an inline macro hashing packege
+Troy D Hanson <tdk@tkhanson.net> for 'uthash.h' - an inline macro hashing packege
 http://troydhanson.github.io/uthash/userguide.html
+
+
+John Calcote - 'Autotools' - A Practitioners Guide to GNU Autoconf, Automake and
+LibTool - No Starch Press - ISBN: 978-1-59327-206-7
 
