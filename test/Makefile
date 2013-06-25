@@ -1,5 +1,4 @@
 
-RELDIR=../
 TSKS=timing timing-dbg timing-prf
 LTSKS=testing testing-dbg testing-prf
 SRCS=timing.c
@@ -38,4 +37,6 @@ testing-prf: timing-prf
 
 clean:
 	rm -f $(TSKS) $(LTSKS) $(SHS) *~ *.orig core* vgcore* x y z
+
+# vim: noexpandtab
 
