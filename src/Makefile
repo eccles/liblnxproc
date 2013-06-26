@@ -66,6 +66,9 @@ install:
 	install -m 0755 $(LIB)-dbg.so $(LIBDIR)
 	install -m 0755 $(LIB)-prf.a $(LIBDIR)
 
+uninstall:
+	-cd $(LIBDIR) && rm -f $(LIB).so $(LIB)-dbg.so $(LIB)-prf.a
+
 $(LIB).so: $(OBJS)
 	$(CC) $(SOFLAGS) -o $@ $^
 
@@ -88,7 +91,7 @@ clean:
 	for d in $(PUBHDIR); do (cd $$d; rm -f *~ ); done
 	rm -f $(BIN) $(BIN)-dbg $(BIN)-prf *.a *.o *.so *~ *.orig core* vgcore* x y z X Y
 
-.PHONY: all clean install
+.PHONY: all clean install uninstall
 
 # vim: set noexpandtab:
 

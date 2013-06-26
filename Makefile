@@ -17,7 +17,7 @@ INCDIR=include
 HDRDIR=include/lnxproc
 DATADIR=proc sys var
 DIRS=$(SRCDIR) $(TESTDIR) $(INCDIR)
-all install:
+all install uninstall:
 	for d in $(DIRS); do (cd $$d; $(MAKE) $@ ); done
 
 check: all
@@ -85,6 +85,6 @@ distcheck: $(distdir).tar.gz
 	@echo "*** Package $(distdir).tar.gz is ready for distribution ***"
 
 	
-.PHONY: FORCE all check clean dist distcheck install
+.PHONY: FORCE all check clean dist distcheck install uninstall
 
 # vim: noexpandtab

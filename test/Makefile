@@ -18,6 +18,9 @@ install:
 	install -d $(BINDIR)
 	install -m 0755 $(TSKS) $(BINDIR)
 
+uninstall:
+	-cd $(BINDIR) && rm -f $(TSKS)
+
 topiary: topiary.c
 	$(CC) $(CCFLAGS) -o $@ $^ $(LDFLAGS)
 
@@ -30,7 +33,7 @@ topiary-prf: topiary.c
 clean:
 	rm -f $(TSKS) gmon.out *~ *.orig core* vgcore* x y z
 
-.PHONY: all clean install
+.PHONY: all clean install uninstall
 
 # vim: noexpandtab
 
