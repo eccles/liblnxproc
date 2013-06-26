@@ -30,5 +30,7 @@ topiary-prf: topiary.c
 clean:
 	rm -f $(TSKS) gmon.out *~ *.orig core* vgcore* x y z
 
+.PHONY: all clean install
+
 # vim: noexpandtab
 
