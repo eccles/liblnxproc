@@ -1,8 +1,8 @@
 
-TSKS=timing timing-dbg timing-prf
-LTSKS=testing testing-dbg testing-prf
-SRCS=timing.c
-SHS=testing.sh
+BINDIR=$(prefix)/bin
+TSKS=topiary topiary-dbg topiary-prf
+SRCS=topiary.c
+SHS=topiary.sh
 
 CC=gcc
 CCFLAGS=-O2 -I../include -Wall -Winline -Werror
@@ -12,34 +12,23 @@ LDFLAGS=-L../src -llnxproc
 LDFLAGSDBG=-L../src -llnxproc-dbg
 LDFLAGSPRF=../src/liblnxproc-prf.a -pg
 
-all: $(TSKS) $(LTSKS) $(SHS)
+all: $(TSKS)
 
 install:
-	@echo "*** $@ not implemented yet ***"
+	install -d $(BINDIR)
+	install -m 0755 $(TSKS) $(BINDIR)
 
-timing: timing.c
+topiary: topiary.c
 	$(CC) $(CCFLAGS) -o $@ $^ $(LDFLAGS)
 
-testing.sh: timing.sh
-	ln -f $^ $@
-
-testing: timing
-	ln -f $^ $@
-
-timing-dbg: timing.c
+topiary-dbg: topiary.c
 	$(CC) $(CCFLAGSDBG) -o $@ $^ $(LDFLAGSDBG)
 
-testing-dbg: timing-dbg
-	ln -f $^ $@
-
-timing-prf: timing.c 
+topiary-prf: topiary.c 
 	$(CC) $(CCFLAGSPRF) -o $@ $^ $(LDFLAGSPRF)
 
-testing-prf: timing-prf
-	ln -f $^ $@
-
 clean:
-	rm -f $(TSKS) $(LTSKS) $(SHS) *~ *.orig core* vgcore* x y z
+	rm -f $(TSKS) gmon.out *~ *.orig core* vgcore* x y z
 
 # vim: noexpandtab
 

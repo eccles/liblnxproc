@@ -1,17 +1,25 @@
 #!/bin/bash
 LD_LIBRARY_PATH=../src
 export LD_LIBRARY_PATH
-if [ $# -eq 0 ]
+if [ $# -lt 2 ]
 then
-    echo "Must give at least one argument"
+    echo "Must give at least 2 arguments"
     exit 1
 fi
 ulimit -c unlimited
-BIN=${0%*.sh}
-if [ "${0}" = "./testing.sh" ]
+BIN=./topiary
+if [ "${1}" = "test" ]
 then
+    FUNC="${1}"
     export LNXPROC_TESTROOT=`pwd`
+elif [ "${1}" = "time" ]
+then
+    FUNC="${1}"
+else
+    echo "Illegal first argument"
+    exit 1
 fi
+shift
 OPT=$1
 shift
 #echo "$#"
@@ -19,38 +27,35 @@ shift
 VALOPTS="--track-fds=yes --leak-check=full --show-reachable=yes --read-var-info=yes --track-origins=yes"
 if [ "${OPT}" = "leak" ]
 then
-    valgrind -v ${VALOPTS} ${BIN} $*
+    valgrind -v ${VALOPTS} ${BIN} ${FUNC} $*
 elif [ "${OPT}" = "leakdbg" ]
 then
-    valgrind -v ${VALOPTS} ${BIN}-dbg $*
+    valgrind -v ${VALOPTS} ${BIN}-dbg ${FUNC} $*
 elif [ "${OPT}" = "ddd" ]
 then
-    ddd ${BIN}
+    ddd ${BIN} ${FUNC}
 elif [ "${OPT}" = "ddddbg" ]
 then
-    ddd ${BIN}-dbg
+    ddd ${BIN}-dbg ${FUNC}
 elif [ "${OPT}" = "dddprf" ]
 then
-    ddd ${BIN}-prf
+    ddd ${BIN}-prf ${FUNC}
 elif [ "${OPT}" = "dbg" ]
 then
-    ${BIN}-dbg $*
+    ${BIN}-dbg ${FUNC} $*
 elif [ "${OPT}" = "prf" ]
 then
-    ${BIN}-prf $*
+    ${BIN}-prf ${FUNC} $*
 elif [ "${OPT}" = "nodbg" ]
 then
-    if [ "${0}" = "./testing.sh" -a $# -eq 0 ]
+    if [ "${FUNC}" = "test" -a $# -eq 0 ]
     then
-        ${BIN} $* &>testoutput.raw
+        ${BIN} ${FUNC} $* &>testoutput.raw
         grep -v '^Timestamp' testoutput.raw | sort > testoutput
         rm testoutput.raw
         diff testoutput testdata
     else
-        ${BIN} $*
+        ${BIN} ${FUNC} $*
     fi
-elif [ "${OPT}" = "time" ]
-then
-    time ${BIN} $*
 fi
 exit 0
