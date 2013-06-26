@@ -1,8 +1,10 @@
+INCDIR = $(prefix)/include/lnxproc
 all clean:
 
 install:
-	@echo "*** $@ not implemented yet ***"
+	install -d $(INCDIR)
+	install -m 0755 *.h $(INCDIR)
 
-.PHONY: all clean
+.PHONY: all clean install
 
 # vim: noexpandtab

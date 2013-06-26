@@ -1,3 +1,4 @@
+LIBDIR=$(prefix)/lib
 PUBHDIR=../include/lnxproc
 FUNCHDRS=limit_chr.h strlcpy.h memdup.h val2str.h allocate.h reference.h io.h
 PUBBASEHDRS=lnxproc.h util.h error.h interface.h opt.h print.h
@@ -60,7 +61,10 @@ all: $(BIN) $(BIN)-dbg $(BIN)-prf
 	for d in $(DIRS); do (cd $$d; $(MAKE) $@ ); done
 
 install:
-	@echo "*** $@ not implemented yet ***"
+	install -d $(LIBDIR)
+	install -m 0755 $(LIB).so $(LIBDIR)
+	install -m 0755 $(LIB)-dbg.so $(LIBDIR)
+	install -m 0755 $(LIB)-prf.a $(LIBDIR)
 
 $(LIB).so: $(OBJS)
 	$(CC) $(SOFLAGS) -o $@ $^
@@ -84,7 +88,7 @@ clean:
 	for d in $(PUBHDIR); do (cd $$d; rm -f *~ ); done
 	rm -f $(BIN) $(BIN)-dbg $(BIN)-prf *.a *.o *.so *~ *.orig core* vgcore* x y z X Y
 
-.PHONY: all clean
+.PHONY: all clean install
 
 # vim: set noexpandtab:
 

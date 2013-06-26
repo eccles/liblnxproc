@@ -1,7 +1,11 @@
+#--------------------------------------------------------------------
 package = liblnxproc
 version = 0.0.1
 tarname = $(package)
 distdir = $(tarname)-$(version)
+prefix = /usr/local
+export prefix
+
 #--------------------------------------------------------------------
 
 FILES=CREDITS LICENSE.txt NOTES README README.md TODO
