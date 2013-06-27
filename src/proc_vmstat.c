@@ -1,18 +1,18 @@
 /*
-This file is part of liblnxproc.
+This file is part of topiary.
 
- liblnxproc is free software: you can redistribute it and/or modify
+ topiary is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
 
- liblnxproc is distributed in the hope that it will be useful,
+ topiary is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General Public License
- along with liblnxproc.  If not, see <http://www.gnu.org/licenses/>.
+ along with topiary.  If not, see <http://www.gnu.org/licenses/>.
 
  Copyright 2013 Paul Hewlett, phewlett76@gmail.com
 
@@ -35,14 +35,14 @@ typical contents of /proc/vmstat file::
 #include "modules.h"
 
 static int
-proc_vmstat_normalize(_LNXPROC_BASE_T *base)
+proc_vmstat_normalize(_TOPIARY_BASE_T *base)
 {
-    _LNXPROC_RESULTS_T *results = base->current->results;
-    _LNXPROC_ARRAY_T *array = base->current->array;
+    _TOPIARY_RESULTS_T *results = base->current->results;
+    _TOPIARY_ARRAY_T *array = base->current->array;
 
     size_t nrows = array->vector->length;
 
-    _LNXPROC_DEBUG("Nrows %zd\n", nrows);
+    _TOPIARY_DEBUG("Nrows %zd\n", nrows);
     char ***values = (char ***) array->vector->values;
     char *key;
     char *val;
@@ -55,7 +55,7 @@ proc_vmstat_normalize(_LNXPROC_BASE_T *base)
 
     STRLCAT(buf, "/", n1, sizeof(buf));
 
-    _lnxproc_results_init(results, nrows);
+    _topiary_results_init(results, nrows);
     for (i = 0; i < nrows; i++) {
         char **value1 = (char **) values[i];
 
@@ -64,52 +64,52 @@ proc_vmstat_normalize(_LNXPROC_BASE_T *base)
         if (!key)
             continue;
 
-        _LNXPROC_DEBUG("%d:key '%s'\n", i, key);
+        _TOPIARY_DEBUG("%d:key '%s'\n", i, key);
 
         val = value1[1];
 
         if (!val)
             continue;
 
-        _LNXPROC_DEBUG("%d:Val '%s'\n", i, val);
+        _TOPIARY_DEBUG("%d:Val '%s'\n", i, val);
 
         int n2 = n1;
 
         STRLCAT(buf, key, n2, sizeof(buf));
-        _LNXPROC_DEBUG("%d:HashKey '%s'\n", i, buf);
-        _lnxproc_results_add_unsigned_long(results, buf, strtoul(val, NULL, 0));
+        _TOPIARY_DEBUG("%d:HashKey '%s'\n", i, buf);
+        _topiary_results_add_unsigned_long(results, buf, strtoul(val, NULL, 0));
     }
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_proc_vmstat_new(_LNXPROC_BASE_T **base, LNXPROC_OPT_T *optional)
+_topiary_proc_vmstat_new(_TOPIARY_BASE_T **base, TOPIARY_OPT_T *optional)
 {
 
-    _LNXPROC_LIMITS_T *limits = NULL;
-    int ret = _lnxproc_limits_new(&limits, 2);
+    _TOPIARY_LIMITS_T *limits = NULL;
+    int ret = _topiary_limits_new(&limits, 2);
 
     if (ret) {
         return ret;
     }
-    ret = _lnxproc_limits_set(limits, 0, 9, "\f\n", 2); /* row delimiters */
+    ret = _topiary_limits_set(limits, 0, 9, "\f\n", 2); /* row delimiters */
     if (ret) {
-        _LNXPROC_LIMITS_FREE(limits);
+        _TOPIARY_LIMITS_FREE(limits);
         return ret;
     }
-    ret = _lnxproc_limits_set(limits, 1, 2, " ", 1);    /* column delimiters */
+    ret = _topiary_limits_set(limits, 1, 2, " ", 1);    /* column delimiters */
     if (ret) {
-        _LNXPROC_LIMITS_FREE(limits);
+        _TOPIARY_LIMITS_FREE(limits);
         return ret;
     }
 
     char *filenames[] = { "/proc/vmstat" };
-    ret = _lnxproc_base_new(base, "proc_vmstat", _LNXPROC_BASE_TYPE_VANILLA,
+    ret = _topiary_base_new(base, "proc_vmstat", _TOPIARY_BASE_TYPE_VANILLA,
                             NULL, proc_vmstat_normalize, NULL, 256, limits);
     if (!ret) {
-        ret = _lnxproc_base_set_filenames(*base, filenames, 1);
+        ret = _topiary_base_set_filenames(*base, filenames, 1);
     }
-    _LNXPROC_LIMITS_FREE(limits);
+    _TOPIARY_LIMITS_FREE(limits);
     return ret;
 }
 

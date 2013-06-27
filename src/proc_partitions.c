@@ -1,18 +1,18 @@
 /*
-This file is part of liblnxproc.
+This file is part of topiary.
 
- liblnxproc is free software: you can redistribute it and/or modify
+ topiary is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
 
- liblnxproc is distributed in the hope that it will be useful,
+ topiary is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General Public License
- along with liblnxproc.  If not, see <http://www.gnu.org/licenses/>.
+ along with topiary.  If not, see <http://www.gnu.org/licenses/>.
 
  Copyright 2013 Paul Hewlett, phewlett76@gmail.com
 
@@ -44,14 +44,14 @@ typical contents of /proc/partitions file::
 #include "modules.h"
 
 static int
-proc_partitions_normalize(_LNXPROC_BASE_T *base)
+proc_partitions_normalize(_TOPIARY_BASE_T *base)
 {
-    _LNXPROC_RESULTS_T *results = base->current->results;
-    _LNXPROC_ARRAY_T *array = base->current->array;
+    _TOPIARY_RESULTS_T *results = base->current->results;
+    _TOPIARY_ARRAY_T *array = base->current->array;
 
     size_t nrows = array->vector->length;
 
-    _LNXPROC_DEBUG("Nrows %zd\n", nrows);
+    _TOPIARY_DEBUG("Nrows %zd\n", nrows);
     char ***values = (char ***) array->vector->values;
     char *val;
     char *rowkey;
@@ -64,7 +64,7 @@ proc_partitions_normalize(_LNXPROC_BASE_T *base)
 
     STRLCAT(buf, "/", n1, sizeof(buf));
 
-    _lnxproc_results_init(results, nrows);
+    _topiary_results_init(results, nrows);
     char **titles = values[0];
 
     for (i = 1; i < nrows; i++) {
@@ -73,7 +73,7 @@ proc_partitions_normalize(_LNXPROC_BASE_T *base)
         rowkey = value1[3];
         if (!rowkey)
             continue;
-        _LNXPROC_DEBUG("%d:Rowkey '%s'\n", i, rowkey);
+        _TOPIARY_DEBUG("%d:Rowkey '%s'\n", i, rowkey);
 
         int n2 = n1;
 
@@ -88,43 +88,43 @@ proc_partitions_normalize(_LNXPROC_BASE_T *base)
             int n3 = n2;
 
             STRLCAT(buf, titles[j], n3, sizeof(buf));
-            _LNXPROC_DEBUG("%d,%d:key '%s'\n", i, j, buf);
-            _LNXPROC_DEBUG("%d,%d:val '%s'\n", i, j, val);
-            _lnxproc_results_add_unsigned_long(results, buf,
+            _TOPIARY_DEBUG("%d,%d:key '%s'\n", i, j, buf);
+            _TOPIARY_DEBUG("%d,%d:val '%s'\n", i, j, val);
+            _topiary_results_add_unsigned_long(results, buf,
                                                strtoul(val, NULL, 0));
         }
     }
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_proc_partitions_new(_LNXPROC_BASE_T **base, LNXPROC_OPT_T *optional)
+_topiary_proc_partitions_new(_TOPIARY_BASE_T **base, TOPIARY_OPT_T *optional)
 {
 
-    _LNXPROC_LIMITS_T *limits = NULL;
-    int ret = _lnxproc_limits_new(&limits, 2);
+    _TOPIARY_LIMITS_T *limits = NULL;
+    int ret = _topiary_limits_new(&limits, 2);
 
     if (ret) {
         return ret;
     }
-    ret = _lnxproc_limits_set(limits, 0, 9, "\f\n", 2); /* row delimiters */
+    ret = _topiary_limits_set(limits, 0, 9, "\f\n", 2); /* row delimiters */
     if (ret) {
-        _LNXPROC_LIMITS_FREE(limits);
+        _TOPIARY_LIMITS_FREE(limits);
         return ret;
     }
-    ret = _lnxproc_limits_set(limits, 1, 4, " ", 1);    /* column delimiters */
+    ret = _topiary_limits_set(limits, 1, 4, " ", 1);    /* column delimiters */
     if (ret) {
-        _LNXPROC_LIMITS_FREE(limits);
+        _TOPIARY_LIMITS_FREE(limits);
         return ret;
     }
 
     char *filenames[] = { "/proc/partitions" };
-    ret = _lnxproc_base_new(base, "proc_partitions", _LNXPROC_BASE_TYPE_VANILLA,
+    ret = _topiary_base_new(base, "proc_partitions", _TOPIARY_BASE_TYPE_VANILLA,
                             NULL, proc_partitions_normalize, NULL, 256, limits);
     if (!ret) {
-        ret = _lnxproc_base_set_filenames(*base, filenames, 1);
+        ret = _topiary_base_set_filenames(*base, filenames, 1);
     }
-    _LNXPROC_LIMITS_FREE(limits);
+    _TOPIARY_LIMITS_FREE(limits);
     return ret;
 }
 

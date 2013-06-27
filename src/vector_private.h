@@ -1,18 +1,18 @@
 /*
- * This file is part of liblnxproc.
+ * This file is part of topiary.
  *
- *  liblnxproc is free software: you can redistribute it and/or modify
+ *  topiary is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  liblnxproc is distributed in the hope that it will be useful,
+ *  topiary is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with liblnxproc.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with topiary.  If not, see <http://www.gnu.org/licenses/>.
  *
  *  Copyright 2013 Paul Hewlett, phewlett76@gmail.com
  *
@@ -21,57 +21,57 @@
 /* This file is a re-implementation of the 'list' type from Python
  */
 
-#ifndef LIBLNXPROC_VECTOR_PRIVATE_H
-#define LIBLNXPROC_VECTOR_PRIVATE_H 1
+#ifndef TOPIARY_VECTOR_PRIVATE_H
+#define TOPIARY_VECTOR_PRIVATE_H 1
 
-typedef struct _lnxproc_vector_t _LNXPROC_VECTOR_T;
-struct _lnxproc_vector_t {
+typedef struct _topiary_vector_t _TOPIARY_VECTOR_T;
+struct _topiary_vector_t {
     size_t length;
     size_t size;
     int recursive;
-    _LNXPROC_VECTOR_T *parent;
+    _TOPIARY_VECTOR_T *parent;
     int idx;
-    _LNXPROC_VECTOR_T **children;
+    _TOPIARY_VECTOR_T **children;
     char **values;
 };
 
-int _lnxproc_vector_new(_LNXPROC_VECTOR_T **vec, size_t size, int recursive);
+int _topiary_vector_new(_TOPIARY_VECTOR_T **vec, size_t size, int recursive);
 
-int _lnxproc_vector_free(_LNXPROC_VECTOR_T **vectorptr);
+int _topiary_vector_free(_TOPIARY_VECTOR_T **vectorptr);
 
-#define _LNXPROC_VECTOR_FREE(v) _lnxproc_vector_free(&v)
+#define _TOPIARY_VECTOR_FREE(v) _topiary_vector_free(&v)
 
-int _lnxproc_vector_size(_LNXPROC_VECTOR_T *vector, size_t * size);
-int _lnxproc_vector_resize(_LNXPROC_VECTOR_T *vector, size_t size);
+int _topiary_vector_size(_TOPIARY_VECTOR_T *vector, size_t * size);
+int _topiary_vector_resize(_TOPIARY_VECTOR_T *vector, size_t size);
 
-int _lnxproc_vector_set_child(_LNXPROC_VECTOR_T *vector,
-                              size_t idx, _LNXPROC_VECTOR_T *child);
-int _lnxproc_vector_set_value(_LNXPROC_VECTOR_T *vector, size_t idx, char *val);
+int _topiary_vector_set_child(_TOPIARY_VECTOR_T *vector,
+                              size_t idx, _TOPIARY_VECTOR_T *child);
+int _topiary_vector_set_value(_TOPIARY_VECTOR_T *vector, size_t idx, char *val);
 
-int _lnxproc_vector_set_last_child(_LNXPROC_VECTOR_T *vector,
-                                   size_t idx, _LNXPROC_VECTOR_T *child);
-int _lnxproc_vector_set_last_value(_LNXPROC_VECTOR_T *vector,
+int _topiary_vector_set_last_child(_TOPIARY_VECTOR_T *vector,
+                                   size_t idx, _TOPIARY_VECTOR_T *child);
+int _topiary_vector_set_last_value(_TOPIARY_VECTOR_T *vector,
                                    size_t idx, char *val);
 
-int _lnxproc_vector_set_length(_LNXPROC_VECTOR_T *vector, size_t idx);
+int _topiary_vector_set_length(_TOPIARY_VECTOR_T *vector, size_t idx);
 
-int _lnxproc_vector_child(_LNXPROC_VECTOR_T *vector,
-                          size_t idx, _LNXPROC_VECTOR_T **child);
-int _lnxproc_vector_value(_LNXPROC_VECTOR_T *vector, size_t idx, char **value);
+int _topiary_vector_child(_TOPIARY_VECTOR_T *vector,
+                          size_t idx, _TOPIARY_VECTOR_T **child);
+int _topiary_vector_value(_TOPIARY_VECTOR_T *vector, size_t idx, char **value);
 
 typedef
-int (*_LNXPROC_VECTOR_ITERATE_FUNC) (_LNXPROC_VECTOR_T *vector, int idx,
+int (*_TOPIARY_VECTOR_ITERATE_FUNC) (_TOPIARY_VECTOR_T *vector, int idx,
                                      int depth, void *data);
 
-int _lnxproc_vector_iterate(_LNXPROC_VECTOR_T *vector,
+int _topiary_vector_iterate(_TOPIARY_VECTOR_T *vector,
                             int idx,
                             int depth,
                             int allocated,
-                            void *data, _LNXPROC_VECTOR_ITERATE_FUNC func);
+                            void *data, _TOPIARY_VECTOR_ITERATE_FUNC func);
 
-int _lnxproc_vector_print(_LNXPROC_VECTOR_T *vector, int allocated, void *data);
+int _topiary_vector_print(_TOPIARY_VECTOR_T *vector, int allocated, void *data);
 
-#endif                          // LIBLNXPROC_VECTOR_PRIVATE_H
+#endif                          // TOPIARY_VECTOR_PRIVATE_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
  */

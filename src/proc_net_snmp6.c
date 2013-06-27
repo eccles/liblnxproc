@@ -1,18 +1,18 @@
 /*
-This file is part of liblnxproc.
+This file is part of topiary.
 
- liblnxproc is free software: you can redistribute it and/or modify
+ topiary is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
 
- liblnxproc is distributed in the hope that it will be useful,
+ topiary is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General Public License
- along with liblnxproc.  If not, see <http://www.gnu.org/licenses/>.
+ along with topiary.  If not, see <http://www.gnu.org/licenses/>.
 
  Copyright 2013 Paul Hewlett, phewlett76@gmail.com
 
@@ -111,29 +111,29 @@ UdpLite6SndbufErrors            	0
 #include "modules.h"
 
 static int
-proc_net_snmp6_normalize(_LNXPROC_BASE_T *base)
+proc_net_snmp6_normalize(_TOPIARY_BASE_T *base)
 {
-    _LNXPROC_RESULTS_T *results = base->current->results;
-    _LNXPROC_ARRAY_T *array = base->current->array;
-    _LNXPROC_VECTOR_T *vector = array->vector;
+    _TOPIARY_RESULTS_T *results = base->current->results;
+    _TOPIARY_ARRAY_T *array = base->current->array;
+    _TOPIARY_VECTOR_T *vector = array->vector;
 
-    _LNXPROC_BASE_DATA_T *pdata = base->previous;
-    _LNXPROC_RESULTS_T *presults = NULL;
+    _TOPIARY_BASE_DATA_T *pdata = base->previous;
+    _TOPIARY_RESULTS_T *presults = NULL;
 
     float tdiff = 0.0;
 
     if (pdata && pdata->array) {
-        _lnxproc_base_timeval_diff(base, &tdiff);
+        _topiary_base_timeval_diff(base, &tdiff);
         presults = pdata->results;
-        _LNXPROC_DEBUG("Previous data is %d at %p\n", pdata->id, pdata);
-        _LNXPROC_DEBUG("Previous results is at %p\n", presults);
+        _TOPIARY_DEBUG("Previous data is %d at %p\n", pdata->id, pdata);
+        _TOPIARY_DEBUG("Previous results is at %p\n", presults);
     }
 
-    _LNXPROC_DEBUG("Time difference = %f secs\n", tdiff);
+    _TOPIARY_DEBUG("Time difference = %f secs\n", tdiff);
 
     size_t nrows = vector->length;
 
-    _LNXPROC_DEBUG("Nrows %zd\n", nrows);
+    _TOPIARY_DEBUG("Nrows %zd\n", nrows);
     char ***values = (char ***) vector->values;
     char *key;
     char *val;
@@ -146,7 +146,7 @@ proc_net_snmp6_normalize(_LNXPROC_BASE_T *base)
 
     STRLCAT(buf, "/", n1, sizeof(buf));
 
-    _lnxproc_results_init(results, nrows);
+    _topiary_results_init(results, nrows);
 
     for (i = 0; i < nrows; i++) {
         char **value1 = (char **) values[i];
@@ -155,69 +155,69 @@ proc_net_snmp6_normalize(_LNXPROC_BASE_T *base)
         if (!key)
             continue;
 
-        _LNXPROC_DEBUG("%d:key '%s'\n", i, key);
+        _TOPIARY_DEBUG("%d:key '%s'\n", i, key);
 
         val = value1[1];
         if (!val)
             continue;
 
-        _LNXPROC_DEBUG("%d:val '%s'\n", i, val);
+        _TOPIARY_DEBUG("%d:val '%s'\n", i, val);
 
         int n2 = n1;
 
         STRLCAT(buf, key, n2, sizeof(buf));
-        _LNXPROC_DEBUG("%d:hashkey '%s'\n", i, buf);
+        _TOPIARY_DEBUG("%d:hashkey '%s'\n", i, buf);
         unsigned long current = strtoul(val, NULL, 0);
 
-        _lnxproc_results_add_unsigned_long(results, buf, current);
+        _topiary_results_add_unsigned_long(results, buf, current);
         if (tdiff > 0.0) {
-            _LNXPROC_RESULTS_TABLE_T *pentry = NULL;
+            _TOPIARY_RESULTS_TABLE_T *pentry = NULL;
 
-            int ret = _lnxproc_results_fetch(presults, buf, &pentry);
+            int ret = _topiary_results_fetch(presults, buf, &pentry);
 
             if (ret)
                 continue;
-            _LNXPROC_DEBUG("%d:previous value for %s is %lu\n", i,
+            _TOPIARY_DEBUG("%d:previous value for %s is %lu\n", i,
                            buf, pentry->value.ul);
             float rate = (current - pentry->value.ul) / tdiff;
 
-            _LNXPROC_DEBUG("%d:rate = %f\n", i, rate);
+            _TOPIARY_DEBUG("%d:rate = %f\n", i, rate);
             STRLCAT(buf, "-s", n2, sizeof(buf));
-            _LNXPROC_DEBUG("%d:hashkey '%s'\n", i, buf);
-            _lnxproc_results_add_fixed(results, buf, rate, 0, 2);
+            _TOPIARY_DEBUG("%d:hashkey '%s'\n", i, buf);
+            _topiary_results_add_fixed(results, buf, rate, 0, 2);
         }
     }
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_proc_net_snmp6_new(_LNXPROC_BASE_T **base, LNXPROC_OPT_T *optional)
+_topiary_proc_net_snmp6_new(_TOPIARY_BASE_T **base, TOPIARY_OPT_T *optional)
 {
 
-    _LNXPROC_LIMITS_T *limits = NULL;
-    int ret = _lnxproc_limits_new(&limits, 2);
+    _TOPIARY_LIMITS_T *limits = NULL;
+    int ret = _topiary_limits_new(&limits, 2);
 
     if (ret) {
         return ret;
     }
-    ret = _lnxproc_limits_set(limits, 0, 5, "\f\n", 2); /* row delimiters */
+    ret = _topiary_limits_set(limits, 0, 5, "\f\n", 2); /* row delimiters */
     if (ret) {
-        _LNXPROC_LIMITS_FREE(limits);
+        _TOPIARY_LIMITS_FREE(limits);
         return ret;
     }
-    ret = _lnxproc_limits_set(limits, 1, 4, "\t ", 2);  /* column delimiters */
+    ret = _topiary_limits_set(limits, 1, 4, "\t ", 2);  /* column delimiters */
     if (ret) {
-        _LNXPROC_LIMITS_FREE(limits);
+        _TOPIARY_LIMITS_FREE(limits);
         return ret;
     }
 
     char *filenames[] = { "/proc/net/snmp6" };
-    ret = _lnxproc_base_new(base, "proc_net_snmp6", _LNXPROC_BASE_TYPE_PREVIOUS,
+    ret = _topiary_base_new(base, "proc_net_snmp6", _TOPIARY_BASE_TYPE_PREVIOUS,
                             NULL, proc_net_snmp6_normalize, NULL, 256, limits);
     if (!ret) {
-        ret = _lnxproc_base_set_filenames(*base, filenames, 1);
+        ret = _topiary_base_set_filenames(*base, filenames, 1);
     }
-    _LNXPROC_LIMITS_FREE(limits);
+    _TOPIARY_LIMITS_FREE(limits);
     return ret;
 }
 

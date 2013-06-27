@@ -1,9 +1,11 @@
 #--------------------------------------------------------------------
-package = liblnxproc
+package = topiary
 version = 0.0.1
 tarname = $(package)
 distdir = $(tarname)-$(version)
 prefix = /usr/local
+
+export package
 export prefix
 
 #--------------------------------------------------------------------
@@ -14,7 +16,7 @@ MANDIR=man
 SRCDIR=src
 TESTDIR=test
 INCDIR=include
-HDRDIR=include/lnxproc
+HDRDIR=include/$(package)
 DATADIR=proc sys var
 DIRS=$(SRCDIR) $(TESTDIR) $(INCDIR)
 all install uninstall:

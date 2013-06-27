@@ -1,4 +1,5 @@
-liblnxproc
-==========
+topiary
+=======
 
-C library for accessing /proc and /sys filesystems in modular fashion
+C library for accessing /proc and /sys filesystems (and other system files such as NTP drift)
+in modular fashion

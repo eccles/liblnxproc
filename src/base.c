@@ -1,18 +1,18 @@
 /*
- * This file is part of liblnxproc.
+ * This file is part of topiary.
  *
- *  liblnxproc is free software: you can redistribute it and/or modify
+ *  topiary is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  liblnxproc is distributed in the hope that it will be useful,
+ *  topiary is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with liblnxproc.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with topiary.  If not, see <http://www.gnu.org/licenses/>.
  *
  *  Copyright 2013 Paul Hewlett, phewlett76@gmail.com
  *
@@ -41,15 +41,15 @@
 #include "limit_chr.h"
 
 char *
-_lnxproc_base_typestr(_LNXPROC_BASE_TYPE_T type, char *buf, size_t len)
+_topiary_base_typestr(_TOPIARY_BASE_TYPE_T type, char *buf, size_t len)
 {
-    static const char *typestr[_LNXPROC_BASE_TYPE_SIZE] = {
+    static const char *typestr[_TOPIARY_BASE_TYPE_SIZE] = {
         "Base type : No attributes",
         "Base type : Previous results are stored",
         "Base type : Results are memoized",
     };
 
-    if (type >= 0 || type < _LNXPROC_BASE_TYPE_SIZE) {
+    if (type >= 0 || type < _TOPIARY_BASE_TYPE_SIZE) {
         snprintf(buf, len, "%d:%s", type, typestr[type]);
     }
     else {
@@ -59,16 +59,16 @@ _lnxproc_base_typestr(_LNXPROC_BASE_TYPE_T type, char *buf, size_t len)
 }
 
 int
-_lnxproc_base_print(_LNXPROC_BASE_T *base)
+_topiary_base_print(_TOPIARY_BASE_T *base)
 {
-    _LNXPROC_DEBUG("Base %p\n", base);
+    _TOPIARY_DEBUG("Base %p\n", base);
 
     if (base) {
         char buf[64];
 
         printf("Base %p\n", base);
         printf("Attribute %s\n",
-               _lnxproc_base_typestr(base->type, buf, sizeof buf));
+               _topiary_base_typestr(base->type, buf, sizeof buf));
         printf("Rawread %p\n", base->rawread);
         printf("Normalize %p\n", base->normalize);
         printf("Read %p\n", base->read);
@@ -83,7 +83,7 @@ _lnxproc_base_print(_LNXPROC_BASE_T *base)
         }
         printf("No. of reads %lu\n", base->count);
 
-        _LNXPROC_BASE_DATA_T *data = base->current;
+        _TOPIARY_BASE_DATA_T *data = base->current;
 
         printf("CURRENT at %p(%d)\n", data, data->id);
         printf("Rawread duration %ld usecs\n", data->rawread_time);
@@ -92,8 +92,8 @@ _lnxproc_base_print(_LNXPROC_BASE_T *base)
         printf("Lines %p\n", data->lines);
         printf("Buflen %zd\n", data->buflen);
         printf("Nbytes %d\n", data->nbytes);
-        _lnxproc_array_print(data->array, 0);
-        _lnxproc_results_print(data->results, STDOUT_FILENO, LNXPROC_PRINT_ALL);
+        _topiary_array_print(data->array, 0);
+        _topiary_results_print(data->results, STDOUT_FILENO, TOPIARY_PRINT_ALL);
 
         if (base->previous) {
             data = base->previous;
@@ -106,37 +106,37 @@ _lnxproc_base_print(_LNXPROC_BASE_T *base)
             printf("Previous Lines %p\n", data->lines);
             printf("Previous Buflen %zd\n", data->buflen);
             printf("Previous Nbytes %d\n", data->nbytes);
-            _lnxproc_array_print(data->array, 0);
-            _lnxproc_results_print(data->results, STDOUT_FILENO,
-                                   LNXPROC_PRINT_ALL);
+            _topiary_array_print(data->array, 0);
+            _topiary_results_print(data->results, STDOUT_FILENO,
+                                   TOPIARY_PRINT_ALL);
         }
-        return LNXPROC_OK;
+        return TOPIARY_OK;
     }
 
-    _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
-    return LNXPROC_ERROR_ILLEGAL_ARG;
+    _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Base");
+    return TOPIARY_ERROR_ILLEGAL_ARG;
 }
 
 static int
 base_rawread(char *filename, char **readbuf, size_t * nbytes)
 {
-    _LNXPROC_DEBUG("Filename %s Readbuf %p Nbytes %zd\n", filename, *readbuf,
+    _TOPIARY_DEBUG("Filename %s Readbuf %p Nbytes %zd\n", filename, *readbuf,
                    *nbytes);
 
     if (*nbytes < 1) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_READ_OVERFLOW, "Raw Read %s",
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_BASE_READ_OVERFLOW, "Raw Read %s",
                              filename);
-        return LNXPROC_ERROR_BASE_READ_OVERFLOW;
+        return TOPIARY_ERROR_BASE_READ_OVERFLOW;
     }
 
-    _LNXPROC_DEBUG("Open %s\n", filename);
+    _TOPIARY_DEBUG("Open %s\n", filename);
 
     int fd = open(filename, O_RDONLY);
 
     if (fd < 0) {
         int myerrno = -errno;
 
-        _LNXPROC_ERROR_DEBUG(myerrno, "Open %s", filename);
+        _TOPIARY_ERROR_DEBUG(myerrno, "Open %s", filename);
         return myerrno;
     }
 
@@ -147,13 +147,13 @@ base_rawread(char *filename, char **readbuf, size_t * nbytes)
     size_t mybytes = *nbytes;
 
     if (mybytes > SSIZE_MAX) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_READ_SSIZE_MAX, "mybytes %zd",
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_BASE_READ_SSIZE_MAX, "mybytes %zd",
                              mybytes);
         close(fd);
-        return LNXPROC_ERROR_BASE_READ_SSIZE_MAX;
+        return TOPIARY_ERROR_BASE_READ_SSIZE_MAX;
     }
 
-    _LNXPROC_DEBUG("Read %s\n", filename);
+    _TOPIARY_DEBUG("Read %s\n", filename);
     ssize_t inbytes;
 
     do {
@@ -162,35 +162,35 @@ base_rawread(char *filename, char **readbuf, size_t * nbytes)
         if (inbytes < 0) {
             int myerrno = -errno;
 
-            _LNXPROC_ERROR_DEBUG(myerrno, "Read %s", filename);
-            _LNXPROC_DEBUG("Close %s\n", filename);
+            _TOPIARY_ERROR_DEBUG(myerrno, "Read %s", filename);
+            _TOPIARY_DEBUG("Close %s\n", filename);
             close(fd);
 
             return myerrno;
         }
-        _LNXPROC_DEBUG("%zd bytes read\n", inbytes);
+        _TOPIARY_DEBUG("%zd bytes read\n", inbytes);
         mybuf += inbytes;
         mybytes -= inbytes;
     } while (inbytes > 0);
     close(fd);
 
-    _LNXPROC_DEBUG("Nbytes %zd read\n", (*nbytes) - mybytes);
+    _TOPIARY_DEBUG("Nbytes %zd read\n", (*nbytes) - mybytes);
 
     if (mybytes < 1) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_READ_OVERFLOW, "Raw Read %s",
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_BASE_READ_OVERFLOW, "Raw Read %s",
                              filename);
-        return LNXPROC_ERROR_BASE_READ_OVERFLOW;
+        return TOPIARY_ERROR_BASE_READ_OVERFLOW;
     }
     *mybuf = '\f';
     mybuf += 1;
     mybytes -= 1;
     *readbuf = mybuf;
     *nbytes = mybytes;
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 static int
-base_read_glob_files(_LNXPROC_BASE_T *base, char **readbuf, size_t * nbytes)
+base_read_glob_files(_TOPIARY_BASE_T *base, char **readbuf, size_t * nbytes)
 {
 
     const char *globwild = base->fileglob;
@@ -198,9 +198,9 @@ base_read_glob_files(_LNXPROC_BASE_T *base, char **readbuf, size_t * nbytes)
     char globpat[FILENAME_MAX];
     char regpat[FILENAME_MAX];
 
-    _LNXPROC_BASE_DATA_T *data = base->current;
-    _LNXPROC_ARRAY_T *array = data->array;
-    _LNXPROC_LIMITS_T *limits = array->limits;
+    _TOPIARY_BASE_DATA_T *data = base->current;
+    _TOPIARY_ARRAY_T *array = data->array;
+    _TOPIARY_LIMITS_T *limits = array->limits;
     size_t dim = limits->dim;
     size_t nseps = dim - 1;
     char separators[nseps];
@@ -232,7 +232,7 @@ base_read_glob_files(_LNXPROC_BASE_T *base, char **readbuf, size_t * nbytes)
     char errbuf[128];
 #endif
 
-    _LNXPROC_DEBUG("Glob pattern '%s'\n", globpat);
+    _TOPIARY_DEBUG("Glob pattern '%s'\n", globpat);
     glob_t globbuf;
 
     memset(&globbuf, 0, sizeof(globbuf));
@@ -240,12 +240,12 @@ base_read_glob_files(_LNXPROC_BASE_T *base, char **readbuf, size_t * nbytes)
     int ret =
         glob(globpat, GLOB_MARK | GLOB_NOSORT | GLOB_BRACE, NULL, &globbuf);
     if (ret) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_GLOB_FAILURE, " errno = %d",
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_BASE_GLOB_FAILURE, " errno = %d",
                              ret);
-        return LNXPROC_ERROR_BASE_GLOB_FAILURE;
+        return TOPIARY_ERROR_BASE_GLOB_FAILURE;
     }
 
-    _LNXPROC_DEBUG("Regex pattern '%s'\n", regpat);
+    _TOPIARY_DEBUG("Regex pattern '%s'\n", regpat);
     regex_t reg;
 
     memset(&reg, 0, sizeof(regex_t));
@@ -257,42 +257,42 @@ base_read_glob_files(_LNXPROC_BASE_T *base, char **readbuf, size_t * nbytes)
 
     if (ret) {
 #ifdef DEBUG
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_REGEX_FAILURE, "%s", regpat);
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_BASE_REGEX_FAILURE, "%s", regpat);
         regerror(ret, &reg, errbuf, sizeof errbuf);
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_REGEX_FAILURE, " errno = %s",
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_BASE_REGEX_FAILURE, " errno = %s",
                              errbuf);
 #endif
         globfree(&globbuf);
-        return LNXPROC_ERROR_BASE_REGEX_FAILURE;
+        return TOPIARY_ERROR_BASE_REGEX_FAILURE;
     }
 
     int j;
 
     for (i = 0; i < globbuf.gl_pathc; i++) {
-        _LNXPROC_DEBUG("%d:File %s\n", i, globbuf.gl_pathv[i]);
+        _TOPIARY_DEBUG("%d:File %s\n", i, globbuf.gl_pathv[i]);
         ret = regexec(&reg, globbuf.gl_pathv[i], pmlen, pmatch, 0);
         if (ret) {
 #ifdef DEBUG
             regerror(ret, &reg, errbuf, sizeof errbuf);
-            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_BASE_REGEX_FAILURE,
+            _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_BASE_REGEX_FAILURE,
                                  " errno = %s", errbuf);
 #endif
             globfree(&globbuf);
             regfree(&reg);
-            return LNXPROC_ERROR_BASE_REGEX_FAILURE;
+            return TOPIARY_ERROR_BASE_REGEX_FAILURE;
         }
         j = 1;                  // $0 is the whole string, $1 is the first regex parameter
         if (pmatch[j].rm_so > -1) {
             char *s = globbuf.gl_pathv[i] + (int) pmatch[j].rm_so;
             int len = (int) pmatch[j].rm_eo - (int) pmatch[j].rm_so;
 
-            _LNXPROC_DEBUG("%d:%d:Match from %d to %d '%.*s'\n", i, j,
+            _TOPIARY_DEBUG("%d:%d:Match from %d to %d '%.*s'\n", i, j,
                            (int) pmatch[j].rm_so, (int) pmatch[j].rm_eo, len,
                            s);
             if ((*nbytes) < len + 1) {
                 globfree(&globbuf);
                 regfree(&reg);
-                return LNXPROC_ERROR_BASE_READ_OVERFLOW;
+                return TOPIARY_ERROR_BASE_READ_OVERFLOW;
             }
             int n = strlcpy(*readbuf, s, len + 1);
 
@@ -302,17 +302,17 @@ base_read_glob_files(_LNXPROC_BASE_T *base, char **readbuf, size_t * nbytes)
             if ((*nbytes) < nseps) {
                 globfree(&globbuf);
                 regfree(&reg);
-                return LNXPROC_ERROR_BASE_READ_OVERFLOW;
+                return TOPIARY_ERROR_BASE_READ_OVERFLOW;
             }
 
             memcpy(*readbuf, separators, nseps);
             *readbuf += nseps;
             *nbytes -= nseps;
 
-            _LNXPROC_DEBUG("Readbuf %p Nbytes %zd\n", *readbuf, *nbytes);
+            _TOPIARY_DEBUG("Readbuf %p Nbytes %zd\n", *readbuf, *nbytes);
             ret = base_rawread(globbuf.gl_pathv[i], readbuf, nbytes);
             if (ret) {
-                if (ret == LNXPROC_ERROR_BASE_READ_OVERFLOW) {
+                if (ret == TOPIARY_ERROR_BASE_READ_OVERFLOW) {
                     globfree(&globbuf);
                     regfree(&reg);
                     return ret;
@@ -324,13 +324,13 @@ base_read_glob_files(_LNXPROC_BASE_T *base, char **readbuf, size_t * nbytes)
     }
     globfree(&globbuf);
     regfree(&reg);
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 static int
-base_read_files(_LNXPROC_BASE_T *base)
+base_read_files(_TOPIARY_BASE_T *base)
 {
-    _LNXPROC_BASE_DATA_T *data = base->current;
+    _TOPIARY_BASE_DATA_T *data = base->current;
     int i;
     char *readbuf = data->lines;
     size_t nbytes = data->buflen;
@@ -352,71 +352,71 @@ base_read_files(_LNXPROC_BASE_T *base)
     }
     data->nbytes = data->buflen - nbytes;
 
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 static int
-base_new_rawread_buffer(_LNXPROC_BASE_DATA_T *data, size_t newlen)
+base_new_rawread_buffer(_TOPIARY_BASE_DATA_T *data, size_t newlen)
 {
-    _LNXPROC_DEBUG("Allocate lines buffer to %zd bytes\n", newlen);
+    _TOPIARY_DEBUG("Allocate lines buffer to %zd bytes\n", newlen);
     char *p = Allocate(data->lines, newlen + 1);
 
     if (!p) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Base buffer");
-        return LNXPROC_ERROR_MALLOC;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_MALLOC, "Base buffer");
+        return TOPIARY_ERROR_MALLOC;
     }
     memset(p, 0, newlen);
     p[newlen] = '\f';
     data->lines = p;
     data->buflen = newlen;
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 static int
-base_resize_rawread_buffer(_LNXPROC_BASE_DATA_T *data)
+base_resize_rawread_buffer(_TOPIARY_BASE_DATA_T *data)
 {
-    _LNXPROC_DEBUG("Resize lines buffer from %zd bytes\n", data->buflen);
+    _TOPIARY_DEBUG("Resize lines buffer from %zd bytes\n", data->buflen);
     return base_new_rawread_buffer(data, data->buflen * 2);
 }
 
 static int
-base_rawread_default(_LNXPROC_BASE_T *base)
+base_rawread_default(_TOPIARY_BASE_T *base)
 {
-    _LNXPROC_DEBUG("Execute default rawread method\n");
+    _TOPIARY_DEBUG("Execute default rawread method\n");
 
     int ret;
-    _LNXPROC_BASE_DATA_T *data = base->current;
+    _TOPIARY_BASE_DATA_T *data = base->current;
 
     do {
         ret = base_read_files(base);
-        if (ret == LNXPROC_ERROR_BASE_READ_OVERFLOW) {
+        if (ret == TOPIARY_ERROR_BASE_READ_OVERFLOW) {
             base_resize_rawread_buffer(data);
         }
-    } while (ret == LNXPROC_ERROR_BASE_READ_OVERFLOW);
+    } while (ret == TOPIARY_ERROR_BASE_READ_OVERFLOW);
     if (ret) {
         return ret;
     }
-    _LNXPROC_DEBUG("Successful\n");
-    return LNXPROC_OK;
+    _TOPIARY_DEBUG("Successful\n");
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_base_rawread(_LNXPROC_BASE_T *base)
+_topiary_base_rawread(_TOPIARY_BASE_T *base)
 {
     if (!base) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Base");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
 
-    _LNXPROC_BASE_DATA_T *data = base->current;
-    _LNXPROC_RESULTS_T *results = data->results;
+    _TOPIARY_BASE_DATA_T *data = base->current;
+    _TOPIARY_RESULTS_T *results = data->results;
 
     if (base->rawread) {
         int ret;
 
-        if (base->type == _LNXPROC_BASE_TYPE_PREVIOUS) {
+        if (base->type == _TOPIARY_BASE_TYPE_PREVIOUS) {
             if (base->count > 0) {
-                ret = _lnxproc_base_store_previous(base);
+                ret = _topiary_base_store_previous(base);
                 if (ret) {
                     results->error = ret;
                     return ret;
@@ -424,7 +424,7 @@ _lnxproc_base_rawread(_LNXPROC_BASE_T *base)
             }
         }
 
-        struct timeval start = lnxproc_timeval();
+        struct timeval start = topiary_timeval();
 
         ret = base->rawread(base);
         if (ret) {
@@ -432,72 +432,72 @@ _lnxproc_base_rawread(_LNXPROC_BASE_T *base)
             return ret;
         }
 
-        results->tv = lnxproc_timeval();
-        data->rawread_time = lnxproc_timeval_diff(&start, &results->tv);
+        results->tv = topiary_timeval();
+        data->rawread_time = topiary_timeval_diff(&start, &results->tv);
 #ifdef DEBUG
         char buf[32];
 
-        _LNXPROC_DEBUG("Current timestamp %s\n",
-                       lnxproc_timeval_print(&results->tv, buf, sizeof buf));
+        _TOPIARY_DEBUG("Current timestamp %s\n",
+                       topiary_timeval_print(&results->tv, buf, sizeof buf));
 #endif
     }
     else {
         data->rawread_time = 0.0;
     }
-    results->error = LNXPROC_OK;
-    return LNXPROC_OK;
+    results->error = TOPIARY_OK;
+    return TOPIARY_OK;
 }
 
 static int
-base_map(_LNXPROC_BASE_T *base)
+base_map(_TOPIARY_BASE_T *base)
 {
-    _LNXPROC_BASE_DATA_T *data = base->current;
+    _TOPIARY_BASE_DATA_T *data = base->current;
 
-    struct timeval start = lnxproc_timeval();
+    struct timeval start = topiary_timeval();
 
-    _LNXPROC_DEBUG("Data %p\n", data);
+    _TOPIARY_DEBUG("Data %p\n", data);
 
-    _LNXPROC_ARRAY_T *array = data->array;
+    _TOPIARY_ARRAY_T *array = data->array;
 
-    _LNXPROC_DEBUG("Array %p\n", array);
+    _TOPIARY_DEBUG("Array %p\n", array);
 
     char *lines = data->lines;
     int nbytes = data->nbytes;
 
-    _LNXPROC_DEBUG("Lines %p Nbytes %d\n", lines, nbytes);
+    _TOPIARY_DEBUG("Lines %p Nbytes %d\n", lines, nbytes);
 
 #ifdef DEBUG
     char basebuf[128];
 
-    _lnxproc_chars_print(lines, nbytes, basebuf, sizeof basebuf);
-    _LNXPROC_DEBUG("Chars %s\n", basebuf);
+    _topiary_chars_print(lines, nbytes, basebuf, sizeof basebuf);
+    _TOPIARY_DEBUG("Chars %s\n", basebuf);
 #endif
 
     if (nbytes > 0) {
         char *c = lines;
 
-        _LNXPROC_DEBUG("Start at Chars %p\n", c);
+        _TOPIARY_DEBUG("Start at Chars %p\n", c);
         char *d = c + nbytes;
 
-        _LNXPROC_DEBUG("End at Chars %p\n", d);
+        _TOPIARY_DEBUG("End at Chars %p\n", d);
 
         if (array) {
 
-            _LNXPROC_LIMITS_T *limits = data->array->limits;
+            _TOPIARY_LIMITS_T *limits = data->array->limits;
             size_t dim = limits->dim;
 
-            _LNXPROC_DEBUG("Limits %p Dim %zd\n", limits, dim);
+            _TOPIARY_DEBUG("Limits %p Dim %zd\n", limits, dim);
 
             size_t idx[dim];
 
             memset(idx, 0, dim * sizeof(size_t));
 
-            _LNXPROC_DEBUG("%p:Idx[%d] = %zd\n", idx, 0, idx[0]);
+            _TOPIARY_DEBUG("%p:Idx[%d] = %zd\n", idx, 0, idx[0]);
             int i, j;
 
             /* swallow any leading separators */
             for (i = dim - 1; i >= 0 && c < d; i--) {
-                _LNXPROC_DEBUG("At Char %p '%c'\n", c, *c);
+                _TOPIARY_DEBUG("At Char %p '%c'\n", c, *c);
                 while (c < d && limit_chr(limits->row + i, *c)) {
                     c++;
                 }
@@ -509,20 +509,20 @@ base_map(_LNXPROC_BASE_T *base)
 
                 int increment = 1;
 
-                _LNXPROC_DEBUG("At Char %p '%c'\n", c, *c);
+                _TOPIARY_DEBUG("At Char %p '%c'\n", c, *c);
                 for (i = dim - 1; (i >= 0) && (c < d); i--) {
                     if (limit_chr(limits->row + i, *c)) {
                         *c = '\0';
-                        _LNXPROC_DEBUG("Saveptr %1$p '%1$s'\n", saveptr);
+                        _TOPIARY_DEBUG("Saveptr %1$p '%1$s'\n", saveptr);
                         if (c > saveptr) {
 #ifdef DEBUG
                             int k;
 
                             for (k = 0; k < dim; k++) {
-                                _LNXPROC_DEBUG("Idx[%d] %zd\n", k, idx[k]);
+                                _TOPIARY_DEBUG("Idx[%d] %zd\n", k, idx[k]);
                             }
 #endif
-                            int ret = _lnxproc_array_set_last(array, idx, dim,
+                            int ret = _topiary_array_set_last(array, idx, dim,
                                                               saveptr);
 
                             if (ret) {
@@ -535,16 +535,16 @@ base_map(_LNXPROC_BASE_T *base)
                             c++;
                         }
                         idx[i]++;
-                        _LNXPROC_DEBUG("New Idx[%d] %zd\n", i, idx[i]);
+                        _TOPIARY_DEBUG("New Idx[%d] %zd\n", i, idx[i]);
                         for (j = i + 1; j < dim; j++) {
                             idx[j] = 0;
                             while ((c < d) && limit_chr(limits->row + j, *c)) {
                                 c++;
                             }
-                            _LNXPROC_DEBUG("New Idx[%d] %zd\n", j, idx[j]);
+                            _TOPIARY_DEBUG("New Idx[%d] %zd\n", j, idx[j]);
                         }
                         saveptr = c;
-                        _LNXPROC_DEBUG("New Saveptr %p\n", saveptr);
+                        _TOPIARY_DEBUG("New Saveptr %p\n", saveptr);
                         increment = 0;
                     }
                 }
@@ -565,17 +565,17 @@ base_map(_LNXPROC_BASE_T *base)
         }
     }
 
-    struct timeval end = lnxproc_timeval();
+    struct timeval end = topiary_timeval();
 
-    data->map_time = lnxproc_timeval_diff(&start, &end);
-    return LNXPROC_OK;
+    data->map_time = topiary_timeval_diff(&start, &end);
+    return TOPIARY_OK;
 }
 
 static int
-array_new(_LNXPROC_BASE_DATA_T *data, _LNXPROC_LIMITS_T *limits)
+array_new(_TOPIARY_BASE_DATA_T *data, _TOPIARY_LIMITS_T *limits)
 {
     if (limits) {
-        int ret = _lnxproc_array_new(&data->array, limits);
+        int ret = _topiary_array_new(&data->array, limits);
 
         if (ret) {
             return ret;
@@ -584,30 +584,30 @@ array_new(_LNXPROC_BASE_DATA_T *data, _LNXPROC_LIMITS_T *limits)
     else {
         data->array = NULL;
     }
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 static int
-base_null_method(_LNXPROC_BASE_T *base)
+base_null_method(_TOPIARY_BASE_T *base)
 {
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_base_normalize(_LNXPROC_BASE_T *base)
+_topiary_base_normalize(_TOPIARY_BASE_T *base)
 {
 
-    _LNXPROC_DEBUG("Base %p\n", base);
+    _TOPIARY_DEBUG("Base %p\n", base);
 
     if (!base) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Base");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
 
     int ret;
 
-    _LNXPROC_BASE_DATA_T *data = base->current;
-    _LNXPROC_RESULTS_T *results = data->results;
+    _TOPIARY_BASE_DATA_T *data = base->current;
+    _TOPIARY_RESULTS_T *results = data->results;
 
     if (base->normalize) {
 
@@ -617,23 +617,23 @@ _lnxproc_base_normalize(_LNXPROC_BASE_T *base)
             return ret;
         }
 
-        _LNXPROC_DEBUG("Execute normalize method\n");
-        struct timeval start = lnxproc_timeval();
+        _TOPIARY_DEBUG("Execute normalize method\n");
+        struct timeval start = topiary_timeval();
 
         ret = base->normalize(base);
-        struct timeval end = lnxproc_timeval();
+        struct timeval end = topiary_timeval();
 
-        data->normalize_time = lnxproc_timeval_diff(&start, &end);
+        data->normalize_time = topiary_timeval_diff(&start, &end);
         if (ret) {
             results->error = ret;
             return ret;
         }
         start = end;
-        _lnxproc_results_hash(data->results);
-        end = lnxproc_timeval();
-        data->hash_time = lnxproc_timeval_diff(&start, &end);
-        if (base->type == _LNXPROC_BASE_TYPE_MEMOIZE) {
-            ret = _lnxproc_base_memoize(base);
+        _topiary_results_hash(data->results);
+        end = topiary_timeval();
+        data->hash_time = topiary_timeval_diff(&start, &end);
+        if (base->type == _TOPIARY_BASE_TYPE_MEMOIZE) {
+            ret = _topiary_base_memoize(base);
             if (ret) {
                 results->error = ret;
                 return ret;
@@ -648,39 +648,39 @@ _lnxproc_base_normalize(_LNXPROC_BASE_T *base)
         data->hash_time = 0.0;
         data->normalize_time = 0.0;
     }
-    results->error = LNXPROC_OK;
-    return LNXPROC_OK;
+    results->error = TOPIARY_OK;
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_base_read(_LNXPROC_BASE_T *base)
+_topiary_base_read(_TOPIARY_BASE_T *base)
 {
 
-    _LNXPROC_DEBUG("Base %p\n", base);
+    _TOPIARY_DEBUG("Base %p\n", base);
 
     if (!base) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Base");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
     int ret;
 
-    ret = _lnxproc_base_rawread(base);
+    ret = _topiary_base_rawread(base);
     if (ret) {
         return ret;
     }
-    ret = _lnxproc_base_normalize(base);
+    ret = _topiary_base_normalize(base);
     if (ret) {
         return ret;
     }
 
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 static int
-_base_data_new(_LNXPROC_BASE_DATA_T *data, int id, char *tag,
-               size_t buflen, _LNXPROC_LIMITS_T *limits)
+_base_data_new(_TOPIARY_BASE_DATA_T *data, int id, char *tag,
+               size_t buflen, _TOPIARY_LIMITS_T *limits)
 {
-    _LNXPROC_DEBUG("New base data at %p index %d\n", data, id);
+    _TOPIARY_DEBUG("New base data at %p index %d\n", data, id);
     data->id = id;
 
     int ret = base_new_rawread_buffer(data, buflen);
@@ -691,21 +691,21 @@ _base_data_new(_LNXPROC_BASE_DATA_T *data, int id, char *tag,
 
     ret = array_new(data, limits);
     if (ret) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Array");
-        return LNXPROC_ERROR_MALLOC;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_MALLOC, "Array");
+        return TOPIARY_ERROR_MALLOC;
     }
 
     data->results = NULL;
-    ret = _lnxproc_results_new(&data->results, tag);
+    ret = _topiary_results_new(&data->results, tag);
     if (ret) {
         return ret;
     }
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 
 }
 
 int
-_lnxproc_base_store_previous(_LNXPROC_BASE_T *base)
+_topiary_base_store_previous(_TOPIARY_BASE_T *base)
 {
     if (base) {
         if (!base->previous) {
@@ -719,38 +719,38 @@ _lnxproc_base_store_previous(_LNXPROC_BASE_T *base)
             }
             base->previous = base->data + 1;
         }
-        _LNXPROC_BASE_DATA_T *tmp = base->current;
+        _TOPIARY_BASE_DATA_T *tmp = base->current;
 
         base->current = base->previous;
         base->previous = tmp;
     }
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_base_set_optional(_LNXPROC_BASE_T *base, LNXPROC_OPT_T *optional)
+_topiary_base_set_optional(_TOPIARY_BASE_T *base, TOPIARY_OPT_T *optional)
 {
     if (!base) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Base");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
     if (base->optional) {
-        LNXPROC_OPT_FREE(base->optional);
+        TOPIARY_OPT_FREE(base->optional);
     }
-    lnxproc_opt_new(&optional);
+    topiary_opt_new(&optional);
     base->optional = optional;
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_base_set_fileprefix(_LNXPROC_BASE_T *base, char *fileprefix)
+_topiary_base_set_fileprefix(_TOPIARY_BASE_T *base, char *fileprefix)
 {
     if (!base) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Base");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
 
-    char *testroot = getenv("LNXPROC_TESTROOT");
+    char *testroot = getenv("TOPIARY_TESTROOT");
 
     DESTROY(base->fileprefix);
     if (fileprefix) {
@@ -767,70 +767,70 @@ _lnxproc_base_set_fileprefix(_LNXPROC_BASE_T *base, char *fileprefix)
             base->fileprefix = strdup(fileprefix);
         }
         if (!base->fileprefix) {
-            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Base fileprefix");
-            return LNXPROC_ERROR_MALLOC;
+            _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_MALLOC, "Base fileprefix");
+            return TOPIARY_ERROR_MALLOC;
         }
     }
 
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_base_set_fileglob(_LNXPROC_BASE_T *base, char *fileglob)
+_topiary_base_set_fileglob(_TOPIARY_BASE_T *base, char *fileglob)
 {
     if (!base) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Base");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
 
     DESTROY(base->fileglob);
     if (fileglob) {
         base->fileglob = strdup(fileglob);
         if (!base->fileglob) {
-            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Base fileglob");
-            return LNXPROC_ERROR_MALLOC;
+            _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_MALLOC, "Base fileglob");
+            return TOPIARY_ERROR_MALLOC;
         }
     }
 
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_base_set_filesuffix(_LNXPROC_BASE_T *base, char *filesuffix)
+_topiary_base_set_filesuffix(_TOPIARY_BASE_T *base, char *filesuffix)
 {
     if (!base) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Base");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
 
     DESTROY(base->filesuffix);
     if (filesuffix) {
         base->filesuffix = strdup(filesuffix);
         if (!base->filesuffix) {
-            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Base filesuffix");
-            return LNXPROC_ERROR_MALLOC;
+            _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_MALLOC, "Base filesuffix");
+            return TOPIARY_ERROR_MALLOC;
         }
     }
 
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_base_set_filenames(_LNXPROC_BASE_T *base,
+_topiary_base_set_filenames(_TOPIARY_BASE_T *base,
                             char **filenames, size_t nfiles)
 {
     if (!base) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Base");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
     if ((filenames && (nfiles < 1)) || (!filenames && (nfiles > 0))) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG,
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG,
                              "Filenames %p Nfiles %zd", filenames, nfiles);
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
 
     if (base->filenames) {
-        _LNXPROC_DEBUG("Free Base filenames\n");
+        _TOPIARY_DEBUG("Free Base filenames\n");
         int i;
 
         for (i = 0; i < base->nfiles; i++) {
@@ -839,14 +839,14 @@ _lnxproc_base_set_filenames(_LNXPROC_BASE_T *base,
         DESTROY(base->filenames);
     }
 
-    char *testroot = getenv("LNXPROC_TESTROOT");
+    char *testroot = getenv("TOPIARY_TESTROOT");
 
     base->nfiles = 0;
     if (filenames) {
         base->filenames = Allocate(NULL, nfiles * sizeof(char *));
         if (!base->filenames) {
-            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Base filenames");
-            return LNXPROC_ERROR_MALLOC;
+            _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_MALLOC, "Base filenames");
+            return TOPIARY_ERROR_MALLOC;
         }
         int i;
 
@@ -864,14 +864,14 @@ _lnxproc_base_set_filenames(_LNXPROC_BASE_T *base,
                 base->filenames[i] = strdup(filenames[i]);
             }
             if (!base->filenames[i]) {
-                _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC,
+                _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_MALLOC,
                                      "Base filenames %d", i);
                 int j;
 
                 for (j = i - 1; j >= 0; j--) {
                     DESTROY(base->filenames[j]);
                 }
-                return LNXPROC_ERROR_MALLOC;
+                return TOPIARY_ERROR_MALLOC;
             }
             base->nfiles++;
         }
@@ -880,44 +880,44 @@ _lnxproc_base_set_filenames(_LNXPROC_BASE_T *base,
         base->filenames = NULL;
     }
 
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_base_new(_LNXPROC_BASE_T **base,
+_topiary_base_new(_TOPIARY_BASE_T **base,
                   char *tag,
-                  _LNXPROC_BASE_TYPE_T type,
-                  _LNXPROC_BASE_METHOD rawread,
-                  _LNXPROC_BASE_METHOD normalize,
-                  _LNXPROC_BASE_METHOD read,
-                  size_t buflen, _LNXPROC_LIMITS_T *limits)
+                  _TOPIARY_BASE_TYPE_T type,
+                  _TOPIARY_BASE_METHOD rawread,
+                  _TOPIARY_BASE_METHOD normalize,
+                  _TOPIARY_BASE_METHOD read,
+                  size_t buflen, _TOPIARY_LIMITS_T *limits)
 {
     int ret;
 
-    _LNXPROC_DEBUG("tag %s\n", tag);
-    _LNXPROC_DEBUG("rawread %p, normalize %p, read %p\n", rawread,
+    _TOPIARY_DEBUG("tag %s\n", tag);
+    _TOPIARY_DEBUG("rawread %p, normalize %p, read %p\n", rawread,
                    normalize, read);
-    _LNXPROC_DEBUG("buflen %zd\n", buflen);
-    _LNXPROC_DEBUG("limits %p\n", limits);
-    _LNXPROC_DEBUG("sizeof ptr %lu\n", sizeof(void *));
-    _LNXPROC_DEBUG("sizeof LNXPROC_BASE_T %lu\n", sizeof(_LNXPROC_BASE_T));
+    _TOPIARY_DEBUG("buflen %zd\n", buflen);
+    _TOPIARY_DEBUG("limits %p\n", limits);
+    _TOPIARY_DEBUG("sizeof ptr %lu\n", sizeof(void *));
+    _TOPIARY_DEBUG("sizeof TOPIARY_BASE_T %lu\n", sizeof(_TOPIARY_BASE_T));
 
     if (!base) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Base");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
 
-    _LNXPROC_BASE_T *p = Allocate(NULL, sizeof(_LNXPROC_BASE_T));
+    _TOPIARY_BASE_T *p = Allocate(NULL, sizeof(_TOPIARY_BASE_T));
 
     if (!p) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Base");
-        return LNXPROC_ERROR_MALLOC;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_MALLOC, "Base");
+        return TOPIARY_ERROR_MALLOC;
     }
 
-    _LNXPROC_DEBUG("Allocate data area\n");
+    _TOPIARY_DEBUG("Allocate data area\n");
     ret = _base_data_new(p->data + 0, 0, tag, buflen, limits);
     if (ret) {
-        _LNXPROC_BASE_FREE(p);
+        _TOPIARY_BASE_FREE(p);
         return ret;
     }
 
@@ -925,7 +925,7 @@ _lnxproc_base_new(_LNXPROC_BASE_T **base,
     p->previous = NULL;
     p->normalize = normalize;
     if (!read) {
-        p->read = _lnxproc_base_read;
+        p->read = _topiary_base_read;
     }
     else {
         p->read = read;
@@ -939,40 +939,40 @@ _lnxproc_base_new(_LNXPROC_BASE_T **base,
     p->type = type;
     p->count = 0;
     *base = p;
-    _LNXPROC_DEBUG("Successful\n");
-    return LNXPROC_OK;
+    _TOPIARY_DEBUG("Successful\n");
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_base_size(_LNXPROC_BASE_T *base, size_t * size)
+_topiary_base_size(_TOPIARY_BASE_T *base, size_t * size)
 {
     if (!size) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Size");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Size");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
     *size = 0;
     if (!base) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Base");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
     *size += sizeof(*base);
     int i;
 
     for (i = 0; i < 2; i++) {
-        _LNXPROC_BASE_DATA_T *d = base->data + i;
+        _TOPIARY_BASE_DATA_T *d = base->data + i;
 
         if (d->lines)
             *size += d->buflen;
         if (d->array) {
             size_t s;
 
-            _lnxproc_array_size(d->array, &s);
+            _topiary_array_size(d->array, &s);
             *size += s;
         }
         if (d->results) {
             size_t s;
 
-            _lnxproc_results_size(d->results, &s);
+            _topiary_results_size(d->results, &s);
             *size += s;
         }
 
@@ -987,48 +987,48 @@ _lnxproc_base_size(_LNXPROC_BASE_T *base, size_t * size)
         *size += strlen(base->fileglob) + 1;
     if (base->filesuffix)
         *size += strlen(base->filesuffix) + 1;
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 static void
-base_data_free(_LNXPROC_BASE_DATA_T *data)
+base_data_free(_TOPIARY_BASE_DATA_T *data)
 {
     if (data) {
-        _LNXPROC_ARRAY_FREE(data->array);
+        _TOPIARY_ARRAY_FREE(data->array);
         DESTROY(data->lines);
-        _LNXPROC_RESULTS_FREE(data->results);
+        _TOPIARY_RESULTS_FREE(data->results);
     }
 }
 
 int
-_lnxproc_base_free(_LNXPROC_BASE_T **baseptr)
+_topiary_base_free(_TOPIARY_BASE_T **baseptr)
 {
-    _LNXPROC_DEBUG("Base %p\n", baseptr);
+    _TOPIARY_DEBUG("Base %p\n", baseptr);
 
     if (baseptr && *baseptr) {
-        _LNXPROC_BASE_T *base = *baseptr;
+        _TOPIARY_BASE_T *base = *baseptr;
 
         base_data_free(base->current);
         base_data_free(base->previous);
-        _lnxproc_base_set_filenames(base, NULL, 0);
+        _topiary_base_set_filenames(base, NULL, 0);
         DESTROY(base->fileprefix);
         DESTROY(base->fileglob);
         DESTROY(base->filesuffix);
-        LNXPROC_OPT_FREE(base->optional);
-        _LNXPROC_DEBUG("Free Base\n");
+        TOPIARY_OPT_FREE(base->optional);
+        _TOPIARY_DEBUG("Free Base\n");
         DESTROY(base);
         *baseptr = NULL;
     }
 
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_base_memoize(_LNXPROC_BASE_T *base)
+_topiary_base_memoize(_TOPIARY_BASE_T *base)
 {
     if (!base) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Base");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
 
     if (!base->memoize_read) {
@@ -1043,15 +1043,15 @@ _lnxproc_base_memoize(_LNXPROC_BASE_T *base)
         base->memoize_normalize = base->normalize;
         base->normalize = NULL;
     }
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_base_unmemoize(_LNXPROC_BASE_T *base)
+_topiary_base_unmemoize(_TOPIARY_BASE_T *base)
 {
     if (!base) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Base");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
 
     if (base->memoize_read) {
@@ -1066,38 +1066,38 @@ _lnxproc_base_unmemoize(_LNXPROC_BASE_T *base)
         base->normalize = base->memoize_normalize;
         base->memoize_normalize = NULL;
     }
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_base_timeval_diff(_LNXPROC_BASE_T *base, float *tdiff)
+_topiary_base_timeval_diff(_TOPIARY_BASE_T *base, float *tdiff)
 {
     if (!tdiff) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Time difference");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Time difference");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
     *tdiff = 0.0;
     if (!base) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Base");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Base");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
 
     if (!base->previous || !base->current) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG,
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG,
                              "Base current/previous");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
 
     if (!base->current->array || !base->previous->array) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG,
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG,
                              "Base current/previous array");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
 
     *tdiff =
-        1.e-6 * lnxproc_timeval_diff(&base->current->results->tv,
+        1.e-6 * topiary_timeval_diff(&base->current->results->tv,
                                      &base->previous->results->tv);
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 /*

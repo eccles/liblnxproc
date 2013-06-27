@@ -1,18 +1,18 @@
 /*
- * This file is part of liblnxproc.
+ * This file is part of topiary.
  *
- *  liblnxproc is free software: you can redistribute it and/or modify
+ *  topiary is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  liblnxproc is distributed in the hope that it will be useful,
+ *  topiary is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with liblnxproc.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with topiary.  If not, see <http://www.gnu.org/licenses/>.
  *
  *  Copyright 2013 Paul Hewlett, phewlett76@gmail.com
  *
@@ -28,32 +28,32 @@
 #include "error_private.h"
 #include "vector_private.h"
 
-static _LNXPROC_VECTOR_T **
+static _TOPIARY_VECTOR_T **
 vector_malloc_children(size_t size)
 {
-    return Allocate(NULL, size * sizeof(_LNXPROC_VECTOR_T *));
+    return Allocate(NULL, size * sizeof(_TOPIARY_VECTOR_T *));
 }
 
-static _LNXPROC_VECTOR_T **
-vector_realloc_children(_LNXPROC_VECTOR_T **old, size_t oldsize, size_t addsize)
+static _TOPIARY_VECTOR_T **
+vector_realloc_children(_TOPIARY_VECTOR_T **old, size_t oldsize, size_t addsize)
 {
-    _LNXPROC_DEBUG("Old %p oldsize %zd addsize %zd\n", old, oldsize, addsize);
+    _TOPIARY_DEBUG("Old %p oldsize %zd addsize %zd\n", old, oldsize, addsize);
 
     size_t nsize = oldsize + addsize;
-    size_t n = nsize * sizeof(_LNXPROC_VECTOR_T *);
+    size_t n = nsize * sizeof(_TOPIARY_VECTOR_T *);
 
-    _LNXPROC_DEBUG("nsize %zd n %zd\n", nsize, n);
+    _TOPIARY_DEBUG("nsize %zd n %zd\n", nsize, n);
 
-    _LNXPROC_VECTOR_T **p = Allocate(old, n);
+    _TOPIARY_VECTOR_T **p = Allocate(old, n);
 
-    _LNXPROC_DEBUG("New %p\n", p);
+    _TOPIARY_DEBUG("New %p\n", p);
     if (p) {
-        _LNXPROC_VECTOR_T **extra = p + oldsize;
+        _TOPIARY_VECTOR_T **extra = p + oldsize;
 
-        _LNXPROC_DEBUG("Extra %p\n", extra);
+        _TOPIARY_DEBUG("Extra %p\n", extra);
 
-        n = addsize * sizeof(_LNXPROC_VECTOR_T *);
-        _LNXPROC_DEBUG("n %zd\n", n);
+        n = addsize * sizeof(_TOPIARY_VECTOR_T *);
+        _TOPIARY_DEBUG("n %zd\n", n);
         memset(extra, 0, n);
     }
 
@@ -69,24 +69,24 @@ vector_malloc_values(size_t size)
 static char **
 vector_realloc_values(char **old, size_t oldsize, size_t addsize)
 {
-    _LNXPROC_DEBUG("Old %p oldsize %zd addsize %zd\n", old, oldsize, addsize);
+    _TOPIARY_DEBUG("Old %p oldsize %zd addsize %zd\n", old, oldsize, addsize);
 
     size_t nsize = oldsize + addsize;
     size_t n = nsize * sizeof(char *);
 
-    _LNXPROC_DEBUG("nsize %zd n %zd\n", nsize, n);
+    _TOPIARY_DEBUG("nsize %zd n %zd\n", nsize, n);
 
     char **p = Allocate(old, n);
 
-    _LNXPROC_DEBUG("New %p\n", p);
+    _TOPIARY_DEBUG("New %p\n", p);
 
     if (p) {
         char **extra = p + oldsize;
 
-        _LNXPROC_DEBUG("Extra %p\n", extra);
+        _TOPIARY_DEBUG("Extra %p\n", extra);
 
         n = addsize * sizeof(char *);
-        _LNXPROC_DEBUG("n %zd\n", n);
+        _TOPIARY_DEBUG("n %zd\n", n);
         memset(extra, 0, n);
     }
 
@@ -94,28 +94,28 @@ vector_realloc_values(char **old, size_t oldsize, size_t addsize)
 }
 
 int
-_lnxproc_vector_new(_LNXPROC_VECTOR_T **vector, size_t size, int recursive)
+_topiary_vector_new(_TOPIARY_VECTOR_T **vector, size_t size, int recursive)
 {
 
-    _LNXPROC_DEBUG("sizeof ptr %lu\n", sizeof(void *));
-    _LNXPROC_DEBUG("sizeof _LNXPROC_VECTOR_T %lu\n", sizeof(_LNXPROC_VECTOR_T));
-    _LNXPROC_DEBUG("Size %zd Recursive %d\n", size, recursive);
+    _TOPIARY_DEBUG("sizeof ptr %lu\n", sizeof(void *));
+    _TOPIARY_DEBUG("sizeof _TOPIARY_VECTOR_T %lu\n", sizeof(_TOPIARY_VECTOR_T));
+    _TOPIARY_DEBUG("Size %zd Recursive %d\n", size, recursive);
 
     if (!vector) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Vector");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Vector");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
 
     if (*vector) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Vector");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Vector");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
 
-    _LNXPROC_VECTOR_T *p = Allocate(NULL, sizeof(_LNXPROC_VECTOR_T));
+    _TOPIARY_VECTOR_T *p = Allocate(NULL, sizeof(_TOPIARY_VECTOR_T));
 
     if (!p) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Vector");
-        return LNXPROC_ERROR_MALLOC;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_MALLOC, "Vector");
+        return TOPIARY_ERROR_MALLOC;
     }
 
     p->length = 0;
@@ -127,65 +127,65 @@ _lnxproc_vector_new(_LNXPROC_VECTOR_T **vector, size_t size, int recursive)
      * realloc
      */
     if (size > 0) {
-        _LNXPROC_DEBUG("Malloc %zd words of child\n", size);
+        _TOPIARY_DEBUG("Malloc %zd words of child\n", size);
 
         if (recursive) {
             p->children = vector_malloc_children(size);
 
             if (!p->children) {
-                _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Vector data");
-                _LNXPROC_VECTOR_FREE(p);
-                return LNXPROC_ERROR_MALLOC;
+                _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_MALLOC, "Vector data");
+                _TOPIARY_VECTOR_FREE(p);
+                return TOPIARY_ERROR_MALLOC;
             }
         }
 
         p->values = vector_malloc_values(size);
 
         if (!p->values) {
-            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Vector values");
-            _LNXPROC_VECTOR_FREE(p);
-            return LNXPROC_ERROR_MALLOC;
+            _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_MALLOC, "Vector values");
+            _TOPIARY_VECTOR_FREE(p);
+            return TOPIARY_ERROR_MALLOC;
         }
     }
 
     *vector = p;
-    _LNXPROC_DEBUG("Success\n");
-    return LNXPROC_OK;
+    _TOPIARY_DEBUG("Success\n");
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_vector_free(_LNXPROC_VECTOR_T **vectorptr)
+_topiary_vector_free(_TOPIARY_VECTOR_T **vectorptr)
 {
-    _LNXPROC_DEBUG("Vector %p\n", vectorptr);
+    _TOPIARY_DEBUG("Vector %p\n", vectorptr);
 
     if (vectorptr && *vectorptr) {
-        _LNXPROC_VECTOR_T *vector = *vectorptr;
+        _TOPIARY_VECTOR_T *vector = *vectorptr;
 
         if (vector->children) {
             int i;
 
             for (i = 0; i < vector->size; i++) {
-                _LNXPROC_VECTOR_FREE(vector->children[i]);
+                _TOPIARY_VECTOR_FREE(vector->children[i]);
             }
             DESTROY(vector->children);
         }
         DESTROY(vector->values);
-        _LNXPROC_DEBUG("Free vector %p\n", vector);
+        _TOPIARY_DEBUG("Free vector %p\n", vector);
         DESTROY(vector);
         *vectorptr = NULL;
     }
 
-    _LNXPROC_DEBUG("Success\n");
-    return LNXPROC_OK;
+    _TOPIARY_DEBUG("Success\n");
+    return TOPIARY_OK;
 }
 
 struct vector_size_t {
     size_t size;
 };
 static int
-vector_size_internal(_LNXPROC_VECTOR_T *vector, int idx, int depth, void *data)
+vector_size_internal(_TOPIARY_VECTOR_T *vector, int idx, int depth, void *data)
 {
-    _LNXPROC_DEBUG("Vector %p Idx %d, Depth %d Data %p\n", vector, idx, depth,
+    _TOPIARY_DEBUG("Vector %p Idx %d, Depth %d Data %p\n", vector, idx, depth,
                    data);
 
     struct vector_size_t *vsize = data;
@@ -197,52 +197,52 @@ vector_size_internal(_LNXPROC_VECTOR_T *vector, int idx, int depth, void *data)
     if (vector->values) {
         vsize->size += sizeof(vector->size * sizeof(*(vector->values)));
     }
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_vector_size(_LNXPROC_VECTOR_T *vector, size_t * size)
+_topiary_vector_size(_TOPIARY_VECTOR_T *vector, size_t * size)
 {
     if (!size) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Size");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Size");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
     *size = 0;
     if (!vector) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Vector");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Vector");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
     struct vector_size_t vsize = {.size = 0, };
 
-    _lnxproc_vector_iterate(vector, 0, 0, 1, &vsize, vector_size_internal);
+    _topiary_vector_iterate(vector, 0, 0, 1, &vsize, vector_size_internal);
     *size = vsize.size;
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_vector_resize(_LNXPROC_VECTOR_T *vector, size_t size)
+_topiary_vector_resize(_TOPIARY_VECTOR_T *vector, size_t size)
 {
-    _LNXPROC_DEBUG("Vector %p Size %zd\n", vector, size);
+    _TOPIARY_DEBUG("Vector %p Size %zd\n", vector, size);
 
     if (!vector) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Vector");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Vector");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
 
     size_t osize = vector->size;
 
     if (vector->recursive) {
-        _LNXPROC_VECTOR_T **p =
+        _TOPIARY_VECTOR_T **p =
             vector_realloc_children(vector->children, osize, size);
 
         if (!p) {
-            _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC,
+            _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_MALLOC,
                                  "Realloc vector children");
-            return LNXPROC_ERROR_MALLOC;
+            return TOPIARY_ERROR_MALLOC;
         }
 
         if (p != vector->children) {
-            _LNXPROC_DEBUG("Children of vector %p moved from %p to %p\n",
+            _TOPIARY_DEBUG("Children of vector %p moved from %p to %p\n",
                            vector, vector->children, p);
             vector->children = p;
         }
@@ -250,23 +250,23 @@ _lnxproc_vector_resize(_LNXPROC_VECTOR_T *vector, size_t size)
     char **q = vector_realloc_values(vector->values, osize, size);
 
     if (!q) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_MALLOC, "Realloc vector values");
-        return LNXPROC_ERROR_MALLOC;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_MALLOC, "Realloc vector values");
+        return TOPIARY_ERROR_MALLOC;
     }
     if (q != vector->values) {
-        _LNXPROC_DEBUG("Values of vector %p moved from %p to %p\n", vector,
+        _TOPIARY_DEBUG("Values of vector %p moved from %p to %p\n", vector,
                        vector->values, q);
 
-        _LNXPROC_VECTOR_T *par = vector->parent;
+        _TOPIARY_VECTOR_T *par = vector->parent;
 
-        _LNXPROC_DEBUG("Parent of vector %p is %p\n", vector, par);
+        _TOPIARY_DEBUG("Parent of vector %p is %p\n", vector, par);
 
         if (par) {
             int i;
 
             for (i = 0; i < par->size; i++) {
                 if (par->values[i] == (char *) vector->values) {
-                    _LNXPROC_DEBUG
+                    _TOPIARY_DEBUG
                         ("Changed parent vector at position %d from %p to %p\n",
                          i, par->values[i], q);
                     par->values[i] = (char *) q;
@@ -276,156 +276,156 @@ _lnxproc_vector_resize(_LNXPROC_VECTOR_T *vector, size_t size)
         vector->values = q;
     }
     vector->size += size;
-    _LNXPROC_DEBUG("Success\n");
+    _TOPIARY_DEBUG("Success\n");
 
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_vector_child(_LNXPROC_VECTOR_T *vector, size_t idx,
-                      _LNXPROC_VECTOR_T **child)
+_topiary_vector_child(_TOPIARY_VECTOR_T *vector, size_t idx,
+                      _TOPIARY_VECTOR_T **child)
 {
-    _LNXPROC_DEBUG("Vector %p Idx %zd\n", vector, idx);
+    _TOPIARY_DEBUG("Vector %p Idx %zd\n", vector, idx);
 
     if (!vector) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Vector");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Vector");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
     if (!child) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Vector child");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Vector child");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
     if (*child) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Vector child");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Vector child");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
     if (!vector->recursive || !vector->children) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Vector not recursive");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Vector not recursive");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
     if (idx >= vector->size) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG,
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG,
                              "Idx %zd >= Size %zd", idx, vector->size);
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
 
     *child = vector->children[idx];
-    _LNXPROC_DEBUG("Success (child = %p)\n", *child);
-    return LNXPROC_OK;
+    _TOPIARY_DEBUG("Success (child = %p)\n", *child);
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_vector_value(_LNXPROC_VECTOR_T *vector, size_t idx, char **value)
+_topiary_vector_value(_TOPIARY_VECTOR_T *vector, size_t idx, char **value)
 {
-    _LNXPROC_DEBUG("Vector %p Idx %zd\n", vector, idx);
+    _TOPIARY_DEBUG("Vector %p Idx %zd\n", vector, idx);
 
     if (!vector) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Vector");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Vector");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
     if (!value) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Vector value");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Vector value");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
     if (*value) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Vector value");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Vector value");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
     if (vector->recursive || !vector->values) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Vector is recursive");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Vector is recursive");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
 
     if (idx >= vector->size) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG,
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG,
                              "Idx %zd >= Size %zd", idx, vector->size);
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
 
     *value = vector->values[idx];
-    _LNXPROC_DEBUG("Success (val = %p '%s')\n", *value, *value);
-    return LNXPROC_OK;
+    _TOPIARY_DEBUG("Success (val = %p '%s')\n", *value, *value);
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_vector_set_child(_LNXPROC_VECTOR_T *vector, size_t idx,
-                          _LNXPROC_VECTOR_T *child)
+_topiary_vector_set_child(_TOPIARY_VECTOR_T *vector, size_t idx,
+                          _TOPIARY_VECTOR_T *child)
 {
-    _LNXPROC_DEBUG("Vector %p Idx %zd Child %p\n", vector, idx, child);
+    _TOPIARY_DEBUG("Vector %p Idx %zd Child %p\n", vector, idx, child);
 
     if (!vector) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Vector");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Vector");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
 
     if (!vector->recursive || !vector->children || !vector->values) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG,
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG,
                              "Vector is not recursive");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
 
     if (idx > vector->length) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG,
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG,
                              "Index %zd Length %zd", idx, vector->length);
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
 
     if (idx == vector->length) {
-        _LNXPROC_DEBUG("Append entry Idx %zd Length %zd\n", idx,
+        _TOPIARY_DEBUG("Append entry Idx %zd Length %zd\n", idx,
                        vector->length);
 
         if (idx >= vector->size) {
-            _LNXPROC_DEBUG("Resize data Size %zd\n", vector->size);
-            int ret = _lnxproc_vector_resize(vector, 1);
+            _TOPIARY_DEBUG("Resize data Size %zd\n", vector->size);
+            int ret = _topiary_vector_resize(vector, 1);
 
             if (ret) {
                 return ret;
             }
         }
         vector->length = idx + 1;
-        _LNXPROC_DEBUG("Vector length is now %zd\n", vector->length);
+        _TOPIARY_DEBUG("Vector length is now %zd\n", vector->length);
     }
-    _LNXPROC_DEBUG("Set Vector %p child %zd to %p\n", vector, idx, child);
+    _TOPIARY_DEBUG("Set Vector %p child %zd to %p\n", vector, idx, child);
     vector->children[idx] = child;
-    _LNXPROC_DEBUG("Set parent of %p to %p(%zd)\n", child, vector, idx);
+    _TOPIARY_DEBUG("Set parent of %p to %p(%zd)\n", child, vector, idx);
     child->parent = vector;
     child->idx = idx;
-    _LNXPROC_DEBUG("Set Vector %p value %zd to %p\n", vector, idx,
+    _TOPIARY_DEBUG("Set Vector %p value %zd to %p\n", vector, idx,
                    child->values);
     vector->values[idx] = (char *) child->values;
 
-    _LNXPROC_DEBUG("Success\n");
-    return LNXPROC_OK;
+    _TOPIARY_DEBUG("Success\n");
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_vector_set_value(_LNXPROC_VECTOR_T *vector, size_t idx, char *val)
+_topiary_vector_set_value(_TOPIARY_VECTOR_T *vector, size_t idx, char *val)
 {
-    _LNXPROC_DEBUG("Vector %p Idx %zd Val %p '%s'\n", vector, idx, val, val);
+    _TOPIARY_DEBUG("Vector %p Idx %zd Val %p '%s'\n", vector, idx, val, val);
 
     if (!vector) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Vector");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Vector");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
 
     if (vector->recursive || !vector->values) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Vector is recursive");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Vector is recursive");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
 
     if (idx > vector->length) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG,
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG,
                              "Index %zd Length %zd", idx, vector->length);
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
 
     if (idx == vector->length) {
-        _LNXPROC_DEBUG("Append entry Idx %zd Length %zd\n", idx,
+        _TOPIARY_DEBUG("Append entry Idx %zd Length %zd\n", idx,
                        vector->length);
 
         if (idx == vector->size) {
-            _LNXPROC_DEBUG("Resize data Size %zd\n", vector->size);
-            int ret = _lnxproc_vector_resize(vector, 1);
+            _TOPIARY_DEBUG("Resize data Size %zd\n", vector->size);
+            int ret = _topiary_vector_resize(vector, 1);
 
             if (ret) {
                 return ret;
@@ -433,80 +433,80 @@ _lnxproc_vector_set_value(_LNXPROC_VECTOR_T *vector, size_t idx, char *val)
         }
 
         vector->length = idx + 1;
-        _LNXPROC_DEBUG("Vector length is now %zd\n", vector->length);
+        _TOPIARY_DEBUG("Vector length is now %zd\n", vector->length);
 
     }
 
-    _LNXPROC_DEBUG("Set Vector %p entry Idx %zd to %p\n", vector, idx, val);
+    _TOPIARY_DEBUG("Set Vector %p entry Idx %zd to %p\n", vector, idx, val);
     vector->values[idx] = val;
 
-    _LNXPROC_DEBUG("Success\n");
-    return LNXPROC_OK;
+    _TOPIARY_DEBUG("Success\n");
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_vector_set_last_child(_LNXPROC_VECTOR_T *vector, size_t idx,
-                               _LNXPROC_VECTOR_T *child)
+_topiary_vector_set_last_child(_TOPIARY_VECTOR_T *vector, size_t idx,
+                               _TOPIARY_VECTOR_T *child)
 {
-    _LNXPROC_DEBUG("Vector %p Idx %zd Child %p\n", vector, idx, child);
+    _TOPIARY_DEBUG("Vector %p Idx %zd Child %p\n", vector, idx, child);
 
-    int ret = _lnxproc_vector_set_child(vector, idx, child);
+    int ret = _topiary_vector_set_child(vector, idx, child);
 
-    if (ret == LNXPROC_OK) {
+    if (ret == TOPIARY_OK) {
         vector->length = idx + 1;
-        _LNXPROC_DEBUG("Vector length is now %zd\n", vector->length);
+        _TOPIARY_DEBUG("Vector length is now %zd\n", vector->length);
     }
 
     return ret;
 }
 
 int
-_lnxproc_vector_set_last_value(_LNXPROC_VECTOR_T *vector, size_t idx, char *val)
+_topiary_vector_set_last_value(_TOPIARY_VECTOR_T *vector, size_t idx, char *val)
 {
-    _LNXPROC_DEBUG("Vector %p Idx %zd Val %p\n", vector, idx, val);
+    _TOPIARY_DEBUG("Vector %p Idx %zd Val %p\n", vector, idx, val);
 
-    int ret = _lnxproc_vector_set_value(vector, idx, val);
+    int ret = _topiary_vector_set_value(vector, idx, val);
 
-    if (ret == LNXPROC_OK) {
+    if (ret == TOPIARY_OK) {
         vector->length = idx + 1;
-        _LNXPROC_DEBUG("Vector length is now %zd\n", vector->length);
+        _TOPIARY_DEBUG("Vector length is now %zd\n", vector->length);
     }
 
     return ret;
 }
 
 int
-_lnxproc_vector_set_length(_LNXPROC_VECTOR_T *vector, size_t idx)
+_topiary_vector_set_length(_TOPIARY_VECTOR_T *vector, size_t idx)
 {
-    _LNXPROC_DEBUG("Vector %p Idx %zd\n", vector, idx);
+    _TOPIARY_DEBUG("Vector %p Idx %zd\n", vector, idx);
 
     if (!vector) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Vector");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Vector");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
 
     if (idx < 0 || idx >= vector->size) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG,
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG,
                              "Index %zd Size %zd", idx, vector->size);
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
 
     vector->length = idx + 1;
-    _LNXPROC_DEBUG("Vector length is now %zd\n", vector->length);
-    return LNXPROC_OK;
+    _TOPIARY_DEBUG("Vector length is now %zd\n", vector->length);
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_vector_iterate(_LNXPROC_VECTOR_T *vector,
+_topiary_vector_iterate(_TOPIARY_VECTOR_T *vector,
                         int idx, int depth, int allocated, void *data,
-                        _LNXPROC_VECTOR_ITERATE_FUNC func)
+                        _TOPIARY_VECTOR_ITERATE_FUNC func)
 {
-    _LNXPROC_DEBUG("Vector %p Depth %d Data %p Func %p\n", vector,
+    _TOPIARY_DEBUG("Vector %p Depth %d Data %p Func %p\n", vector,
                    depth, data, func);
 
     if (!vector) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Vector");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Vector");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
 
     func(vector, idx, depth, data);
@@ -521,20 +521,20 @@ _lnxproc_vector_iterate(_LNXPROC_VECTOR_T *vector,
             end = vector->length;
         }
 
-        _LNXPROC_DEBUG("Iterate from 0 to %d\n", end);
+        _TOPIARY_DEBUG("Iterate from 0 to %d\n", end);
         int i;
 
         depth++;
         for (i = 0; i < end; i++) {
             if (vector->children[i]) {
-                _lnxproc_vector_iterate(vector->children[i], i, depth,
+                _topiary_vector_iterate(vector->children[i], i, depth,
                                         allocated, data, func);
             }
         }
         depth--;
     }
-    _LNXPROC_DEBUG("Success\n");
-    return LNXPROC_OK;
+    _TOPIARY_DEBUG("Success\n");
+    return TOPIARY_OK;
 }
 
 static void
@@ -548,9 +548,9 @@ vector_print_depth(int depth)
 }
 
 static int
-vector_print_internal(_LNXPROC_VECTOR_T *vector, int idx, int depth, void *data)
+vector_print_internal(_TOPIARY_VECTOR_T *vector, int idx, int depth, void *data)
 {
-    _LNXPROC_DEBUG("Vector %p Idx %d, Depth %d Data %p\n", vector, idx, depth,
+    _TOPIARY_DEBUG("Vector %p Idx %d, Depth %d Data %p\n", vector, idx, depth,
                    data);
 
     vector_print_depth(depth);
@@ -588,23 +588,23 @@ vector_print_internal(_LNXPROC_VECTOR_T *vector, int idx, int depth, void *data)
         }
     }
     printf("\n");
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_vector_print(_LNXPROC_VECTOR_T *vector, int allocated, void *data)
+_topiary_vector_print(_TOPIARY_VECTOR_T *vector, int allocated, void *data)
 {
-    _LNXPROC_DEBUG("Vector %p Data %p\n", vector, data);
+    _TOPIARY_DEBUG("Vector %p Data %p\n", vector, data);
 
     if (!vector) {
-        _LNXPROC_ERROR_DEBUG(LNXPROC_ERROR_ILLEGAL_ARG, "Vector");
-        return LNXPROC_ERROR_ILLEGAL_ARG;
+        _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Vector");
+        return TOPIARY_ERROR_ILLEGAL_ARG;
     }
 
-    _lnxproc_vector_iterate(vector, 0, 0, allocated, NULL,
+    _topiary_vector_iterate(vector, 0, 0, allocated, NULL,
                             vector_print_internal);
     printf("\n");
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 /*

@@ -1,14 +1,15 @@
+package ?= topiary
 LIBDIR=$(prefix)/lib
-PUBHDIR=../include/lnxproc
+PUBHDIR=../include/$(package)
 FUNCHDRS=limit_chr.h strlcpy.h memdup.h val2str.h allocate.h reference.h io.h
-PUBBASEHDRS=lnxproc.h util.h error.h interface.h opt.h print.h
+PUBBASEHDRS=$(package).h util.h error.h interface.h opt.h print.h
 PROCHDRS=modules.h
 PUBHDRS=$(PUBBASEHDRS)
 PRIVHDRS=util_private.h base_private.h error_private.h interface_private.h \
 limits_private.h vector_private.h array_private.h results_private.h \
 opt_private.h print_private.h
 HDRS=$(PRIVHDRS) $(PROCHDRS) $(FUNCHDRS)
-LIB=liblnxproc
+LIB=lib$(package)
 BASESRCS=util.c error.c results.c limits.c vector.c array.c base.c interface.c \
 opt.c
 MISCSRCS=ntp_drift.c
@@ -26,7 +27,7 @@ $(PROCNETSRCS) $(PROCPIDSRCS) $(PROCSYSSRCS)
 SYSSRCS=sys_cpufreq.c sys_disksectors.c
 SRCS=$(BASESRCS) $(PROCSRCS) $(SYSSRCS) $(MISCSRCS)
 DIRS=
-BIN=test-lnxproc
+BIN=test-$(package)
 
 .SUFFIXES: .c .o .so
 
@@ -37,8 +38,8 @@ CCFLAGSO=-O2
 CCFLAGS1=-I../include -Wall -Werror
 CCFLAGS2=$(CCFLAGS1) -fpic
 #CCFLAGS=-g -fpic -I. -Wall
-LDFLAGS1=-L. -llnxproc
-LDFLAGS2=-L. -llnxproc-dbg
+LDFLAGS1=-L. -l$(package)
+LDFLAGS2=-L. -l$(package)-dbg
 LDFLAGS3=-pg 
 SOFLAGS=-shared
 OBJS=$(SRCS:.c=.o)

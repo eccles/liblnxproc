@@ -1,18 +1,18 @@
 /*
-This file is part of liblnxproc.
+This file is part of topiary.
 
- liblnxproc is free software: you can redistribute it and/or modify
+ topiary is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
 
- liblnxproc is distributed in the hope that it will be useful,
+ topiary is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General Public License
- along with liblnxproc.  If not, see <http://www.gnu.org/licenses/>.
+ along with topiary.  If not, see <http://www.gnu.org/licenses/>.
 
  Copyright 2013 Paul Hewlett, phewlett76@gmail.com
 
@@ -35,27 +35,27 @@ This file is part of liblnxproc.
 #include "modules.h"
 
 static int
-sys_cpufreq_normalize(_LNXPROC_BASE_T *base)
+sys_cpufreq_normalize(_TOPIARY_BASE_T *base)
 {
-    _lnxproc_results_init(base->current->results, 1);
-    _lnxproc_results_add_stringref(base->current->results, "/value",
+    _topiary_results_init(base->current->results, 1);
+    _topiary_results_add_stringref(base->current->results, "/value",
                                    base->current->lines);
 
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_sys_cpufreq_new(_LNXPROC_BASE_T **base, LNXPROC_OPT_T *optional)
+_topiary_sys_cpufreq_new(_TOPIARY_BASE_T **base, TOPIARY_OPT_T *optional)
 {
 
     char *filenames[] =
         { "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq", };
-    int ret = _lnxproc_base_new(base, "sys_cpufreq", _LNXPROC_BASE_TYPE_MEMOIZE,
+    int ret = _topiary_base_new(base, "sys_cpufreq", _TOPIARY_BASE_TYPE_MEMOIZE,
                                 NULL,
                                 sys_cpufreq_normalize, NULL, 64, NULL);
 
     if (!ret) {
-        ret = _lnxproc_base_set_filenames(*base, filenames, 1);
+        ret = _topiary_base_set_filenames(*base, filenames, 1);
     }
     return ret;
 }

@@ -7,11 +7,11 @@ then
     exit 1
 fi
 ulimit -c unlimited
-BIN=./topiary
+BIN=${0%.sh}
 if [ "${1}" = "test" ]
 then
     FUNC="${1}"
-    export LNXPROC_TESTROOT=`pwd`
+    export TOPIARY_TESTROOT=`pwd`
 elif [ "${1}" = "time" ]
 then
     FUNC="${1}"

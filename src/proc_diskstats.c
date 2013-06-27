@@ -1,18 +1,18 @@
 /*
-This file is part of liblnxproc.
+This file is part of topiary.
 
- liblnxproc is free software: you can redistribute it and/or modify
+ topiary is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
 
- liblnxproc is distributed in the hope that it will be useful,
+ topiary is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General Public License
- along with liblnxproc.  If not, see <http://www.gnu.org/licenses/>.
+ along with topiary.  If not, see <http://www.gnu.org/licenses/>.
 
  Copyright 2013 Paul Hewlett, phewlett76@gmail.com
 
@@ -96,19 +96,19 @@ Typical contents of /proc/diskstats::
 #include "modules.h"
 
 static void
-derived_values(int i, int j, _LNXPROC_RESULTS_T *results,
-               _LNXPROC_RESULTS_T *presults, char *pkey,
+derived_values(int i, int j, _TOPIARY_RESULTS_T *results,
+               _TOPIARY_RESULTS_T *presults, char *pkey,
                int offset, size_t plen, float out, float tdiff)
 {
-    _LNXPROC_DEBUG("pKey %1$p '%1$s'\n", pkey);
-    _LNXPROC_DEBUG("offset %d\n", offset);
-    _LNXPROC_DEBUG("plen %zd\n", plen);
-    _LNXPROC_DEBUG("out %f\n", out);
-    _LNXPROC_DEBUG("tdiff %f\n", tdiff);
+    _TOPIARY_DEBUG("pKey %1$p '%1$s'\n", pkey);
+    _TOPIARY_DEBUG("offset %d\n", offset);
+    _TOPIARY_DEBUG("plen %zd\n", plen);
+    _TOPIARY_DEBUG("out %f\n", out);
+    _TOPIARY_DEBUG("tdiff %f\n", tdiff);
     if (tdiff > 0.0) {
-        _LNXPROC_RESULTS_TABLE_T *pentry = NULL;
+        _TOPIARY_RESULTS_TABLE_T *pentry = NULL;
 
-        int ret = _lnxproc_results_fetch(presults, pkey, &pentry);
+        int ret = _topiary_results_fetch(presults, pkey, &pentry);
 
         if (ret)
             return;
@@ -117,49 +117,49 @@ derived_values(int i, int j, _LNXPROC_RESULTS_T *results,
         char buf[64];
         char *pbuf;
 
-        _lnxproc_results_table_valuestr(pentry, buf, sizeof buf, &pbuf);
+        _topiary_results_table_valuestr(pentry, buf, sizeof buf, &pbuf);
 
-        _LNXPROC_DEBUG("%d,%d:Prev %s = %s\n", i, j, pkey, pbuf);
+        _TOPIARY_DEBUG("%d,%d:Prev %s = %s\n", i, j, pkey, pbuf);
 #endif
         STRLCAT(pkey, "-s", offset, plen);
-        _LNXPROC_DEBUG("pKey %1$p '%1$s'\n", pkey);
+        _TOPIARY_DEBUG("pKey %1$p '%1$s'\n", pkey);
         float value = (out - pentry->value.f) / tdiff;
 
-        _lnxproc_results_add_fixed(results, pkey, value, 0, 1);
+        _topiary_results_add_fixed(results, pkey, value, 0, 1);
 #ifdef DEBUG
-        _LNXPROC_DEBUG("%d,%d:Rate %s = %f\n", i, j, pkey, value);
+        _TOPIARY_DEBUG("%d,%d:Rate %s = %f\n", i, j, pkey, value);
         if (value < 0.0) {
-            _LNXPROC_DEBUG("WARN: diff < 0 (=%f)\n", value);
+            _TOPIARY_DEBUG("WARN: diff < 0 (=%f)\n", value);
         }
 #endif
     }
 }
 
 static int
-proc_diskstats_normalize(_LNXPROC_BASE_T *base)
+proc_diskstats_normalize(_TOPIARY_BASE_T *base)
 {
-    _LNXPROC_BASE_DATA_T *data = base->current;
-    _LNXPROC_RESULTS_T *results = data->results;
-    _LNXPROC_ARRAY_T *current = data->array;
+    _TOPIARY_BASE_DATA_T *data = base->current;
+    _TOPIARY_RESULTS_T *results = data->results;
+    _TOPIARY_ARRAY_T *current = data->array;
 
-    _LNXPROC_DEBUG("Current data is %d at %p\n", data->id, data);
-    _LNXPROC_DEBUG("Current results is at %p\n", results);
+    _TOPIARY_DEBUG("Current data is %d at %p\n", data->id, data);
+    _TOPIARY_DEBUG("Current results is at %p\n", results);
 
     float tdiff = 0.0;
-    _LNXPROC_BASE_DATA_T *pdata = base->previous;
-    _LNXPROC_RESULTS_T *presults = NULL;
+    _TOPIARY_BASE_DATA_T *pdata = base->previous;
+    _TOPIARY_RESULTS_T *presults = NULL;
 
     if (pdata) {
-        _lnxproc_base_timeval_diff(base, &tdiff);
+        _topiary_base_timeval_diff(base, &tdiff);
         presults = pdata->results;
-        _LNXPROC_DEBUG("Previous data is %d at %p\n", pdata->id, pdata);
-        _LNXPROC_DEBUG("Previous results is at %p\n", presults);
-        _LNXPROC_DEBUG("Time difference = %f secs\n", tdiff);
+        _TOPIARY_DEBUG("Previous data is %d at %p\n", pdata->id, pdata);
+        _TOPIARY_DEBUG("Previous results is at %p\n", presults);
+        _TOPIARY_DEBUG("Time difference = %f secs\n", tdiff);
     }
 
     const size_t nrows = current->vector->length;
 
-    _LNXPROC_DEBUG("Nrows %zd\n", nrows);
+    _TOPIARY_DEBUG("Nrows %zd\n", nrows);
     char ***values = (char ***) current->vector->values;
 
 #define MAJORCOL 0
@@ -212,9 +212,9 @@ proc_diskstats_normalize(_LNXPROC_BASE_T *base)
     int n1 = 0;
 
     STRLCAT(pkey, "/", n1, sizeof(pkey));
-    _LNXPROC_DEBUG("pKey %1$p '%1$s'\n", pkey);
+    _TOPIARY_DEBUG("pKey %1$p '%1$s'\n", pkey);
 
-    _lnxproc_results_init(results, nrows);
+    _topiary_results_init(results, nrows);
     for (i = 0; i < nrows; i++) {
         char **value1 = (char **) values[i];
         char *key = value1[KEYCOL];
@@ -222,13 +222,13 @@ proc_diskstats_normalize(_LNXPROC_BASE_T *base)
         if (!key)
             continue;
 
-        _LNXPROC_DEBUG("%1$d:Key %2$p '%2$s'\n", i, key);
+        _TOPIARY_DEBUG("%1$d:Key %2$p '%2$s'\n", i, key);
 
         int n2 = n1;
 
         STRLCAT(pkey, key, n2, sizeof(pkey));
         STRLCAT(pkey, "/", n2, sizeof(pkey));
-        _LNXPROC_DEBUG("%2$d:pKey %1$p '%1$s'\n", pkey, i);
+        _TOPIARY_DEBUG("%2$d:pKey %1$p '%1$s'\n", pkey, i);
 
 /* sort out sector size */
         int n3 = n2;
@@ -236,20 +236,20 @@ proc_diskstats_normalize(_LNXPROC_BASE_T *base)
         int sectorsize = 0;
 
         STRLCAT(pkey, "sector", n3, sizeof(pkey));
-        _LNXPROC_DEBUG("%2$d:pKey %1$p '%1$s'\n", pkey, i);
+        _TOPIARY_DEBUG("%2$d:pKey %1$p '%1$s'\n", pkey, i);
         if (presults) {
-            _LNXPROC_RESULTS_TABLE_T *pentry = NULL;
-            int ret = _lnxproc_results_fetch(presults, pkey, &pentry);
+            _TOPIARY_RESULTS_TABLE_T *pentry = NULL;
+            int ret = _topiary_results_fetch(presults, pkey, &pentry);
 
             if (!ret) {
                 sectorsize = pentry->value.i;
-                _LNXPROC_DEBUG("%d:previous sectorsize %d\n", i, sectorsize);
-                _lnxproc_results_add_int(results, pkey, sectorsize);
+                _TOPIARY_DEBUG("%d:previous sectorsize %d\n", i, sectorsize);
+                _topiary_results_add_int(results, pkey, sectorsize);
             }
 
         }
         if (sectorsize == 0) {
-            _LNXPROC_RESULTS_T *disksectors = base->optional->results;
+            _TOPIARY_RESULTS_T *disksectors = base->optional->results;
 
             if (disksectors) {
                 char dkey[64];
@@ -262,28 +262,28 @@ proc_diskstats_normalize(_LNXPROC_BASE_T *base)
                 else {
                     STRLCAT(dkey, key, m1, sizeof(dkey));
                 }
-                _LNXPROC_DEBUG("%2$d:dKey %1$p '%1$s'\n", dkey, i);
-                _LNXPROC_RESULTS_TABLE_T *pentry = NULL;
-                int ret = _lnxproc_results_fetch(disksectors, dkey, &pentry);
+                _TOPIARY_DEBUG("%2$d:dKey %1$p '%1$s'\n", dkey, i);
+                _TOPIARY_RESULTS_TABLE_T *pentry = NULL;
+                int ret = _topiary_results_fetch(disksectors, dkey, &pentry);
 
                 if (ret) {
                     sectorsize = 512;
-                    _LNXPROC_DEBUG("%d:default sectorsize %d\n", i, sectorsize);
+                    _TOPIARY_DEBUG("%d:default sectorsize %d\n", i, sectorsize);
                 }
                 else {
                     sectorsize = pentry->value.i;
-                    _LNXPROC_DEBUG("%d:disksector sectorsize %d\n", i,
+                    _TOPIARY_DEBUG("%d:disksector sectorsize %d\n", i,
                                    sectorsize);
                 }
             }
             else {
                 sectorsize = 512;
-                _LNXPROC_DEBUG("%d:default (no disksectors) sectorsize %d\n", i,
+                _TOPIARY_DEBUG("%d:default (no disksectors) sectorsize %d\n", i,
                                sectorsize);
             }
-            _lnxproc_results_add_int(results, pkey, sectorsize);
+            _topiary_results_add_int(results, pkey, sectorsize);
         }
-        _LNXPROC_DEBUG("%d:sectorsize %d\n", i, sectorsize);
+        _TOPIARY_DEBUG("%d:sectorsize %d\n", i, sectorsize);
 
 /* sort out millisecond fields */
         float iodiff[nprecols];
@@ -303,35 +303,35 @@ proc_diskstats_normalize(_LNXPROC_BASE_T *base)
                 int n3 = n2;
 
                 STRLCAT(pkey, pars[k].name, n3, sizeof(pkey));
-                _LNXPROC_DEBUG("%2$d,%3$d:pKey %1$p '%1$s'\n", pkey, i, k);
+                _TOPIARY_DEBUG("%2$d,%3$d:pKey %1$p '%1$s'\n", pkey, i, k);
 
-                _LNXPROC_DEBUG("%d,%d:Curr %s = %f\n", i, k, pkey, secs);
-                _lnxproc_results_add_fixed(results, pkey, secs, 0, 1);
+                _TOPIARY_DEBUG("%d,%d:Curr %s = %f\n", i, k, pkey, secs);
+                _topiary_results_add_fixed(results, pkey, secs, 0, 1);
                 if (!presults)
                     continue;
-                _LNXPROC_RESULTS_TABLE_T *pentry = NULL;
+                _TOPIARY_RESULTS_TABLE_T *pentry = NULL;
 
-                int ret = _lnxproc_results_fetch(presults, pkey, &pentry);
+                int ret = _topiary_results_fetch(presults, pkey, &pentry);
 
                 if (ret)
                     continue;
 
-                _LNXPROC_DEBUG("%d,%d:Prev %s = %f\n", i, k, pentry->key,
+                _TOPIARY_DEBUG("%d,%d:Prev %s = %f\n", i, k, pentry->key,
                                pentry->value.f);
                 iodiff[j] = secs - pentry->value.f;
-                _LNXPROC_DEBUG("%d,%d:iodiff %s = %f\n", i, j, pkey, iodiff[j]);
+                _TOPIARY_DEBUG("%d,%d:iodiff %s = %f\n", i, j, pkey, iodiff[j]);
             }
         }
 
         size_t ncols = current->vector->children[i]->length;
         int mincols = ncols > numcols ? numcols : ncols;
 
-        _LNXPROC_DEBUG("%d:mincols %d\n", i, mincols);
+        _TOPIARY_DEBUG("%d:mincols %d\n", i, mincols);
 
         for (j = 0; j < mincols; j++) {
-            _LNXPROC_DEBUG("%d,%d:'%s'\n", i, j, pars[j].name);
+            _TOPIARY_DEBUG("%d,%d:'%s'\n", i, j, pars[j].name);
             if (j == KEYCOL) {
-                _LNXPROC_DEBUG("%d,%d:Ignore '%s'\n", i, j, pars[j].name);
+                _TOPIARY_DEBUG("%d,%d:Ignore '%s'\n", i, j, pars[j].name);
                 continue;
             }
 
@@ -339,27 +339,27 @@ proc_diskstats_normalize(_LNXPROC_BASE_T *base)
 
             for (k = 0; k < nprecols; k++) {
                 if (j == precols[k]) {
-                    _LNXPROC_DEBUG("%d,%d:Ignore '%s'\n", i, j, pars[j].name);
+                    _TOPIARY_DEBUG("%d,%d:Ignore '%s'\n", i, j, pars[j].name);
                     break;
                 }
             }
             if (k < nprecols) {
-                _LNXPROC_DEBUG("%d,%d:Ignore '%s'\n", i, j,
+                _TOPIARY_DEBUG("%d,%d:Ignore '%s'\n", i, j,
                                pars[precols[k]].name);
                 continue;
             }
 
-            _LNXPROC_DEBUG("%d,%d:Process '%s'\n", i, j, pars[j].name);
+            _TOPIARY_DEBUG("%d,%d:Process '%s'\n", i, j, pars[j].name);
             float out = 0.0;
 
             int n3 = n2;
 
             STRLCAT(pkey, pars[j].name, n3, sizeof(pkey));
-            _LNXPROC_DEBUG("%2$d,%3$d:pKey %1$p '%1$s'\n", pkey, i, j);
+            _TOPIARY_DEBUG("%2$d,%3$d:pKey %1$p '%1$s'\n", pkey, i, j);
 
             char *val = value1[j];
 
-            _LNXPROC_DEBUG("%d,%d:Curr value %s = %s\n", i, j, pkey, val);
+            _TOPIARY_DEBUG("%d,%d:Curr value %s = %s\n", i, j, pkey, val);
             if (!val)
                 continue;
 
@@ -368,12 +368,12 @@ proc_diskstats_normalize(_LNXPROC_BASE_T *base)
                 if ((j == S_WRITECOL) || (j == S_READCOL)) {
                     out *= sectorsize;
                 }
-                _lnxproc_results_add_fixed(results, pkey, out, 0, 1);
-                _LNXPROC_DEBUG("%d,%d:Curr %s = %f\n", i, j, pkey, out);
+                _topiary_results_add_fixed(results, pkey, out, 0, 1);
+                _TOPIARY_DEBUG("%d,%d:Curr %s = %f\n", i, j, pkey, out);
             }
             else {
-                _lnxproc_results_add_int(results, pkey, atoi(val));
-                _LNXPROC_DEBUG("%d,%d:Curr %s = %s\n", i, j, pkey, val);
+                _topiary_results_add_int(results, pkey, atoi(val));
+                _TOPIARY_DEBUG("%d,%d:Curr %s = %s\n", i, j, pkey, val);
             }
 
             if (!presults)
@@ -395,59 +395,59 @@ proc_diskstats_normalize(_LNXPROC_BASE_T *base)
         }
 
     }
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_proc_diskstats_new(_LNXPROC_BASE_T **base, LNXPROC_OPT_T *optional)
+_topiary_proc_diskstats_new(_TOPIARY_BASE_T **base, TOPIARY_OPT_T *optional)
 {
     int ret;
 
-    _LNXPROC_BASE_T *disksectors = NULL;
+    _TOPIARY_BASE_T *disksectors = NULL;
 
-    ret = _lnxproc_sys_disksectors_new(&disksectors, NULL);
+    ret = _topiary_sys_disksectors_new(&disksectors, NULL);
     if (ret) {
         return ret;
     }
-    ret = _lnxproc_base_read(disksectors);
+    ret = _topiary_base_read(disksectors);
     if (ret) {
         return ret;
     }
 
-    _LNXPROC_LIMITS_T *limits = NULL;
+    _TOPIARY_LIMITS_T *limits = NULL;
 
-    ret = _lnxproc_limits_new(&limits, 2);
+    ret = _topiary_limits_new(&limits, 2);
 
     if (ret) {
         return ret;
     }
-    ret = _lnxproc_limits_set(limits, 0, 9, "\f\n", 2); /* row delimiters */
+    ret = _topiary_limits_set(limits, 0, 9, "\f\n", 2); /* row delimiters */
     if (ret) {
-        _LNXPROC_LIMITS_FREE(limits);
+        _TOPIARY_LIMITS_FREE(limits);
         return ret;
     }
-    ret = _lnxproc_limits_set(limits, 1, 14, " ", 1);   /* column delimiters */
+    ret = _topiary_limits_set(limits, 1, 14, " ", 1);   /* column delimiters */
     if (ret) {
-        _LNXPROC_LIMITS_FREE(limits);
+        _TOPIARY_LIMITS_FREE(limits);
         return ret;
     }
 
     char *filenames[] = { "/proc/diskstats" };
 
-    ret = _lnxproc_base_new(base, "proc_diskstats",
-                            _LNXPROC_BASE_TYPE_PREVIOUS, NULL,
+    ret = _topiary_base_new(base, "proc_diskstats",
+                            _TOPIARY_BASE_TYPE_PREVIOUS, NULL,
                             proc_diskstats_normalize, NULL, 256, limits);
     if (!ret) {
-        ret = _lnxproc_base_set_filenames(*base, filenames, 1);
-        LNXPROC_OPT_T *opt = NULL;
+        ret = _topiary_base_set_filenames(*base, filenames, 1);
+        TOPIARY_OPT_T *opt = NULL;
 
-        lnxproc_opt_new(&opt);
-        ret = _lnxproc_opt_set_results(opt, disksectors->current->results);
-        ret = _lnxproc_base_set_optional(*base, opt);
-        LNXPROC_OPT_FREE(opt);
+        topiary_opt_new(&opt);
+        ret = _topiary_opt_set_results(opt, disksectors->current->results);
+        ret = _topiary_base_set_optional(*base, opt);
+        TOPIARY_OPT_FREE(opt);
     }
-    _LNXPROC_BASE_FREE(disksectors);
-    _LNXPROC_LIMITS_FREE(limits);
+    _TOPIARY_BASE_FREE(disksectors);
+    _TOPIARY_LIMITS_FREE(limits);
     return ret;
 }
 

@@ -1,18 +1,18 @@
 /*
- * This file is part of liblnxproc.
+ * This file is part of topiary.
  *
- *  liblnxproc is free software: you can redistribute it and/or modify
+ *  topiary is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  liblnxproc is distributed in the hope that it will be useful,
+ *  topiary is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with liblnxproc.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with topiary.  If not, see <http://www.gnu.org/licenses/>.
  *
  *  Copyright 2013 Paul Hewlett, phewlett76@gmail.com
  *
@@ -45,7 +45,7 @@ static const char unknown_error[] = "Unknown error";
 
 #ifdef DEBUG
 void
-_lnxproc_debug(const char *filename, int lineno, const char *funcname,
+_topiary_debug(const char *filename, int lineno, const char *funcname,
                char *fmt, ...)
 {
     va_list args;
@@ -59,7 +59,7 @@ _lnxproc_debug(const char *filename, int lineno, const char *funcname,
 }
 #endif
 const char *
-lnxproc_strerror(int err, char *buf, size_t buflen)
+topiary_strerror(int err, char *buf, size_t buflen)
 {
     if (err < 0) {
         strerror_r(-((int) err), buf, buflen);
@@ -73,16 +73,16 @@ lnxproc_strerror(int err, char *buf, size_t buflen)
 }
 
 int
-_lnxproc_error_check(void)
+_topiary_error_check(void)
 {
-    if (LNXPROC_ERROR_SIZE != ERRSTR_SIZE) {
-        int err = LNXPROC_ERROR_MISMATCHED_STRINGS;
+    if (TOPIARY_ERROR_SIZE != ERRSTR_SIZE) {
+        int err = TOPIARY_ERROR_MISMATCHED_STRINGS;
 
-        printf("Error: %s %d != %zd\n", errstr[err], LNXPROC_ERROR_SIZE,
+        printf("Error: %s %d != %zd\n", errstr[err], TOPIARY_ERROR_SIZE,
                ERRSTR_SIZE);
         return err;
     }
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 /*

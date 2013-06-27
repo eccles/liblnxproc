@@ -1,5 +1,6 @@
+package ?= topiary
 all clean install uninstall:
-	for d in lnxproc; do (cd $$d; $(MAKE) $@ ); done
+	cd $(package) && $(MAKE) $@
 
 .PHONY: all clean install uninstall
 

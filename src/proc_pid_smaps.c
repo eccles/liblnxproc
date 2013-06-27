@@ -1,18 +1,18 @@
 /*
-This file is part of liblnxproc.
+This file is part of topiary.
 
- liblnxproc is free software: you can redistribute it and/or modify
+ topiary is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
 
- liblnxproc is distributed in the hope that it will be useful,
+ topiary is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General Public License
- along with liblnxproc.  If not, see <http://www.gnu.org/licenses/>.
+ along with topiary.  If not, see <http://www.gnu.org/licenses/>.
 
  Copyright 2013 Paul Hewlett, phewlett76@gmail.com
 
@@ -68,18 +68,18 @@ VmFlags: rd mr mw me dw ac
 #include "modules.h"
 
 static int
-proc_pid_smaps_normalize(_LNXPROC_BASE_T *base)
+proc_pid_smaps_normalize(_TOPIARY_BASE_T *base)
 {
-    _LNXPROC_BASE_DATA_T *data = base->current;
-    _LNXPROC_RESULTS_T *results = data->results;
-    _LNXPROC_ARRAY_T *array = data->array;
-    _LNXPROC_VECTOR_T *vector = array->vector;
+    _TOPIARY_BASE_DATA_T *data = base->current;
+    _TOPIARY_RESULTS_T *results = data->results;
+    _TOPIARY_ARRAY_T *array = data->array;
+    _TOPIARY_VECTOR_T *vector = array->vector;
 
     size_t npids = vector->length;
 
-    _LNXPROC_DEBUG("Current data is %d at %p\n", data->id, data);
-    _LNXPROC_DEBUG("Current results is at %p\n", results);
-    _LNXPROC_DEBUG("Npids %zd\n", npids);
+    _TOPIARY_DEBUG("Current data is %d at %p\n", data->id, data);
+    _TOPIARY_DEBUG("Current results is at %p\n", results);
+    _TOPIARY_DEBUG("Npids %zd\n", npids);
     char ****values = (char ****) vector->values;
 
     int i, j;
@@ -90,7 +90,7 @@ proc_pid_smaps_normalize(_LNXPROC_BASE_T *base)
 
     STRLCAT(hash, "/", n1, sizeof(hash));
 
-    _lnxproc_results_init(results, npids);
+    _topiary_results_init(results, npids);
 
     for (i = 0; i < npids; i++) {
         char ***value1 = (char ***) values[i];
@@ -99,11 +99,11 @@ proc_pid_smaps_normalize(_LNXPROC_BASE_T *base)
         if (!pidkey)
             continue;
 
-        _LNXPROC_VECTOR_T *child = vector->children[i];
+        _TOPIARY_VECTOR_T *child = vector->children[i];
         size_t nrows = child->length;
 
-        _LNXPROC_DEBUG("%d:pidkey '%s'\n", i, pidkey);
-        _LNXPROC_DEBUG("%d:nrows = %zd\n", i, nrows);
+        _TOPIARY_DEBUG("%d:pidkey '%s'\n", i, pidkey);
+        _TOPIARY_DEBUG("%d:nrows = %zd\n", i, nrows);
         int first = -1;
         int last = -1;
 
@@ -116,12 +116,12 @@ proc_pid_smaps_normalize(_LNXPROC_BASE_T *base)
 
             if (!key)
                 continue;
-            _LNXPROC_DEBUG("%d,%d:key '%s'\n", i, j, key);
-            _LNXPROC_DEBUG("%d,%d:key[0] '%c'\n", i, j, key[0]);
+            _TOPIARY_DEBUG("%d,%d:key '%s'\n", i, j, key);
+            _TOPIARY_DEBUG("%d,%d:key[0] '%c'\n", i, j, key[0]);
             if (!isupper(key[0])) {
                 j++;
                 first = j;
-                _LNXPROC_DEBUG("%d,%d:first %d\n", i, j, first);
+                _TOPIARY_DEBUG("%d,%d:first %d\n", i, j, first);
                 break;
             }
         }
@@ -137,11 +137,11 @@ proc_pid_smaps_normalize(_LNXPROC_BASE_T *base)
 
             if (!key)
                 continue;
-            _LNXPROC_DEBUG("%d,%d:key '%s'\n", i, j, key);
-            _LNXPROC_DEBUG("%d,%d:key[0] '%c'\n", i, j, key[0]);
+            _TOPIARY_DEBUG("%d,%d:key '%s'\n", i, j, key);
+            _TOPIARY_DEBUG("%d,%d:key[0] '%c'\n", i, j, key[0]);
             if (!isupper(key[0])) {
                 last = j;
-                _LNXPROC_DEBUG("%d,%d:last %d\n", i, j, last);
+                _TOPIARY_DEBUG("%d,%d:last %d\n", i, j, last);
                 break;
             }
         }
@@ -150,7 +150,7 @@ proc_pid_smaps_normalize(_LNXPROC_BASE_T *base)
 
         int nparams = last - first;
 
-        _LNXPROC_DEBUG("%d:nparams %d\n", i, nparams);
+        _TOPIARY_DEBUG("%d:nparams %d\n", i, nparams);
         if (nparams < 2)
             continue;
 
@@ -167,11 +167,11 @@ proc_pid_smaps_normalize(_LNXPROC_BASE_T *base)
 
             if (!key)
                 continue;
-            _LNXPROC_DEBUG("%d,%d:key '%s'\n", i, j, key);
-            _LNXPROC_DEBUG("%d,%d:key[0] '%c'\n", i, j, key[0]);
+            _TOPIARY_DEBUG("%d,%d:key '%s'\n", i, j, key);
+            _TOPIARY_DEBUG("%d,%d:key[0] '%c'\n", i, j, key[0]);
             if (n < nparams) {
                 fields[n] = key;
-                _LNXPROC_DEBUG("%d,%d:fields[%d] '%s'\n", i, j, n, fields[n]);
+                _TOPIARY_DEBUG("%d,%d:fields[%d] '%s'\n", i, j, n, fields[n]);
                 n++;
             }
         }
@@ -190,7 +190,7 @@ proc_pid_smaps_normalize(_LNXPROC_BASE_T *base)
 
             if (!key)
                 continue;
-            _LNXPROC_DEBUG("%d,%d:key '%s'\n", i, j, key);
+            _TOPIARY_DEBUG("%d,%d:key '%s'\n", i, j, key);
 
             if (!isupper(key[0])) {
                 n = -1;
@@ -199,8 +199,8 @@ proc_pid_smaps_normalize(_LNXPROC_BASE_T *base)
             else {
                 n++;
             }
-            _LNXPROC_DEBUG("%d,%d:n = %d\n", i, j, n);
-            _LNXPROC_DEBUG("%d,%d:fields[%d] '%s'\n", i, j, n, fields[n]);
+            _TOPIARY_DEBUG("%d,%d:n = %d\n", i, j, n);
+            _TOPIARY_DEBUG("%d,%d:fields[%d] '%s'\n", i, j, n, fields[n]);
 
             if (!strcmp("VmFlags", key))
                 continue;
@@ -209,12 +209,12 @@ proc_pid_smaps_normalize(_LNXPROC_BASE_T *base)
 
             if (!val)
                 continue;
-            _LNXPROC_DEBUG("%d,%d,%d:val = '%s'\n", i, j, 1, val);
+            _TOPIARY_DEBUG("%d,%d,%d:val = '%s'\n", i, j, 1, val);
 
             if (n < nparams) {
                 sums[n] += strtoul(val, NULL, 0);
 
-                _LNXPROC_DEBUG("%d,%d:sums[%d] %lu\n", i, j, n, sums[n]);
+                _TOPIARY_DEBUG("%d,%d:sums[%d] %lu\n", i, j, n, sums[n]);
             }
         }
 /*
@@ -228,49 +228,49 @@ proc_pid_smaps_normalize(_LNXPROC_BASE_T *base)
         for (j = 0; j < nparams; j++) {
             char *key = fields[j];
 
-            _LNXPROC_DEBUG("%d,%d:key '%s'\n", i, j, key);
+            _TOPIARY_DEBUG("%d,%d:key '%s'\n", i, j, key);
             if (!strcmp("VmFlags", key))
                 continue;
 
             unsigned long val = sums[j];
 
-            _LNXPROC_DEBUG("%d,%d:val %lu\n", i, j, val);
+            _TOPIARY_DEBUG("%d,%d:val %lu\n", i, j, val);
 
             int n3 = n2;
 
             STRLCAT(hash, key, n3, sizeof(hash));
-            _LNXPROC_DEBUG("%d,%d:hash '%s'\n", i, j, hash);
+            _TOPIARY_DEBUG("%d,%d:hash '%s'\n", i, j, hash);
 
-            _lnxproc_results_add_unsigned_long(results, hash, val);
+            _topiary_results_add_unsigned_long(results, hash, val);
         }
     }
 
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_proc_pid_smaps_new(_LNXPROC_BASE_T **base, LNXPROC_OPT_T *optional)
+_topiary_proc_pid_smaps_new(_TOPIARY_BASE_T **base, TOPIARY_OPT_T *optional)
 {
 
-    _LNXPROC_LIMITS_T *limits = NULL;
-    int ret = _lnxproc_limits_new(&limits, 3);
+    _TOPIARY_LIMITS_T *limits = NULL;
+    int ret = _topiary_limits_new(&limits, 3);
 
     if (ret) {
         return ret;
     }
-    ret = _lnxproc_limits_set(limits, 0, 9, "\f", 1);   /* row delimiters */
+    ret = _topiary_limits_set(limits, 0, 9, "\f", 1);   /* row delimiters */
     if (ret) {
-        _LNXPROC_LIMITS_FREE(limits);
+        _TOPIARY_LIMITS_FREE(limits);
         return ret;
     }
-    ret = _lnxproc_limits_set(limits, 1, 9, "\n", 1);   /* row delimiters */
+    ret = _topiary_limits_set(limits, 1, 9, "\n", 1);   /* row delimiters */
     if (ret) {
-        _LNXPROC_LIMITS_FREE(limits);
+        _TOPIARY_LIMITS_FREE(limits);
         return ret;
     }
-    ret = _lnxproc_limits_set(limits, 2, 4, ": ", 2);   /* column delimiters */
+    ret = _topiary_limits_set(limits, 2, 4, ": ", 2);   /* column delimiters */
     if (ret) {
-        _LNXPROC_LIMITS_FREE(limits);
+        _TOPIARY_LIMITS_FREE(limits);
         return ret;
     }
 
@@ -286,14 +286,14 @@ _lnxproc_proc_pid_smaps_new(_LNXPROC_BASE_T **base, LNXPROC_OPT_T *optional)
 
     char *filesuffix = "smaps";
 
-    ret = _lnxproc_base_new(base, "proc_pid_smaps", _LNXPROC_BASE_TYPE_PREVIOUS,
+    ret = _topiary_base_new(base, "proc_pid_smaps", _TOPIARY_BASE_TYPE_PREVIOUS,
                             NULL, proc_pid_smaps_normalize, NULL, 256, limits);
     if (!ret) {
-        _lnxproc_base_set_fileprefix(*base, fileprefix);
-        _lnxproc_base_set_fileglob(*base, fileglob);
-        _lnxproc_base_set_filesuffix(*base, filesuffix);
+        _topiary_base_set_fileprefix(*base, fileprefix);
+        _topiary_base_set_fileglob(*base, fileglob);
+        _topiary_base_set_filesuffix(*base, filesuffix);
     }
-    _LNXPROC_LIMITS_FREE(limits);
+    _TOPIARY_LIMITS_FREE(limits);
     return ret;
 }
 

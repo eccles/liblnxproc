@@ -1,18 +1,18 @@
 /*
-This file is part of liblnxproc.
+This file is part of topiary.
 
- liblnxproc is free software: you can redistribute it and/or modify
+ topiary is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
 
- liblnxproc is distributed in the hope that it will be useful,
+ topiary is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General Public License
- along with liblnxproc.  If not, see <http://www.gnu.org/licenses/>.
+ along with topiary.  If not, see <http://www.gnu.org/licenses/>.
 
  Copyright 2013 Paul Hewlett, phewlett76@gmail.com
 
@@ -32,18 +32,18 @@ This file is part of liblnxproc.
 #include "modules.h"
 
 static int
-proc_cpuinfo_normalize(_LNXPROC_BASE_T *base)
+proc_cpuinfo_normalize(_TOPIARY_BASE_T *base)
 {
-    _LNXPROC_BASE_DATA_T *data = base->current;
-    _LNXPROC_RESULTS_T *results = data->results;
-    _LNXPROC_ARRAY_T *array = data->array;
-    _LNXPROC_VECTOR_T *vector = array->vector;
+    _TOPIARY_BASE_DATA_T *data = base->current;
+    _TOPIARY_RESULTS_T *results = data->results;
+    _TOPIARY_ARRAY_T *array = data->array;
+    _TOPIARY_VECTOR_T *vector = array->vector;
 
     size_t nrows = vector->length;
 
-    _LNXPROC_DEBUG("Current data is %d at %p\n", data->id, data);
-    _LNXPROC_DEBUG("Current results is at %p\n", results);
-    _LNXPROC_DEBUG("Nrows %zd\n", nrows);
+    _TOPIARY_DEBUG("Current data is %d at %p\n", data->id, data);
+    _TOPIARY_DEBUG("Current results is at %p\n", results);
+    _TOPIARY_DEBUG("Nrows %zd\n", nrows);
     char ***values = (char ***) vector->values;
 
     int i;
@@ -58,7 +58,7 @@ proc_cpuinfo_normalize(_LNXPROC_BASE_T *base)
 
     STRLCAT(key, "/", n1, sizeof(key));
 
-    _lnxproc_results_init(results, nrows);
+    _topiary_results_init(results, nrows);
     int first = 2;
 
     for (i = 0; i < nrows; i++) {
@@ -67,7 +67,7 @@ proc_cpuinfo_normalize(_LNXPROC_BASE_T *base)
 
         if (!rowkey)
             continue;
-        _LNXPROC_DEBUG("%d:rowkey '%s'\n", i, rowkey);
+        _TOPIARY_DEBUG("%d:rowkey '%s'\n", i, rowkey);
 
         char *val = value1[1];
 
@@ -81,7 +81,7 @@ proc_cpuinfo_normalize(_LNXPROC_BASE_T *base)
             STRLCAT(prockey, val, np2, sizeof(prockey));
             STRLCAT(prockey, "/", np2, sizeof(prockey));
             first--;
-            _LNXPROC_DEBUG("%d:first %d prockey '%s'\n", i, first, prockey);
+            _TOPIARY_DEBUG("%d:first %d prockey '%s'\n", i, first, prockey);
         }
 
         else {
@@ -91,23 +91,23 @@ proc_cpuinfo_normalize(_LNXPROC_BASE_T *base)
                 int np3 = np2;
 
                 STRLCAT(prockey, rowkey, np3, sizeof(prockey));
-                _LNXPROC_DEBUG("%d:key '%s'\n", i, prockey);
+                _TOPIARY_DEBUG("%d:key '%s'\n", i, prockey);
                 int v = atoi(val);
 
-                _LNXPROC_DEBUG("%d:val %d\n", i, v);
+                _TOPIARY_DEBUG("%d:val %d\n", i, v);
 
-                _lnxproc_results_add_int(results, prockey, v);
+                _topiary_results_add_int(results, prockey, v);
             }
             else if (!strcmp(rowkey, "bogomips") || !strcmp(rowkey, "cpu MHz")) {
                 if (first > 0) {
                     int n2 = n1;
 
                     STRLCAT(key, rowkey, n2, sizeof(key));
-                    _LNXPROC_DEBUG("%d:key '%s'\n", i, key);
+                    _TOPIARY_DEBUG("%d:key '%s'\n", i, key);
                     float f = atof(val);
 
-                    _LNXPROC_DEBUG("%d:val %f\n", i, f);
-                    _lnxproc_results_add_fixed(results, key, f, 0, 1);
+                    _TOPIARY_DEBUG("%d:val %f\n", i, f);
+                    _topiary_results_add_fixed(results, key, f, 0, 1);
                 }
             }
             else if (!strcmp(rowkey, "cpu cores") ||
@@ -123,11 +123,11 @@ proc_cpuinfo_normalize(_LNXPROC_BASE_T *base)
                     int n2 = n1;
 
                     STRLCAT(key, rowkey, n2, sizeof(key));
-                    _LNXPROC_DEBUG("%d:key '%s'\n", i, key);
+                    _TOPIARY_DEBUG("%d:key '%s'\n", i, key);
                     int v = atoi(val);
 
-                    _LNXPROC_DEBUG("%d:val %d\n", i, v);
-                    _lnxproc_results_add_int(results, key, v);
+                    _TOPIARY_DEBUG("%d:val %d\n", i, v);
+                    _topiary_results_add_int(results, key, v);
                 }
             }
             else if (!strcmp(rowkey, "address sizes") ||
@@ -138,60 +138,60 @@ proc_cpuinfo_normalize(_LNXPROC_BASE_T *base)
                      !strcmp(rowkey, "microcode") ||
                      !strcmp(rowkey, "power management") ||
                      !strcmp(rowkey, "vendor_id") || !strcmp(rowkey, "wp")) {
-                _LNXPROC_DEBUG("%d:first %d\n", i, first);
+                _TOPIARY_DEBUG("%d:first %d\n", i, first);
                 if (first > 0) {
                     int n2 = n1;
 
                     STRLCAT(key, rowkey, n2, sizeof(key));
-                    _LNXPROC_DEBUG("%d:key '%s'\n", i, key);
-                    _LNXPROC_DEBUG("%d:val '%s'\n", i, val);
-                    _lnxproc_results_add_stringref(results, key, val);
+                    _TOPIARY_DEBUG("%d:key '%s'\n", i, key);
+                    _TOPIARY_DEBUG("%d:val '%s'\n", i, val);
+                    _topiary_results_add_stringref(results, key, val);
                 }
             }
             else {
                 int np3 = np2;
 
                 STRLCAT(prockey, rowkey, np3, sizeof(prockey));
-                _LNXPROC_DEBUG("%d:key '%s'\n", i, prockey);
-                _LNXPROC_DEBUG("%d:val '%s'\n", i, val);
+                _TOPIARY_DEBUG("%d:key '%s'\n", i, prockey);
+                _TOPIARY_DEBUG("%d:val '%s'\n", i, val);
 
-                _lnxproc_results_add_stringref(results, prockey, val);
+                _topiary_results_add_stringref(results, prockey, val);
             }
         }
 
     }
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_proc_cpuinfo_new(_LNXPROC_BASE_T **base, LNXPROC_OPT_T *optional)
+_topiary_proc_cpuinfo_new(_TOPIARY_BASE_T **base, TOPIARY_OPT_T *optional)
 {
 
-    _LNXPROC_LIMITS_T *limits = NULL;
-    int ret = _lnxproc_limits_new(&limits, 2);
+    _TOPIARY_LIMITS_T *limits = NULL;
+    int ret = _topiary_limits_new(&limits, 2);
 
     if (ret) {
         return ret;
     }
-    ret = _lnxproc_limits_set(limits, 0, 9, "\f\n", 2); /* row delimiters */
+    ret = _topiary_limits_set(limits, 0, 9, "\f\n", 2); /* row delimiters */
     if (ret) {
-        _LNXPROC_LIMITS_FREE(limits);
+        _TOPIARY_LIMITS_FREE(limits);
         return ret;
     }
-    ret = _lnxproc_limits_set(limits, 1, 2, ":\t", 2);  /* column delimiter */
+    ret = _topiary_limits_set(limits, 1, 2, ":\t", 2);  /* column delimiter */
     if (ret) {
-        _LNXPROC_LIMITS_FREE(limits);
+        _TOPIARY_LIMITS_FREE(limits);
         return ret;
     }
 
     char *filenames[] = { "/proc/cpuinfo", };
     ret =
-        _lnxproc_base_new(base, "proc_cpuinfo", _LNXPROC_BASE_TYPE_MEMOIZE,
+        _topiary_base_new(base, "proc_cpuinfo", _TOPIARY_BASE_TYPE_MEMOIZE,
                           NULL, proc_cpuinfo_normalize, NULL, 256, limits);
     if (!ret) {
-        ret = _lnxproc_base_set_filenames(*base, filenames, 1);
+        ret = _topiary_base_set_filenames(*base, filenames, 1);
     }
-    _LNXPROC_LIMITS_FREE(limits);
+    _TOPIARY_LIMITS_FREE(limits);
     return ret;
 }
 

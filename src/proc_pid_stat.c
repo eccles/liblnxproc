@@ -1,18 +1,18 @@
 /*
-This file is part of liblnxproc.
+This file is part of topiary.
 
- liblnxproc is free software: you can redistribute it and/or modify
+ topiary is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
 
- liblnxproc is distributed in the hope that it will be useful,
+ topiary is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General Public License
- along with liblnxproc.  If not, see <http://www.gnu.org/licenses/>.
+ along with topiary.  If not, see <http://www.gnu.org/licenses/>.
 
  Copyright 2013 Paul Hewlett, phewlett76@gmail.com
 
@@ -135,11 +135,11 @@ struct my_list_t {
 static struct my_list_t *
 mylist_clear(struct my_list_t *mylist)
 {
-    _LNXPROC_DEBUG("FREE %p\n", mylist);
+    _TOPIARY_DEBUG("FREE %p\n", mylist);
     while (mylist) {
         struct my_list_t *tmp = mylist->next;
 
-        _LNXPROC_DEBUG("FREE %p PID %d\n", mylist, mylist->value);
+        _TOPIARY_DEBUG("FREE %p PID %d\n", mylist, mylist->value);
         free(mylist);
         mylist = tmp;
     }
@@ -156,7 +156,7 @@ mylist_add(struct my_list_t *mylist, int value)
     mlist->value = value;
     mlist->next = mylist;
     mylist = mlist;
-    _LNXPROC_DEBUG("ADD %p VAL %d\n", mlist, mlist->value);
+    _TOPIARY_DEBUG("ADD %p VAL %d\n", mlist, mlist->value);
     return mylist;
 }
 
@@ -168,11 +168,11 @@ struct my_pidlist_t {
 static struct my_pidlist_t *
 mypidlist_clear(struct my_pidlist_t *mypidlist)
 {
-    _LNXPROC_DEBUG("FREE %p\n", mypidlist);
+    _TOPIARY_DEBUG("FREE %p\n", mypidlist);
     while (mypidlist) {
         struct my_pidlist_t *tmp = mypidlist->next;
 
-        _LNXPROC_DEBUG("FREE %p PID %s\n", mypidlist, mypidlist->value);
+        _TOPIARY_DEBUG("FREE %p PID %s\n", mypidlist, mypidlist->value);
         free(mypidlist);
         mypidlist = tmp;
     }
@@ -189,7 +189,7 @@ mypidlist_add(struct my_pidlist_t *mypidlist, char *value)
     mpidlist->value = value;
     mpidlist->next = mypidlist;
     mypidlist = mpidlist;
-    _LNXPROC_DEBUG("ADD %p VAL %s\n", mpidlist, mpidlist->value);
+    _TOPIARY_DEBUG("ADD %p VAL %s\n", mpidlist, mpidlist->value);
     return mypidlist;
 }
 
@@ -207,12 +207,12 @@ struct my_hash_t {
 static struct my_hash_t *
 myhash_clear(struct my_hash_t *myhash)
 {
-    _LNXPROC_DEBUG("FREE %p\n", myhash);
+    _TOPIARY_DEBUG("FREE %p\n", myhash);
     if (myhash) {
         struct my_hash_t *mhash, *tmp;
 
         HASH_ITER(hh, myhash, mhash, tmp) {
-            _LNXPROC_DEBUG("FREE %p PGRP %d\n", mhash, mhash->key);
+            _TOPIARY_DEBUG("FREE %p PGRP %d\n", mhash, mhash->key);
             mhash->head = mylist_clear(mhash->head);
             HASH_DEL(myhash, mhash);
             free(mhash);
@@ -232,7 +232,7 @@ myhash_add(struct my_hash_t *myhash, int key, int value)
         if (!mhash)
             return myhash;
         mhash->key = key;
-        _LNXPROC_DEBUG("ADD %p KEY %d\n", mhash, mhash->key);
+        _TOPIARY_DEBUG("ADD %p KEY %d\n", mhash, mhash->key);
         HASH_ADD(hh, myhash, key, sizeof(mhash->key), mhash);
     }
     if (mhash) {
@@ -290,13 +290,13 @@ static const char *colkey[] = {
  * functions that need it.
  */
 struct process_t {
-    _LNXPROC_VECTOR_T *vector;
+    _TOPIARY_VECTOR_T *vector;
     char key[64];
     int n1;
     float tdiff;
-    _LNXPROC_RESULTS_T *presults;
-    _LNXPROC_RESULTS_T *results;
-    _LNXPROC_RESULTS_TABLE_T *hash;
+    _TOPIARY_RESULTS_T *presults;
+    _TOPIARY_RESULTS_T *results;
+    _TOPIARY_RESULTS_TABLE_T *hash;
     struct my_hash_t *ppidhash;
     struct my_hash_t *pgrphash;
     struct my_list_t *pidlist;
@@ -311,14 +311,14 @@ struct process_t {
 static void
 process_pid(int i, struct process_t *process)
 {
-    _LNXPROC_VECTOR_T *vector = process->vector;
+    _TOPIARY_VECTOR_T *vector = process->vector;
     char ***values = (char ***) vector->values;
     char *key = process->key;
     size_t keysize = sizeof(process->key);
     int n1 = process->n1;
 
-    _LNXPROC_RESULTS_T *results = process->results;
-    _LNXPROC_RESULTS_TABLE_T *hash = process->hash;
+    _TOPIARY_RESULTS_T *results = process->results;
+    _TOPIARY_RESULTS_TABLE_T *hash = process->hash;
 
     char **value1 = (char **) values[i];
     char *pidkey = value1[0];
@@ -331,7 +331,7 @@ process_pid(int i, struct process_t *process)
     size_t ncols = vector->children[i]->length;
     size_t ncols1 = ncols > NCOLKEYS ? NCOLKEYS : ncols;
 
-    _LNXPROC_DEBUG("%d:first Rowkey value %s\n", i, pidkey);
+    _TOPIARY_DEBUG("%d:first Rowkey value %s\n", i, pidkey);
     int n2 = n1;
 
     STRLCAT(key, pidkey, n2, keysize);
@@ -354,36 +354,36 @@ process_pid(int i, struct process_t *process)
         if ((j == VSIZECOL) || (j == RLIMCOL)) {
             unsigned long value = strtoul(val, NULL, 0) / 1024;
 
-            _LNXPROC_DEBUG("%d,%d:%s value %s ul %lu\n", i, j, key, val, value);
-            _lnxproc_results_add_unsigned_long(results, key, value);
+            _TOPIARY_DEBUG("%d,%d:%s value %s ul %lu\n", i, j, key, val, value);
+            _topiary_results_add_unsigned_long(results, key, value);
         }
         else if ((j == RSSCOL) || (j == NSWAPCOL) || (j == CNSWAPCOL)) {
             long value = atoi(val) * results->page_size;
 
-            _LNXPROC_DEBUG("%d,%d:%s value %s long %ld\n", i, j, key,
+            _TOPIARY_DEBUG("%d,%d:%s value %s long %ld\n", i, j, key,
                            val, value);
-            _lnxproc_results_add_long(results, key, value);
+            _topiary_results_add_long(results, key, value);
         }
         else if ((j == UTIMECOL) ||
                  (j == STIMECOL) || (j == CUTIMECOL) || (j == CSTIMECOL)
                  || (j == STARTTIMECOL)) {
             float value = strtoul(val, NULL, 0) * results->secs_per_jiffy;
 
-            _LNXPROC_DEBUG("%d,%d:%s value %s float %f\n", i, j, key,
+            _TOPIARY_DEBUG("%d,%d:%s value %s float %f\n", i, j, key,
                            val, value);
-            _lnxproc_results_add_fixed(results, key, value, 0, 3);
+            _topiary_results_add_fixed(results, key, value, 0, 3);
 
 /*
  * Store values so that usage (%) can be calculated.
  */
-            _LNXPROC_RESULTS_TABLE_T *hentry =
-                Allocate(NULL, sizeof(_LNXPROC_RESULTS_TABLE_T));
+            _TOPIARY_RESULTS_TABLE_T *hentry =
+                Allocate(NULL, sizeof(_TOPIARY_RESULTS_TABLE_T));
             if (!hentry)
                 continue;
             strlcpy(hentry->key, key, sizeof hentry->key);
-            hentry->valuetype = _LNXPROC_RESULTS_TABLE_VALUETYPE_FLOAT;
+            hentry->valuetype = _TOPIARY_RESULTS_TABLE_VALUETYPE_FLOAT;
             hentry->value.f = value;
-            _LNXPROC_DEBUG("%d,%d:Store %s = %f\n", i, j, hentry->key, value);
+            _TOPIARY_DEBUG("%d,%d:Store %s = %f\n", i, j, hentry->key, value);
             HASH_ADD(hh, hash, key, n3, hentry);
         }
         else if ((j == ITREALVALUECOL) ||
@@ -391,22 +391,22 @@ process_pid(int i, struct process_t *process)
                  (j == CGUEST_TIMECOL) || (j == DELAY_BLKIO_TICKSCOL)) {
             float value = strtoul(val, NULL, 0) * results->secs_per_jiffy;
 
-            _LNXPROC_DEBUG("%d,%d:%s value %s float %f\n", i, j, key,
+            _TOPIARY_DEBUG("%d,%d:%s value %s float %f\n", i, j, key,
                            val, value);
-            _lnxproc_results_add_fixed(results, key, value, 0, 3);
+            _topiary_results_add_fixed(results, key, value, 0, 3);
 
         }
         else if ((j == MINFLTCOL) ||
                  (j == CMINFLTCOL) || (j == MAJFLTCOL) || (j == CMAJFLTCOL)) {
             unsigned long value = strtoul(val, NULL, 0);
 
-            _lnxproc_results_add_unsigned_long(results, key, value);
+            _topiary_results_add_unsigned_long(results, key, value);
         }
         else if ((j == TPGIDCOL) || (j == PPIDCOL) || (j == PPIDCOL)) {
-            _lnxproc_results_add_int(results, key, atoi(val));
+            _topiary_results_add_int(results, key, atoi(val));
         }
         else {
-            _lnxproc_results_add_stringref(results, key, val);
+            _topiary_results_add_stringref(results, key, val);
         }
     }
     process->hash = hash;
@@ -418,15 +418,15 @@ process_pid(int i, struct process_t *process)
 static void
 process_rates(int i, struct process_t *process)
 {
-    _LNXPROC_VECTOR_T *vector = process->vector;
+    _TOPIARY_VECTOR_T *vector = process->vector;
     char ***values = (char ***) vector->values;
     char *key = process->key;
     size_t keysize = sizeof(process->key);
     int n1 = process->n1;
     float tdiff = process->tdiff;
-    _LNXPROC_RESULTS_T *presults = process->presults;
-    _LNXPROC_RESULTS_T *results = process->results;
-    _LNXPROC_RESULTS_TABLE_T *hash = process->hash;
+    _TOPIARY_RESULTS_T *presults = process->presults;
+    _TOPIARY_RESULTS_T *results = process->results;
+    _TOPIARY_RESULTS_TABLE_T *hash = process->hash;
 
     char **value1 = (char **) values[i];
     char *pidkey = value1[0];
@@ -434,14 +434,14 @@ process_rates(int i, struct process_t *process)
     if (!pidkey)
         return;
 
-    _LNXPROC_DEBUG("%d:second Rowkey value %s\n", i, pidkey);
+    _TOPIARY_DEBUG("%d:second Rowkey value %s\n", i, pidkey);
 
     int n2 = n1;
 
     STRLCAT(key, pidkey, n2, keysize);
     STRLCAT(key, "/", n2, keysize);
 
-    _LNXPROC_RESULTS_TABLE_T *startentry = NULL;
+    _TOPIARY_RESULTS_TABLE_T *startentry = NULL;
 
     HASH_FIND_STR(hash, key, startentry);
 
@@ -449,19 +449,19 @@ process_rates(int i, struct process_t *process)
  * Ignore previous entries with a different starttime
  */
     if (startentry) {
-        _LNXPROC_DEBUG("%d:current starttime for %s is %f\n", i, pidkey,
+        _TOPIARY_DEBUG("%d:current starttime for %s is %f\n", i, pidkey,
                        startentry->value.f);
-        _LNXPROC_RESULTS_TABLE_T *pentry = NULL;
+        _TOPIARY_RESULTS_TABLE_T *pentry = NULL;
 
         int n3 = n2;
 
         STRLCAT(key, colkey[STARTTIMECOL], n3, keysize);
-        int ret = _lnxproc_results_fetch(presults, key, &pentry);
+        int ret = _topiary_results_fetch(presults, key, &pentry);
 
         if (ret)
             return;
 
-        _LNXPROC_DEBUG("%d:previous starttime for %s is %f\n", i,
+        _TOPIARY_DEBUG("%d:previous starttime for %s is %f\n", i,
                        pidkey, pentry->value.f);
 
         if (pentry->value.f != startentry->value.f)
@@ -475,17 +475,17 @@ process_rates(int i, struct process_t *process)
 
         STRLCAT(key, colkey[j], n3, keysize);
 
-        _LNXPROC_RESULTS_TABLE_T *pentry = NULL;
+        _TOPIARY_RESULTS_TABLE_T *pentry = NULL;
 
-        int ret = _lnxproc_results_fetch(presults, key, &pentry);
+        int ret = _topiary_results_fetch(presults, key, &pentry);
 
         if (ret)
             continue;
 
-        _LNXPROC_DEBUG("%d,%d:Prev value %s = %f\n", i, j, pentry->key,
+        _TOPIARY_DEBUG("%d,%d:Prev value %s = %f\n", i, j, pentry->key,
                        pentry->value.f);
 
-        _LNXPROC_RESULTS_TABLE_T *hentry = NULL;
+        _TOPIARY_RESULTS_TABLE_T *hentry = NULL;
 
         HASH_FIND_STR(hash, key, hentry);
         if (!hentry)
@@ -497,13 +497,13 @@ process_rates(int i, struct process_t *process)
             / tdiff;
 
         if (value < 0.0) {
-            _LNXPROC_DEBUG("%d,%d:WARN Usage %s = %f\n", i, j, key, value);
+            _TOPIARY_DEBUG("%d,%d:WARN Usage %s = %f\n", i, j, key, value);
         }
         else {
-            _LNXPROC_DEBUG("%d,%d:Usage %s = %f\n", i, j, key, value);
+            _TOPIARY_DEBUG("%d,%d:Usage %s = %f\n", i, j, key, value);
         }
 
-        _lnxproc_results_add_fixed(results, key, value, 0, 1);
+        _topiary_results_add_fixed(results, key, value, 0, 1);
     }
 }
 
@@ -611,22 +611,22 @@ pids_iterate(char *master,
  * Process the raw data returned by the rawread function for this module
  */
 static int
-proc_pid_stat_normalize(_LNXPROC_BASE_T *base)
+proc_pid_stat_normalize(_TOPIARY_BASE_T *base)
 {
 
     struct process_t process;
 
-    _LNXPROC_BASE_DATA_T *data = base->current;
+    _TOPIARY_BASE_DATA_T *data = base->current;
 
     process.results = data->results;
-    _LNXPROC_ARRAY_T *array = data->array;
+    _TOPIARY_ARRAY_T *array = data->array;
 
     process.vector = array->vector;
-    LNXPROC_OPT_T *opt = base->optional;
+    TOPIARY_OPT_T *opt = base->optional;
 
-    _LNXPROC_DEBUG("Optional %p\n", opt);
+    _TOPIARY_DEBUG("Optional %p\n", opt);
     char *master = NULL;
-    LNXPROC_MODULE_T *sub = NULL;
+    TOPIARY_MODULE_T *sub = NULL;
 
     if (opt) {
         if (opt->master) {
@@ -635,17 +635,17 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T *base)
                 sub = opt->module;
         }
     }
-    _LNXPROC_DEBUG("Master task '%s'\n", master);
-    _LNXPROC_DEBUG("Sub %p\n", sub);
+    _TOPIARY_DEBUG("Master task '%s'\n", master);
+    _TOPIARY_DEBUG("Sub %p\n", sub);
 
     size_t nrows = process.vector->length;
 
-    _LNXPROC_DEBUG("Current data is %d at %p\n", data->id, data);
-    _LNXPROC_DEBUG("Current results is at %p\n", process.results);
-    _LNXPROC_DEBUG("Nrows %zd\n", nrows);
+    _TOPIARY_DEBUG("Current data is %d at %p\n", data->id, data);
+    _TOPIARY_DEBUG("Current results is at %p\n", process.results);
+    _TOPIARY_DEBUG("Nrows %zd\n", nrows);
     char ***values = (char ***) process.vector->values;
 
-    _LNXPROC_BASE_DATA_T *pdata = base->previous;
+    _TOPIARY_BASE_DATA_T *pdata = base->previous;
 
     process.presults = NULL;
 
@@ -679,7 +679,7 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T *base)
 
             int pgrp = atoi(val);
 
-            _LNXPROC_DEBUG("%d:PID %d PGRP %d\n", i, atoi(pidkey), pgrp);
+            _TOPIARY_DEBUG("%d:PID %d PGRP %d\n", i, atoi(pidkey), pgrp);
             process.pgrphash = myhash_add(process.pgrphash, pgrp, i);
 
             val = value1[PPIDCOL];
@@ -688,7 +688,7 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T *base)
                 continue;
             int ppid = atoi(val);
 
-            _LNXPROC_DEBUG("%d:PID %d PPID %d\n", i, atoi(pidkey), ppid);
+            _TOPIARY_DEBUG("%d:PID %d PPID %d\n", i, atoi(pidkey), ppid);
 
             process.ppidhash = myhash_add(process.ppidhash, ppid, i);
 
@@ -697,7 +697,7 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T *base)
                 continue;
             if (ppid == 1 && !strcmp(master, val)) {
                 process.pidlist = mylist_add(process.pidlist, i);
-                _LNXPROC_DEBUG("MASTERPID %d at %d\n", atoi(pidkey), i);
+                _TOPIARY_DEBUG("MASTERPID %d at %d\n", atoi(pidkey), i);
             }
         }
     }
@@ -708,7 +708,7 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T *base)
 /*
  * Convert raw values into the appropriate form and store in results table
  */
-    _lnxproc_results_init(process.results, nrows);
+    _topiary_results_init(process.results, nrows);
     pids_iterate(master, '-', &process, process_pid);
 
 /*
@@ -728,9 +728,9 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T *base)
         }
         n--;
         STRLCAT(fileglob, "}", n, sizeof fileglob);
-        _LNXPROC_DEBUG("New fileglob '%s'\n", fileglob);
-        _lnxproc_set_fileglob(sub, fileglob);
-        lnxproc_read(sub);
+        _TOPIARY_DEBUG("New fileglob '%s'\n", fileglob);
+        _topiary_set_fileglob(sub, fileglob);
+        topiary_read(sub);
     }
 
 /*
@@ -738,18 +738,18 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T *base)
  * remember the locations of each pid entry in order to calculate usage etc.
  */
     if (pdata && pdata->array) {
-        _lnxproc_base_timeval_diff(base, &process.tdiff);
+        _topiary_base_timeval_diff(base, &process.tdiff);
         process.presults = pdata->results;
-        _LNXPROC_DEBUG("Previous data is %d at %p\n", pdata->id, pdata);
-        _LNXPROC_DEBUG("Previous results is at %p\n", process.presults);
+        _TOPIARY_DEBUG("Previous data is %d at %p\n", pdata->id, pdata);
+        _TOPIARY_DEBUG("Previous results is at %p\n", process.presults);
     }
 
-    _LNXPROC_DEBUG("Time difference = %f secs\n", process.tdiff);
+    _TOPIARY_DEBUG("Time difference = %f secs\n", process.tdiff);
     if (process.tdiff > 0.0) {
-        _LNXPROC_DEBUG("Current timestamp is %f\n",
-                       lnxproc_timeval_secs(&data->results->tv));
-        _LNXPROC_DEBUG("Previous timestamp is %f\n",
-                       lnxproc_timeval_secs(&pdata->results->tv));
+        _TOPIARY_DEBUG("Current timestamp is %f\n",
+                       topiary_timeval_secs(&data->results->tv));
+        _TOPIARY_DEBUG("Previous timestamp is %f\n",
+                       topiary_timeval_secs(&pdata->results->tv));
 
         pids_iterate(master, '+', &process, process_rates);
     }
@@ -757,7 +757,7 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T *base)
  * Clean up all memory allocated
  */
     if (process.hash) {
-        _LNXPROC_RESULTS_TABLE_T *entry, *tmp;
+        _TOPIARY_RESULTS_TABLE_T *entry, *tmp;
 
         HASH_ITER(hh, process.hash, entry, tmp) {
             HASH_DEL(process.hash, entry);
@@ -769,43 +769,43 @@ proc_pid_stat_normalize(_LNXPROC_BASE_T *base)
     process.pgrphash = myhash_clear(process.pgrphash);
     process.ppidhash = myhash_clear(process.ppidhash);
 
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 /*-----------------------------------------------------------------------------
  * Create this module 
  */
 int
-_lnxproc_proc_pid_stat_new(_LNXPROC_BASE_T **base, LNXPROC_OPT_T *optional)
+_topiary_proc_pid_stat_new(_TOPIARY_BASE_T **base, TOPIARY_OPT_T *optional)
 {
 
-    _LNXPROC_LIMITS_T *limits = NULL;
-    int ret = _lnxproc_limits_new(&limits, 2);
+    _TOPIARY_LIMITS_T *limits = NULL;
+    int ret = _topiary_limits_new(&limits, 2);
 
     if (ret) {
         return ret;
     }
-    ret = _lnxproc_limits_set(limits, 0, 9, "\f\n", 2); /* row delimiters */
+    ret = _topiary_limits_set(limits, 0, 9, "\f\n", 2); /* row delimiters */
     if (ret) {
-        _LNXPROC_LIMITS_FREE(limits);
+        _TOPIARY_LIMITS_FREE(limits);
         return ret;
     }
-    ret = _lnxproc_limits_set(limits, 1, 4, "() ", 3);  /* column delimiters */
+    ret = _topiary_limits_set(limits, 1, 4, "() ", 3);  /* column delimiters */
     if (ret) {
-        _LNXPROC_LIMITS_FREE(limits);
+        _TOPIARY_LIMITS_FREE(limits);
         return ret;
     }
 
-    _LNXPROC_DEBUG("Optional %p\n", optional);
-    LNXPROC_MODULE_T *sub = NULL;
+    _TOPIARY_DEBUG("Optional %p\n", optional);
+    TOPIARY_MODULE_T *sub = NULL;
 
     if (optional) {
         if (optional->master && optional->module) {
             sub = optional->module;
-            _lnxproc_create(sub);
+            _topiary_create(sub);
         }
     }
-    _LNXPROC_DEBUG("Sub %p\n", sub);
+    _TOPIARY_DEBUG("Sub %p\n", sub);
 
     char *fileprefix = "/proc";
     char *fileglob;
@@ -820,16 +820,16 @@ _lnxproc_proc_pid_stat_new(_LNXPROC_BASE_T **base, LNXPROC_OPT_T *optional)
     char *filesuffix = "stat";
 
     ret =
-        _lnxproc_base_new(base, "proc_pid_stat",
-                          _LNXPROC_BASE_TYPE_PREVIOUS, NULL,
+        _topiary_base_new(base, "proc_pid_stat",
+                          _TOPIARY_BASE_TYPE_PREVIOUS, NULL,
                           proc_pid_stat_normalize, NULL, 256, limits);
     if (!ret) {
-        _lnxproc_base_set_fileprefix(*base, fileprefix);
-        _lnxproc_base_set_fileglob(*base, fileglob);
-        _lnxproc_base_set_filesuffix(*base, filesuffix);
-        _lnxproc_base_set_optional(*base, optional);
+        _topiary_base_set_fileprefix(*base, fileprefix);
+        _topiary_base_set_fileglob(*base, fileglob);
+        _topiary_base_set_filesuffix(*base, filesuffix);
+        _topiary_base_set_optional(*base, optional);
     }
-    _LNXPROC_LIMITS_FREE(limits);
+    _TOPIARY_LIMITS_FREE(limits);
     return ret;
 }
 

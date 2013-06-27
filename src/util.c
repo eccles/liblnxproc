@@ -1,18 +1,18 @@
 /*
- * This file is part of liblnxproc.
+ * This file is part of topiary.
  *
- *  liblnxproc is free software: you can redistribute it and/or modify
+ *  topiary is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  liblnxproc is distributed in the hope that it will be useful,
+ *  topiary is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with liblnxproc.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with topiary.  If not, see <http://www.gnu.org/licenses/>.
  *
  *  Copyright 2013 Paul Hewlett, phewlett76@gmail.com
  *
@@ -28,7 +28,7 @@
  */
 
 float
-lnxproc_timeval_secs(struct timeval *tv)
+topiary_timeval_secs(struct timeval *tv)
 {
     float res = 0.0;
 
@@ -39,7 +39,7 @@ lnxproc_timeval_secs(struct timeval *tv)
 }
 
 long
-lnxproc_timeval_diff(struct timeval *start, struct timeval *end)
+topiary_timeval_diff(struct timeval *start, struct timeval *end)
 {
     long res = 0;
 
@@ -57,7 +57,7 @@ lnxproc_timeval_diff(struct timeval *start, struct timeval *end)
 }
 
 char *
-lnxproc_timeval_print(struct timeval *tv, char *buf, size_t len)
+topiary_timeval_print(struct timeval *tv, char *buf, size_t len)
 {
     if (tv && buf && (len > 0)) {
         snprintf(buf, len, "%lu.%06lu", (unsigned long) tv->tv_sec,
@@ -67,7 +67,7 @@ lnxproc_timeval_print(struct timeval *tv, char *buf, size_t len)
 }
 
 struct timeval
-lnxproc_timeval(void)
+topiary_timeval(void)
 {
     struct timeval tv;
 

@@ -1,18 +1,18 @@
 /*
-This file is part of liblnxproc.
+This file is part of topiary.
 
- liblnxproc is free software: you can redistribute it and/or modify
+ topiary is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
 
- liblnxproc is distributed in the hope that it will be useful,
+ topiary is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General Public License
- along with liblnxproc.  If not, see <http://www.gnu.org/licenses/>.
+ along with topiary.  If not, see <http://www.gnu.org/licenses/>.
 
  Copyright 2013 Paul Hewlett, phewlett76@gmail.com
 
@@ -48,17 +48,17 @@ This file is part of liblnxproc.
 #include "modules.h"
 
 static int
-proc_pid_statm_normalize(_LNXPROC_BASE_T *base)
+proc_pid_statm_normalize(_TOPIARY_BASE_T *base)
 {
-    _LNXPROC_BASE_DATA_T *data = base->current;
-    _LNXPROC_RESULTS_T *results = data->results;
-    _LNXPROC_ARRAY_T *array = data->array;
+    _TOPIARY_BASE_DATA_T *data = base->current;
+    _TOPIARY_RESULTS_T *results = data->results;
+    _TOPIARY_ARRAY_T *array = data->array;
 
     size_t nrows = array->vector->length;
 
-    _LNXPROC_DEBUG("Current data is %d at %p\n", data->id, data);
-    _LNXPROC_DEBUG("Current results is at %p\n", results);
-    _LNXPROC_DEBUG("Nrows %zd\n", nrows);
+    _TOPIARY_DEBUG("Current data is %d at %p\n", data->id, data);
+    _TOPIARY_DEBUG("Current results is at %p\n", results);
+    _TOPIARY_DEBUG("Nrows %zd\n", nrows);
     char ***values = (char ***) array->vector->values;
 
     int i, j;
@@ -73,7 +73,7 @@ proc_pid_statm_normalize(_LNXPROC_BASE_T *base)
 
     STRLCAT(key, "/", n1, sizeof(key));
 
-    _lnxproc_results_init(results, nrows);
+    _topiary_results_init(results, nrows);
     for (i = 0; i < nrows; i++) {
         char **value1 = (char **) values[i];
         char *rowkey = value1[0];
@@ -83,9 +83,9 @@ proc_pid_statm_normalize(_LNXPROC_BASE_T *base)
 
         size_t ncols = array->vector->children[i]->length;
 
-        _LNXPROC_DEBUG("%d:ncols %zd\n", i, ncols);
+        _TOPIARY_DEBUG("%d:ncols %zd\n", i, ncols);
 
-        _LNXPROC_DEBUG("%d:Rowkey value %s\n", i, rowkey);
+        _TOPIARY_DEBUG("%d:Rowkey value %s\n", i, rowkey);
         int n2 = n1;
 
         STRLCAT(key, rowkey, n2, sizeof(key));
@@ -103,33 +103,33 @@ proc_pid_statm_normalize(_LNXPROC_BASE_T *base)
 
             unsigned long value = strtoul(val, NULL, 0) * results->page_size;
 
-            _LNXPROC_DEBUG("%d,%d:%s value %s int %lu\n", i, j, key, val,
+            _TOPIARY_DEBUG("%d,%d:%s value %s int %lu\n", i, j, key, val,
                            value);
-            _lnxproc_results_add_unsigned_long(results, key, value);
+            _topiary_results_add_unsigned_long(results, key, value);
         }
     }
 
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_proc_pid_statm_new(_LNXPROC_BASE_T **base, LNXPROC_OPT_T *optional)
+_topiary_proc_pid_statm_new(_TOPIARY_BASE_T **base, TOPIARY_OPT_T *optional)
 {
 
-    _LNXPROC_LIMITS_T *limits = NULL;
-    int ret = _lnxproc_limits_new(&limits, 2);
+    _TOPIARY_LIMITS_T *limits = NULL;
+    int ret = _topiary_limits_new(&limits, 2);
 
     if (ret) {
         return ret;
     }
-    ret = _lnxproc_limits_set(limits, 0, 9, "\f\n", 2); /* row delimiters */
+    ret = _topiary_limits_set(limits, 0, 9, "\f\n", 2); /* row delimiters */
     if (ret) {
-        _LNXPROC_LIMITS_FREE(limits);
+        _TOPIARY_LIMITS_FREE(limits);
         return ret;
     }
-    ret = _lnxproc_limits_set(limits, 1, 4, " ", 1);    /* column delimiters */
+    ret = _topiary_limits_set(limits, 1, 4, " ", 1);    /* column delimiters */
     if (ret) {
-        _LNXPROC_LIMITS_FREE(limits);
+        _TOPIARY_LIMITS_FREE(limits);
         return ret;
     }
 
@@ -145,14 +145,14 @@ _lnxproc_proc_pid_statm_new(_LNXPROC_BASE_T **base, LNXPROC_OPT_T *optional)
 
     char *filesuffix = "statm";
 
-    ret = _lnxproc_base_new(base, "proc_pid_statm", _LNXPROC_BASE_TYPE_PREVIOUS,
+    ret = _topiary_base_new(base, "proc_pid_statm", _TOPIARY_BASE_TYPE_PREVIOUS,
                             NULL, proc_pid_statm_normalize, NULL, 256, limits);
     if (!ret) {
-        _lnxproc_base_set_fileprefix(*base, fileprefix);
-        _lnxproc_base_set_fileglob(*base, fileglob);
-        _lnxproc_base_set_filesuffix(*base, filesuffix);
+        _topiary_base_set_fileprefix(*base, fileprefix);
+        _topiary_base_set_fileglob(*base, fileglob);
+        _topiary_base_set_filesuffix(*base, filesuffix);
     }
-    _LNXPROC_LIMITS_FREE(limits);
+    _TOPIARY_LIMITS_FREE(limits);
     return ret;
 }
 

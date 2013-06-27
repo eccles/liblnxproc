@@ -1,18 +1,18 @@
 /*
-This file is part of liblnxproc.
+This file is part of topiary.
 
- liblnxproc is free software: you can redistribute it and/or modify
+ topiary is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
 
- liblnxproc is distributed in the hope that it will be useful,
+ topiary is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General Public License
- along with liblnxproc.  If not, see <http://www.gnu.org/licenses/>.
+ along with topiary.  If not, see <http://www.gnu.org/licenses/>.
 
  Copyright 2013 Paul Hewlett, phewlett76@gmail.com
 
@@ -34,15 +34,15 @@ BOOT_IMAGE=/vmlinuz-3.8.0-21-generic root=/dev/mapper/ubuntu-root ro quiet splas
 #include "modules.h"
 
 static int
-proc_cmdline_normalize(_LNXPROC_BASE_T *base)
+proc_cmdline_normalize(_TOPIARY_BASE_T *base)
 {
-    _LNXPROC_RESULTS_T *results = base->current->results;
-    _LNXPROC_ARRAY_T *array = base->current->array;
+    _TOPIARY_RESULTS_T *results = base->current->results;
+    _TOPIARY_ARRAY_T *array = base->current->array;
     char **values = (char **) array->vector->values;
 
     size_t ncols = array->vector->length;
 
-    _lnxproc_results_init(results, ncols);
+    _topiary_results_init(results, ncols);
     int i;
 
     char buf[64];
@@ -60,35 +60,35 @@ proc_cmdline_normalize(_LNXPROC_BASE_T *base)
         int n2 = n1;
 
         INTCAT(buf, i, n2, sizeof(buf));
-        _LNXPROC_DEBUG("Key %s, Value %s\n", buf, val);
-        _lnxproc_results_add_stringref(results, buf, val);
+        _TOPIARY_DEBUG("Key %s, Value %s\n", buf, val);
+        _topiary_results_add_stringref(results, buf, val);
 
     }
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_proc_cmdline_new(_LNXPROC_BASE_T **base, LNXPROC_OPT_T *optional)
+_topiary_proc_cmdline_new(_TOPIARY_BASE_T **base, TOPIARY_OPT_T *optional)
 {
 
     char *filenames[] = { "/proc/cmdline", };
-    _LNXPROC_LIMITS_T *limits = NULL;
-    int ret = _lnxproc_limits_new(&limits, 1);
+    _TOPIARY_LIMITS_T *limits = NULL;
+    int ret = _topiary_limits_new(&limits, 1);
 
     if (ret) {
         return ret;
     }
-    ret = _lnxproc_limits_set(limits, 0, 9, " \f\n", 3);        /* row delimiters */
+    ret = _topiary_limits_set(limits, 0, 9, " \f\n", 3);        /* row delimiters */
     if (ret) {
-        _LNXPROC_LIMITS_FREE(limits);
+        _TOPIARY_LIMITS_FREE(limits);
         return ret;
     }
-    ret = _lnxproc_base_new(base, "proc_cmdline", _LNXPROC_BASE_TYPE_MEMOIZE,
+    ret = _topiary_base_new(base, "proc_cmdline", _TOPIARY_BASE_TYPE_MEMOIZE,
                             NULL, proc_cmdline_normalize, NULL, 64, limits);
     if (!ret) {
-        ret = _lnxproc_base_set_filenames(*base, filenames, 1);
+        ret = _topiary_base_set_filenames(*base, filenames, 1);
     }
-    _LNXPROC_LIMITS_FREE(limits);
+    _TOPIARY_LIMITS_FREE(limits);
     return ret;
 }
 

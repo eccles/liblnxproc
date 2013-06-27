@@ -1,0 +1,745 @@
+.\" Copyright (c) 2023 Paul Hewlett <phewlett76@gmail.com>
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one.
+.\"
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\"
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.TH TOPIARY 3 2013-05-16 "Linux" "Linux Programmer's Manual"
+.SH NAME
+.nf
+topiary \- interface to reading the /proc/ & /sys filesystems
+.fi
+.SH SYNOPSIS
+.nf
+.BI #include " "<topiary/topiary.h>
+
+.BI "int topiary_new(TOPIARY_MODULE_T **" moduleptr ", size_t " nmodule);
+
+.BI "int topiary_set(TOPIARY_MODULE_T *" module , 
+.BI "                size_t " pos , 
+.BI "                TOPIARY_MODULE_TYPE_T " type , 
+.BI "                TOPIARY_OPT_T *" optional "); "
+
+.BI "int topiary_free(TOPIARY_MODULE_T **" modulesptr ");"
+
+.BI "TOPIARY_FREE(" b ")"
+
+.BI "int topiary_read(TOPIARY_MODULE_T *" modules ");"
+
+.BI "int topiary_print(TOPIARY_MODULE_T *" modules ,
+.BI "                        int " fd ,
+.BI "                        TOPIARY_PRINT_T " print ");"
+
+.BI "int topiary_performance(TOPIARY_MODULE_T *" modules ,
+.BI "                        long *" rawread_time ,
+.BI "                        long *" map_time , 
+.BI "                        long *" normalize_time ,
+.BI "                        long *" hash_time ");"
+
+.BI "int topiary_size(TOPIARY_MODULE_T *" modules ,
+.BI "                        size_t *" size ");"
+
+.BI "typedef (*TOPIARY_INTERFACE_METHOD)(char *" module , 
+.BI "                                    char *" key ,
+.BI "                                    char *" value ,
+.BI "                                    void *" data ");"
+
+.BI "int topiary_iterate(TOPIARY_MODULE_T *" modules ,
+.BI "                    TOPIARY_INTERFACE_METHOD " func ,
+.BI "                    void *" data ");"
+
+.BI "int topiary_fetch(TOPIARY_MODULE_T *" modules ,
+.BI "                  TOPIARY_MODULE_TYPE_T " type ,
+.BI "                  char *" value ,
+.BI "                  size_t " valuelen ");"
+
+.BI "const char *topiary_strerror(int " err, 
+.BI "                             char *" buf, 
+.BI "                             size_t " buflen ");"
+
+.BI "int topiary_opt_new(TOPIARY_OPT_T **" optptr ");"
+
+.BI "int topiary_opt_set_fileglob(TOPIARY_OPT_T *" optptr ,
+.BI "                             char *" fileglob ");"
+
+.BI "int topiary_opt_set_master(TOPIARY_OPT_T *" optptr ,
+.BI "                             char *" master ");"
+
+.BI "int topiary_opt_set_module(TOPIARY_OPT_T *" optptr ,
+.BI "                             TOPIARY_MODULE_T *" module ");"
+
+.BI "int topiary_opt_free(TOPIARY_OPT_T **" optptr ");"
+
+.BI "TOPIARY_OPT_FREE(" b ")"
+
+.fi
+.sp
+Compile and link with \fI\-ltopiary\fP.
+.SH DESCRIPTION
+.SS Overview
+This library provides a means of reading the various files in the /proc and 
+/sys filesystems provided by 
+.B Linux.
+The library consists of individual modules , each module corresponding to a
+particular file or set of files. All structures in the library are opaque and
+require constructor functions to initialise. The design is similar to that of
+the
+.B pthreads
+library.
+.P
+The interface consists of contructing a 
+.B TOPIARY_MODULE_T
+object and then specifying the characteristics of this object by one or more
+calls to the
+.B topiary_set_*()
+functions. The module so constructed is then initialised by the
+.B topiary_init()
+function which creates all the necessary structures for subsequent reads.
+To read values, execute the
+.B topiary_read()
+function.
+.P
+Each module can have differing characteristics. Some modules are 
+.B memoized
+i.e. second and subsequent reads of the module always return the same value.
+.P 
+Some modules return derived parameters such as % usage and/or rates. These 
+modules store the values of the previous read. These derived values are only
+available from the second read onwards.
+.P
+The library will 'grow' internal structures to accommodate the amount of
+data read. Consequently the first read issued will be quite slow. In general
+memory is *not* freed unless the user explicitly calls the appropriate 
+function or macro.
+.P
+To minimise sampling skew, the code is written such that the read of data 
+occurs as quickly as possible with the minimal of processing. Subsequent 
+processing to calculate derived parameters and convert values into
+standard units occurs afterwards. Mostly all parameters are converted to 
+a consistent set of units \- time is in 
+.B float
+seconds, usage is in 
+.B float %
+, rates are per second, memory is in
+.B KiB.
+.P
+Additionally some modules take optional parameter(s). These parameters are
+defined in a
+.B TOPIARY_OPT_T
+object and are initialised by means of calls to the functions
+.B topiary_opt_set*().
+The optional parameters are not used in all modules. For example one can 
+specify the optional parameter
+.B fileglob
+to restrict data collection to a subset of pids (or only one particular pid)
+for any of the
+.B PROC_PID_*
+modules. Also one can specify the
+.B master
+optional parameter for the
+.B PROC_PID_STAT
+module to only collect data for all processes that are children/grandchildren
+etc. of a particular process.
+If 
+.B master
+is specified, one can also 'chain' calls to another module by specifying the
+.B module
+optional parameter.
+.sp
+See the example code below for examples.
+.SS Main functions
+.P
+.BR topiary_new ()
+creates a module containing
+.B nmodule 
+entries. 
+If 
+.B nmodule
+is 0 then all modules are loaded and no subsequent calls to
+.B topiary_set()
+are required.
+If
+.B nmodule
+is positive then
+.B nmodule
+calls to
+.B topiary_set()
+must be executed for each entry in the 
+.B modules
+argument.
+.P
+.BR topiary_set()
+sets the values of an entry in the 
+.B modules
+argument. 
+.B pos
+indicates the index of the entry,
+.B type
+indicates which module and corresponds to a particular file or files to be read from
+the /proc or /sys filesystems.
+
+The 
+.B type 
+field is an enumerated field. The following table shows each module
+type together with other characteristics:
+
+.TP
+.B TOPIARY_PROC_BUDDYINFO    
+reads the /proc/buddyinfo file.
+.TP
+.B TOPIARY_PROC_CGROUPS    
+reads the /proc/cgroups file.
+.TP
+.B TOPIARY_PROC_CMDLINE    
+reads the /proc/cmdline file.
+.TP
+.B TOPIARY_PROC_CPUINFO    
+reads the /proc/cpuinfo file.
+.TP
+.B TOPIARY_PROC_DISKSTATS
+reads the /proc/diskstats file.
+.TP
+.B TOPIARY_PROC_DOMAINNAME 
+reads the /proc/sys/kernel/domainname file. This call is memoized \- second and
+subsequent reads always return the same value.
+.TP
+.B TOPIARY_PROC_INTERRUPTS
+reads the /proc/interrupts file.
+.TP
+.B TOPIARY_PROC_HOSTNAME
+reads the /proc/sys/kernel/hostname file. This call is memoized \- second and
+subsequent reads always return the same value.
+.TP
+.B TOPIARY_PROC_LOADAVG
+reads the /proc/loadavg file.
+.TP
+.B TOPIARY_PROC_MEMINFO
+reads the /proc/meminfo file.
+.TP
+.B TOPIARY_PROC_NET_DEV
+reads the /proc/net/dev file.
+.TP
+.B TOPIARY_PROC_NET_NETSTAT
+reads the /proc/net/netstat file.
+.TP
+.B TOPIARY_PROC_NET_RPC_NFS
+reads the /proc/net/rpc/nfs file.
+.TP
+.B TOPIARY_PROC_NET_RPC_NFSD
+reads the /proc/net/rpc/nfsd file.
+.TP
+.B TOPIARY_PROC_NET_SNMP
+reads the /proc/net/snmp file.
+.TP
+.B TOPIARY_PROC_NET_SNMP6
+reads the /proc/net/snmp6 file.
+.TP
+.B TOPIARY_PROC_NET_SOCKSTAT
+reads the /proc/net/sockstat file.
+.TP
+.B TOPIARY_PROC_MOUNTS
+reads the /proc/mounts file.
+.TP
+.B TOPIARY_PROC_OSRELEASE
+reads the /proc/sys/kernel/osrelease file. This call is memoized \- second and
+subsequent reads always return the same value.
+.TP
+.B TOPIARY_PROC_PARTITIONS
+reads the /proc/partitions file.
+.TP
+.B TOPIARY_PROC_PID_ENVIRON
+reads the
+/proc/[1-9]*/environ
+files. 
+A different fileglob pattern can be specified by creating a
+.B TOPIARY_OPT_T 
+object and initialising the 
+.B fileglob
+field using the
+.B topiary_opt_set_fileglob()
+function.
+For example the following code will only retrieve data for 
+.B pid 12345
+:
+\&
+.nf
+
+        TOPIARY_OPT_T *opt = NULL;
+        topiary_opt_new(&opt);
+        topiary_opt_set_fileglob(opt,"12345");
+        TOPIARY_MODULE_T * modules = NULL;
+        topiary_new(&modules, 1);
+        topiary_set(modules, 0, TOPIARY_PROC_PID_STAT, opt);
+        TOPIARY_OPT_FREE(opt);
+
+.fi
+.TP
+.B TOPIARY_PROC_PID_IO
+reads the
+/proc/[1-9]*/io
+files. 
+See 
+.B PROC_PID_ENVIRON
+above for explanation of usage of the 
+.B optional
+argument.
+.TP
+.B TOPIARY_PROC_PID_SMAPS
+reads the
+/proc/[1-9]*/smaps
+files. 
+See 
+.B PROC_PID_ENVIRON
+above for explanation of usage of the 
+.B optional
+argument.
+.TP
+.B TOPIARY_PROC_PID_STAT
+reads the
+/proc/[1-9]*/stat
+files. 
+See 
+.B PROC_PID_ENVIRON
+above for explanation of usage of the 
+.B optional
+argument.
+.TP
+.B TOPIARY_PROC_PID_STATM
+reads the
+/proc/[1-9]*/statm
+files. 
+See 
+.B PROC_PID_ENVIRON
+above for explanation of usage of the 
+.B optional
+argument.
+.TP
+.B TOPIARY_PROC_PID_STATUS
+reads the
+/proc/[1-9]*/status
+files. 
+See 
+.B PROC_PID_ENVIRON
+above for explanation of usage of the 
+.B optional
+argument.
+.TP
+.B TOPIARY_PROC_SOFTIRQS
+reads the /proc/softirqs file.
+.TP
+.B TOPIARY_PROC_STAT
+reads the /proc/stat file.
+.TP
+.B TOPIARY_PROC_SYS_FS_FILE_NR
+reads the /proc/sys/fs/file-nr file.
+.TP
+.B TOPIARY_PROC_UPTIME
+reads the /proc/uptime file.
+.TP
+.B TOPIARY_PROC_VMSTAT
+reads the /proc/vmstat file.
+.TP
+.B TOPIARY_SYS_CPUFREQ
+reads the
+/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+file. This call is memoized \- second and
+subsequent reads always return the same value.
+.TP
+.B TOPIARY_SYS_DISKSECTORS
+reads the
+/sys/block/*/queue/hw_sector_size
+files. This call is memoized \- second and
+subsequent reads always return the same values.
+See 
+.B PROC_PID_ENVIRON
+above for explanation of usage of the 
+.B optional
+argument.
+.P
+.BR topiary_free()
+frees all allocated memory for
+.B modules
+and nullifies the 
+.B modules 
+pointer.
+.P
+.BR TOPIARY_FREE()
+macro version of
+.B topiary_free()
+.SS Actions
+.P
+.BR topiary_read()
+reads all files corresponding to all
+.B modules
+in the 
+.B modules
+argument.
+The first call to
+.B topiary_read()
+may be slow as the internal buffers are 
+.B grown
+to accommodate the data read. Also any time-derived values such as % usage
+and/or rates are only calculated from the second call onwards. 
+.P
+.BR topiary_print()
+print to 
+.B fd
+all data collected on the last call to
+.B topiary_read().
+The 
+.B print 
+option can have the following options:
+.TP
+.B TOPIARY_PRINT_ALL
+Prints out all info.
+.TP
+.B TOPIARY_PRINT_VALUES
+Prints out essential info.
+.TP
+.B TOPIARY_PRINT_JSON
+Prints data in JSON format.
+.P
+.BR topiary_performance()
+returns the time taken to read and process the data in read, map,
+normalize and hash phases.
+.P
+.BR topiary_size()
+returns the memory consumed.
+.P
+.BR topiary_iterate()
+iterates over the whole datatset, executing the supplied function on every data
+point found.
+.P
+.BR topiary_fetch()
+fetches the data for the specified module and key.
+.SS Optional parameter handling
+.P
+.BR topiary_opt_new()
+creates a new optional argument that can be passed to the
+.B topiary_set()
+function. The value of the first argument should normally be NULL in 
+order to create a new 
+.B TOPIARY_OPT_T 
+object. If not, a new reference is acquired (i.e. the reference count for
+.B opt
+will be incremented) . Viz:
+\&
+.nf
+
+        TOPIARY_OPT_T *opt = NULL; // is NULL to create new object
+        topiary_opt_new(&opt);
+        ...
+        TOPIARY_OPT_FREE(opt);
+
+.fi
+.P
+.BR topiary_set_fileglob()
+sets the the optional fileglob pattern.
+.P
+.BR topiary_set_master()
+sets the the optional master task name. 
+This option is only currently used for the 
+.B PROC_PID_STAT
+module.
+The
+.B PROC_PID_STAT
+module will only collect data on pids that are children or belong to the same
+process group as the specified master task. The master task must be a daemon
+(i.e. the 
+.B PPID
+of the master task is 1). All children, grandchildren etc.. are processed.
+All processes that have the same process group as any of the pids is also
+included.
+The master task is matched against the second field in the /proc/<pid>/stat
+file with the '(' and ')' characters removed.
+.P
+.BR topiary_set_module()
+sets the the optional submodule for the
+.B PROC_PID_STAT
+module. 
+This option is only used when the option
+.B master
+is also set. Only data for pids that are matched for the specified
+.B master
+task are collected. For example one can specify the
+.B PROC_PID_STATM
+as a submodule. Only modules that take pids as a fileglob can be specified as a
+submodule of
+.B PROC_PID_STAT.
+i.e. any module with a type of
+.B PROC_PID_*.
+.P
+.BR topiary_opt_free()
+frees all allocated memory for the specified 
+.B TOPIARY_OPT_T
+object
+and nullifies the 
+.B opt 
+pointer.
+.P
+.BR TOPIARY_OPT_FREE()
+macro version of
+.B topiary_opt_free()
+.SS Error handling
+.P
+.BR topiary_strerror()
+formats any return values as a string.
+.SH RETURN VALUE
+On success, all routines return zero.
+Negative return values correspond to system error i.e. -errno.
+Positive return values are described below.
+.SH ERRORS
+.TP
+.B TOPIARY_OK
+No error
+.TP
+.B TOPIARY_ERROR_MISMATCHED_STRINGS
+Internal error - indicates an inconsistency in the error submodule
+.TP
+.B TOPIARY_ERROR_MALLOC
+A malloc,realloc,calloc call has returned NULL.
+.TP
+.B TOPIARY_ERROR_ILLEGAL_ARG
+A function argument is illegal. This includes cases where an argument
+may have subfields that are illegal.
+.TP
+.B TOPIARY_ERROR_BASE_READ_OVERFLOW
+Internal error to indicate when to grow buffers to accommodate the quantity
+read.
+This error is never returned to the user.
+.TP
+.B TOPIARY_ERROR_BASE_REGEX_FAILURE
+The regular expression matcher has failed and is unable to extract the 
+field data. Only some modules (
+.B TOPIARY_SYS_DISKSECTORS & TOPIARY_PID_STAT
+at time of writing ) use file globbing.
+.TP
+.B TOPIARY_ERROR_BASE_GLOB_FAILURE
+The globbing expression matcher has failed and has returned no files matched.
+Only some modules use file globbing.
+.TP
+.B TOPIARY_ERROR_NOT_FOUND
+Requested group/key does not exist in the data read from the /proc and/or
+/sys filesystems.
+.TP
+.B TOPIARY_ERROR_BASE_READ_SSIZE_MAX
+Read request exceeds system limit SSIZE_MAX.
+.SH ENVIRONMENT
+The environment variable 
+.B TOPIARY_TESTROOT
+will be prepended to all files opened and closed by the
+.B topiary
+library. This environment variable is only set when testing the library against
+a fixed set of /proc and /sys files located on a normal filesystem.
+.SH FILES
+.TP
+TBD
+.SH VERSIONS
+.TP
+TBD
+.SH NOTES
+Currently the key field of the hashtable produced by all the modules of topiary
+has
+a hardwired limit of 48 characters. When adding a new module please ensure that
+any
+generated keys are either not longer than this or increase the key length
+limit and recompile the library.
+.SH BUGS
+The 
+.B topiary
+library was tested on Ubuntu 12.04 and 13.04 using valgrind and a standardised
+test data set. 
+The code is designed to work on earlier versions of the kernel. 
+Some modules may not work and such cases should be reported to the author.
+.SH EXAMPLE
+The program below demonstrates the use of
+.BR topiary_new (),
+as well as a number of other functions in the topiary API.
+
+.fi
+.in
+.SS Program source
+\&
+.nf
+
+#include <stdio.h>
+#include <string.h>             // strrchr()
+#include <sys/time.h>
+#include <sys/types.h>          // getpid()
+#include <unistd.h>             // getpid()
+
+#include <topiary/topiary.h>
+
+static const int ntimes = 1000;
+
+static void
+test_module(TOPIARY_MODULE_T * modules, char *str)
+{
+    if (modules) {
+        char buf[96];
+        TOPIARY_ERROR_T ret = topiary_read(modules);
+
+        ret = topiary_read(modules);
+        if (ret) {
+            printf("Error %s\\n", topiary_strerror(ret, buf, sizeof buf));
+        }
+        ret = topiary_read(modules);
+        if (ret) {
+            printf("Error %s\\n", topiary_strerror(ret, buf, sizeof buf));
+        }
+
+        long rawread_time;
+        long map_time;
+        long hash_time;
+        long normalize_time;
+        float sum_rawread_time = 0;
+        float sum_map_time = 0;
+        float sum_hash_time = 0;
+        float sum_normalize_time = 0;
+        struct timeval start = topiary_timeval();
+
+        int i;
+
+        for (i = 0; i < ntimes; i++) {
+            ret = topiary_read(modules);
+            if (ret) {
+                printf("%s:Error %s\\n", str,
+                       topiary_strerror(ret, buf, sizeof buf));
+                break;
+            }
+            topiary_performance(modules, &rawread_time, &map_time,
+                                &hash_time, &normalize_time);
+            sum_rawread_time += rawread_time;
+            sum_map_time += map_time;
+            sum_hash_time += hash_time;
+            sum_normalize_time += normalize_time;
+        }
+
+        struct timeval end = topiary_timeval();
+        long timediff = topiary_timeval_diff(&start, &end);
+
+        printf("%s:Elapsed time = %.1f usecs (%.1f,%.1f,%.1f,%.1f)\\n", 
+               str,
+               (timediff * 1.0) / ntimes, sum_rawread_time / ntimes,
+               sum_map_time / ntimes, sum_hash_time / ntimes,
+               sum_normalize_time / ntimes);
+    }
+}
+
+/*---------------------------------------------------------------------*/
+int
+main(int argc, char *argv[])
+{
+    /* NB Omit return values for clarity */
+
+    TOPIARY_MODULE_T * modules = NULL;
+    topiary_new(&modules, 0); // load all modules
+    test_module(modules, "All");
+    TOPIARY_FREE(modules);
+
+    topiary_new(&modules, 1); // only read /proc/cgroups
+    topiary_set(modules, 0, TOPIARY_PROC_CGROUPS, NULL);
+    test_module(modules, "proc_cgroups");
+    TOPIARY_FREE(modules);
+
+    topiary_new(&modules, 2); // read /proc/groups and 
+                              // /proc/diskstats simultaneously
+    topiary_set(modules, 0, TOPIARY_PROC_CGROUPS, NULL);
+    topiary_set(modules, 1, TOPIARY_PROC_DISKSTATS, NULL);
+    test_module(modules, "proc_diskstats");
+    TOPIARY_FREE(modules);
+
+    topiary_new(&modules, 1); // Domainname - the value is memoized
+    topiary_set(modules, 0, TOPIARY_PROC_DOMAINNAME, NULL);
+    test_module(modules, "proc_domainname");
+    TOPIARY_FREE(modules);
+
+    topiary_new(&modules, 1); // Get sector size for every disk 
+                              // memoized
+    topiary_set(modules, 0, TOPIARY_SYS_DISKSECTORS, NULL);
+    test_module(modules, "sys_disksectors");
+    TOPIARY_FREE(modules);
+
+    TOPIARY_OPT_T *opt = NULL;
+    topiary_opt_new(&opt);
+    topiary_opt_set_fileglob(opt,"sd*");
+    topiary_new(&modules, 1); // get sector size for esata disks
+    topiary_set(modules, 0, TOPIARY_SYS_DISKSECTORS, opt);
+    TOPIARY_OPT_FREE(opt);
+    test_module(modules, "sys_sd_disksectors");
+    TOPIARY_FREE(modules);
+
+    topiary_new(&modules, 1); // Read /proc/<pid>/stat file for 
+                              // every process
+    topiary_set(modules, 0, TOPIARY_PROC_PID_STAT, NULL);
+    test_module(modules, "proc_pid_stat");
+    TOPIARY_FREE(modules);
+
+    char pid[32];
+
+    snprintf(pid, sizeof pid, "%d", getpid());
+    topiary_opt_new(&opt);
+    topiary_opt_set_fileglob(opt,pid);
+    topiary_new(&modules, 1); // Read /proc/<pid>/stat file for 
+                              // this process
+    topiary_set(modules, 0, TOPIARY_PROC_PID_STAT, opt);
+    TOPIARY_OPT_FREE(opt);
+
+    char buf[32];
+    snprintf(buf, sizeof buf, "proc_%s_stat", pid);
+    test_module(modules, buf);
+    TOPIARY_FREE(modules);
+
+    topiary_opt_new(&opt);
+    topiary_opt_set_master(opt,"chrome");
+    topiary_new(&modules, 1); // Read /proc/<pid>/stat file for 
+                              // all chrome processes
+    topiary_set(modules, 0, TOPIARY_PROC_PID_STAT, opt);
+    TOPIARY_OPT_FREE(opt);
+
+    test_module(modules, "proc_chrome_stat");
+    TOPIARY_FREE(modules);
+
+    TOPIARY_MODULE_T * submodules = NULL;
+    topiary_new(&submodules, 1); // Read /proc/<pid>/statm file 
+    topiary_set(submodules, 0, TOPIARY_PROC_PID_STATM, NULL);
+    topiary_opt_new(&opt);
+    topiary_opt_set_master(opt,"chrome");
+    topiary_opt_set_module(opt,submodules);
+    TOPIARY_FREE(submodules);
+    topiary_new(&modules, 1); // Read /proc/<pid>/stat file for 
+                              // all chrome processes together
+                              // with /proc/<pid>/statm
+    topiary_set(modules, 0, TOPIARY_PROC_PID_STAT, opt);
+    TOPIARY_OPT_FREE(opt);
+
+    test_module(modules, "proc_chrome_stat_statm");
+    TOPIARY_FREE(modules);
+
+    return 0;
+}
+.fi
+.SH SEE ALSO
+.TP
+TBD
+.SH COLOPHON
+A description of the project,
+and information about reporting bugs,
+can be found at
+http://www.github.com/eccles/libtopiary/.

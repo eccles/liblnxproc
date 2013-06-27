@@ -1,16 +1,16 @@
-
+package ?= topiary
 BINDIR=$(prefix)/bin
-TSKS=topiary topiary-dbg topiary-prf
-SRCS=topiary.c
-SHS=topiary.sh
+TSKS=$(package) $(package)-dbg $(package)-prf
+SRCS=$(package).c
+SHS=$(package).sh
 
 CC=gcc
 CCFLAGS=-O2 -I../include -Wall -Winline -Werror
 CCFLAGSDBG=-g -I../include -Wall -Winline -Werror
 CCFLAGSPRF=-pg -g -I../include -Wall -Winline -Werror
-LDFLAGS=-L../src -llnxproc
-LDFLAGSDBG=-L../src -llnxproc-dbg
-LDFLAGSPRF=../src/liblnxproc-prf.a -pg
+LDFLAGS=-L../src -l$(package)
+LDFLAGSDBG=-L../src -l$(package)-dbg
+LDFLAGSPRF=../src/lib$(package)-prf.a -pg
 
 all: $(TSKS)
 
@@ -21,13 +21,13 @@ install:
 uninstall:
 	-cd $(BINDIR) && rm -f $(TSKS)
 
-topiary: topiary.c
+$(package): $(package).c
 	$(CC) $(CCFLAGS) -o $@ $^ $(LDFLAGS)
 
-topiary-dbg: topiary.c
+$(package)-dbg: $(package).c
 	$(CC) $(CCFLAGSDBG) -o $@ $^ $(LDFLAGSDBG)
 
-topiary-prf: topiary.c 
+$(package)-prf: $(package).c 
 	$(CC) $(CCFLAGSPRF) -o $@ $^ $(LDFLAGSPRF)
 
 clean:

@@ -1,18 +1,18 @@
 /*
-This file is part of liblnxproc.
+This file is part of topiary.
 
- liblnxproc is free software: you can redistribute it and/or modify
+ topiary is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
 
- liblnxproc is distributed in the hope that it will be useful,
+ topiary is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General Public License
- along with liblnxproc.  If not, see <http://www.gnu.org/licenses/>.
+ along with topiary.  If not, see <http://www.gnu.org/licenses/>.
 
  Copyright 2013 Paul Hewlett, phewlett76@gmail.com
 
@@ -73,18 +73,18 @@ nonvoluntary_ctxt_switches:	399
 #include "modules.h"
 
 static int
-proc_pid_status_normalize(_LNXPROC_BASE_T *base)
+proc_pid_status_normalize(_TOPIARY_BASE_T *base)
 {
-    _LNXPROC_BASE_DATA_T *data = base->current;
-    _LNXPROC_RESULTS_T *results = data->results;
-    _LNXPROC_ARRAY_T *array = data->array;
-    _LNXPROC_VECTOR_T *vector = array->vector;
+    _TOPIARY_BASE_DATA_T *data = base->current;
+    _TOPIARY_RESULTS_T *results = data->results;
+    _TOPIARY_ARRAY_T *array = data->array;
+    _TOPIARY_VECTOR_T *vector = array->vector;
 
     size_t npids = vector->length;
 
-    _LNXPROC_DEBUG("Current data is %d at %p\n", data->id, data);
-    _LNXPROC_DEBUG("Current results is at %p\n", results);
-    _LNXPROC_DEBUG("Npids %zd\n", npids);
+    _TOPIARY_DEBUG("Current data is %d at %p\n", data->id, data);
+    _TOPIARY_DEBUG("Current results is at %p\n", results);
+    _TOPIARY_DEBUG("Npids %zd\n", npids);
     char ****values = (char ****) vector->values;
 
     int i, j, k;
@@ -94,7 +94,7 @@ proc_pid_status_normalize(_LNXPROC_BASE_T *base)
 
     STRLCAT(hash, "/", n1, sizeof(hash));
 
-    _lnxproc_results_init(results, npids);
+    _topiary_results_init(results, npids);
     for (i = 0; i < npids; i++) {
         char ***value1 = (char ***) values[i];
         char *pidkey = value1[0][0];
@@ -107,11 +107,11 @@ proc_pid_status_normalize(_LNXPROC_BASE_T *base)
         STRLCAT(hash, pidkey, n2, sizeof(hash));
         STRLCAT(hash, "/", n2, sizeof(hash));
 
-        _LNXPROC_VECTOR_T *child = vector->children[i];
+        _TOPIARY_VECTOR_T *child = vector->children[i];
         size_t nrows = child->length;
 
-        _LNXPROC_DEBUG("%d:pidkey '%s'\n", i, pidkey);
-        _LNXPROC_DEBUG("%d:nrows = %zd\n", i, nrows);
+        _TOPIARY_DEBUG("%d:pidkey '%s'\n", i, pidkey);
+        _TOPIARY_DEBUG("%d:nrows = %zd\n", i, nrows);
         for (j = 1; j < nrows; j++) {
             char **value2 = (char **) value1[j];
 
@@ -119,12 +119,12 @@ proc_pid_status_normalize(_LNXPROC_BASE_T *base)
 
             if (!key)
                 continue;
-            _LNXPROC_DEBUG("%d,%d:key '%s'\n", i, j, key);
+            _TOPIARY_DEBUG("%d,%d:key '%s'\n", i, j, key);
 
-            _LNXPROC_VECTOR_T *grandchild = child->children[j];
+            _TOPIARY_VECTOR_T *grandchild = child->children[j];
             size_t ncols = grandchild->length;
 
-            _LNXPROC_DEBUG("%d,%d:ncols = %zd\n", i, j, ncols);
+            _TOPIARY_DEBUG("%d,%d:ncols = %zd\n", i, j, ncols);
 
             int n3 = n2;
 
@@ -136,13 +136,13 @@ proc_pid_status_normalize(_LNXPROC_BASE_T *base)
                 !strncmp(key, "Mems_allowed", 12) ||
                 !strncmp(key, "Cap", 3) ||
                 !strncmp(key, "Shd", 3) || !strncmp(key, "Sig", 3)) {
-                _LNXPROC_DEBUG("%d,%d:hash key '%s'\n", i, j, hash);
+                _TOPIARY_DEBUG("%d,%d:hash key '%s'\n", i, j, hash);
                 char *val = value2[1];
 
                 if (!val)
                     continue;
-                _LNXPROC_DEBUG("%d,%d:val '%s'\n", i, j, val);
-                _lnxproc_results_add_stringref(results, hash, val);
+                _TOPIARY_DEBUG("%d,%d:val '%s'\n", i, j, val);
+                _topiary_results_add_stringref(results, hash, val);
             }
             else if (!strcmp(key, "Tgid") ||
                      !strcmp(key, "TracerPid") ||
@@ -154,13 +154,13 @@ proc_pid_status_normalize(_LNXPROC_BASE_T *base)
                      !strcmp(key, "voluntary_ctxt_switches") ||
                      !strcmp(key, "nonvoluntary_ctxt_switches") ||
                      !strncmp(key, "Vm", 2)) {
-                _LNXPROC_DEBUG("%d,%d:hash key '%s'\n", i, j, hash);
+                _TOPIARY_DEBUG("%d,%d:hash key '%s'\n", i, j, hash);
                 char *val = value2[1];
 
                 if (!val)
                     continue;
-                _LNXPROC_DEBUG("%d,%d:val '%s'\n", i, j, val);
-                _lnxproc_results_add_int(results, hash, atoi(val));
+                _TOPIARY_DEBUG("%d,%d:val '%s'\n", i, j, val);
+                _topiary_results_add_int(results, hash, atoi(val));
             }
             else if (!strcmp(key, "Uid")) {
                 static const char *uidtitle[] =
@@ -170,13 +170,13 @@ proc_pid_status_normalize(_LNXPROC_BASE_T *base)
                     int n3 = n2;
 
                     STRLCAT(hash, uidtitle[k - 1], n3, sizeof(hash));
-                    _LNXPROC_DEBUG("%d,%d,%d:hash key '%s'\n", i, j, k, hash);
+                    _TOPIARY_DEBUG("%d,%d,%d:hash key '%s'\n", i, j, k, hash);
                     char *val = value2[k];
 
                     if (!val)
                         continue;
-                    _LNXPROC_DEBUG("%d,%d,%d:val '%s'\n", i, j, k, val);
-                    _lnxproc_results_add_int(results, hash, atoi(val));
+                    _TOPIARY_DEBUG("%d,%d,%d:val '%s'\n", i, j, k, val);
+                    _topiary_results_add_int(results, hash, atoi(val));
                 }
 
             }
@@ -188,13 +188,13 @@ proc_pid_status_normalize(_LNXPROC_BASE_T *base)
                     int n3 = n2;
 
                     STRLCAT(hash, gidtitle[k - 1], n3, sizeof(hash));
-                    _LNXPROC_DEBUG("%d,%d,%d:hash key '%s'\n", i, j, k, hash);
+                    _TOPIARY_DEBUG("%d,%d,%d:hash key '%s'\n", i, j, k, hash);
                     char *val = value2[k];
 
                     if (!val)
                         continue;
-                    _LNXPROC_DEBUG("%d,%d,%d:val '%s'\n", i, j, k, val);
-                    _lnxproc_results_add_int(results, hash, atoi(val));
+                    _TOPIARY_DEBUG("%d,%d,%d:val '%s'\n", i, j, k, val);
+                    _topiary_results_add_int(results, hash, atoi(val));
                 }
 
             }
@@ -204,13 +204,13 @@ proc_pid_status_normalize(_LNXPROC_BASE_T *base)
 
                     STRLCAT(hash, "/", n4, sizeof(hash));
                     INTCAT(hash, k - 1, n4, sizeof(hash));
-                    _LNXPROC_DEBUG("%d,%d,%d:hash key '%s'\n", i, j, k, hash);
+                    _TOPIARY_DEBUG("%d,%d,%d:hash key '%s'\n", i, j, k, hash);
                     char *val = value2[k];
 
                     if (!val)
                         continue;
-                    _LNXPROC_DEBUG("%d,%d,%d:val '%s'\n", i, j, k, val);
-                    _lnxproc_results_add_int(results, hash, atoi(val));
+                    _TOPIARY_DEBUG("%d,%d,%d:val '%s'\n", i, j, k, val);
+                    _topiary_results_add_int(results, hash, atoi(val));
                 }
 
             }
@@ -222,45 +222,45 @@ proc_pid_status_normalize(_LNXPROC_BASE_T *base)
                     STRLCAT(hash, "/", n4, sizeof(hash));
                     INTCAT(hash, k - 1, n4, sizeof(hash));
 
-                    _LNXPROC_DEBUG("%d,%d,%d:WARN hash key '%s'\n", i, j, k,
+                    _TOPIARY_DEBUG("%d,%d,%d:WARN hash key '%s'\n", i, j, k,
                                    hash);
 
                     char *val = value2[k];
 
                     if (!val)
                         continue;
-                    _LNXPROC_DEBUG("%d,%d,%d:WARN val '%s'\n", i, j, k, val);
-                    //_lnxproc_results_add_stringref(results, buf, val);
+                    _TOPIARY_DEBUG("%d,%d,%d:WARN val '%s'\n", i, j, k, val);
+                    //_topiary_results_add_stringref(results, buf, val);
                 }
             }
         }
     }
-    return LNXPROC_OK;
+    return TOPIARY_OK;
 }
 
 int
-_lnxproc_proc_pid_status_new(_LNXPROC_BASE_T **base, LNXPROC_OPT_T *optional)
+_topiary_proc_pid_status_new(_TOPIARY_BASE_T **base, TOPIARY_OPT_T *optional)
 {
 
-    _LNXPROC_LIMITS_T *limits = NULL;
-    int ret = _lnxproc_limits_new(&limits, 3);
+    _TOPIARY_LIMITS_T *limits = NULL;
+    int ret = _topiary_limits_new(&limits, 3);
 
     if (ret) {
         return ret;
     }
-    ret = _lnxproc_limits_set(limits, 0, 9, "\f", 1);   /* row delimiters (per pid) */
+    ret = _topiary_limits_set(limits, 0, 9, "\f", 1);   /* row delimiters (per pid) */
     if (ret) {
-        _LNXPROC_LIMITS_FREE(limits);
+        _TOPIARY_LIMITS_FREE(limits);
         return ret;
     }
-    ret = _lnxproc_limits_set(limits, 1, 2, "\n", 1);   /* column delimiter */
+    ret = _topiary_limits_set(limits, 1, 2, "\n", 1);   /* column delimiter */
     if (ret) {
-        _LNXPROC_LIMITS_FREE(limits);
+        _TOPIARY_LIMITS_FREE(limits);
         return ret;
     }
-    ret = _lnxproc_limits_set(limits, 2, 2, " \t:", 3);
+    ret = _topiary_limits_set(limits, 2, 2, " \t:", 3);
     if (ret) {
-        _LNXPROC_LIMITS_FREE(limits);
+        _TOPIARY_LIMITS_FREE(limits);
         return ret;
     }
 
@@ -277,14 +277,14 @@ _lnxproc_proc_pid_status_new(_LNXPROC_BASE_T **base, LNXPROC_OPT_T *optional)
     char *filesuffix = "status";
 
     ret =
-        _lnxproc_base_new(base, "proc_pid_status", _LNXPROC_BASE_TYPE_VANILLA,
+        _topiary_base_new(base, "proc_pid_status", _TOPIARY_BASE_TYPE_VANILLA,
                           NULL, proc_pid_status_normalize, NULL, 256, limits);
     if (!ret) {
-        _lnxproc_base_set_fileprefix(*base, fileprefix);
-        _lnxproc_base_set_fileglob(*base, fileglob);
-        _lnxproc_base_set_filesuffix(*base, filesuffix);
+        _topiary_base_set_fileprefix(*base, fileprefix);
+        _topiary_base_set_fileglob(*base, fileglob);
+        _topiary_base_set_filesuffix(*base, filesuffix);
     }
-    _LNXPROC_LIMITS_FREE(limits);
+    _TOPIARY_LIMITS_FREE(limits);
     return ret;
 }
 
