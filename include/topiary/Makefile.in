@@ -7,6 +7,9 @@ VPATH = @srcdir@
 package = @PACKAGE_NAME@
 prefix = @prefix@
 includedir = @includedir@
+
+INSTALL = @INSTALL@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
 #-----------------------------------------------------------------------
 INCDIR = $(includedir)/$(package)
 HDRS = error.h interface.h $(package).h opt.h print.h util.h
@@ -17,8 +20,8 @@ clean:
 	-rm -f x y z *~
 
 install:
-	install -d $(DESTDIR)$(INCDIR)
-	install -m 0755 $(HDRS) $(DESTDIR)$(INCDIR)
+	$(INSTALL) -d $(DESTDIR)$(INCDIR)
+	$(INSTALL_SCRIPT) -m 0644 $(HDRS) $(DESTDIR)$(INCDIR)
 
 uninstall:
 	-cd $(DESTDIR)$(includedir) && rm -rf $(package)

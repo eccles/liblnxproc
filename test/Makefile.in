@@ -7,6 +7,9 @@ VPATH = @srcdir@
 package = @PACKAGE_NAME@
 exec_prefix = @exec_prefix@
 bindir = @bindir@
+
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
 #---------------------------------------------------------------------
 TSKS=$(package) $(package)-dbg $(package)-prf
 SRCS=$(package).c
@@ -24,8 +27,8 @@ LDFLAGSPRF=../src/lib$(package)-prf.a -pg
 all: $(TSKS)
 
 install:
-	install -d $(DESTDIR)$(bindir)
-	install -m 0755 $(TSKS) $(DESTDIR)$(bindir)
+	$(INSTALL) -d $(DESTDIR)$(bindir)
+	$(INSTALL_PROGRAM) -m 0755 $(TSKS) $(DESTDIR)$(bindir)
 
 uninstall:
 	-cd $(DESTDIR)$(bindir) && rm -f $(TSKS)

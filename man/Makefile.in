@@ -8,13 +8,15 @@ prefix = @prefix@
 datarootdir = @datarootdir@
 mandir = @mandir@
 man3dir = @mandir@/man3
+
+INSTALL = @INSTALL@
 #-------------------------------------------------------------------------------
 
 MANS = topiary.3 topiary_free.3 topiary_new.3 topiary_performance.3 topiary_print.3 topiary_set.3
 all clean:
 
 install:
-	install -d $(DESTDIR)$(man3dir)
+	$(INSTALL) -d $(DESTDIR)$(man3dir)
 	for d in $(MANS); do ( gzip -9 -c $$d > $(DESTDIR)$(man3dir)/$$d.gz ); done;
 
 uninstall:

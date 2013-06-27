@@ -7,6 +7,9 @@ VPATH = @srcdir@
 package = @PACKAGE_NAME@
 exec_prefix = @exec_prefix@
 libdir = @libdir@
+
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
 #-----------------------------------------------------------------------
 SYSHDRS=stdlib.h
 FUNCHDRS=limit_chr.h strlcpy.h memdup.h val2str.h allocate.h reference.h io.h
@@ -70,10 +73,10 @@ all: $(BIN) $(BIN)-dbg $(BIN)-prf
 	for d in $(DIRS); do (cd $$d; $(MAKE) $@ ); done
 
 install:
-	install -d $(DESTDIR)$(libdir)
-	install -m 0755 $(LIB).so $(DESTDIR)$(libdir)
-	install -m 0755 $(LIB)-dbg.so $(DESTDIR)$(libdir)
-	install -m 0755 $(LIB)-prf.a $(DESTDIR)$(libdir)
+	$(INSTALL) -d $(DESTDIR)$(libdir)
+	$(INSTALL_PROGRAM) -m 0755 $(LIB).so $(DESTDIR)$(libdir)
+	$(INSTALL_PROGRAM) -m 0755 $(LIB)-dbg.so $(DESTDIR)$(libdir)
+	$(INSTALL_PROGRAM) -m 0755 $(LIB)-prf.a $(DESTDIR)$(libdir)
 
 uninstall:
 	-cd $(DESTDIR)$(libdir) && rm -f $(LIB).so $(LIB)-dbg.so $(LIB)-prf.a
