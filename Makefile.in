@@ -1,6 +1,9 @@
 #--------------------------------------------------------------------
 # @configure_input@
 #--------------------------------------------------------------------
+srcdir = @srcdir@
+VPATH = @srcdir@
+
 package = @PACKAGE_NAME@
 version = @PACKAGE_VERSION@
 tarname = @PACKAGE_TARNAME@
@@ -43,33 +46,33 @@ $(distdir).tar.gz: $(distdir)
 
 $(distdir)/$(SRCDIR):
 	mkdir -p $@
-	cp $(SRCDIR)/Makefile.in $@
-	cp $(SRCDIR)/*.[ch] $@
-	cp $(SRCDIR)/*.sh $@
+	cp $(srcdir)/$(SRCDIR)/Makefile.in $@
+	cp $(srcdir)/$(SRCDIR)/*.[ch] $@
+	cp $(srcdir)/$(SRCDIR)/*.sh $@
 
 $(distdir)/$(TESTDIR):
 	mkdir -p $@
-	cp $(TESTDIR)/Makefile.in $@
-	cp $(TESTDIR)/*.c $@
-	cp $(TESTDIR)/*.sh $@
-	cp $(TESTDIR)/testdata $@
-	cp $(TESTDIR)/testoutput $@
-	for d in $(DATADIR); do (cp -r $(TESTDIR)/$$d $@ ); done
+	cp $(srcdir)/$(TESTDIR)/Makefile.in $@
+	cp $(srcdir)/$(TESTDIR)/*.c $@
+	cp $(srcdir)/$(TESTDIR)/*.sh $@
+	cp $(srcdir)/$(TESTDIR)/testdata $@
+	cp $(srcdir)/$(TESTDIR)/testoutput $@
+	for d in $(DATADIR); do (cp -r $(srcdir)/$(TESTDIR)/$$d $@ ); done
 
 $(distdir)/$(INCDIR):
 	mkdir -p $@
-	cp $(INCDIR)/Makefile.in $@
-	cp $(INCDIR)/*.h $@
+	cp $(srcdir)/$(INCDIR)/Makefile.in $@
+	cp $(srcdir)/$(INCDIR)/*.h $@
 
 $(distdir)/$(HDRDIR):
 	mkdir -p $@
-	cp $(HDRDIR)/Makefile.in $@
-	cp $(HDRDIR)/*.h $@
+	cp $(srcdir)/$(HDRDIR)/Makefile.in $@
+	cp $(srcdir)/$(HDRDIR)/*.h $@
 
 $(distdir)/$(MANDIR):
 	mkdir -p $@
-	cp $(HDRDIR)/Makefile.in $@
-	cp $(MANDIR)/*.3 $@
+	cp $(srcdir)/$(MANDIR)/Makefile.in $@
+	cp $(srcdir)/$(MANDIR)/*.3 $@
 
 $(distdir): FORCE \
             $(distdir)/$(SRCDIR)\
@@ -78,7 +81,7 @@ $(distdir): FORCE \
             $(distdir)/$(INCDIR)\
             $(distdir)/$(HDRDIR)
 	mkdir -p $@
-	cp Makefile.in $(FILES) $(SCRIPTS) $@
+	for d in Makefile.in $(FILES) $(SCRIPTS); do (cp $(srcdir)/$$d $@ ); done
 
 FORCE:
 	-rm $(distdir).tar.gz >/dev/null 2>&1

@@ -1,6 +1,9 @@
 #-----------------------------------------------------------------------
 # @configure_input@
 #-----------------------------------------------------------------------
+srcdir = @srcdir@
+VPATH = @srcdir@
+
 package = @PACKAGE_NAME@
 prefix = @prefix@
 includedir = @includedir@

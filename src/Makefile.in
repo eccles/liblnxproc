@@ -1,6 +1,9 @@
 #-----------------------------------------------------------------------
 # @configure_input@
 #-----------------------------------------------------------------------
+srcdir = @srcdir@
+VPATH = @srcdir@
+
 package = @PACKAGE_NAME@
 exec_prefix = @exec_prefix@
 libdir = @libdir@
@@ -39,7 +42,7 @@ BIN=test-$(package)
 CCFLAGSD=-DDEBUG=1 -g
 CCFLAGSP=-pg -g
 CCFLAGSO=-O2
-CCFLAGS1=-I../include -Wall -Werror
+CCFLAGS1=-I$(srcdir)/../include -Wall -Werror
 CCFLAGS2=$(CCFLAGS1) -fpic
 #CCFLAGS=-g -fpic -I. -Wall
 LDFLAGS1=-L. -l$(package)

@@ -1,6 +1,9 @@
 #---------------------------------------------------------------------
 # @configure_input@
 #---------------------------------------------------------------------
+srcdir = @srcdir@
+VPATH = @srcdir@
+
 package = @PACKAGE_NAME@
 exec_prefix = @exec_prefix@
 bindir = @bindir@
@@ -11,9 +14,9 @@ SHS=$(package).sh
 #---------------------------------------------------------------------
 
 #CC=gcc
-CCFLAGS=-O2 -I../include -Wall -Winline -Werror
-CCFLAGSDBG=-g -I../include -Wall -Winline -Werror
-CCFLAGSPRF=-pg -g -I../include -Wall -Winline -Werror
+CCFLAGS=-O2 -I$(srcdir)/../include -Wall -Winline -Werror
+CCFLAGSDBG=-g -I$(srcdir)/../include -Wall -Winline -Werror
+CCFLAGSPRF=-pg -g -I$(srcdir)/../include -Wall -Winline -Werror
 LDFLAGS=-L../src -l$(package)
 LDFLAGSDBG=-L../src -l$(package)-dbg
 LDFLAGSPRF=../src/lib$(package)-prf.a -pg

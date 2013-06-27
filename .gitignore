@@ -35,3 +35,6 @@ core*
 
 # generated Makefiles
 Makefile
+
+# separate build directories
+build
