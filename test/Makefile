@@ -1,10 +1,11 @@
 package ?= topiary
-bindir ? = $(exec_prefix)/bin
+bindir ?= $(exec_prefix)/bin
+
 TSKS=$(package) $(package)-dbg $(package)-prf
 SRCS=$(package).c
 SHS=$(package).sh
 
-CC=gcc
+#CC=gcc
 CCFLAGS=-O2 -I../include -Wall -Winline -Werror
 CCFLAGSDBG=-g -I../include -Wall -Winline -Werror
 CCFLAGSPRF=-pg -g -I../include -Wall -Winline -Werror

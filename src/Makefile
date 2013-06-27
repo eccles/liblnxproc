@@ -32,7 +32,7 @@ BIN=test-$(package)
 
 .SUFFIXES: .c .o .so
 
-CC=gcc
+#CC=gcc
 CCFLAGSD=-DDEBUG=1 -g
 CCFLAGSP=-pg -g
 CCFLAGSO=-O2
