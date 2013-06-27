@@ -1,3 +1,4 @@
+
 /*
  * This file is part of topiary.
  *
@@ -18,40 +19,18 @@
  *
  */
 
-#ifndef TOPIARY_ALLOCATE_H
-#define TOPIARY_ALLOCATE_H 1
+#ifndef TOPIARY_STDLIB_H
+#define TOPIARY_STDLIB_H 1
 
 #include "config.h"
 
-#include "stdlib.h"             //calloc,realloc,free
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+#else
+#error This code requires stdlib.h
+#endif
 
-/*-----------------------------------------------------------------------------
- * Memory allocation
- */
-
-static inline void *
-Allocate(void *p, size_t size)
-{
-    if (p) {
-        p = realloc(p, size);
-    }
-    else {
-        p = calloc(1, size);
-    }
-    return p;
-}
-
-static inline void *
-Destroy(void *p)
-{
-    if (p)
-        free(p);
-    return NULL;
-}
-
-#define DESTROY(p) p = Destroy(p)
-
-#endif                          // TOPIARY_ALLOCATE_H
+#endif                          // TOPIARY_STDLIB_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
  */

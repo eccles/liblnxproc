@@ -32,7 +32,7 @@ typical contents of /proc/partitions file::
 
 #include "config.h"
 
-#include <stdlib.h>
+#include "stdlib.h"
 #include <stdio.h>
 #include <string.h>
 

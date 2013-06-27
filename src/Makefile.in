@@ -8,6 +8,7 @@ package = @PACKAGE_NAME@
 exec_prefix = @exec_prefix@
 libdir = @libdir@
 #-----------------------------------------------------------------------
+SYSHDRS=stdlib.h
 FUNCHDRS=limit_chr.h strlcpy.h memdup.h val2str.h allocate.h reference.h io.h
 PUBBASEHDRS=$(package).h util.h error.h interface.h opt.h print.h
 PROCHDRS=modules.h

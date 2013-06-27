@@ -24,7 +24,7 @@ Typical contents of file /proc/sys/kernel/osrelease::
 
 #include "config.h"
 
-#include <stdlib.h>
+#include "stdlib.h"
 #include <string.h>
 
 #include "error_private.h"

@@ -24,7 +24,7 @@ BOOT_IMAGE=/vmlinuz-3.8.0-21-generic root=/dev/mapper/ubuntu-root ro quiet splas
 
 #include "config.h"
 
-#include <stdlib.h>
+#include "stdlib.h"
 #include <string.h>
 
 #include "strlcpy.h"

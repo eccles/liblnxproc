@@ -24,7 +24,7 @@
 #include "config.h"
 
 #include <stddef.h>             //offsetof
-#include <stdlib.h>             //calloc
+#include "stdlib.h"             //calloc
 
 /*-----------------------------------------------------------------------------
  * Reference counting

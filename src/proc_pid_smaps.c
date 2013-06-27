@@ -57,7 +57,7 @@ VmFlags: rd mr mw me dw ac
 
 #include <ctype.h>              // isupper
 #include <stdio.h>
-#include <stdlib.h>
+#include "stdlib.h"
 #include <string.h>
 
 #include "strlcpy.h"

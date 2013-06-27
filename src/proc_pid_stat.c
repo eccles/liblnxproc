@@ -111,7 +111,7 @@ Description::
 #include "config.h"
 
 #include <stdio.h>
-#include <stdlib.h>             //strtoul
+#include "stdlib.h"             //strtoul
 #include <string.h>
 
 #include "allocate.h"
