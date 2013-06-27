@@ -1,5 +1,6 @@
 package ?= topiary
-LIBDIR=$(prefix)/lib
+libdir ? = $(exec_prefix)/lib
+
 PUBHDIR=../include/$(package)
 FUNCHDRS=limit_chr.h strlcpy.h memdup.h val2str.h allocate.h reference.h io.h
 PUBBASEHDRS=$(package).h util.h error.h interface.h opt.h print.h
@@ -62,13 +63,13 @@ all: $(BIN) $(BIN)-dbg $(BIN)-prf
 	for d in $(DIRS); do (cd $$d; $(MAKE) $@ ); done
 
 install:
-	install -d $(LIBDIR)
-	install -m 0755 $(LIB).so $(LIBDIR)
-	install -m 0755 $(LIB)-dbg.so $(LIBDIR)
-	install -m 0755 $(LIB)-prf.a $(LIBDIR)
+	install -d $(libdir)
+	install -m 0755 $(LIB).so $(libdir)
+	install -m 0755 $(LIB)-dbg.so $(libdir)
+	install -m 0755 $(LIB)-prf.a $(libdir)
 
 uninstall:
-	-cd $(LIBDIR) && rm -f $(LIB).so $(LIB)-dbg.so $(LIB)-prf.a
+	-cd $(libdir) && rm -f $(LIB).so $(LIB)-dbg.so $(LIB)-prf.a
 
 $(LIB).so: $(OBJS)
 	$(CC) $(SOFLAGS) -o $@ $^

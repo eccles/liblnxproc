@@ -1,4 +1,5 @@
-INCDIR = $(prefix)/include/$(package)
+includedir ?= $(prefix)/include
+INCDIR = $(includedir)/$(package)
 HDRS = error.h interface.h $(package).h opt.h print.h util.h
 all clean:
 

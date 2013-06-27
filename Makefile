@@ -4,7 +4,21 @@ version = 0.0.1
 tarname = $(package)
 distdir = $(tarname)-$(version)
 prefix = /usr/local
+exec_prefix = $(prefix)
+bindir = $(exec_prefix)/bin
+datarootdir = $(prefix)/share
+includedir = $(prefix)/include
+libdir = $(exec_prefix)/lib
+mandir = $(datarootdir)/man
+man3dir = $(mandir)/man3
 
+export bindir
+export exec_prefix
+export datarootdir
+export includedir
+export libdir
+export mandir
+export man3dir
 export package
 export prefix
 
@@ -18,7 +32,7 @@ TESTDIR=test
 INCDIR=include
 HDRDIR=include/$(package)
 DATADIR=proc sys var
-DIRS=$(SRCDIR) $(TESTDIR) $(INCDIR)
+DIRS=$(MANDIR) $(SRCDIR) $(TESTDIR) $(INCDIR)
 all install uninstall:
 	for d in $(DIRS); do (cd $$d; $(MAKE) $@ ); done
 

@@ -1,5 +1,5 @@
 package ?= topiary
-BINDIR=$(prefix)/bin
+bindir ? = $(exec_prefix)/bin
 TSKS=$(package) $(package)-dbg $(package)-prf
 SRCS=$(package).c
 SHS=$(package).sh
@@ -15,11 +15,11 @@ LDFLAGSPRF=../src/lib$(package)-prf.a -pg
 all: $(TSKS)
 
 install:
-	install -d $(BINDIR)
-	install -m 0755 $(TSKS) $(BINDIR)
+	install -d $(bindir)
+	install -m 0755 $(TSKS) $(bindir)
 
 uninstall:
-	-cd $(BINDIR) && rm -f $(TSKS)
+	-cd $(bindir) && rm -f $(TSKS)
 
 $(package): $(package).c
 	$(CC) $(CCFLAGS) -o $@ $^ $(LDFLAGS)
