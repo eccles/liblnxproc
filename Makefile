@@ -11,6 +11,7 @@ includedir = $(prefix)/include
 libdir = $(exec_prefix)/lib
 mandir = $(datarootdir)/man
 man3dir = $(mandir)/man3
+sysconfdir = /etc
 
 export bindir
 export exec_prefix
@@ -21,6 +22,7 @@ export mandir
 export man3dir
 export package
 export prefix
+export sysconfdir
 
 #--------------------------------------------------------------------
 
