@@ -583,8 +583,9 @@ PACKAGE_TARNAME='topiary'
 PACKAGE_VERSION='0.0.1'
 PACKAGE_STRING='topiary 0.0.1'
 PACKAGE_BUGREPORT='phewlett76@gmail.com'
-PACKAGE_URL=''
+PACKAGE_URL='https://github.com/eccles/liblnxproc'
 
+ac_unique_file="include/topiary/topiary.h"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>
@@ -1306,6 +1307,7 @@ Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
 
 Report bugs to <phewlett76@gmail.com>.
+topiary home page: <https://github.com/eccles/liblnxproc>.
 _ACEOF
 ac_status=$?
 fi
@@ -2240,8 +2242,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 #
-# false setting? - comment out in the meantime
-#AC_CONFIG_SRCDIR([python/topiarymodule.c])
+
 ac_config_headers="$ac_config_headers config.h"
 
 
@@ -4426,7 +4427,8 @@ $config_files
 Configuration headers:
 $config_headers
 
-Report bugs to <phewlett76@gmail.com>."
+Report bugs to <phewlett76@gmail.com>.
+topiary home page: <https://github.com/eccles/liblnxproc>."
 
 _ACEOF
 cat >>$CONFIG_STATUS <<_ACEOF || ac_write_fail=1
@@ -5146,4 +5148,20 @@ if test -n "$ac_unrecognized_opts" && test "$enable_option_checking" != no; then
   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: unrecognized options: $ac_unrecognized_opts" >&5
 $as_echo "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
+
+
+echo \
+"-----------------------------------------------------------------------------
+${PACKAGE_NAME} Version ${PACKAGE_VERSION}
+
+Prefix: '${prefix}'
+Compiler: '${CC} ${CFLAGS}'
+
+Now type 'make [<target>]'
+
+where the optional <target> is:
+    all                 - build libraries,binaries
+    install             - install everything
+
+-----------------------------------------------------------------------------"
 

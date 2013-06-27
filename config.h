@@ -85,7 +85,7 @@
 #define PACKAGE_TARNAME "topiary"
 
 /* Define to the home page for this package. */
-#define PACKAGE_URL ""
+#define PACKAGE_URL "https://github.com/eccles/liblnxproc"
 
 /* Define to the version of this package. */
 #define PACKAGE_VERSION "0.0.1"

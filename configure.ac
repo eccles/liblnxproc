@@ -37,3 +37,19 @@ AC_CONFIG_FILES([Makefile
                  src/Makefile
                  test/Makefile])
 AC_OUTPUT
+
+echo \
+"-----------------------------------------------------------------------------
+${PACKAGE_NAME} Version ${PACKAGE_VERSION}
+
+Prefix: '${prefix}'
+Compiler: '${CC} ${CFLAGS}'
+
+Now type 'make @<:@<target>@:>@'
+
+where the optional <target> is:
+    all                 - build libraries,binaries
+    install             - install everything
+
+-----------------------------------------------------------------------------"
+
