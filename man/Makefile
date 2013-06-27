@@ -7,10 +7,10 @@ all clean:
 
 install:
 	install -d $(man3dir)
-	for d in $(MANS); do ( gzip -9 -c $$d > $(man3dir)/$$d.gz ); done;
+	for d in $(MANS); do ( gzip -9 -c $$d > $(DESTDIR)$(man3dir)/$$d.gz ); done;
 
 uninstall:
-	for d in $(MANS); do ( rm -rf $(man3dir)/$$d.gz ); done;
+	for d in $(MANS); do ( rm -f $(DESTDIR)$(man3dir)/$$d.gz ); done;
 
 .PHONY: all clean install uninstall
 

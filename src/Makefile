@@ -63,13 +63,13 @@ all: $(BIN) $(BIN)-dbg $(BIN)-prf
 	for d in $(DIRS); do (cd $$d; $(MAKE) $@ ); done
 
 install:
-	install -d $(libdir)
-	install -m 0755 $(LIB).so $(libdir)
-	install -m 0755 $(LIB)-dbg.so $(libdir)
-	install -m 0755 $(LIB)-prf.a $(libdir)
+	install -d $(DESTDIR)$(libdir)
+	install -m 0755 $(LIB).so $(DESTDIR)$(libdir)
+	install -m 0755 $(LIB)-dbg.so $(DESTDIR)$(libdir)
+	install -m 0755 $(LIB)-prf.a $(DESTDIR)$(libdir)
 
 uninstall:
-	-cd $(libdir) && rm -f $(LIB).so $(LIB)-dbg.so $(LIB)-prf.a
+	-cd $(DESTDIR)$(libdir) && rm -f $(LIB).so $(LIB)-dbg.so $(LIB)-prf.a
 
 $(LIB).so: $(OBJS)
 	$(CC) $(SOFLAGS) -o $@ $^

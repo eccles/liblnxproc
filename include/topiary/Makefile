@@ -4,11 +4,11 @@ HDRS = error.h interface.h $(package).h opt.h print.h util.h
 all clean:
 
 install:
-	install -d $(INCDIR)
-	install -m 0755 $(HDRS) $(INCDIR)
+	install -d $(DESTDIR)$(INCDIR)
+	install -m 0755 $(HDRS) $(DESTDIR)$(INCDIR)
 
 uninstall:
-	-cd $(INCDIR) && rm -rf $(INCDIR)
+	-cd $(DESTDIR)$(includedir) && rm -rf $(package)
 
 .PHONY: all clean install uninstall
 
