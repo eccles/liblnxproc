@@ -15,11 +15,11 @@ LDFLAGSPRF=../src/lib$(package)-prf.a -pg
 all: $(TSKS)
 
 install:
-	install -d $(bindir)
-	install -m 0755 $(TSKS) $(bindir)
+	install -d $(DESTDIR)$(bindir)
+	install -m 0755 $(TSKS) $(DESTDIR)$(bindir)
 
 uninstall:
-	-cd $(bindir) && rm -f $(TSKS)
+	-cd $(DESTDIR)$(bindir) && rm -f $(TSKS)
 
 $(package): $(package).c
 	$(CC) $(CCFLAGS) -o $@ $^ $(LDFLAGS)
