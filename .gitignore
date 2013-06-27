@@ -33,3 +33,5 @@ core*
 *.tar
 *.tar.gz
 
+# generated Makefiles
+Makefile

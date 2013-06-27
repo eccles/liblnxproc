@@ -1,0 +1,31 @@
+#-----------------------------------------------------------------------
+# @configure_input@
+#-----------------------------------------------------------------------
+package = @PACKAGE_NAME@
+prefix = @prefix@
+includedir = @includedir@
+#-----------------------------------------------------------------------
+INCDIR = $(includedir)/$(package)
+HDRS = error.h interface.h $(package).h opt.h print.h util.h
+
+all:
+
+clean:
+	-rm -f x y z *~
+
+install:
+	install -d $(DESTDIR)$(INCDIR)
+	install -m 0755 $(HDRS) $(DESTDIR)$(INCDIR)
+
+uninstall:
+	-cd $(DESTDIR)$(includedir) && rm -rf $(package)
+
+Makefile: Makefile.in ../../config.status
+	cd ../.. && ./config.status $@
+
+../../config.status: ../../configure
+	cd ../.. && ./config.status --recheck
+
+.PHONY: all clean install uninstall
+
+# vim: noexpandtab

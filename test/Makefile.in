@@ -1,9 +1,14 @@
-package ?= topiary
-bindir ?= $(exec_prefix)/bin
-
+#---------------------------------------------------------------------
+# @configure_input@
+#---------------------------------------------------------------------
+package = @PACKAGE_NAME@
+exec_prefix = @exec_prefix@
+bindir = @bindir@
+#---------------------------------------------------------------------
 TSKS=$(package) $(package)-dbg $(package)-prf
 SRCS=$(package).c
 SHS=$(package).sh
+#---------------------------------------------------------------------
 
 #CC=gcc
 CCFLAGS=-O2 -I../include -Wall -Winline -Werror
@@ -33,6 +38,12 @@ $(package)-prf: $(package).c
 
 clean:
 	rm -f $(TSKS) gmon.out *~ *.orig core* vgcore* x y z
+
+Makefile: Makefile.in ../config.status
+	cd .. && ./config.status $@
+
+../config.status: ../configure
+	cd .. && ./config.status --recheck
 
 .PHONY: all clean install uninstall
 

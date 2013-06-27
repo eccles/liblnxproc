@@ -1,7 +1,10 @@
-package ?= topiary
-libdir ? = $(exec_prefix)/lib
-
-PUBHDIR=../include/$(package)
+#-----------------------------------------------------------------------
+# @configure_input@
+#-----------------------------------------------------------------------
+package = @PACKAGE_NAME@
+exec_prefix = @exec_prefix@
+libdir = @libdir@
+#-----------------------------------------------------------------------
 FUNCHDRS=limit_chr.h strlcpy.h memdup.h val2str.h allocate.h reference.h io.h
 PUBBASEHDRS=$(package).h util.h error.h interface.h opt.h print.h
 PROCHDRS=modules.h
@@ -90,8 +93,13 @@ $(BIN)-prf: $(BIN).c $(LIB)-prf.a
 	$(CC) $(CCFLAGSP) $(CCFLAGS1) -o $@ $^ $(LDFLAGS3)
 
 clean:
-	for d in $(PUBHDIR); do (cd $$d; rm -f *~ ); done
 	rm -f $(BIN) $(BIN)-dbg $(BIN)-prf *.a *.o *.so *~ *.orig core* vgcore* x y z X Y
+
+Makefile: Makefile.in ../config.status
+	cd .. && ./config.status $@
+
+../config.status: ../configure
+	cd .. && ./config.status --recheck
 
 .PHONY: all clean install uninstall
 

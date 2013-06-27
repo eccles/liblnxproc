@@ -1,33 +1,22 @@
 #--------------------------------------------------------------------
-package = topiary
-version = 0.0.1
-tarname = $(package)
+# @configure_input@
+#--------------------------------------------------------------------
+package = @PACKAGE_NAME@
+version = @PACKAGE_VERSION@
+tarname = @PACKAGE_TARNAME@
 distdir = $(tarname)-$(version)
-prefix = /usr/local
-exec_prefix = $(prefix)
-bindir = $(exec_prefix)/bin
-datarootdir = $(prefix)/share
-includedir = $(prefix)/include
-libdir = $(exec_prefix)/lib
-mandir = $(datarootdir)/man
-man3dir = $(mandir)/man3
-sysconfdir = /etc
-
-export bindir
-export exec_prefix
-export datarootdir
-export includedir
-export libdir
-export mandir
-export man3dir
-export package
-export prefix
-export sysconfdir
-
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+bindir = @bindir@
+datarootdir = @datarootdir@
+includedir = @includedir@
+libdir = @libdir@
+mandir = @mandir@
+sysconfdir = @sysconfdir@
 #--------------------------------------------------------------------
 
-FILES=CREDITS LICENSE.txt NOTES README README.md TODO
-SCRIPTS=format.sh genchanges.sh splint.conf submit.sh
+FILES=CREDITS LICENSE.txt NOTES README README.md TODO configure.ac
+SCRIPTS=format.sh genchanges.sh splint.conf submit.sh configure
 MANDIR=man
 SRCDIR=src
 TESTDIR=test
@@ -54,13 +43,13 @@ $(distdir).tar.gz: $(distdir)
 
 $(distdir)/$(SRCDIR):
 	mkdir -p $@
-	cp $(SRCDIR)/Makefile $@
+	cp $(SRCDIR)/Makefile.in $@
 	cp $(SRCDIR)/*.[ch] $@
 	cp $(SRCDIR)/*.sh $@
 
 $(distdir)/$(TESTDIR):
 	mkdir -p $@
-	cp $(TESTDIR)/Makefile $@
+	cp $(TESTDIR)/Makefile.in $@
 	cp $(TESTDIR)/*.c $@
 	cp $(TESTDIR)/*.sh $@
 	cp $(TESTDIR)/testdata $@
@@ -69,17 +58,18 @@ $(distdir)/$(TESTDIR):
 
 $(distdir)/$(INCDIR):
 	mkdir -p $@
-	cp $(INCDIR)/Makefile $@
+	cp $(INCDIR)/Makefile.in $@
 	cp $(INCDIR)/*.h $@
 
 $(distdir)/$(HDRDIR):
 	mkdir -p $@
-	cp $(HDRDIR)/Makefile $@
+	cp $(HDRDIR)/Makefile.in $@
 	cp $(HDRDIR)/*.h $@
 
 $(distdir)/$(MANDIR):
 	mkdir -p $@
-	cp $(MANDIR)/* $@
+	cp $(HDRDIR)/Makefile.in $@
+	cp $(MANDIR)/*.3 $@
 
 $(distdir): FORCE \
             $(distdir)/$(SRCDIR)\
@@ -88,7 +78,7 @@ $(distdir): FORCE \
             $(distdir)/$(INCDIR)\
             $(distdir)/$(HDRDIR)
 	mkdir -p $@
-	cp Makefile $(FILES) $(SCRIPTS) $@
+	cp Makefile.in $(FILES) $(SCRIPTS) $@
 
 FORCE:
 	-rm $(distdir).tar.gz >/dev/null 2>&1
@@ -96,6 +86,7 @@ FORCE:
 
 distcheck: $(distdir).tar.gz
 	gzip -cd $(distdir).tar.gz | tar xvf -
+	cd $(distdir) && ./configure
 	cd $(distdir) && $(MAKE) all
 	cd $(distdir) && $(MAKE) check
 	cd $(distdir) && $(MAKE) DESTDIR=$${PWD}/_inst install
@@ -108,8 +99,13 @@ distcheck: $(distdir).tar.gz
 	cd $(distdir) && $(MAKE) clean
 	rm -rf $(distdir)
 	@echo "*** Package $(distdir).tar.gz is ready for distribution ***"
-
 	
+Makefile: Makefile.in config.status
+	./config.status $@
+
+config.status: configure
+	./config.status --recheck
+
 .PHONY: FORCE all check clean dist distcheck install uninstall
 
 # vim: noexpandtab
