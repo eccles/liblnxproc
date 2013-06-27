@@ -21,6 +21,8 @@
 #ifndef TOPIARY_IO_H
 #define TOPIARY_IO_H 1
 
+#include "config.h"
+
 #include <string.h>             //strlen()
 #include <unistd.h>             //write()
 

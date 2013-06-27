@@ -21,6 +21,8 @@
 #ifndef TOPIARY_LIMITS_CHR_H
 #define TOPIARY_LIMITS_CHR_H 1
 
+#include "config.h"
+
 #include "limits_private.h"
 
 /*

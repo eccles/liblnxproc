@@ -18,6 +18,8 @@ This file is part of topiary.
 
 */
 
+#include "config.h"
+
 #include <ctype.h>              //isdigit
 #include <stdio.h>
 #include <stdlib.h>

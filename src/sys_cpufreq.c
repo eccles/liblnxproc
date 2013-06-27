@@ -25,6 +25,8 @@ This file is part of topiary.
 '''
 */
 
+#include "config.h"
+
 #include <stdlib.h>
 #include <string.h>
 

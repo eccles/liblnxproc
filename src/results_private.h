@@ -21,6 +21,8 @@
 #ifndef TOPIARY_RESULTS_PRIVATE_H
 #define TOPIARY_RESULTS_PRIVATE_H 1
 
+#include "config.h"
+
 #include <sys/time.h>           // struct timeval
 
 #include "print_private.h"

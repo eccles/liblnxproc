@@ -18,6 +18,8 @@ This file is part of topiary.
 
 */
 
+#include "config.h"
+
 #include <sys/types.h>          // getpid()
 #include <unistd.h>             // sleep(),getpid()
 

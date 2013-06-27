@@ -18,6 +18,8 @@
  *
  */
 
+#include "config.h"
+
 #include <errno.h>              //errno
 #include <fcntl.h>              //open
 #include <limits.h>             //SSIZE_MAX

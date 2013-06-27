@@ -21,6 +21,8 @@
 #ifndef TOPIARY_ALLOCATE_H
 #define TOPIARY_ALLOCATE_H 1
 
+#include "config.h"
+
 #include <stdlib.h>             //calloc,realloc,free
 
 /*-----------------------------------------------------------------------------

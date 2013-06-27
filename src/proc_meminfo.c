@@ -18,6 +18,8 @@ This file is part of topiary.
 
 */
 
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>             //strtoul()
 #include <string.h>

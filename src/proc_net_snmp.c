@@ -33,6 +33,8 @@ UdpLite: 0 0 0 0 0 0
 
 */
 
+#include "config.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

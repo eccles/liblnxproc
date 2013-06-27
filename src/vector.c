@@ -21,6 +21,8 @@
 /* This file is a re-implementation of the 'list' type from Python
  */
 
+#include "config.h"
+
 #include <stdio.h>              //printf
 #include <string.h>             //memset
 

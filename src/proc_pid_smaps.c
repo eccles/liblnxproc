@@ -53,6 +53,8 @@ VmFlags: rd mr mw me dw ac
 ......
 */
 
+#include "config.h"
+
 #include <ctype.h>              // isupper
 #include <stdio.h>
 #include <stdlib.h>

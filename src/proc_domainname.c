@@ -28,6 +28,8 @@ Typical contents of file /proc/sys/kernel/domainname::
 
 */
 
+#include "config.h"
+
 #include <stdlib.h>
 #include <string.h>
 

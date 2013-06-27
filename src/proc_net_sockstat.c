@@ -27,6 +27,8 @@ FRAG: inuse 0 memory 0
 
 */
 
+#include "config.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

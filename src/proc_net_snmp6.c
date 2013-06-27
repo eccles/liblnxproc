@@ -97,6 +97,8 @@ UdpLite6RcvbufErrors            	0
 UdpLite6SndbufErrors            	0
 */
 
+#include "config.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

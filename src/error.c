@@ -18,6 +18,8 @@
  *
  */
 
+#include "config.h"
+
 #include <stdio.h>              //printf
 #include <string.h>             //strerror_r
 

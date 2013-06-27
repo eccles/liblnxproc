@@ -61,6 +61,8 @@ tmpfs /var/lib/schroot/mount/quantal_i386-2067f996-115f-4d50-8c79-0ce81663e317/t
 
 */
 
+#include "config.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

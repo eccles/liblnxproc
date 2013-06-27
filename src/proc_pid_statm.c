@@ -34,6 +34,8 @@ This file is part of topiary.
 5899 1235 471 225 0 761 0
 */
 
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

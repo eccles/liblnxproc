@@ -26,6 +26,8 @@ typical contents of /proc/net/rpc/nfs file::
 
 */
 
+#include "config.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

@@ -18,8 +18,8 @@ mandir = @mandir@
 sysconfdir = @sysconfdir@
 #--------------------------------------------------------------------
 
-FILES=CREDITS LICENSE.txt NOTES README README.md TODO configure.ac
-SCRIPTS=format.sh genchanges.sh splint.conf submit.sh configure
+FILES=CREDITS LICENSE.txt NOTES README README.md TODO configure.ac config.h.in
+SCRIPTS=format.sh genchanges.sh splint.conf submit.sh configure install-sh
 MANDIR=man
 SRCDIR=src
 TESTDIR=test

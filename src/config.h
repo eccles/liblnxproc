@@ -18,28 +18,12 @@
  *
  */
 
-#ifndef TOPIARY_MEMDUP_H
-#define TOPIARY_MEMDUP_H 1
+#ifndef TOPIARY_CONFIG_H
+#define TOPIARY_CONFIG_H 1
 
-#include "config.h"
+#include "../config.h"
 
-#include <string.h>             // memcpy
-
-static inline void *
-memdup(void *old, size_t len)
-{
-    void *ret = NULL;
-
-    if (old && len > 0) {
-        ret = calloc(1, len);
-        if (ret) {
-            memcpy(ret, old, len);
-        }
-    }
-    return ret;
-}
-
-#endif                          // TOPIARY_MEMDUP_H
+#endif                          // TOPIARY_CONFIG_H
 /*
  * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
  */

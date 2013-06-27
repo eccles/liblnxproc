@@ -18,6 +18,8 @@
  *
  */
 
+#include "config.h"
+
 #include <sys/time.h>           //gettimeofday
 #include <stdio.h>              //snprintf
 

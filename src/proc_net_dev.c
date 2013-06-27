@@ -31,6 +31,8 @@ virbr0:       0       0    0    0    0     0          0         0        0      
  vnet2: 25128174   82211    0    0    0     0          0         0 29883316  390887    0    0    0     0       0          0
 */
 
+#include "config.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

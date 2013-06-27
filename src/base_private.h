@@ -21,6 +21,8 @@
 #ifndef TOPIARY_BASE_PRIVATE_H
 #define TOPIARY_BASE_PRIVATE_H 1
 
+#include "config.h"
+
 #include <stddef.h>             // size_t
 
 #include "reference.h"

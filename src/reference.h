@@ -21,6 +21,8 @@
 #ifndef TOPIARY_REFERENCE_H
 #define TOPIARY_REFERENCE_H 1
 
+#include "config.h"
+
 #include <stddef.h>             //offsetof
 #include <stdlib.h>             //calloc
 

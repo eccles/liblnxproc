@@ -58,6 +58,8 @@ voluntary_ctxt_switches:	7876
 nonvoluntary_ctxt_switches:	399
 */
 
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

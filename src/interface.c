@@ -18,6 +18,8 @@
  *
  */
 
+#include "config.h"
+
 #include <string.h>             //memcpy
 
 #include "allocate.h"

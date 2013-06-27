@@ -18,6 +18,8 @@
  *
  */
 
+#include "config.h"
+
 #include <ctype.h>              //isdigit
 #include <unistd.h>             //sysconf
 

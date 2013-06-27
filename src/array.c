@@ -20,6 +20,7 @@
 
 /* This file is a re-implementation of the 'list' type from Python
  */
+#include "config.h"
 
 #include <string.h>             //memset
 

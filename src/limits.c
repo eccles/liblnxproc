@@ -18,6 +18,8 @@
  *
  */
 
+#include "config.h"
+
 #include <string.h>             //strdup
 
 #include "allocate.h"
