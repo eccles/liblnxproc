@@ -84,7 +84,7 @@ Typical contents of /proc/diskstats::
 #include "config.h"
 
 #include <stdio.h>
-#include "stdlib.h"
+#include "topiary_stdlib.h"
 #include <string.h>
 
 #include "reference.h"

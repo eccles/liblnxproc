@@ -1,0 +1,20 @@
+#------------------------------------------------------------------
+# @configure_input@
+#------------------------------------------------------------------
+srcdir = @srcdir@
+VPATH = @srcdir@
+
+package = @PACKAGE_NAME@
+#------------------------------------------------------------------
+all clean install uninstall:
+	cd $(package) && $(MAKE) $@
+
+Makefile: Makefile.in ../config.status
+	cd .. && ./config.status $@
+
+../config.status: ../configure
+	cd .. && ./config.status --recheck
+
+.PHONY: all clean install uninstall
+
+# vim: noexpandtab

@@ -23,7 +23,7 @@
 
 #include "config.h"
 
-#include "stdlib.h"             //calloc,realloc,free
+#include "topiary_stdlib.h"             //calloc,realloc,free
 
 /*-----------------------------------------------------------------------------
  * Memory allocation

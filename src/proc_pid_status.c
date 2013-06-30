@@ -61,7 +61,7 @@ nonvoluntary_ctxt_switches:	399
 #include "config.h"
 
 #include <stdio.h>
-#include "stdlib.h"
+#include "topiary_stdlib.h"
 #include <string.h>
 
 #include "strlcpy.h"

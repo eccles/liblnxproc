@@ -22,7 +22,7 @@ This file is part of topiary.
 
 #include "config.h"
 
-#include "stdlib.h"
+#include "topiary_stdlib.h"
 #include <string.h>
 
 #include "strlcpy.h"

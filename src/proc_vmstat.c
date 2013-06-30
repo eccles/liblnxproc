@@ -22,7 +22,7 @@ typical contents of /proc/vmstat file::
 
 #include "config.h"
 
-#include "stdlib.h"
+#include "topiary_stdlib.h"
 #include <stdio.h>
 #include <string.h>
 

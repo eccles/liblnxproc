@@ -27,10 +27,7 @@
 
 #include "print_private.h"
 
-#ifdef DEBUG
-#define HASH_DEBUG 1
-#endif
-#include "uthash.h"
+#include "topiary_uthash.h"
 
 #define _TOPIARY_RESULTS_TABLE_KEYLEN 48
 #define _TOPIARY_RESULTS_TABLE_VALLEN 32

@@ -5,6 +5,9 @@
    don't. */
 #define HAVE_DECL_STRERROR_R 1
 
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#define HAVE_DLFCN_H 1
+
 /* Define to 1 if you have the <fcntl.h> header file. */
 #define HAVE_FCNTL_H 1
 
@@ -72,6 +75,16 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
 
+/* Define to the sub-directory in which libtool stores uninstalled libraries.
+   */
+#define LT_OBJDIR ".libs/"
+
+/* Define to 1 if your C compiler doesn't accept -c and -o together. */
+/* #undef NO_MINUS_C_MINUS_O */
+
+/* Name of package */
+#define PACKAGE "topiary"
+
 /* Define to the address where bug reports for this package should be sent. */
 #define PACKAGE_BUGREPORT "phewlett76@gmail.com"
 
@@ -95,6 +108,9 @@
 
 /* Define to 1 if strerror_r returns char *. */
 /* #undef STRERROR_R_CHAR_P */
+
+/* Version number of package */
+#define VERSION "0.0.1"
 
 /* Define for Solaris 2.5.1 so the uint32_t typedef from <sys/synch.h>,
    <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the

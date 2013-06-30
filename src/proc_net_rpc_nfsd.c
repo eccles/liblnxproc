@@ -34,7 +34,7 @@ proc4ops 59 0 0 0 1 0 0 0 0 0 18 3 0 0 0 0 2 0 0 0 0 0 0 15 0 3 0 0 0 0 0 435 0 
 
 #include "config.h"
 
-#include "stdlib.h"
+#include "topiary_stdlib.h"
 #include <stdio.h>
 #include <string.h>
 

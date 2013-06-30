@@ -111,7 +111,7 @@ Description::
 #include "config.h"
 
 #include <stdio.h>
-#include "stdlib.h"             //strtoul
+#include "topiary_stdlib.h"             //strtoul
 #include <string.h>
 
 #include "allocate.h"
@@ -123,7 +123,7 @@ Description::
 #include "interface_private.h"
 #include "base_private.h"
 #include "modules.h"
-#include "uthash.h"
+#include "topiary_uthash.h"
 
 /*-----------------------------------------------------------------------------
  * list handlers - used to store lists of pid records

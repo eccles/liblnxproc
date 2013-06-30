@@ -41,4 +41,8 @@ build
 
 # autotools files
 configure.scan
+#compile
+#depcomp
+#install-sh
+#missing
 

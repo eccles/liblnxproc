@@ -1,0 +1,57 @@
+#---------------------------------------------------------------------
+# @configure_input@
+#---------------------------------------------------------------------
+srcdir = @srcdir@
+VPATH = @srcdir@
+
+package = @PACKAGE_NAME@
+exec_prefix = @exec_prefix@
+bindir = @bindir@
+
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+#---------------------------------------------------------------------
+TSKS=$(package) $(package)-dbg $(package)-prf
+SRCS=$(package).c
+SHS=$(package).sh
+#---------------------------------------------------------------------
+
+#CC=gcc
+CCFLAGS=-O2 -I$(srcdir)/../include -Wall -Winline -Werror
+CCFLAGSDBG=-g -I$(srcdir)/../include -Wall -Winline -Werror
+CCFLAGSPRF=-pg -g -I$(srcdir)/../include -Wall -Winline -Werror
+LDFLAGS=-L../src -l$(package)
+LDFLAGSDBG=-L../src -l$(package)-dbg
+LDFLAGSPRF=../src/lib$(package)-prf.a -pg
+
+all: $(TSKS)
+
+install:
+	$(INSTALL) -d $(DESTDIR)$(bindir)
+	$(INSTALL_PROGRAM) -m 0755 $(TSKS) $(DESTDIR)$(bindir)
+
+uninstall:
+	-cd $(DESTDIR)$(bindir) && rm -f $(TSKS)
+
+$(package): $(package).c
+	$(CC) $(CCFLAGS) -o $@ $^ $(LDFLAGS)
+
+$(package)-dbg: $(package).c
+	$(CC) $(CCFLAGSDBG) -o $@ $^ $(LDFLAGSDBG)
+
+$(package)-prf: $(package).c 
+	$(CC) $(CCFLAGSPRF) -o $@ $^ $(LDFLAGSPRF)
+
+clean:
+	rm -f $(TSKS) gmon.out *~ *.orig core* vgcore* x y z
+
+Makefile: Makefile.in ../config.status
+	cd .. && ./config.status $@
+
+../config.status: ../configure
+	cd .. && ./config.status --recheck
+
+.PHONY: all clean install uninstall
+
+# vim: noexpandtab
+

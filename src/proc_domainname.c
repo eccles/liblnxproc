@@ -30,7 +30,7 @@ Typical contents of file /proc/sys/kernel/domainname::
 
 #include "config.h"
 
-#include "stdlib.h"
+#include "topiary_stdlib.h"
 #include <string.h>
 
 #include "error_private.h"

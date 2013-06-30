@@ -24,7 +24,7 @@
 #include "config.h"
 
 #include <stddef.h>             //offsetof
-#include "stdlib.h"             //calloc
+#include "topiary_stdlib.h"             //calloc
 
 /*-----------------------------------------------------------------------------
  * Reference counting

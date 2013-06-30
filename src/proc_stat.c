@@ -86,7 +86,7 @@ softirq 90796022 0 21051565 44290 15033485 9523416 0 1316048 21055421 165439 226
 
 #include "config.h"
 
-#include "stdlib.h"
+#include "topiary_stdlib.h"
 #include <stdio.h>
 #include <string.h>
 

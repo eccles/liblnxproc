@@ -45,18 +45,37 @@ PATH: /usr/local/games
 ## Core tests. ##
 ## ----------- ##
 
-configure:2298: checking for gcc
-configure:2314: found /usr/bin/gcc
-configure:2325: result: gcc
-configure:2554: checking for C compiler version
-configure:2563: gcc --version >&5
+configure:2397: checking for a BSD-compatible install
+configure:2465: result: /usr/bin/install -c
+configure:2476: checking whether build environment is sane
+configure:2526: result: yes
+configure:2667: checking for a thread-safe mkdir -p
+configure:2706: result: /bin/mkdir -p
+configure:2719: checking for gawk
+configure:2735: found /usr/bin/gawk
+configure:2746: result: gawk
+configure:2757: checking whether make sets $(MAKE)
+configure:2779: result: yes
+configure:2890: checking build system type
+configure:2904: result: x86_64-unknown-linux-gnu
+configure:2924: checking host system type
+configure:2937: result: x86_64-unknown-linux-gnu
+configure:2978: checking how to print strings
+configure:3005: result: printf
+configure:3038: checking for style of include used by make
+configure:3066: result: GNU
+configure:3137: checking for gcc
+configure:3153: found /usr/bin/gcc
+configure:3164: result: gcc
+configure:3393: checking for C compiler version
+configure:3402: gcc --version >&5
 gcc (Ubuntu/Linaro 4.7.3-1ubuntu1) 4.7.3
 Copyright (C) 2012 Free Software Foundation, Inc.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-configure:2574: $? = 0
-configure:2563: gcc -v >&5
+configure:3413: $? = 0
+configure:3402: gcc -v >&5
 Using built-in specs.
 COLLECT_GCC=gcc
 COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/4.7/lto-wrapper
@@ -64,58 +83,137 @@ Target: x86_64-linux-gnu
 Configured with: ../src/configure -v --with-pkgversion='Ubuntu/Linaro 4.7.3-1ubuntu1' --with-bugurl=file:///usr/share/doc/gcc-4.7/README.Bugs --enable-languages=c,c++,go,fortran,objc,obj-c++ --prefix=/usr --program-suffix=-4.7 --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --with-gxx-include-dir=/usr/include/c++/4.7 --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --enable-gnu-unique-object --enable-plugin --with-system-zlib --enable-objc-gc --with-cloog --enable-cloog-backend=ppl --disable-cloog-version-check --disable-ppl-version-check --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --with-tune=generic --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu
 Thread model: posix
 gcc version 4.7.3 (Ubuntu/Linaro 4.7.3-1ubuntu1) 
-configure:2574: $? = 0
-configure:2563: gcc -V >&5
+configure:3413: $? = 0
+configure:3402: gcc -V >&5
 gcc: error: unrecognized command line option '-V'
 gcc: fatal error: no input files
 compilation terminated.
-configure:2574: $? = 4
-configure:2563: gcc -qversion >&5
+configure:3413: $? = 4
+configure:3402: gcc -qversion >&5
 gcc: error: unrecognized command line option '-qversion'
 gcc: fatal error: no input files
 compilation terminated.
-configure:2574: $? = 4
-configure:2594: checking whether the C compiler works
-configure:2616: gcc    conftest.c  >&5
-configure:2620: $? = 0
-configure:2668: result: yes
-configure:2671: checking for C compiler default output file name
-configure:2673: result: a.out
-configure:2679: checking for suffix of executables
-configure:2686: gcc -o conftest    conftest.c  >&5
-configure:2690: $? = 0
-configure:2712: result: 
-configure:2734: checking whether we are cross compiling
-configure:2742: gcc -o conftest    conftest.c  >&5
-configure:2746: $? = 0
-configure:2753: ./conftest
-configure:2757: $? = 0
-configure:2772: result: no
-configure:2777: checking for suffix of object files
-configure:2799: gcc -c   conftest.c >&5
-configure:2803: $? = 0
-configure:2824: result: o
-configure:2828: checking whether we are using the GNU C compiler
-configure:2847: gcc -c   conftest.c >&5
-configure:2847: $? = 0
-configure:2856: result: yes
-configure:2865: checking whether gcc accepts -g
-configure:2885: gcc -c -g  conftest.c >&5
-configure:2885: $? = 0
-configure:2926: result: yes
-configure:2943: checking for gcc option to accept ISO C89
-configure:3006: gcc  -c -g -O2  conftest.c >&5
-configure:3006: $? = 0
-configure:3019: result: none needed
-configure:3082: checking for a BSD-compatible install
-configure:3150: result: /usr/bin/install -c
-configure:3171: checking how to run the C preprocessor
-configure:3202: gcc -E  conftest.c
-configure:3202: $? = 0
-configure:3216: gcc -E  conftest.c
-conftest.c:9:28: fatal error: ac_nonexistent.h: No such file or directory
+configure:3413: $? = 4
+configure:3433: checking whether the C compiler works
+configure:3455: gcc    conftest.c  >&5
+configure:3459: $? = 0
+configure:3507: result: yes
+configure:3510: checking for C compiler default output file name
+configure:3512: result: a.out
+configure:3518: checking for suffix of executables
+configure:3525: gcc -o conftest    conftest.c  >&5
+configure:3529: $? = 0
+configure:3551: result: 
+configure:3573: checking whether we are cross compiling
+configure:3581: gcc -o conftest    conftest.c  >&5
+configure:3585: $? = 0
+configure:3592: ./conftest
+configure:3596: $? = 0
+configure:3611: result: no
+configure:3616: checking for suffix of object files
+configure:3638: gcc -c   conftest.c >&5
+configure:3642: $? = 0
+configure:3663: result: o
+configure:3667: checking whether we are using the GNU C compiler
+configure:3686: gcc -c   conftest.c >&5
+configure:3686: $? = 0
+configure:3695: result: yes
+configure:3704: checking whether gcc accepts -g
+configure:3724: gcc -c -g  conftest.c >&5
+configure:3724: $? = 0
+configure:3765: result: yes
+configure:3782: checking for gcc option to accept ISO C89
+configure:3845: gcc  -c -g -O2  conftest.c >&5
+configure:3845: $? = 0
+configure:3858: result: none needed
+configure:3880: checking dependency style of gcc
+configure:3991: result: gcc3
+configure:4006: checking for a sed that does not truncate output
+configure:4070: result: /bin/sed
+configure:4088: checking for grep that handles long lines and -e
+configure:4146: result: /bin/grep
+configure:4151: checking for egrep
+configure:4213: result: /bin/grep -E
+configure:4218: checking for fgrep
+configure:4280: result: /bin/grep -F
+configure:4315: checking for ld used by gcc
+configure:4382: result: /usr/bin/ld
+configure:4389: checking if the linker (/usr/bin/ld) is GNU ld
+configure:4404: result: yes
+configure:4416: checking for BSD- or MS-compatible name lister (nm)
+configure:4465: result: /usr/bin/nm -B
+configure:4595: checking the name lister (/usr/bin/nm -B) interface
+configure:4602: gcc -c -g -O2  conftest.c >&5
+configure:4605: /usr/bin/nm -B "conftest.o"
+configure:4608: output
+0000000000000000 B some_variable
+configure:4615: result: BSD nm
+configure:4618: checking whether ln -s works
+configure:4622: result: yes
+configure:4630: checking the maximum length of command line arguments
+configure:4761: result: 1572864
+configure:4778: checking whether the shell understands some XSI constructs
+configure:4788: result: yes
+configure:4792: checking whether the shell understands "+="
+configure:4798: result: yes
+configure:4833: checking how to convert x86_64-unknown-linux-gnu file names to x86_64-unknown-linux-gnu format
+configure:4873: result: func_convert_file_noop
+configure:4880: checking how to convert x86_64-unknown-linux-gnu file names to toolchain format
+configure:4900: result: func_convert_file_noop
+configure:4907: checking for /usr/bin/ld option to reload object files
+configure:4914: result: -r
+configure:4988: checking for objdump
+configure:5004: found /usr/bin/objdump
+configure:5015: result: objdump
+configure:5047: checking how to recognize dependent libraries
+configure:5245: result: pass_all
+configure:5330: checking for dlltool
+configure:5360: result: no
+configure:5390: checking how to associate runtime and link libraries
+configure:5417: result: printf %s\n
+configure:5478: checking for ar
+configure:5494: found /usr/bin/ar
+configure:5505: result: ar
+configure:5542: checking for archiver @FILE support
+configure:5559: gcc -c -g -O2  conftest.c >&5
+configure:5559: $? = 0
+configure:5562: ar cru libconftest.a @conftest.lst >&5
+configure:5565: $? = 0
+configure:5570: ar cru libconftest.a @conftest.lst >&5
+ar: conftest.o: No such file or directory
+configure:5573: $? = 1
+configure:5585: result: @
+configure:5643: checking for strip
+configure:5659: found /usr/bin/strip
+configure:5670: result: strip
+configure:5742: checking for ranlib
+configure:5758: found /usr/bin/ranlib
+configure:5769: result: ranlib
+configure:5871: checking command to parse /usr/bin/nm -B output from gcc object
+configure:5991: gcc -c -g -O2  conftest.c >&5
+configure:5994: $? = 0
+configure:5998: /usr/bin/nm -B conftest.o \| sed -n -e 's/^.*[ ]\([ABCDGIRSTW][ABCDGIRSTW]*\)[ ][ ]*\([_A-Za-z][_A-Za-z0-9]*\)$/\1 \2 \2/p' | sed '/ __gnu_lto/d' \> conftest.nm
+configure:6001: $? = 0
+configure:6067: gcc -o conftest -g -O2   conftest.c conftstm.o >&5
+configure:6070: $? = 0
+configure:6108: result: ok
+configure:6145: checking for sysroot
+configure:6175: result: no
+configure:6252: gcc -c -g -O2  conftest.c >&5
+configure:6255: $? = 0
+configure:6438: checking for mt
+configure:6454: found /bin/mt
+configure:6465: result: mt
+configure:6488: checking if mt is a manifest tool
+configure:6494: mt '-?'
+configure:6502: result: no
+configure:7144: checking how to run the C preprocessor
+configure:7175: gcc -E  conftest.c
+configure:7175: $? = 0
+configure:7189: gcc -E  conftest.c
+conftest.c:11:28: fatal error: ac_nonexistent.h: No such file or directory
 compilation terminated.
-configure:3216: $? = 1
+configure:7189: $? = 1
 configure: failed program was:
 | /* confdefs.h */
 | #define PACKAGE_NAME "topiary"
@@ -124,15 +222,17 @@ configure: failed program was:
 | #define PACKAGE_STRING "topiary 0.0.1"
 | #define PACKAGE_BUGREPORT "phewlett76@gmail.com"
 | #define PACKAGE_URL "https://github.com/eccles/liblnxproc"
+| #define PACKAGE "topiary"
+| #define VERSION "0.0.1"
 | /* end confdefs.h.  */
 | #include <ac_nonexistent.h>
-configure:3241: result: gcc -E
-configure:3261: gcc -E  conftest.c
-configure:3261: $? = 0
-configure:3275: gcc -E  conftest.c
-conftest.c:9:28: fatal error: ac_nonexistent.h: No such file or directory
+configure:7214: result: gcc -E
+configure:7234: gcc -E  conftest.c
+configure:7234: $? = 0
+configure:7248: gcc -E  conftest.c
+conftest.c:11:28: fatal error: ac_nonexistent.h: No such file or directory
 compilation terminated.
-configure:3275: $? = 1
+configure:7248: $? = 1
 configure: failed program was:
 | /* confdefs.h */
 | #define PACKAGE_NAME "topiary"
@@ -141,115 +241,99 @@ configure: failed program was:
 | #define PACKAGE_STRING "topiary 0.0.1"
 | #define PACKAGE_BUGREPORT "phewlett76@gmail.com"
 | #define PACKAGE_URL "https://github.com/eccles/liblnxproc"
+| #define PACKAGE "topiary"
+| #define VERSION "0.0.1"
 | /* end confdefs.h.  */
 | #include <ac_nonexistent.h>
-configure:3304: checking for grep that handles long lines and -e
-configure:3362: result: /bin/grep
-configure:3367: checking for egrep
-configure:3429: result: /bin/grep -E
-configure:3434: checking for ANSI C header files
-configure:3454: gcc -c -g -O2  conftest.c >&5
-configure:3454: $? = 0
-configure:3527: gcc -o conftest -g -O2   conftest.c  >&5
-configure:3527: $? = 0
-configure:3527: ./conftest
-configure:3527: $? = 0
-configure:3538: result: yes
-configure:3551: checking for sys/types.h
-configure:3551: gcc -c -g -O2  conftest.c >&5
-configure:3551: $? = 0
-configure:3551: result: yes
-configure:3551: checking for sys/stat.h
-configure:3551: gcc -c -g -O2  conftest.c >&5
-configure:3551: $? = 0
-configure:3551: result: yes
-configure:3551: checking for stdlib.h
-configure:3551: gcc -c -g -O2  conftest.c >&5
-configure:3551: $? = 0
-configure:3551: result: yes
-configure:3551: checking for string.h
-configure:3551: gcc -c -g -O2  conftest.c >&5
-configure:3551: $? = 0
-configure:3551: result: yes
-configure:3551: checking for memory.h
-configure:3551: gcc -c -g -O2  conftest.c >&5
-configure:3551: $? = 0
-configure:3551: result: yes
-configure:3551: checking for strings.h
-configure:3551: gcc -c -g -O2  conftest.c >&5
-configure:3551: $? = 0
-configure:3551: result: yes
-configure:3551: checking for inttypes.h
-configure:3551: gcc -c -g -O2  conftest.c >&5
-configure:3551: $? = 0
-configure:3551: result: yes
-configure:3551: checking for stdint.h
-configure:3551: gcc -c -g -O2  conftest.c >&5
-configure:3551: $? = 0
-configure:3551: result: yes
-configure:3551: checking for unistd.h
-configure:3551: gcc -c -g -O2  conftest.c >&5
-configure:3551: $? = 0
-configure:3551: result: yes
-configure:3566: checking fcntl.h usability
-configure:3566: gcc -c -g -O2  conftest.c >&5
-configure:3566: $? = 0
-configure:3566: result: yes
-configure:3566: checking fcntl.h presence
-configure:3566: gcc -E  conftest.c
-configure:3566: $? = 0
-configure:3566: result: yes
-configure:3566: checking for fcntl.h
-configure:3566: result: yes
-configure:3566: checking for inttypes.h
-configure:3566: result: yes
-configure:3566: checking limits.h usability
-configure:3566: gcc -c -g -O2  conftest.c >&5
-configure:3566: $? = 0
-configure:3566: result: yes
-configure:3566: checking limits.h presence
-configure:3566: gcc -E  conftest.c
-configure:3566: $? = 0
-configure:3566: result: yes
-configure:3566: checking for limits.h
-configure:3566: result: yes
-configure:3566: checking stddef.h usability
-configure:3566: gcc -c -g -O2  conftest.c >&5
-configure:3566: $? = 0
-configure:3566: result: yes
-configure:3566: checking stddef.h presence
-configure:3566: gcc -E  conftest.c
-configure:3566: $? = 0
-configure:3566: result: yes
-configure:3566: checking for stddef.h
-configure:3566: result: yes
-configure:3566: checking for stdlib.h
-configure:3566: result: yes
-configure:3566: checking for string.h
-configure:3566: result: yes
-configure:3566: checking sys/time.h usability
-configure:3566: gcc -c -g -O2  conftest.c >&5
-configure:3566: $? = 0
-configure:3566: result: yes
-configure:3566: checking sys/time.h presence
-configure:3566: gcc -E  conftest.c
-configure:3566: $? = 0
-configure:3566: result: yes
-configure:3566: checking for sys/time.h
-configure:3566: result: yes
-configure:3566: checking for unistd.h
-configure:3566: result: yes
-configure:3578: checking for inline
-configure:3594: gcc -c -g -O2  conftest.c >&5
-configure:3594: $? = 0
-configure:3602: result: inline
-configure:3620: checking for size_t
-configure:3620: gcc -c -g -O2  conftest.c >&5
-configure:3620: $? = 0
-configure:3620: gcc -c -g -O2  conftest.c >&5
-conftest.c: In function 'main':
-conftest.c:63:21: error: expected expression before ')' token
-configure:3620: $? = 1
+configure:7277: checking for ANSI C header files
+configure:7297: gcc -c -g -O2  conftest.c >&5
+configure:7297: $? = 0
+configure:7370: gcc -o conftest -g -O2   conftest.c  >&5
+configure:7370: $? = 0
+configure:7370: ./conftest
+configure:7370: $? = 0
+configure:7381: result: yes
+configure:7394: checking for sys/types.h
+configure:7394: gcc -c -g -O2  conftest.c >&5
+configure:7394: $? = 0
+configure:7394: result: yes
+configure:7394: checking for sys/stat.h
+configure:7394: gcc -c -g -O2  conftest.c >&5
+configure:7394: $? = 0
+configure:7394: result: yes
+configure:7394: checking for stdlib.h
+configure:7394: gcc -c -g -O2  conftest.c >&5
+configure:7394: $? = 0
+configure:7394: result: yes
+configure:7394: checking for string.h
+configure:7394: gcc -c -g -O2  conftest.c >&5
+configure:7394: $? = 0
+configure:7394: result: yes
+configure:7394: checking for memory.h
+configure:7394: gcc -c -g -O2  conftest.c >&5
+configure:7394: $? = 0
+configure:7394: result: yes
+configure:7394: checking for strings.h
+configure:7394: gcc -c -g -O2  conftest.c >&5
+configure:7394: $? = 0
+configure:7394: result: yes
+configure:7394: checking for inttypes.h
+configure:7394: gcc -c -g -O2  conftest.c >&5
+configure:7394: $? = 0
+configure:7394: result: yes
+configure:7394: checking for stdint.h
+configure:7394: gcc -c -g -O2  conftest.c >&5
+configure:7394: $? = 0
+configure:7394: result: yes
+configure:7394: checking for unistd.h
+configure:7394: gcc -c -g -O2  conftest.c >&5
+configure:7394: $? = 0
+configure:7394: result: yes
+configure:7408: checking for dlfcn.h
+configure:7408: gcc -c -g -O2  conftest.c >&5
+configure:7408: $? = 0
+configure:7408: result: yes
+configure:7613: checking for objdir
+configure:7628: result: .libs
+configure:7895: checking if gcc supports -fno-rtti -fno-exceptions
+configure:7913: gcc -c -g -O2  -fno-rtti -fno-exceptions conftest.c >&5
+cc1: warning: command line option '-fno-rtti' is valid for C++/ObjC++ but not for C [enabled by default]
+configure:7917: $? = 0
+configure:7930: result: no
+configure:8257: checking for gcc option to produce PIC
+configure:8264: result: -fPIC -DPIC
+configure:8272: checking if gcc PIC flag -fPIC -DPIC works
+configure:8290: gcc -c -g -O2  -fPIC -DPIC -DPIC conftest.c >&5
+configure:8294: $? = 0
+configure:8307: result: yes
+configure:8336: checking if gcc static flag -static works
+configure:8364: result: yes
+configure:8379: checking if gcc supports -c -o file.o
+configure:8400: gcc -c -g -O2  -o out/conftest2.o conftest.c >&5
+configure:8404: $? = 0
+configure:8426: result: yes
+configure:8434: checking if gcc supports -c -o file.o
+configure:8481: result: yes
+configure:8514: checking whether the gcc linker (/usr/bin/ld -m elf_x86_64) supports shared libraries
+configure:9671: result: yes
+configure:9708: checking whether -lc should be explicitly linked in
+configure:9716: gcc -c -g -O2  conftest.c >&5
+configure:9719: $? = 0
+configure:9734: gcc -shared  -fPIC -DPIC conftest.o  -v -Wl,-soname -Wl,conftest -o conftest 2\>\&1 \| /bin/grep  -lc  \>/dev/null 2\>\&1
+configure:9737: $? = 0
+configure:9751: result: no
+configure:9911: checking dynamic linker characteristics
+configure:10411: gcc -o conftest -g -O2   -Wl,-rpath -Wl,/foo conftest.c  >&5
+configure:10411: $? = 0
+configure:10645: result: GNU/Linux ld.so
+configure:10752: checking how to hardcode library paths into programs
+configure:10777: result: immediate
+configure:10871: checking for shl_load
+configure:10871: gcc -o conftest -g -O2   conftest.c  >&5
+/tmp/ccpw7KSJ.o: In function `main':
+/home/paul/projects/github/liblnxproc/conftest.c:57: undefined reference to `shl_load'
+collect2: error: ld returned 1 exit status
+configure:10871: $? = 1
 configure: failed program was:
 | /* confdefs.h */
 | #define PACKAGE_NAME "topiary"
@@ -258,6 +342,8 @@ configure: failed program was:
 | #define PACKAGE_STRING "topiary 0.0.1"
 | #define PACKAGE_BUGREPORT "phewlett76@gmail.com"
 | #define PACKAGE_URL "https://github.com/eccles/liblnxproc"
+| #define PACKAGE "topiary"
+| #define VERSION "0.0.1"
 | #define STDC_HEADERS 1
 | #define HAVE_SYS_TYPES_H 1
 | #define HAVE_SYS_STAT_H 1
@@ -268,6 +354,314 @@ configure: failed program was:
 | #define HAVE_INTTYPES_H 1
 | #define HAVE_STDINT_H 1
 | #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| /* end confdefs.h.  */
+| /* Define shl_load to an innocuous variant, in case <limits.h> declares shl_load.
+|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+| #define shl_load innocuous_shl_load
+| 
+| /* System header to define __stub macros and hopefully few prototypes,
+|     which can conflict with char shl_load (); below.
+|     Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+|     <limits.h> exists even on freestanding compilers.  */
+| 
+| #ifdef __STDC__
+| # include <limits.h>
+| #else
+| # include <assert.h>
+| #endif
+| 
+| #undef shl_load
+| 
+| /* Override any GCC internal prototype to avoid an error.
+|    Use char because int might match the return type of a GCC
+|    builtin and then its argument prototype would still apply.  */
+| #ifdef __cplusplus
+| extern "C"
+| #endif
+| char shl_load ();
+| /* The GNU C library defines this for functions which it implements
+|     to always fail with ENOSYS.  Some functions are actually named
+|     something starting with __ and the normal name is an alias.  */
+| #if defined __stub_shl_load || defined __stub___shl_load
+| choke me
+| #endif
+| 
+| int
+| main ()
+| {
+| return shl_load ();
+|   ;
+|   return 0;
+| }
+configure:10871: result: no
+configure:10875: checking for shl_load in -ldld
+configure:10900: gcc -o conftest -g -O2   conftest.c -ldld   >&5
+/usr/bin/ld: cannot find -ldld
+collect2: error: ld returned 1 exit status
+configure:10900: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "topiary"
+| #define PACKAGE_TARNAME "topiary"
+| #define PACKAGE_VERSION "0.0.1"
+| #define PACKAGE_STRING "topiary 0.0.1"
+| #define PACKAGE_BUGREPORT "phewlett76@gmail.com"
+| #define PACKAGE_URL "https://github.com/eccles/liblnxproc"
+| #define PACKAGE "topiary"
+| #define VERSION "0.0.1"
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_MEMORY_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| /* end confdefs.h.  */
+| 
+| /* Override any GCC internal prototype to avoid an error.
+|    Use char because int might match the return type of a GCC
+|    builtin and then its argument prototype would still apply.  */
+| #ifdef __cplusplus
+| extern "C"
+| #endif
+| char shl_load ();
+| int
+| main ()
+| {
+| return shl_load ();
+|   ;
+|   return 0;
+| }
+configure:10909: result: no
+configure:10914: checking for dlopen
+configure:10914: gcc -o conftest -g -O2   conftest.c  >&5
+/tmp/ccbs5N6P.o: In function `main':
+/home/paul/projects/github/liblnxproc/conftest.c:57: undefined reference to `dlopen'
+collect2: error: ld returned 1 exit status
+configure:10914: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "topiary"
+| #define PACKAGE_TARNAME "topiary"
+| #define PACKAGE_VERSION "0.0.1"
+| #define PACKAGE_STRING "topiary 0.0.1"
+| #define PACKAGE_BUGREPORT "phewlett76@gmail.com"
+| #define PACKAGE_URL "https://github.com/eccles/liblnxproc"
+| #define PACKAGE "topiary"
+| #define VERSION "0.0.1"
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_MEMORY_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| /* end confdefs.h.  */
+| /* Define dlopen to an innocuous variant, in case <limits.h> declares dlopen.
+|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+| #define dlopen innocuous_dlopen
+| 
+| /* System header to define __stub macros and hopefully few prototypes,
+|     which can conflict with char dlopen (); below.
+|     Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+|     <limits.h> exists even on freestanding compilers.  */
+| 
+| #ifdef __STDC__
+| # include <limits.h>
+| #else
+| # include <assert.h>
+| #endif
+| 
+| #undef dlopen
+| 
+| /* Override any GCC internal prototype to avoid an error.
+|    Use char because int might match the return type of a GCC
+|    builtin and then its argument prototype would still apply.  */
+| #ifdef __cplusplus
+| extern "C"
+| #endif
+| char dlopen ();
+| /* The GNU C library defines this for functions which it implements
+|     to always fail with ENOSYS.  Some functions are actually named
+|     something starting with __ and the normal name is an alias.  */
+| #if defined __stub_dlopen || defined __stub___dlopen
+| choke me
+| #endif
+| 
+| int
+| main ()
+| {
+| return dlopen ();
+|   ;
+|   return 0;
+| }
+configure:10914: result: no
+configure:10918: checking for dlopen in -ldl
+configure:10943: gcc -o conftest -g -O2   conftest.c -ldl   >&5
+configure:10943: $? = 0
+configure:10952: result: yes
+configure:11071: checking whether a program can dlopen itself
+configure:11151: gcc -o conftest -g -O2  -DHAVE_DLFCN_H  -Wl,--export-dynamic conftest.c -ldl  >&5
+configure:11154: $? = 0
+configure:11172: result: yes
+configure:11177: checking whether a statically linked program can dlopen itself
+configure:11257: gcc -o conftest -g -O2  -DHAVE_DLFCN_H  -Wl,--export-dynamic -static conftest.c -ldl  >&5
+/tmp/cca53DX3.o: In function `main':
+/home/paul/projects/github/liblnxproc/configure:11236: warning: Using 'dlopen' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: dynamic STT_GNU_IFUNC symbol `strcmp' with pointer equality in `/usr/lib/gcc/x86_64-linux-gnu/4.7/../../../x86_64-linux-gnu/libc.a(strcmp.o)' can not be used when making an executable; recompile with -fPIE and relink with -pie
+collect2: error: ld returned 1 exit status
+configure:11260: $? = 1
+configure:11278: result: no
+configure:11317: checking whether stripping libraries is possible
+configure:11322: result: yes
+configure:11357: checking if libtool supports shared libraries
+configure:11359: result: yes
+configure:11362: checking whether to build shared libraries
+configure:11383: result: yes
+configure:11386: checking whether to build static libraries
+configure:11390: result: yes
+configure:11481: checking for gcc
+configure:11508: result: gcc
+configure:11737: checking for C compiler version
+configure:11746: gcc --version >&5
+gcc (Ubuntu/Linaro 4.7.3-1ubuntu1) 4.7.3
+Copyright (C) 2012 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+configure:11757: $? = 0
+configure:11746: gcc -v >&5
+Using built-in specs.
+COLLECT_GCC=gcc
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/4.7/lto-wrapper
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu/Linaro 4.7.3-1ubuntu1' --with-bugurl=file:///usr/share/doc/gcc-4.7/README.Bugs --enable-languages=c,c++,go,fortran,objc,obj-c++ --prefix=/usr --program-suffix=-4.7 --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --with-gxx-include-dir=/usr/include/c++/4.7 --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --enable-gnu-unique-object --enable-plugin --with-system-zlib --enable-objc-gc --with-cloog --enable-cloog-backend=ppl --disable-cloog-version-check --disable-ppl-version-check --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --with-tune=generic --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu
+Thread model: posix
+gcc version 4.7.3 (Ubuntu/Linaro 4.7.3-1ubuntu1) 
+configure:11757: $? = 0
+configure:11746: gcc -V >&5
+gcc: error: unrecognized command line option '-V'
+gcc: fatal error: no input files
+compilation terminated.
+configure:11757: $? = 4
+configure:11746: gcc -qversion >&5
+gcc: error: unrecognized command line option '-qversion'
+gcc: fatal error: no input files
+compilation terminated.
+configure:11757: $? = 4
+configure:11761: checking whether we are using the GNU C compiler
+configure:11789: result: yes
+configure:11798: checking whether gcc accepts -g
+configure:11859: result: yes
+configure:11876: checking for gcc option to accept ISO C89
+configure:11952: result: none needed
+configure:11974: checking dependency style of gcc
+configure:12085: result: gcc3
+configure:12103: checking whether gcc and cc understand -c and -o together
+configure:12134: gcc -c conftest.c -o conftest2.o >&5
+configure:12138: $? = 0
+configure:12144: gcc -c conftest.c -o conftest2.o >&5
+configure:12148: $? = 0
+configure:12159: cc -c conftest.c >&5
+configure:12163: $? = 0
+configure:12171: cc -c conftest.c -o conftest2.o >&5
+configure:12175: $? = 0
+configure:12181: cc -c conftest.c -o conftest2.o >&5
+configure:12185: $? = 0
+configure:12203: result: yes
+configure:12235: checking fcntl.h usability
+configure:12235: gcc -c -g -O2  conftest.c >&5
+configure:12235: $? = 0
+configure:12235: result: yes
+configure:12235: checking fcntl.h presence
+configure:12235: gcc -E  conftest.c
+configure:12235: $? = 0
+configure:12235: result: yes
+configure:12235: checking for fcntl.h
+configure:12235: result: yes
+configure:12235: checking for inttypes.h
+configure:12235: result: yes
+configure:12235: checking limits.h usability
+configure:12235: gcc -c -g -O2  conftest.c >&5
+configure:12235: $? = 0
+configure:12235: result: yes
+configure:12235: checking limits.h presence
+configure:12235: gcc -E  conftest.c
+configure:12235: $? = 0
+configure:12235: result: yes
+configure:12235: checking for limits.h
+configure:12235: result: yes
+configure:12235: checking stddef.h usability
+configure:12235: gcc -c -g -O2  conftest.c >&5
+configure:12235: $? = 0
+configure:12235: result: yes
+configure:12235: checking stddef.h presence
+configure:12235: gcc -E  conftest.c
+configure:12235: $? = 0
+configure:12235: result: yes
+configure:12235: checking for stddef.h
+configure:12235: result: yes
+configure:12235: checking for stdlib.h
+configure:12235: result: yes
+configure:12235: checking for string.h
+configure:12235: result: yes
+configure:12235: checking sys/time.h usability
+configure:12235: gcc -c -g -O2  conftest.c >&5
+configure:12235: $? = 0
+configure:12235: result: yes
+configure:12235: checking sys/time.h presence
+configure:12235: gcc -E  conftest.c
+configure:12235: $? = 0
+configure:12235: result: yes
+configure:12235: checking for sys/time.h
+configure:12235: result: yes
+configure:12235: checking for unistd.h
+configure:12235: result: yes
+configure:12247: checking for inline
+configure:12263: gcc -c -g -O2  conftest.c >&5
+configure:12263: $? = 0
+configure:12271: result: inline
+configure:12289: checking for size_t
+configure:12289: gcc -c -g -O2  conftest.c >&5
+configure:12289: $? = 0
+configure:12289: gcc -c -g -O2  conftest.c >&5
+conftest.c: In function 'main':
+conftest.c:67:21: error: expected expression before ')' token
+configure:12289: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "topiary"
+| #define PACKAGE_TARNAME "topiary"
+| #define PACKAGE_VERSION "0.0.1"
+| #define PACKAGE_STRING "topiary 0.0.1"
+| #define PACKAGE_BUGREPORT "phewlett76@gmail.com"
+| #define PACKAGE_URL "https://github.com/eccles/liblnxproc"
+| #define PACKAGE "topiary"
+| #define VERSION "0.0.1"
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_MEMORY_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
 | #define HAVE_FCNTL_H 1
 | #define HAVE_INTTYPES_H 1
 | #define HAVE_LIMITS_H 1
@@ -318,14 +712,14 @@ configure: failed program was:
 |   ;
 |   return 0;
 | }
-configure:3620: result: yes
-configure:3631: checking for ssize_t
-configure:3631: gcc -c -g -O2  conftest.c >&5
-configure:3631: $? = 0
-configure:3631: gcc -c -g -O2  conftest.c >&5
+configure:12289: result: yes
+configure:12300: checking for ssize_t
+configure:12300: gcc -c -g -O2  conftest.c >&5
+configure:12300: $? = 0
+configure:12300: gcc -c -g -O2  conftest.c >&5
 conftest.c: In function 'main':
-conftest.c:63:22: error: expected expression before ')' token
-configure:3631: $? = 1
+conftest.c:67:22: error: expected expression before ')' token
+configure:12300: $? = 1
 configure: failed program was:
 | /* confdefs.h */
 | #define PACKAGE_NAME "topiary"
@@ -334,6 +728,8 @@ configure: failed program was:
 | #define PACKAGE_STRING "topiary 0.0.1"
 | #define PACKAGE_BUGREPORT "phewlett76@gmail.com"
 | #define PACKAGE_URL "https://github.com/eccles/liblnxproc"
+| #define PACKAGE "topiary"
+| #define VERSION "0.0.1"
 | #define STDC_HEADERS 1
 | #define HAVE_SYS_TYPES_H 1
 | #define HAVE_SYS_STAT_H 1
@@ -344,6 +740,8 @@ configure: failed program was:
 | #define HAVE_INTTYPES_H 1
 | #define HAVE_STDINT_H 1
 | #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
 | #define HAVE_FCNTL_H 1
 | #define HAVE_INTTYPES_H 1
 | #define HAVE_LIMITS_H 1
@@ -394,26 +792,26 @@ configure: failed program was:
 |   ;
 |   return 0;
 | }
-configure:3631: result: yes
-configure:3642: checking for uint16_t
-configure:3642: gcc -c -g -O2  conftest.c >&5
-configure:3642: $? = 0
-configure:3642: result: yes
-configure:3654: checking for uint32_t
-configure:3654: gcc -c -g -O2  conftest.c >&5
-configure:3654: $? = 0
-configure:3654: result: yes
-configure:3668: checking for uint8_t
-configure:3668: gcc -c -g -O2  conftest.c >&5
-configure:3668: $? = 0
-configure:3668: result: yes
-configure:3682: checking for ptrdiff_t
-configure:3682: gcc -c -g -O2  conftest.c >&5
-configure:3682: $? = 0
-configure:3682: gcc -c -g -O2  conftest.c >&5
+configure:12300: result: yes
+configure:12311: checking for uint16_t
+configure:12311: gcc -c -g -O2  conftest.c >&5
+configure:12311: $? = 0
+configure:12311: result: yes
+configure:12323: checking for uint32_t
+configure:12323: gcc -c -g -O2  conftest.c >&5
+configure:12323: $? = 0
+configure:12323: result: yes
+configure:12337: checking for uint8_t
+configure:12337: gcc -c -g -O2  conftest.c >&5
+configure:12337: $? = 0
+configure:12337: result: yes
+configure:12351: checking for ptrdiff_t
+configure:12351: gcc -c -g -O2  conftest.c >&5
+configure:12351: $? = 0
+configure:12351: gcc -c -g -O2  conftest.c >&5
 conftest.c: In function 'main':
-conftest.c:63:24: error: expected expression before ')' token
-configure:3682: $? = 1
+conftest.c:67:24: error: expected expression before ')' token
+configure:12351: $? = 1
 configure: failed program was:
 | /* confdefs.h */
 | #define PACKAGE_NAME "topiary"
@@ -422,6 +820,8 @@ configure: failed program was:
 | #define PACKAGE_STRING "topiary 0.0.1"
 | #define PACKAGE_BUGREPORT "phewlett76@gmail.com"
 | #define PACKAGE_URL "https://github.com/eccles/liblnxproc"
+| #define PACKAGE "topiary"
+| #define VERSION "0.0.1"
 | #define STDC_HEADERS 1
 | #define HAVE_SYS_TYPES_H 1
 | #define HAVE_SYS_STAT_H 1
@@ -432,6 +832,8 @@ configure: failed program was:
 | #define HAVE_INTTYPES_H 1
 | #define HAVE_STDINT_H 1
 | #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
 | #define HAVE_FCNTL_H 1
 | #define HAVE_INTTYPES_H 1
 | #define HAVE_LIMITS_H 1
@@ -482,29 +884,29 @@ configure: failed program was:
 |   ;
 |   return 0;
 | }
-configure:3682: result: yes
-configure:3696: checking for stdlib.h
-configure:3696: result: yes
-configure:3706: checking for GNU libc compatible realloc
-configure:3730: gcc -o conftest -g -O2   conftest.c  >&5
-configure:3730: $? = 0
-configure:3730: ./conftest
-configure:3730: $? = 0
-configure:3740: result: yes
-configure:3761: checking whether strerror_r is declared
-configure:3761: gcc -c -g -O2  conftest.c >&5
-configure:3761: $? = 0
-configure:3761: result: yes
-configure:3774: checking for strerror_r
-configure:3774: gcc -o conftest -g -O2   conftest.c  >&5
-configure:3774: $? = 0
-configure:3774: result: yes
-configure:3783: checking whether strerror_r returns char *
-configure:3807: gcc -c -g -O2  conftest.c >&5
+configure:12351: result: yes
+configure:12365: checking for stdlib.h
+configure:12365: result: yes
+configure:12375: checking for GNU libc compatible realloc
+configure:12399: gcc -o conftest -g -O2   conftest.c  >&5
+configure:12399: $? = 0
+configure:12399: ./conftest
+configure:12399: $? = 0
+configure:12409: result: yes
+configure:12430: checking whether strerror_r is declared
+configure:12430: gcc -c -g -O2  conftest.c >&5
+configure:12430: $? = 0
+configure:12430: result: yes
+configure:12443: checking for strerror_r
+configure:12443: gcc -o conftest -g -O2   conftest.c  >&5
+configure:12443: $? = 0
+configure:12443: result: yes
+configure:12452: checking whether strerror_r returns char *
+configure:12476: gcc -c -g -O2  conftest.c >&5
 conftest.c: In function 'main':
-conftest.c:70:13: error: invalid type argument of unary '*' (have 'int')
-conftest.c:71:14: warning: initialization makes pointer from integer without a cast [enabled by default]
-configure:3807: $? = 1
+conftest.c:74:13: error: invalid type argument of unary '*' (have 'int')
+conftest.c:75:14: warning: initialization makes pointer from integer without a cast [enabled by default]
+configure:12476: $? = 1
 configure: failed program was:
 | /* confdefs.h */
 | #define PACKAGE_NAME "topiary"
@@ -513,6 +915,8 @@ configure: failed program was:
 | #define PACKAGE_STRING "topiary 0.0.1"
 | #define PACKAGE_BUGREPORT "phewlett76@gmail.com"
 | #define PACKAGE_URL "https://github.com/eccles/liblnxproc"
+| #define PACKAGE "topiary"
+| #define VERSION "0.0.1"
 | #define STDC_HEADERS 1
 | #define HAVE_SYS_TYPES_H 1
 | #define HAVE_SYS_STAT_H 1
@@ -523,6 +927,8 @@ configure: failed program was:
 | #define HAVE_INTTYPES_H 1
 | #define HAVE_STDINT_H 1
 | #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
 | #define HAVE_FCNTL_H 1
 | #define HAVE_INTTYPES_H 1
 | #define HAVE_LIMITS_H 1
@@ -582,35 +988,35 @@ configure: failed program was:
 |   ;
 |   return 0;
 | }
-configure:3845: result: no
-configure:3856: checking for gettimeofday
-configure:3856: gcc -o conftest -g -O2   conftest.c  >&5
-configure:3856: $? = 0
-configure:3856: result: yes
-configure:3856: checking for memset
-configure:3856: gcc -o conftest -g -O2   conftest.c  >&5
-conftest.c:56:6: warning: conflicting types for built-in function 'memset' [enabled by default]
-configure:3856: $? = 0
-configure:3856: result: yes
-configure:3856: checking for regcomp
-configure:3856: gcc -o conftest -g -O2   conftest.c  >&5
-configure:3856: $? = 0
-configure:3856: result: yes
-configure:3856: checking for strchr
-configure:3856: gcc -o conftest -g -O2   conftest.c  >&5
-conftest.c:58:6: warning: conflicting types for built-in function 'strchr' [enabled by default]
-configure:3856: $? = 0
-configure:3856: result: yes
-configure:3856: checking for strdup
-configure:3856: gcc -o conftest -g -O2   conftest.c  >&5
-conftest.c:59:6: warning: conflicting types for built-in function 'strdup' [enabled by default]
-configure:3856: $? = 0
-configure:3856: result: yes
-configure:3856: checking for strtoul
-configure:3856: gcc -o conftest -g -O2   conftest.c  >&5
-configure:3856: $? = 0
-configure:3856: result: yes
-configure:3982: creating ./config.status
+configure:12514: result: no
+configure:12525: checking for gettimeofday
+configure:12525: gcc -o conftest -g -O2   conftest.c  >&5
+configure:12525: $? = 0
+configure:12525: result: yes
+configure:12525: checking for memset
+configure:12525: gcc -o conftest -g -O2   conftest.c  >&5
+conftest.c:60:6: warning: conflicting types for built-in function 'memset' [enabled by default]
+configure:12525: $? = 0
+configure:12525: result: yes
+configure:12525: checking for regcomp
+configure:12525: gcc -o conftest -g -O2   conftest.c  >&5
+configure:12525: $? = 0
+configure:12525: result: yes
+configure:12525: checking for strchr
+configure:12525: gcc -o conftest -g -O2   conftest.c  >&5
+conftest.c:62:6: warning: conflicting types for built-in function 'strchr' [enabled by default]
+configure:12525: $? = 0
+configure:12525: result: yes
+configure:12525: checking for strdup
+configure:12525: gcc -o conftest -g -O2   conftest.c  >&5
+conftest.c:63:6: warning: conflicting types for built-in function 'strdup' [enabled by default]
+configure:12525: $? = 0
+configure:12525: result: yes
+configure:12525: checking for strtoul
+configure:12525: gcc -o conftest -g -O2   conftest.c  >&5
+configure:12525: $? = 0
+configure:12525: result: yes
+configure:12671: creating ./config.status
 
 ## ---------------------- ##
 ## Running config.status. ##
@@ -627,18 +1033,22 @@ generated by GNU Autoconf 2.69.  Invocation command line was
 
 on Feynmann.hewlett
 
-config.status:826: creating Makefile
-config.status:826: creating include/Makefile
-config.status:826: creating include/topiary/Makefile
-config.status:826: creating man/Makefile
-config.status:826: creating src/Makefile
-config.status:826: creating test/Makefile
-config.status:826: creating config.h
+config.status:1101: creating Makefile
+config.status:1101: creating data/Makefile
+config.status:1101: creating include/Makefile
+config.status:1101: creating man/Makefile
+config.status:1101: creating src/Makefile
+config.status:1101: creating test/Makefile
+config.status:1101: creating config.h
+config.status:1282: config.h is unchanged
+config.status:1330: executing depfiles commands
+config.status:1330: executing libtool commands
 
 ## ---------------- ##
 ## Cache variables. ##
 ## ---------------- ##
 
+ac_cv_build=x86_64-unknown-linux-gnu
 ac_cv_c_compiler_gnu=yes
 ac_cv_c_inline=inline
 ac_cv_c_uint16_t=yes
@@ -662,16 +1072,19 @@ ac_cv_env_host_alias_set=
 ac_cv_env_host_alias_value=
 ac_cv_env_target_alias_set=
 ac_cv_env_target_alias_value=
+ac_cv_func_dlopen=no
 ac_cv_func_gettimeofday=yes
 ac_cv_func_memset=yes
 ac_cv_func_realloc_0_nonnull=yes
 ac_cv_func_regcomp=yes
+ac_cv_func_shl_load=no
 ac_cv_func_strchr=yes
 ac_cv_func_strdup=yes
 ac_cv_func_strerror_r=yes
 ac_cv_func_strerror_r_char_p=no
 ac_cv_func_strtoul=yes
 ac_cv_have_decl_strerror_r=yes
+ac_cv_header_dlfcn_h=yes
 ac_cv_header_fcntl_h=yes
 ac_cv_header_inttypes_h=yes
 ac_cv_header_limits_h=yes
@@ -686,41 +1099,117 @@ ac_cv_header_sys_stat_h=yes
 ac_cv_header_sys_time_h=yes
 ac_cv_header_sys_types_h=yes
 ac_cv_header_unistd_h=yes
+ac_cv_host=x86_64-unknown-linux-gnu
+ac_cv_lib_dl_dlopen=yes
+ac_cv_lib_dld_shl_load=no
 ac_cv_objext=o
 ac_cv_path_EGREP='/bin/grep -E'
+ac_cv_path_FGREP='/bin/grep -F'
 ac_cv_path_GREP=/bin/grep
+ac_cv_path_SED=/bin/sed
 ac_cv_path_install='/usr/bin/install -c'
+ac_cv_path_mkdir=/bin/mkdir
+ac_cv_prog_AWK=gawk
 ac_cv_prog_CPP='gcc -E'
+ac_cv_prog_ac_ct_AR=ar
 ac_cv_prog_ac_ct_CC=gcc
+ac_cv_prog_ac_ct_MANIFEST_TOOL=mt
+ac_cv_prog_ac_ct_OBJDUMP=objdump
+ac_cv_prog_ac_ct_RANLIB=ranlib
+ac_cv_prog_ac_ct_STRIP=strip
 ac_cv_prog_cc_c89=
 ac_cv_prog_cc_g=yes
+ac_cv_prog_cc_gcc_c_o=yes
+ac_cv_prog_make_make_set=yes
 ac_cv_type_ptrdiff_t=yes
 ac_cv_type_size_t=yes
 ac_cv_type_ssize_t=yes
+am_cv_CC_dependencies_compiler_type=gcc3
+lt_cv_ar_at_file=@
+lt_cv_archive_cmds_need_lc=no
+lt_cv_deplibs_check_method=pass_all
+lt_cv_dlopen=dlopen
+lt_cv_dlopen_libs=-ldl
+lt_cv_dlopen_self=yes
+lt_cv_dlopen_self_static=no
+lt_cv_file_magic_cmd='$MAGIC_CMD'
+lt_cv_file_magic_test_file=
+lt_cv_ld_reload_flag=-r
+lt_cv_nm_interface='BSD nm'
+lt_cv_objdir=.libs
+lt_cv_path_LD=/usr/bin/ld
+lt_cv_path_NM='/usr/bin/nm -B'
+lt_cv_path_mainfest_tool=no
+lt_cv_prog_compiler_c_o=yes
+lt_cv_prog_compiler_pic='-fPIC -DPIC'
+lt_cv_prog_compiler_pic_works=yes
+lt_cv_prog_compiler_rtti_exceptions=no
+lt_cv_prog_compiler_static_works=yes
+lt_cv_prog_gnu_ld=yes
+lt_cv_sharedlib_from_linklib_cmd='printf %s\n'
+lt_cv_shlibpath_overrides_runpath=no
+lt_cv_sys_global_symbol_pipe='sed -n -e '\''s/^.*[	 ]\([ABCDGIRSTW][ABCDGIRSTW]*\)[	 ][	 ]*\([_A-Za-z][_A-Za-z0-9]*\)$/\1 \2 \2/p'\'' | sed '\''/ __gnu_lto/d'\'''
+lt_cv_sys_global_symbol_to_c_name_address='sed -n -e '\''s/^: \([^ ]*\)[ ]*$/  {\"\1\", (void *) 0},/p'\'' -e '\''s/^[ABCDGIRSTW]* \([^ ]*\) \([^ ]*\)$/  {"\2", (void *) \&\2},/p'\'''
+lt_cv_sys_global_symbol_to_c_name_address_lib_prefix='sed -n -e '\''s/^: \([^ ]*\)[ ]*$/  {\"\1\", (void *) 0},/p'\'' -e '\''s/^[ABCDGIRSTW]* \([^ ]*\) \(lib[^ ]*\)$/  {"\2", (void *) \&\2},/p'\'' -e '\''s/^[ABCDGIRSTW]* \([^ ]*\) \([^ ]*\)$/  {"lib\2", (void *) \&\2},/p'\'''
+lt_cv_sys_global_symbol_to_cdecl='sed -n -e '\''s/^T .* \(.*\)$/extern int \1();/p'\'' -e '\''s/^[ABCDGIRSTW]* .* \(.*\)$/extern char \1;/p'\'''
+lt_cv_sys_max_cmd_len=1572864
+lt_cv_to_host_file_cmd=func_convert_file_noop
+lt_cv_to_tool_file_cmd=func_convert_file_noop
 
 ## ----------------- ##
 ## Output variables. ##
 ## ----------------- ##
 
+ACLOCAL='${SHELL} /home/paul/projects/github/liblnxproc/missing --run aclocal-1.11'
+AMDEPBACKSLASH='\'
+AMDEP_FALSE='#'
+AMDEP_TRUE=''
+AMTAR='$${TAR-tar}'
+AR='ar'
+AUTOCONF='${SHELL} /home/paul/projects/github/liblnxproc/missing --run autoconf'
+AUTOHEADER='${SHELL} /home/paul/projects/github/liblnxproc/missing --run autoheader'
+AUTOMAKE='${SHELL} /home/paul/projects/github/liblnxproc/missing --run automake-1.11'
+AWK='gawk'
 CC='gcc'
+CCDEPMODE='depmode=gcc3'
 CFLAGS='-g -O2'
 CPP='gcc -E'
 CPPFLAGS=''
+CYGPATH_W='echo'
 DEFS='-DHAVE_CONFIG_H'
+DEPDIR='.deps'
+DLLTOOL='false'
+DSYMUTIL=''
+DUMPBIN=''
 ECHO_C=''
 ECHO_N='-n'
 ECHO_T=''
 EGREP='/bin/grep -E'
 EXEEXT=''
+FGREP='/bin/grep -F'
 GREP='/bin/grep'
 INSTALL_DATA='${INSTALL} -m 644'
 INSTALL_PROGRAM='${INSTALL}'
 INSTALL_SCRIPT='${INSTALL}'
+INSTALL_STRIP_PROGRAM='$(install_sh) -c -s'
+LD='/usr/bin/ld -m elf_x86_64'
 LDFLAGS=''
 LIBOBJS=''
 LIBS=''
+LIBTOOL='$(SHELL) $(top_builddir)/libtool'
+LIPO=''
+LN_S='ln -s'
 LTLIBOBJS=''
+MAKEINFO='${SHELL} /home/paul/projects/github/liblnxproc/missing --run makeinfo'
+MANIFEST_TOOL=':'
+MKDIR_P='/bin/mkdir -p'
+NM='/usr/bin/nm -B'
+NMEDIT=''
+OBJDUMP='objdump'
 OBJEXT='o'
+OTOOL64=''
+OTOOL=''
+PACKAGE='topiary'
 PACKAGE_BUGREPORT='phewlett76@gmail.com'
 PACKAGE_NAME='topiary'
 PACKAGE_STRING='topiary 0.0.1'
@@ -728,24 +1217,52 @@ PACKAGE_TARNAME='topiary'
 PACKAGE_URL='https://github.com/eccles/liblnxproc'
 PACKAGE_VERSION='0.0.1'
 PATH_SEPARATOR=':'
+RANLIB='ranlib'
+SED='/bin/sed'
+SET_MAKE=''
 SHELL='/bin/bash'
+STRIP='strip'
+VERSION='0.0.1'
+ac_ct_AR='ar'
 ac_ct_CC='gcc'
+ac_ct_DUMPBIN=''
+am__EXEEXT_FALSE=''
+am__EXEEXT_TRUE='#'
+am__fastdepCC_FALSE='#'
+am__fastdepCC_TRUE=''
+am__include='include'
+am__isrc=''
+am__leading_dot='.'
+am__nodep='_no'
+am__quote=''
+am__tar='$${TAR-tar} chof - "$$tardir"'
+am__untar='$${TAR-tar} xf -'
 bindir='${exec_prefix}/bin'
+build='x86_64-unknown-linux-gnu'
 build_alias=''
+build_cpu='x86_64'
+build_os='linux-gnu'
+build_vendor='unknown'
 datadir='${datarootdir}'
 datarootdir='${prefix}/share'
 docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
 dvidir='${docdir}'
 exec_prefix='${prefix}'
+host='x86_64-unknown-linux-gnu'
 host_alias=''
+host_cpu='x86_64'
+host_os='linux-gnu'
+host_vendor='unknown'
 htmldir='${docdir}'
 includedir='${prefix}/include'
 infodir='${datarootdir}/info'
+install_sh='${SHELL} /home/paul/projects/github/liblnxproc/install-sh'
 libdir='${exec_prefix}/lib'
 libexecdir='${exec_prefix}/libexec'
 localedir='${datarootdir}/locale'
 localstatedir='${prefix}/var'
 mandir='${datarootdir}/man'
+mkdir_p='/bin/mkdir -p'
 oldincludedir='/usr/include'
 pdfdir='${docdir}'
 prefix='/usr/local'
@@ -767,6 +1284,8 @@ target_alias=''
 #define PACKAGE_STRING "topiary 0.0.1"
 #define PACKAGE_BUGREPORT "phewlett76@gmail.com"
 #define PACKAGE_URL "https://github.com/eccles/liblnxproc"
+#define PACKAGE "topiary"
+#define VERSION "0.0.1"
 #define STDC_HEADERS 1
 #define HAVE_SYS_TYPES_H 1
 #define HAVE_SYS_STAT_H 1
@@ -777,6 +1296,8 @@ target_alias=''
 #define HAVE_INTTYPES_H 1
 #define HAVE_STDINT_H 1
 #define HAVE_UNISTD_H 1
+#define HAVE_DLFCN_H 1
+#define LT_OBJDIR ".libs/"
 #define HAVE_FCNTL_H 1
 #define HAVE_INTTYPES_H 1
 #define HAVE_LIMITS_H 1

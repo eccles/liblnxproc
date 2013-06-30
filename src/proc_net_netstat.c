@@ -26,7 +26,7 @@ IpExt: 2 0 237 65 1242 73 117712822 103374286 35236 8641 121278 9694
 
 #include "config.h"
 
-#include "stdlib.h"
+#include "topiary_stdlib.h"
 #include <stdio.h>
 #include <string.h>
 

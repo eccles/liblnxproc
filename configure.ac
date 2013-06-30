@@ -4,12 +4,19 @@
 AC_PREREQ([2.69])
 AC_INIT([topiary], [0.0.1], [phewlett76@gmail.com], [topiary], [https://github.com/eccles/liblnxproc])
 #
+AM_INIT_AUTOMAKE
+#
+LT_PREREQ([2.2])
+LT_INIT([dlopen])
+#
 AC_CONFIG_SRCDIR([include/topiary/topiary.h])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_INSTALL
+#AC_PROG_RANLIB
+AM_PROG_CC_C_O
 
 # Checks for libraries.
 
@@ -31,8 +38,8 @@ AC_FUNC_STRERROR_R
 AC_CHECK_FUNCS([gettimeofday memset regcomp strchr strdup strtoul])
 
 AC_CONFIG_FILES([Makefile
+                 data/Makefile
                  include/Makefile
-                 include/topiary/Makefile
                  man/Makefile
                  src/Makefile
                  test/Makefile])
