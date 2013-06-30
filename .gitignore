@@ -6,6 +6,7 @@ z
 # backup files
 *~
 *.orig
+*.org
 
 # Object files
 *.o
