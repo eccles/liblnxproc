@@ -330,7 +330,7 @@ configure:10752: checking how to hardcode library paths into programs
 configure:10777: result: immediate
 configure:10871: checking for shl_load
 configure:10871: gcc -o conftest -g -O2   conftest.c  >&5
-/tmp/ccimadyK.o: In function `main':
+/tmp/ccbXqYbl.o: In function `main':
 /home/paul/projects/github/liblnxproc/conftest.c:57: undefined reference to `shl_load'
 collect2: error: ld returned 1 exit status
 configure:10871: $? = 1
@@ -442,7 +442,7 @@ configure: failed program was:
 configure:10909: result: no
 configure:10914: checking for dlopen
 configure:10914: gcc -o conftest -g -O2   conftest.c  >&5
-/tmp/cceh1FGR.o: In function `main':
+/tmp/ccAu0XXr.o: In function `main':
 /home/paul/projects/github/liblnxproc/conftest.c:57: undefined reference to `dlopen'
 collect2: error: ld returned 1 exit status
 configure:10914: $? = 1
@@ -518,7 +518,7 @@ configure:11154: $? = 0
 configure:11172: result: yes
 configure:11177: checking whether a statically linked program can dlopen itself
 configure:11257: gcc -o conftest -g -O2  -DHAVE_DLFCN_H  -Wl,--export-dynamic -static conftest.c -ldl  >&5
-/tmp/ccmxrrI4.o: In function `main':
+/tmp/ccgnB92F.o: In function `main':
 /home/paul/projects/github/liblnxproc/configure:11236: warning: Using 'dlopen' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
 /usr/bin/ld: dynamic STT_GNU_IFUNC symbol `strcmp' with pointer equality in `/usr/lib/gcc/x86_64-linux-gnu/4.7/../../../x86_64-linux-gnu/libc.a(strcmp.o)' can not be used when making an executable; recompile with -fPIE and relink with -pie
 collect2: error: ld returned 1 exit status
@@ -1037,8 +1037,8 @@ config.status:1101: creating Makefile
 config.status:1101: creating data/Makefile
 config.status:1101: creating include/Makefile
 config.status:1101: creating man/Makefile
-config.status:1101: creating src/Makefile
-config.status:1101: creating test/Makefile
+config.status:1101: creating lib/Makefile
+config.status:1101: creating bin/Makefile
 config.status:1101: creating config.h
 config.status:1282: config.h is unchanged
 config.status:1330: executing depfiles commands

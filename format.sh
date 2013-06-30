@@ -57,7 +57,7 @@ INDTYPES=" \
 #echo ":$*:"
 code=0
 #CNF=${D}/splint.conf
-DIRS="src include/topiary python test"
+DIRS="bin include/topiary python lib"
 for i in ${DIRS}
 do
 #    splint -f ${CNF} -nof $i

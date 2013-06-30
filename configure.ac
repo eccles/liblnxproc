@@ -41,8 +41,8 @@ AC_CONFIG_FILES([Makefile
                  data/Makefile
                  include/Makefile
                  man/Makefile
-                 src/Makefile
-                 test/Makefile])
+                 lib/Makefile
+                 bin/Makefile])
 AC_OUTPUT
 
 echo \

@@ -1,3 +1,3 @@
-SUBDIRS = data include src test man
+SUBDIRS = data include lib bin man
 
 # vim: noexpandtab

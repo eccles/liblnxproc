@@ -38,6 +38,9 @@ core*
 *.tar
 *.tar.gz
 
+# dist dirs
+topiary-[0-9]*
+
 # generated Makefiles
 Makefile
 
@@ -46,6 +49,7 @@ build
 
 # autotools files
 configure.scan
+autom4te.cache
 #compile
 #depcomp
 #install-sh
