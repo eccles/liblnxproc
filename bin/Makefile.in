@@ -53,7 +53,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = topiary$(EXEEXT)
-subdir = test
+subdir = bin
 DIST_COMMON = $(dist_noinst_SCRIPTS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -68,7 +68,7 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_topiary_OBJECTS = topiary-topiary.$(OBJEXT)
 topiary_OBJECTS = $(am_topiary_OBJECTS)
-topiary_DEPENDENCIES = ../src/libtopiary.la
+topiary_DEPENDENCIES = ../lib/libtopiary.la
 topiary_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(topiary_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
@@ -211,7 +211,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 topiary_SOURCES = topiary.c
 topiary_CFLAGS = -I$(top_srcdir)/include
-topiary_LDADD = ../src/libtopiary.la
+topiary_LDADD = ../lib/libtopiary.la
 dist_noinst_SCRIPTS = topiary.sh
 check_SCRIPTS = check-topiary.sh
 CLEANFILES = check-topiary.sh
@@ -228,9 +228,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu test/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu bin/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu test/Makefile
+	  $(AUTOMAKE) --gnu bin/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
