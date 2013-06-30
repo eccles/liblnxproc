@@ -2,3 +2,8 @@ test-topiary
 test-topiary-dbg
 test-topiary-prf
 Makefile
+.deps
+.libs
+*.o
+*.lo
+*.la

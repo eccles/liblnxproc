@@ -9,10 +9,14 @@ z
 
 # Object files
 *.o
+*.lo
 
 # Libraries
 *.lib
 *.a
+*.la
+.deps
+.libs
 
 # Shared objects (inc. Windows DLLs)
 *.dll
