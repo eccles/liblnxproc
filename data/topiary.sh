@@ -1,5 +1,5 @@
 #!/bin/bash
-LD_LIBRARY_PATH=../src
+LD_LIBRARY_PATH=../lib
 export LD_LIBRARY_PATH
 if [ $# -lt 2 ]
 then
@@ -7,7 +7,7 @@ then
     exit 1
 fi
 ulimit -c unlimited
-BIN=${0%.sh}
+BIN=../bin/${0%.sh}
 if [ "${1}" = "test" ]
 then
     FUNC="${1}"

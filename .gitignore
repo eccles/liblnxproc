@@ -50,6 +50,7 @@ build
 # autotools files
 configure.scan
 autom4te.cache
+config.log
 #compile
 #depcomp
 #install-sh
