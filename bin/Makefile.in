@@ -52,6 +52,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = topiary$(EXEEXT)
+noinst_PROGRAMS = test-topiary$(EXEEXT)
 subdir = bin
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -66,7 +67,13 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
-PROGRAMS = $(bin_PROGRAMS)
+PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
+am_test_topiary_OBJECTS = test_topiary-test-topiary.$(OBJEXT)
+test_topiary_OBJECTS = $(am_test_topiary_OBJECTS)
+test_topiary_DEPENDENCIES = ../lib/libtopiary.la
+test_topiary_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(test_topiary_CFLAGS) \
+	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am_topiary_OBJECTS = topiary-topiary.$(OBJEXT)
 topiary_OBJECTS = $(am_topiary_OBJECTS)
 topiary_DEPENDENCIES = ../lib/libtopiary.la
@@ -86,8 +93,8 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(topiary_SOURCES)
-DIST_SOURCES = $(topiary_SOURCES)
+SOURCES = $(test_topiary_SOURCES) $(topiary_SOURCES)
+DIST_SOURCES = $(test_topiary_SOURCES) $(topiary_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -212,6 +219,9 @@ top_srcdir = @top_srcdir@
 topiary_SOURCES = topiary.c
 topiary_CFLAGS = -I$(top_srcdir)/include
 topiary_LDADD = ../lib/libtopiary.la
+test_topiary_SOURCES = test-topiary.c
+test_topiary_CFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/lib
+test_topiary_LDADD = ../lib/libtopiary.la
 all: all-am
 
 .SUFFIXES:
@@ -292,6 +302,18 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+
+clean-noinstPROGRAMS:
+	@list='$(noinst_PROGRAMS)'; test -n "$$list" || exit 0; \
+	echo " rm -f" $$list; \
+	rm -f $$list || exit $$?; \
+	test -n "$(EXEEXT)" || exit 0; \
+	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
+	echo " rm -f" $$list; \
+	rm -f $$list
+test-topiary$(EXEEXT): $(test_topiary_OBJECTS) $(test_topiary_DEPENDENCIES) $(EXTRA_test_topiary_DEPENDENCIES) 
+	@rm -f test-topiary$(EXEEXT)
+	$(test_topiary_LINK) $(test_topiary_OBJECTS) $(test_topiary_LDADD) $(LIBS)
 topiary$(EXEEXT): $(topiary_OBJECTS) $(topiary_DEPENDENCIES) $(EXTRA_topiary_DEPENDENCIES) 
 	@rm -f topiary$(EXEEXT)
 	$(topiary_LINK) $(topiary_OBJECTS) $(topiary_LDADD) $(LIBS)
@@ -302,6 +324,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_topiary-test-topiary.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/topiary-topiary.Po@am__quote@
 
 .c.o:
@@ -324,6 +347,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+
+test_topiary-test-topiary.o: test-topiary.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_topiary_CFLAGS) $(CFLAGS) -MT test_topiary-test-topiary.o -MD -MP -MF $(DEPDIR)/test_topiary-test-topiary.Tpo -c -o test_topiary-test-topiary.o `test -f 'test-topiary.c' || echo '$(srcdir)/'`test-topiary.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/test_topiary-test-topiary.Tpo $(DEPDIR)/test_topiary-test-topiary.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='test-topiary.c' object='test_topiary-test-topiary.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_topiary_CFLAGS) $(CFLAGS) -c -o test_topiary-test-topiary.o `test -f 'test-topiary.c' || echo '$(srcdir)/'`test-topiary.c
+
+test_topiary-test-topiary.obj: test-topiary.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_topiary_CFLAGS) $(CFLAGS) -MT test_topiary-test-topiary.obj -MD -MP -MF $(DEPDIR)/test_topiary-test-topiary.Tpo -c -o test_topiary-test-topiary.obj `if test -f 'test-topiary.c'; then $(CYGPATH_W) 'test-topiary.c'; else $(CYGPATH_W) '$(srcdir)/test-topiary.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/test_topiary-test-topiary.Tpo $(DEPDIR)/test_topiary-test-topiary.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='test-topiary.c' object='test_topiary-test-topiary.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_topiary_CFLAGS) $(CFLAGS) -c -o test_topiary-test-topiary.obj `if test -f 'test-topiary.c'; then $(CYGPATH_W) 'test-topiary.c'; else $(CYGPATH_W) '$(srcdir)/test-topiary.c'; fi`
 
 topiary-topiary.o: topiary.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(topiary_CFLAGS) $(CFLAGS) -MT topiary-topiary.o -MD -MP -MF $(DEPDIR)/topiary-topiary.Tpo -c -o topiary-topiary.o `test -f 'topiary.c' || echo '$(srcdir)/'`topiary.c
@@ -466,7 +503,8 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
+clean-am: clean-binPROGRAMS clean-generic clean-libtool \
+	clean-noinstPROGRAMS mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -537,18 +575,18 @@ uninstall-am: uninstall-binPROGRAMS
 .MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-binPROGRAMS \
-	clean-generic clean-libtool ctags distclean distclean-compile \
-	distclean-generic distclean-libtool distclean-tags distdir dvi \
-	dvi-am html html-am info info-am install install-am \
-	install-binPROGRAMS install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am install-man \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	pdf pdf-am ps ps-am tags uninstall uninstall-am \
-	uninstall-binPROGRAMS
+	clean-generic clean-libtool clean-noinstPROGRAMS ctags \
+	distclean distclean-compile distclean-generic \
+	distclean-libtool distclean-tags distdir dvi dvi-am html \
+	html-am info info-am install install-am install-binPROGRAMS \
+	install-data install-data-am install-dvi install-dvi-am \
+	install-exec install-exec-am install-html install-html-am \
+	install-info install-info-am install-man install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags uninstall uninstall-am uninstall-binPROGRAMS
 
 
 # vim: noexpandtab
