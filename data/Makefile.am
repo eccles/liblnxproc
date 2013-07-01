@@ -1,12 +1,12 @@
-EXTRA_DIST = topiary.sh proc sys var
-check_SCRIPTS = check-topiary.sh
+EXTRA_DIST = proc sys var testdata test.sh
+check_SCRIPTS = check-test.sh
+TESTS = check-test.sh
 
-check-topiary.sh:
-	echo './topiary.sh test nodbg' > check-topiary.sh
-	chmod +x check-topiary.sh
-	./check-topiary.sh
+check-test.sh:
+	echo '$(srcdir)/test.sh $(srcdir)' > check-test.sh
+	chmod +x check-test.sh
 
-CLEANFILES = check-topiary.sh
+CLEANFILES = check-test.sh testoutput
 
 # vim: noexpandtab
 
