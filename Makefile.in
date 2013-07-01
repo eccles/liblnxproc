@@ -246,6 +246,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = data include lib bin man
 ACLOCAL_AMFLAGS = -I m4
+AM_CFLAGS = -Wall -Werror
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 

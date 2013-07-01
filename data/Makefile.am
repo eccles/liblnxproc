@@ -1,3 +1,6 @@
+#if USE_VALGRIND
+#	TESTS_ENVIRONMENT=./valgrind-wrapper
+#endif
 EXTRA_DIST = proc sys var testdata test.sh
 check_SCRIPTS = check-test.sh
 TESTS = check-test.sh

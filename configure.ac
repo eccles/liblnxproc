@@ -33,6 +33,20 @@ AC_TYPE_UINT32_T
 AC_TYPE_UINT8_T
 AC_CHECK_TYPES([ptrdiff_t])
 
+# Support for running test cases using valgrind:
+#
+#use_valgrind=false
+#AC_ARG_ENABLE(valgrind,[--enable-valgrind       Use valgrind when running unit tests. ],[ use_valgrind=true ])
+#
+#if [[ "$use_valgrind" = "true" ]]; then
+#    AC_CHECK_PROG(HAVE_VALGRIND, valgrind, yes, no)
+# 
+#    if [[ "$HAVE_VALGRIND" = "no" ]]; then
+#        AC_MSG_ERROR([Valgrind not found in PATH. ])
+#    fi
+#fi
+#AM_CONDITIONAL(USE_VALGRIND, $use_valgrind)
+#
 # Checks for library functions.
 AC_FUNC_REALLOC
 AC_FUNC_STRERROR_R
