@@ -23,7 +23,7 @@
 .TH TOPIARY 3 2013-05-16 "Linux" "Linux Programmer's Manual"
 .SH NAME
 .nf
-topiary \- interface to reading the /proc/ & /sys filesystems
+libtopiary \- interface to reading the /proc, /sys filesystems and other files
 .fi
 .SH SYNOPSIS
 .nf
@@ -199,6 +199,9 @@ The
 field is an enumerated field. The following table shows each module
 type together with other characteristics:
 
+.TP
+.B TOPIARY_NTP_DRIFT    
+reads the /var/lib/ntp/ntp.drift file.
 .TP
 .B TOPIARY_PROC_BUDDYINFO    
 reads the /proc/buddyinfo file.
@@ -423,7 +426,7 @@ normalize and hash phases.
 returns the memory consumed.
 .P
 .BR topiary_iterate()
-iterates over the whole datatset, executing the supplied function on every data
+iterates over the whole dataset, executing the supplied function on every data
 point found.
 .P
 .BR topiary_fetch()
@@ -742,4 +745,4 @@ TBD
 A description of the project,
 and information about reporting bugs,
 can be found at
-http://www.github.com/eccles/libtopiary/.
+http://www.github.com/eccles/liblnxproc/.
