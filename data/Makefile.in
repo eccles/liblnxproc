@@ -482,7 +482,7 @@ uninstall-am:
 
 
 check-test.sh:
-	echo '$(srcdir)/test.sh $(srcdir)' > check-test.sh
+	echo '$(srcdir)/test.sh $(srcdir) "@CFLAGS@"' > check-test.sh
 	chmod +x check-test.sh
 
 # vim: noexpandtab

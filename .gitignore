@@ -46,6 +46,9 @@ Makefile
 
 # separate build directories
 build
+debug
+perform
+valgrind
 
 # autotools files
 configure.scan

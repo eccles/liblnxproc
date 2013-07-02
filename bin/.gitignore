@@ -1,8 +1,7 @@
 topiary
-topiary-dbg
-topiary-prf
+test-topiary
 gmon.out
 Makefile
-.libs/*
-.deps/*
+.libs
+.deps
 

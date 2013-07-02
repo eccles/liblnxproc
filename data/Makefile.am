@@ -6,7 +6,7 @@ check_SCRIPTS = check-test.sh
 TESTS = check-test.sh
 
 check-test.sh:
-	echo '$(srcdir)/test.sh $(srcdir)' > check-test.sh
+	echo '$(srcdir)/test.sh $(srcdir) "@CFLAGS@"' > check-test.sh
 	chmod +x check-test.sh
 
 CLEANFILES = check-test.sh testoutput

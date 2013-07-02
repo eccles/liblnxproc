@@ -1,12 +1,15 @@
 
 In no particular order:
 
-    - autotools
     - modify print functions to optional fd with differing levels of detail
     - python interface
     - master task - uses curses to show values on terminal like top
     - slave task - samples module at given rate and outputs somewhere
     - slave tasks manager
     - shared memory to monitor slave tasks
+    - read from socket as well as a file
+    - load individual modules on demand (ltdl)
+    - add support for gprof,gcov
+    - add support for valgrind
 
 
