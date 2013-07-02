@@ -31,5 +31,12 @@ $(SYSHDRS) $(PRIVHDRS) $(PROCHDRS) $(FUNCHDRS)
 libtopiary_la_CFLAGS = -I$(top_srcdir)/include
 libtopiary_la_LDFLAGS = -release 0.0.1 -version-info 0:0:0
 
+#install-exec-hook:
+#	if test "$$USER" = "root"; then \
+#	groupadd -f topiary;\
+#	chgrp topiary $(DESTDIR)/$(libdir)/libtopiary;\
+#	fi;
+#	chmod 750 $(DESTDIR)$(libdir)/libtopiary
+#
 # vim: noexpandtab
 

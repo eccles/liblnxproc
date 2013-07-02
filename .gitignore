@@ -54,6 +54,11 @@ valgrind
 configure.scan
 autom4te.cache
 config.log
+deleted:    config.h
+config.status
+libtool
+stamp-h1
+
 #compile
 #depcomp
 #install-sh

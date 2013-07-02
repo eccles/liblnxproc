@@ -963,6 +963,13 @@ uninstall-am: uninstall-libLTLIBRARIES
 	tags uninstall uninstall-am uninstall-libLTLIBRARIES
 
 
+#install-exec-hook:
+#	if test "$$USER" = "root"; then \
+#	groupadd -f topiary;\
+#	chgrp topiary $(DESTDIR)/$(libdir)/libtopiary;\
+#	fi;
+#	chmod 750 $(DESTDIR)$(libdir)/libtopiary
+#
 # vim: noexpandtab
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
