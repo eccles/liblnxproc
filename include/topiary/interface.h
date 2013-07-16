@@ -51,6 +51,10 @@ extern "C" {
  * WARN: must be in same order as table in interface.c 
  * only add new modules to end of enum to preserve a consistent API
  *
+ * TOPIARY_ALL is used *only* for testing.
+ *
+ * TOPIARY_LAST is used *only* as an end marker.
+ *
  * @see topiary_new()
  */
 
@@ -109,14 +113,14 @@ extern "C" {
  *
  * @return              A TOPIARY_ERROR value - 0 is success.
  */
-    int topiary_new(TOPIARY_MODULE_T **moduleptr, size_t nmodule);
+    int topiary_new(TOPIARY_MODULE_T **modulesptr, size_t nmodule);
 
 /**
  * @brief Free a module.
  *
  * @param[in]  modulesptr   Address of pointer to module - modules reference
- *                         count is decremented\. If 0 the module structure 
- *                         is freed.
+ *                         count is decremented\. If reference count is 0 the 
+ *                         module structure is freed.
  *
  * @return              A TOPIARY_ERROR value - 0 is success.
  */
@@ -125,47 +129,48 @@ extern "C" {
 /**
  * @brief Set attribute for one row of the module.
  *
- * @param[in]  module   Address of module.
+ * @param[in]  modules   Address of modules.
  *
  * @param[in]  pos   Position - from 0 to nmodule-1.
  *
  * @param[in]  type Indicates which submodule to map to this row of the
  *                  module.
  *
+ * @see topiary_module_type_t
+ *
  * @param[in]  optional Address of optional structure.
  *
  * @return              A TOPIARY_ERROR value - 0 is success.
  *
- * @see topiary_module_type_t
  */
-    int topiary_set(TOPIARY_MODULE_T *module, size_t pos,
+    int topiary_set(TOPIARY_MODULE_T *modules, size_t pos,
                     TOPIARY_MODULE_TYPE_T type, TOPIARY_OPT_T *optional);
 /**
- * @brief Set tag for one row of the module.
+ * @brief Gets tag for one row of the module.
  *
- * @param[in]  module   Address of module.
+ * @param[in]  modules   Address of modules.
  *
  * @param[in]  pos   Position - from 0 to nmodule-1.
  *
- * @param[in]  tag Character string that tags row.
+ * @param[out]  tag Address of character string that tags row.
  *
  * @return              A TOPIARY_ERROR value - 0 is success.
  */
-    int topiary_tag(TOPIARY_MODULE_T *module, size_t pos, const char **tag);
+    int topiary_tag(TOPIARY_MODULE_T *modules, size_t pos, const char **tag);
 
 /**
  * @brief Read data for all submodules.
  *
- * @param[in]  module   Address of module.
+ * @param[in]  modules   Address of modules.
  *
  * @return              A TOPIARY_ERROR value - 0 is success.
  */
-    int topiary_read(TOPIARY_MODULE_T *module);
+    int topiary_read(TOPIARY_MODULE_T *modules);
 
 /**
  * @brief Print data for all submodules from last read operation.
  *
- * @param[in]  module   Address of module.
+ * @param[in]  modules   Address of modules.
  *
  * @param[in]  fd   File descriptor to output results.
  *
@@ -173,26 +178,26 @@ extern "C" {
  *
  * @return              A TOPIARY_ERROR value - 0 is success.
  */
-    int topiary_print(TOPIARY_MODULE_T *module, int fd, TOPIARY_PRINT_T print);
+    int topiary_print(TOPIARY_MODULE_T *modules, int fd, TOPIARY_PRINT_T print);
 
 /**
  * @brief Print performance.
  *
- * @param[in]  module   Address of module.
+ * @param[in]  modules   Address of modules.
  *
- * @param[in]  rawread_time   Address of where to put time to read data
+ * @param[out]  rawread_time   Address of where to put time to read data
  *
- * @param[in]  map_time   Address of where to put time to map data to array.
+ * @param[out]  map_time   Address of where to put time to map data to array.
  *
- * @param[in]  normalize_time   Address of where to put time to normalize 
+ * @param[out]  normalize_time   Address of where to put time to normalize 
  *                              data i.e. convert to standard units and 
  *                              calculate rates and usage.
  *
- * @param[in]  hash_time   Address of where to put time to create hash map.
+ * @param[out]  hash_time   Address of where to put time to create hash map.
  *
  * @return              A TOPIARY_ERROR value - 0 is success.
  */
-    int topiary_performance(TOPIARY_MODULE_T *module,
+    int topiary_performance(TOPIARY_MODULE_T *modules,
                             long *rawread_time,
                             long *map_time,
                             long *normalize_time, long *hash_time);
@@ -200,13 +205,13 @@ extern "C" {
 /**
  * @brief Print memory consumption.
  *
- * @param[in]  module   Address of module.
+ * @param[in]  modules   Address of modules.
  *
- * @param[in]  size   Address of where to put used RAM.
+ * @param[out]  size   Address of where to put used RAM.
  *
  * @return              A TOPIARY_ERROR value - 0 is success.
  */
-    int topiary_size(TOPIARY_MODULE_T *module, size_t * size );
+    int topiary_size(TOPIARY_MODULE_T *modules, size_t * size );
 
 /**
  * @brief Callback function type.
@@ -231,7 +236,7 @@ extern "C" {
 /**
  * @brief Iterate over all values from last read operation.
  *
- * @param[in]  modules   Address of module.
+ * @param[in]  modules   Address of modules.
  *
  * @param[in]  func  Callback function.
  *
@@ -246,7 +251,7 @@ extern "C" {
 /**
  * @brief Fetch data value.
  *
- * @param[in]  modules   Address of module.
+ * @param[in]  modules   Address of modules.
  *
  * @param[in]  type Indicates which submodule.
  *
@@ -254,16 +259,16 @@ extern "C" {
  *
  * @param[out]  value  Location to store value.
  *
- * @param[in]  value  Length of value buffer.
+ * @param[in]  valuelen  Length of value buffer.
  *
- * @param[in]  pbuf  ?.
+ * @param[out]  pbuf  Contains pointer to string containing value.
  *
  * @return              A TOPIARY_ERROR value - 0 is success.
  */
     int topiary_fetch(TOPIARY_MODULE_T *modules, TOPIARY_MODULE_TYPE_T type,
                       char *key, char *value, size_t valuelen, char **pbuf);
 
-/* @} ******************************************************************/
+/** @} ******************************************************************/
 
 #ifdef __cplusplus
 }                               // extern "C"
