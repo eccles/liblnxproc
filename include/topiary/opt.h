@@ -63,6 +63,8 @@ extern "C" {
 /**
  * @brief Set fileglob attribute for object.
  *
+ * @param[in]  opt   Address of object.
+ *
  * @param[in]  fileglob   File globbing pattern.
  *
  * @return              A TOPIARY_ERROR value - 0 is success.
@@ -72,6 +74,8 @@ extern "C" {
 
 /**
  * @brief Set master attribute for object.
+ *
+ * @param[in]  opt   Address of object.
  *
  * @param[in]  master   Master task character string.
  *
@@ -85,6 +89,8 @@ extern "C" {
 
 /**
  * @brief Set submodule attribute for object.
+ *
+ * @param[in]  opt   Address of object.
  *
  * @param[in]  module   Submodule object.
  *
