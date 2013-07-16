@@ -248,7 +248,7 @@ topiary_set(TOPIARY_MODULE_T *module, size_t pos,
     }
 
     if (row->optional) {
-        TOPIARY_OPT_FREE(row->optional);
+        topiary_opt_free(&row->optional);
     }
 
     memcpy(row, mymodules + type - 1, sizeof(_TOPIARY_MODULE_ROW_T));

@@ -737,7 +737,7 @@ _topiary_base_set_optional(_TOPIARY_BASE_T *base, TOPIARY_OPT_T *optional)
         return TOPIARY_ERROR_ILLEGAL_ARG;
     }
     if (base->optional) {
-        TOPIARY_OPT_FREE(base->optional);
+        topiary_opt_free(&base->optional);
     }
     topiary_opt_new(&optional);
     base->optional = optional;
@@ -1016,7 +1016,7 @@ _topiary_base_free(_TOPIARY_BASE_T **baseptr)
         DESTROY(base->fileprefix);
         DESTROY(base->fileglob);
         DESTROY(base->filesuffix);
-        TOPIARY_OPT_FREE(base->optional);
+        topiary_opt_free(&base->optional);
         _TOPIARY_DEBUG("Free Base\n");
         DESTROY(base);
         *baseptr = NULL;

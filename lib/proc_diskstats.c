@@ -447,7 +447,7 @@ _topiary_proc_diskstats_new(_TOPIARY_BASE_T **base, TOPIARY_OPT_T *optional)
         topiary_opt_new(&opt);
         ret = _topiary_opt_set_results(opt, disksectors->current->results);
         ret = _topiary_base_set_optional(*base, opt);
-        TOPIARY_OPT_FREE(opt);
+        topiary_opt_free(&opt);
     }
     _TOPIARY_BASE_FREE(disksectors);
     _TOPIARY_LIMITS_FREE(limits);

@@ -556,7 +556,7 @@ test_interface(void)
 
     topiary_new(&modules, 1);
     topiary_set(modules, 0, TOPIARY_PROC_PID_STAT, opt);
-    TOPIARY_OPT_FREE(opt);
+    topiary_opt_free(&opt);
 
     topiary_read(modules);
     topiary_read(modules);
@@ -570,7 +570,7 @@ test_interface(void)
     topiary_opt_set_master(opt, "chrome");
     topiary_new(&modules, 1);
     topiary_set(modules, 0, TOPIARY_PROC_PID_STAT, opt);
-    TOPIARY_OPT_FREE(opt);
+    topiary_opt_free(&opt);
 
     topiary_read(modules);
     topiary_read(modules);
@@ -584,7 +584,7 @@ test_interface(void)
     topiary_opt_set_fileglob(opt, "sd*");
     topiary_new(&modules, 1);
     topiary_set(modules, 0, TOPIARY_SYS_DISKSECTORS, opt);
-    TOPIARY_OPT_FREE(opt);
+    topiary_opt_free(&opt);
 
     topiary_read(modules);
     topiary_read(modules);
@@ -611,7 +611,7 @@ test_module(TOPIARY_MODULE_TYPE_T type, TOPIARY_OPT_T *opt)
 
         topiary_tag(modules, 0, &tag);
         ret = topiary_set(modules, 0, type, opt);
-        TOPIARY_OPT_FREE(opt);
+        topiary_opt_free(&opt);
         if (ret) {
             printf("%s: Error '%s'\n", tag,
                    topiary_strerror(ret, errbuf, sizeof errbuf));

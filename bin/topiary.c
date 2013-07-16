@@ -124,7 +124,7 @@ test_all(void)
     TOPIARY_MODULE_T *modules = NULL; \
     topiary_new(&modules, 1); \
     topiary_set(modules, 0, (type), opt ); \
-    TOPIARY_OPT_FREE(opt); \
+    topiary_opt_free(&opt); \
 \
     test_module(modules, #type); \
     topiary_free(&modules); \
@@ -142,7 +142,7 @@ test_all(void)
     TOPIARY_MODULE_T *modules = NULL; \
     topiary_new(&modules, 1); \
     topiary_set(modules, 0, (type), opt ); \
-    TOPIARY_OPT_FREE(opt); \
+    topiary_opt_free(&opt); \
 \
     test_module(modules, #type); \
     topiary_free(&modules); \
@@ -162,7 +162,7 @@ test_all(void)
     TOPIARY_MODULE_T *modules = NULL; \
     topiary_new(&modules, 1); \
     topiary_set(modules, 0, (type), opt ); \
-    TOPIARY_OPT_FREE(opt); \
+    topiary_opt_free(&opt); \
 \
     test_module(modules, #type); \
     topiary_free(&modules); \

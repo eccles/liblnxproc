@@ -84,8 +84,6 @@ libtopiary \- interface to reading the /proc, /sys filesystems and other files
 
 .BI "int topiary_opt_free(TOPIARY_OPT_T **" optptr ");"
 
-.BI "TOPIARY_OPT_FREE(" b ")"
-
 .fi
 .sp
 Compile and link with \fI\-ltopiary\fP.
@@ -287,7 +285,7 @@ For example the following code will only retrieve data for
         TOPIARY_MODULE_T * modules = NULL;
         topiary_new(&modules, 1);
         topiary_set(modules, 0, TOPIARY_PROC_PID_STAT, opt);
-        TOPIARY_OPT_FREE(opt);
+        topiary_opt_free(&opt);
 
 .fi
 .TP
@@ -442,7 +440,7 @@ will be incremented) . Viz:
         TOPIARY_OPT_T *opt = NULL; // is NULL to create new object
         topiary_opt_new(&opt);
         ...
-        TOPIARY_OPT_FREE(opt);
+        topiary_opt_free(&opt);
 
 .fi
 .P
@@ -489,10 +487,6 @@ object
 and nullifies the 
 .B opt 
 pointer.
-.P
-.BR TOPIARY_OPT_FREE()
-macro version of
-.B topiary_opt_free()
 .SS Error handling
 .P
 .BR topiary_strerror()
@@ -678,7 +672,7 @@ main(int argc, char *argv[])
     topiary_opt_set_fileglob(opt,"sd*");
     topiary_new(&modules, 1); // get sector size for esata disks
     topiary_set(modules, 0, TOPIARY_SYS_DISKSECTORS, opt);
-    TOPIARY_OPT_FREE(opt);
+    topiary_opt_free(&opt);
     test_module(modules, "sys_sd_disksectors");
     topiary_free(&modules);
 
@@ -696,7 +690,7 @@ main(int argc, char *argv[])
     topiary_new(&modules, 1); // Read /proc/<pid>/stat file for 
                               // this process
     topiary_set(modules, 0, TOPIARY_PROC_PID_STAT, opt);
-    TOPIARY_OPT_FREE(opt);
+    topiary_opt_free(&opt);
 
     char buf[32];
     snprintf(buf, sizeof buf, "proc_%s_stat", pid);
@@ -708,7 +702,7 @@ main(int argc, char *argv[])
     topiary_new(&modules, 1); // Read /proc/<pid>/stat file for 
                               // all chrome processes
     topiary_set(modules, 0, TOPIARY_PROC_PID_STAT, opt);
-    TOPIARY_OPT_FREE(opt);
+    topiary_opt_free(&opt);
 
     test_module(modules, "proc_chrome_stat");
     topiary_free(&modules);
@@ -724,7 +718,7 @@ main(int argc, char *argv[])
                               // all chrome processes together
                               // with /proc/<pid>/statm
     topiary_set(modules, 0, TOPIARY_PROC_PID_STAT, opt);
-    TOPIARY_OPT_FREE(opt);
+    topiary_opt_free(&opt);
 
     test_module(modules, "proc_chrome_stat_statm");
     topiary_free(&modules);
