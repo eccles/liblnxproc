@@ -1,3 +1,6 @@
+#ifndef TOPIARY_UTIL_H
+#define TOPIARY_UTIL_H 1
+
 /*
  *  'topiary' - gather stats on linux performance
  *  Copyright (C) 2013  Paul Hewlett phewlett76@gmail.com
@@ -18,23 +21,68 @@
  *
  */
 
-/* Common macros and utility functions
- */
-
-#ifndef TOPIARY_UTIL_H
-#define TOPIARY_UTIL_H 1
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/**
+ * @defgroup util The topiary utility API.
+ *
+ * Some utility functions.
+ *
+ * @section topiary_util Utility functions.
+ *
+ * @{
+ */
+
 #include <sys/time.h>
 #include <stddef.h>
 
+/**
+ * @brief Calculate float representation of time from timeval struct.
+ *
+ * @param[in]  tv   Address of struct timeval.
+ *
+ * @return          float representation of time in seconds.
+ *
+ */
     float topiary_timeval_secs(struct timeval *tv);
+
+/**
+ * @brief Calculate long representation of time difference from timeval structs.
+ *
+ * @param[in]  start   Address of struct timeval start time.
+ *
+ * @param[in]  end   Address of struct timeval end time.
+ *
+ * @return          long representation of time in microseconds.
+ *
+ */
     long topiary_timeval_diff(struct timeval *start, struct timeval *end);
+
+/**
+ * @brief Calculate string representation of time from timeval struct.
+ *
+ * @param[in]  tv   Address of struct timeval.
+ *
+ * @param[out]  buf   Address of buffer into which to store result.
+ *
+ * @param[in]  len   Length of buf.
+ *
+ * @return          character representation of time in SSSSSS.UUUUUU seconds.
+ *
+ */
     char *topiary_timeval_print(struct timeval *tv, char *buf, size_t len);
+
+/**
+ * @brief Return current time.
+ *
+ * @return          current time in struct timeval.
+ *
+ */
     struct timeval topiary_timeval(void);
+
+/** @} ******************************************************************/
 
 #ifdef __cplusplus
 }                               // extern "C"
