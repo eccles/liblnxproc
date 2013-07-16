@@ -1,3 +1,6 @@
+#ifndef TOPIARY_PRINT_H
+#define TOPIARY_PRINT_H 1
+
 /*
  *  'topiary' - gather stats on linux performance
  *  Copyright (C) 2013  Paul Hewlett phewlett76@gmail.com
@@ -18,13 +21,30 @@
  *
  */
 
-#ifndef TOPIARY_PRINT_H
-#define TOPIARY_PRINT_H 1
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/**
+ * @defgroup print The topiary print API.
+ *
+ * This module controls output of the various print functions in topiary.
+ *
+ * @section topiary_print Print control.
+ *
+ * @{
+ */
+
+/**
+ * @brief Print selection.
+ *
+ * TOPIARY_PRINT_ALL Print all data.
+ *
+ * TOPIARY_PRINT_VALUES Print only values in key,value form.
+ *
+ * TOPIARY_PRINT_JSON Print only values in JSON form.
+ *
+ */
     enum topiary_print_t {
         TOPIARY_PRINT_ALL = 0,
         TOPIARY_PRINT_VALUES,
@@ -32,7 +52,10 @@ extern "C" {
         TOPIARY_PRINT_SIZE      // must be last
     };
 
+/** A convenient typedef for the TOPIARY_PRINT_T object */
     typedef enum topiary_print_t TOPIARY_PRINT_T;
+
+/** @} ******************************************************************/
 
 #ifdef __cplusplus
 }                               // extern "C"
