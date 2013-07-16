@@ -38,8 +38,6 @@ libtopiary \- interface to reading the /proc, /sys filesystems and other files
 
 .BI "int topiary_free(TOPIARY_MODULE_T **" modulesptr ");"
 
-.BI "TOPIARY_FREE(" b ")"
-
 .BI "int topiary_read(TOPIARY_MODULE_T *" modules ");"
 
 .BI "int topiary_print(TOPIARY_MODULE_T *" modules ,
@@ -381,10 +379,6 @@ frees all allocated memory for
 and nullifies the 
 .B modules 
 pointer.
-.P
-.BR TOPIARY_FREE()
-macro version of
-.B topiary_free()
 .SS Actions
 .P
 .BR topiary_read()
@@ -654,30 +648,30 @@ main(int argc, char *argv[])
     TOPIARY_MODULE_T * modules = NULL;
     topiary_new(&modules, 0); // load all modules
     test_module(modules, "All");
-    TOPIARY_FREE(modules);
+    topiary_free(&modules);
 
     topiary_new(&modules, 1); // only read /proc/cgroups
     topiary_set(modules, 0, TOPIARY_PROC_CGROUPS, NULL);
     test_module(modules, "proc_cgroups");
-    TOPIARY_FREE(modules);
+    topiary_free(&modules);
 
     topiary_new(&modules, 2); // read /proc/groups and 
                               // /proc/diskstats simultaneously
     topiary_set(modules, 0, TOPIARY_PROC_CGROUPS, NULL);
     topiary_set(modules, 1, TOPIARY_PROC_DISKSTATS, NULL);
     test_module(modules, "proc_diskstats");
-    TOPIARY_FREE(modules);
+    topiary_free(&modules);
 
     topiary_new(&modules, 1); // Domainname - the value is memoized
     topiary_set(modules, 0, TOPIARY_PROC_DOMAINNAME, NULL);
     test_module(modules, "proc_domainname");
-    TOPIARY_FREE(modules);
+    topiary_free(&modules);
 
     topiary_new(&modules, 1); // Get sector size for every disk 
                               // memoized
     topiary_set(modules, 0, TOPIARY_SYS_DISKSECTORS, NULL);
     test_module(modules, "sys_disksectors");
-    TOPIARY_FREE(modules);
+    topiary_free(&modules);
 
     TOPIARY_OPT_T *opt = NULL;
     topiary_opt_new(&opt);
@@ -686,13 +680,13 @@ main(int argc, char *argv[])
     topiary_set(modules, 0, TOPIARY_SYS_DISKSECTORS, opt);
     TOPIARY_OPT_FREE(opt);
     test_module(modules, "sys_sd_disksectors");
-    TOPIARY_FREE(modules);
+    topiary_free(&modules);
 
     topiary_new(&modules, 1); // Read /proc/<pid>/stat file for 
                               // every process
     topiary_set(modules, 0, TOPIARY_PROC_PID_STAT, NULL);
     test_module(modules, "proc_pid_stat");
-    TOPIARY_FREE(modules);
+    topiary_free(&modules);
 
     char pid[32];
 
@@ -707,7 +701,7 @@ main(int argc, char *argv[])
     char buf[32];
     snprintf(buf, sizeof buf, "proc_%s_stat", pid);
     test_module(modules, buf);
-    TOPIARY_FREE(modules);
+    topiary_free(&modules);
 
     topiary_opt_new(&opt);
     topiary_opt_set_master(opt,"chrome");
@@ -717,7 +711,7 @@ main(int argc, char *argv[])
     TOPIARY_OPT_FREE(opt);
 
     test_module(modules, "proc_chrome_stat");
-    TOPIARY_FREE(modules);
+    topiary_free(&modules);
 
     TOPIARY_MODULE_T * submodules = NULL;
     topiary_new(&submodules, 1); // Read /proc/<pid>/statm file 
@@ -725,7 +719,7 @@ main(int argc, char *argv[])
     topiary_opt_new(&opt);
     topiary_opt_set_master(opt,"chrome");
     topiary_opt_set_module(opt,submodules);
-    TOPIARY_FREE(submodules);
+    topiary_free(&submodules);
     topiary_new(&modules, 1); // Read /proc/<pid>/stat file for 
                               // all chrome processes together
                               // with /proc/<pid>/statm
@@ -733,7 +727,7 @@ main(int argc, char *argv[])
     TOPIARY_OPT_FREE(opt);
 
     test_module(modules, "proc_chrome_stat_statm");
-    TOPIARY_FREE(modules);
+    topiary_free(&modules);
 
     return 0;
 }

@@ -549,7 +549,7 @@ test_interface(void)
     topiary_print(modules, STDOUT_FILENO, TOPIARY_PRINT_ALL);
     topiary_print(modules, STDOUT_FILENO, TOPIARY_PRINT_JSON);
     topiary_iterate(modules, interface_func, "All");
-    TOPIARY_FREE(modules);
+    topiary_free(&modules);
 
     topiary_opt_new(&opt);
     topiary_opt_set_fileglob(opt, pid);
@@ -564,7 +564,7 @@ test_interface(void)
     topiary_print(modules, STDOUT_FILENO, TOPIARY_PRINT_ALL);
     topiary_print(modules, STDOUT_FILENO, TOPIARY_PRINT_JSON);
     topiary_iterate(modules, interface_func, "PID_STAT");
-    TOPIARY_FREE(modules);
+    topiary_free(&modules);
 
     topiary_opt_new(&opt);
     topiary_opt_set_master(opt, "chrome");
@@ -578,7 +578,7 @@ test_interface(void)
     topiary_print(modules, STDOUT_FILENO, TOPIARY_PRINT_ALL);
     topiary_print(modules, STDOUT_FILENO, TOPIARY_PRINT_JSON);
     topiary_iterate(modules, interface_func, "PID_STAT");
-    TOPIARY_FREE(modules);
+    topiary_free(&modules);
 
     topiary_opt_new(&opt);
     topiary_opt_set_fileglob(opt, "sd*");
@@ -592,7 +592,7 @@ test_interface(void)
     topiary_print(modules, STDOUT_FILENO, TOPIARY_PRINT_ALL);
     topiary_print(modules, STDOUT_FILENO, TOPIARY_PRINT_JSON);
     topiary_iterate(modules, interface_func, "SYS_DISKSECTORS");
-    TOPIARY_FREE(modules);
+    topiary_free(&modules);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -630,7 +630,7 @@ test_module(TOPIARY_MODULE_TYPE_T type, TOPIARY_OPT_T *opt)
             topiary_print(modules, STDOUT_FILENO, TOPIARY_PRINT_JSON);
             topiary_print(modules, STDOUT_FILENO, TOPIARY_PRINT_ALL);
         }
-        TOPIARY_FREE(modules);
+        topiary_free(&modules);
     }
 }
 
@@ -668,7 +668,7 @@ test_mod_module(TOPIARY_MODULE_TYPE_T type, char *task,
     topiary_opt_new(&opt);
     topiary_opt_set_master(opt, task);
     topiary_opt_set_module(opt, sub);
-    TOPIARY_FREE(sub);
+    topiary_free(&sub);
 
     test_module(type, opt);
 }

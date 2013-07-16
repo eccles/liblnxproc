@@ -55,7 +55,7 @@ topiary_opt_release(void *arg)
         DESTROY(opt->fileglob);
         _TOPIARY_RESULTS_FREE(opt->results);
         DESTROY(opt->master);
-        TOPIARY_FREE(opt->module);
+        topiary_free(&opt->module);
     }
 }
 
@@ -101,7 +101,7 @@ topiary_opt_set_module(TOPIARY_OPT_T *opt, TOPIARY_MODULE_T *module)
         _TOPIARY_ERROR_DEBUG(TOPIARY_ERROR_ILLEGAL_ARG, "Option");
         return TOPIARY_ERROR_ILLEGAL_ARG;
     }
-    TOPIARY_FREE(opt->module);
+    topiary_free(&opt->module);
     if (module) {
         topiary_new(&module, module->nmodules);
         opt->module = module;

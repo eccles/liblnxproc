@@ -1,4 +1,5 @@
 #!/bin/sh
+make distclean
 rm -rf build debug topiary*.tar.gz
 find -type f -name '*~' -exec rm -f {} \; -print
 find -type f -name 'x' -exec rm -f {} \; -print

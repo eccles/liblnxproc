@@ -102,7 +102,7 @@ test_all(void)
 
     topiary_new(&modules, 0);
     test_module(modules, "All");
-    TOPIARY_FREE(modules);
+    topiary_free(&modules);
 
 }
 
@@ -113,7 +113,7 @@ test_all(void)
     topiary_set(modules, 0, (type), NULL ); \
 \
     test_module(modules, #type); \
-    TOPIARY_FREE(modules); \
+    topiary_free(&modules); \
 } while(0)
 
 #define TEST_GLOB_MODULE(type,option) do {\
@@ -127,7 +127,7 @@ test_all(void)
     TOPIARY_OPT_FREE(opt); \
 \
     test_module(modules, #type); \
-    TOPIARY_FREE(modules); \
+    topiary_free(&modules); \
 } while(0)
 
 #define TEST_PID_MODULE(type) do {\
@@ -145,14 +145,14 @@ test_all(void)
     TOPIARY_OPT_FREE(opt); \
 \
     test_module(modules, #type); \
-    TOPIARY_FREE(modules); \
+    topiary_free(&modules); \
 } while(0)
 
 #define TEST_MOD_MODULE(type,task,subtype) do {\
     TOPIARY_MODULE_T *submodule = NULL; \
     topiary_new(&submodule, 1); \
     topiary_set(submodule, 0, (subtype), NULL ); \
-    TOPIARY_FREE(submodule); \
+    topiary_free(&submodule); \
 \
     TOPIARY_OPT_T *opt = NULL; \
     topiary_opt_new(&opt); \
@@ -165,7 +165,7 @@ test_all(void)
     TOPIARY_OPT_FREE(opt); \
 \
     test_module(modules, #type); \
-    TOPIARY_FREE(modules); \
+    topiary_free(&modules); \
 } while(0)
 
 /*----------------------------------------------------------------------------*/

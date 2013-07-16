@@ -33,19 +33,15 @@ AC_TYPE_UINT32_T
 AC_TYPE_UINT8_T
 AC_CHECK_TYPES([ptrdiff_t])
 
-# Support for running test cases using valgrind:
-#
-#use_valgrind=false
-#AC_ARG_ENABLE(valgrind,[--enable-valgrind       Use valgrind when running unit tests. ],[ use_valgrind=true ])
-#
-#if [[ "$use_valgrind" = "true" ]]; then
-#    AC_CHECK_PROG(HAVE_VALGRIND, valgrind, yes, no)
-# 
-#    if [[ "$HAVE_VALGRIND" = "no" ]]; then
-#        AC_MSG_ERROR([Valgrind not found in PATH. ])
-#    fi
-#fi
-#AM_CONDITIONAL(USE_VALGRIND, $use_valgrind)
+# doxygen support
+
+AC_CHECK_PROGS([DOXYGEN], [doxygen])
+if test -z "$DOXYGEN";
+   then AC_MSG_WARN([Doxygen not found - continuing without Doxygen support])
+fi
+AM_CONDITIONAL([HAVE_DOXYGEN], 
+[test -n "$DOXYGEN"])AM_COND_IF([HAVE_DOXYGEN], [AC_CONFIG_FILES([docs/Doxyfile])])
+
 #
 # Checks for library functions.
 AC_FUNC_REALLOC
@@ -56,6 +52,7 @@ AC_CONFIG_FILES([Makefile
                  data/Makefile
                  include/Makefile
                  man/Makefile
+                 docs/Makefile
                  lib/Makefile
                  bin/Makefile])
 AC_OUTPUT

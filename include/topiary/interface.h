@@ -1,3 +1,6 @@
+#ifndef TOPIARY_INTERFACE_H
+#define TOPIARY_INTERFACE_H 1
+
 /*
  *  'topiary' - gather stats on linux performance
  *  Copyright (C) 2013  Paul Hewlett phewlett76@gmail.com
@@ -18,9 +21,6 @@
  *
  */
 
-#ifndef TOPIARY_INTERFACE_H
-#define TOPIARY_INTERFACE_H 1
-
 #include <topiary/util.h>
 #include <topiary/error.h>
 #include <topiary/print.h>
@@ -30,9 +30,28 @@
 extern "C" {
 #endif
 
-/* 
- * must be in same order as table in interface.c 
- * only add to end of enum to preserve a consistent API
+/**
+ * @defgroup topiary The topiary API
+ *
+ * topiary is an interface to the /proc,/sys and other system files that reads
+ * parameters and calculates (if appropriate) rates and usage statistics of a
+ * Linux system.
+ *
+ * @section topiary_interface Interface
+ *
+ * Similar in design to the pthreads library. That is all structures are 
+ * opaque and must be created by suitable function calls.
+ *
+ * @{
+ */
+
+/**
+ * @brief Indicates which topiary module is selected
+ *
+ * WARN: must be in same order as table in interface.c 
+ * only add new modules to end of enum to preserve a consistent API
+ *
+ * @see topiary_new()
  */
 
     enum topiary_module_type_t {
@@ -73,35 +92,178 @@ extern "C" {
         TOPIARY_NTP_DRIFT,
         TOPIARY_LAST,           // must be last
     };
+
+/** A convenient typedef for the enum topiary_module_type_t */
     typedef enum topiary_module_type_t TOPIARY_MODULE_TYPE_T;
 
+/** A convenient typedef for the struct topiary_module_t */
     typedef struct topiary_module_t TOPIARY_MODULE_T;
 
+/**
+ * @brief Create a module.
+ *
+ * @param[in]  modulesptr  Address of pointer to module - must contain NULL if
+ *                         a new structure is required.
+ *
+ * @param[in]  nmodule The number of submodules required.
+ *
+ * @return              A TOPIARY_ERROR value - 0 is success.
+ */
     int topiary_new(TOPIARY_MODULE_T **moduleptr, size_t nmodule);
-    int topiary_size(TOPIARY_MODULE_T *module, size_t * size);
-    int topiary_set(TOPIARY_MODULE_T *module, size_t pos,
-                    TOPIARY_MODULE_TYPE_T type, TOPIARY_OPT_T *optional);
-    int topiary_tag(TOPIARY_MODULE_T *module, size_t pos, const char **tag);
+
+/**
+ * @brief Free a module.
+ *
+ * @param[in]  modulesptr   Address of pointer to module - modules reference
+ *                         count is decremented\. If 0 the module structure 
+ *                         is freed.
+ *
+ * @return              A TOPIARY_ERROR value - 0 is success.
+ */
     int topiary_free(TOPIARY_MODULE_T **modulesptr);
 
-#define TOPIARY_FREE(b) topiary_free(&b)
+/**
+ * @brief Set attribute for one row of the module.
+ *
+ * @param[in]  module   Address of module.
+ *
+ * @param[in]  pos   Position - from 0 to nmodule-1.
+ *
+ * @param[in]  type Indicates which submodule to map to this row of the
+ *                  module.
+ *
+ * @param[in]  optional Address of optional structure.
+ *
+ * @return              A TOPIARY_ERROR value - 0 is success.
+ *
+ * @see topiary_module_type_t
+ */
+    int topiary_set(TOPIARY_MODULE_T *module, size_t pos,
+                    TOPIARY_MODULE_TYPE_T type, TOPIARY_OPT_T *optional);
+/**
+ * @brief Set tag for one row of the module.
+ *
+ * @param[in]  module   Address of module.
+ *
+ * @param[in]  pos   Position - from 0 to nmodule-1.
+ *
+ * @param[in]  tag Character string that tags row.
+ *
+ * @return              A TOPIARY_ERROR value - 0 is success.
+ */
+    int topiary_tag(TOPIARY_MODULE_T *module, size_t pos, const char **tag);
 
-    int topiary_read(TOPIARY_MODULE_T *modules);
+/**
+ * @brief Read data for all submodules.
+ *
+ * @param[in]  module   Address of module.
+ *
+ * @return              A TOPIARY_ERROR value - 0 is success.
+ */
+    int topiary_read(TOPIARY_MODULE_T *module);
 
-    int topiary_print(TOPIARY_MODULE_T *modules, int fd, TOPIARY_PRINT_T print);
+/**
+ * @brief Print data for all submodules from last read operation.
+ *
+ * @param[in]  module   Address of module.
+ *
+ * @param[in]  fd   File descriptor to output results.
+ *
+ * @param[in]  print   Output type - VANILLA or JSON.
+ *
+ * @return              A TOPIARY_ERROR value - 0 is success.
+ */
+    int topiary_print(TOPIARY_MODULE_T *module, int fd, TOPIARY_PRINT_T print);
 
-    int topiary_performance(TOPIARY_MODULE_T *modules,
+/**
+ * @brief Print performance.
+ *
+ * @param[in]  module   Address of module.
+ *
+ * @param[in]  rawread_time   Address of where to put time to read data
+ *
+ * @param[in]  map_time   Address of where to put time to map data to array.
+ *
+ * @param[in]  normalize_time   Address of where to put time to normalize 
+ *                              data i.e. convert to standard units and 
+ *                              calculate rates and usage.
+ *
+ * @param[in]  hash_time   Address of where to put time to create hash map.
+ *
+ * @return              A TOPIARY_ERROR value - 0 is success.
+ */
+    int topiary_performance(TOPIARY_MODULE_T *module,
                             long *rawread_time,
                             long *map_time,
                             long *normalize_time, long *hash_time);
 
+/**
+ * @brief Print memory consumption.
+ *
+ * @param[in]  module   Address of module.
+ *
+ * @param[in]  size   Address of where to put used RAM.
+ *
+ * @return              A TOPIARY_ERROR value - 0 is success.
+ */
+    int topiary_size(TOPIARY_MODULE_T *module, size_t * size );
+
+/**
+ * @brief Callback function type.
+ *
+ * Functions of this type are called for every data type read from the
+ * source when executing the topiary_iterate() function.
+ *
+ * @param[in]  mod  ?.
+ *
+ * @param[in]  key  Hash map key of data value.
+ *
+ * @param[in]  value Value of the data as a string.
+ *
+ * @param[in]  data  Optional data structure that is passed to the 
+ *                   callback function unmodified.
+ *
+ * @return              A TOPIARY_ERROR value - 0 is success.
+ */
     typedef int (*TOPIARY_INTERFACE_METHOD) (char *mod, char *key, char *value,
                                              void *data);
+
+/**
+ * @brief Iterate over all values from last read operation.
+ *
+ * @param[in]  modules   Address of module.
+ *
+ * @param[in]  func  Callback function.
+ *
+ * @param[in]  data  Optional data structure that is passed to the 
+ *                   callback function unmodified.
+ *
+ * @return              A TOPIARY_ERROR value - 0 is success.
+ */
     int topiary_iterate(TOPIARY_MODULE_T *modules,
                         TOPIARY_INTERFACE_METHOD func, void *data);
 
+/**
+ * @brief Fetch data value.
+ *
+ * @param[in]  modules   Address of module.
+ *
+ * @param[in]  type Indicates which submodule.
+ *
+ * @param[in]  key  Data hash key.
+ *
+ * @param[out]  value  Location to store value.
+ *
+ * @param[in]  value  Length of value buffer.
+ *
+ * @param[in]  pbuf  ?.
+ *
+ * @return              A TOPIARY_ERROR value - 0 is success.
+ */
     int topiary_fetch(TOPIARY_MODULE_T *modules, TOPIARY_MODULE_TYPE_T type,
                       char *key, char *value, size_t valuelen, char **pbuf);
+
+/* @} ******************************************************************/
 
 #ifdef __cplusplus
 }                               // extern "C"

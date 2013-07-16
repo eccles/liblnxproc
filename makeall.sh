@@ -32,6 +32,14 @@ do
     else 
         echo "Make '$d' SUCCESS"
     fi
+    make html >>${LOG}
+    if [ $? -ne 0 ]
+    then
+        echo "Make '$d' FAILED"
+        continue
+    else 
+        echo "Make '$d' SUCCESS"
+    fi
     make check >>${LOG}
     if [ $? -ne 0 ]
     then
