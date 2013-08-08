@@ -625,7 +625,7 @@ test_module(TOPIARY_MODULE_TYPE_T type, TOPIARY_OPT_T *opt)
                     printf("%s: Error '%s'\n", tag,
                            topiary_strerror(ret, errbuf, sizeof errbuf));
                 }
-                sleep(10);
+                //sleep(10);
             }
             topiary_print(modules, STDOUT_FILENO, TOPIARY_PRINT_JSON);
             topiary_print(modules, STDOUT_FILENO, TOPIARY_PRINT_ALL);
