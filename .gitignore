@@ -44,10 +44,10 @@ topiary-[0-9]*
 # generated Makefiles
 Makefile
 
-# separate build directories
+# VPATH build directories
 build
 debug
-perform
+gcov
 valgrind
 
 # autotools files

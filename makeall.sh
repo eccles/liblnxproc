@@ -1,8 +1,14 @@
 #!/bin/sh
 #
-#" makes all versions and test them
+# makes all versions and test them
+#
+# build - vanilla build
+# debug - vanilla build with DEBUG enabled
+# valgrind - check memory leakage
+# gcov - check test coverage analysis
+#
 BASE=`pwd`
-DIRS="build debug"
+DIRS="build debug valgrind gcov"
 if [ $# -gt 0 ]
 then
     DIRS=$1
@@ -13,10 +19,23 @@ do
     rm -rf $d
     mkdir $d
     cd $d
+    echo $d > buildname
     LOG=$d.log
-    MYCFLAGS=`cat ../cflags.$d`
-    echo "Process '$d' directory with CFLAGS '${MYCFLAGS}'"
-    ../configure CFLAGS="${MYCFLAGS}" >>${LOG}
+    if [ -s ../configure.$d ]
+    then
+        MYCFG=`cat ../configure.$d`
+    else
+        MYCFG=
+    fi
+    if [ -s ../cflags.$d ]
+    then
+        MYCFLAGS=`cat ../cflags.$d`
+        echo "Process '$d' directory with 'CFLAGS=\"${MYCFLAGS}\" ${MYCFG}'"
+        ../configure CFLAGS="${MYCFLAGS}" ${MYCFG} >>${LOG}
+    else
+        echo "Process '$d' directory with '${MYCFG}'"
+        ../configure ${MYCFG} >>${LOG}
+    fi
     if [ $? -ne 0 ]
     then
         echo "Configure '$d' FAILED"
@@ -35,10 +54,10 @@ do
     make html >>${LOG}
     if [ $? -ne 0 ]
     then
-        echo "Make '$d' FAILED"
+        echo "Make html '$d' FAILED"
         continue
     else 
-        echo "Make '$d' SUCCESS"
+        echo "Make html '$d' SUCCESS"
     fi
     make check >>${LOG}
     if [ $? -ne 0 ]
@@ -48,6 +67,6 @@ do
     else 
         echo "Make check '$d' SUCCESS"
     fi
-    rm -f ${LOG}
+#    rm -f ${LOG}
 done
 exit 0
