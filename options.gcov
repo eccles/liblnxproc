@@ -1,0 +1,3 @@
+MYCFLAGS="-DDEBUG=1 -g -Wall -Werror -fno-inline --coverage"
+MYCONFIGURE=--disable-shared
+

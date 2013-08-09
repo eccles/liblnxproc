@@ -1,1 +1,0 @@
--DDEBUG=1 -g -Wall -Werror -fno-inline --coverage

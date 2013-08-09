@@ -1,0 +1,3 @@
+MYCFLAGS="-g -O2 -Wall -Werror"
+MYCONFIGURE=
+
