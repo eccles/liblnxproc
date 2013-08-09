@@ -1,7 +1,6 @@
 
 In no particular order:
 
-    - modify print functions to optional fd with differing levels of detail
     - python interface
     - master task - uses curses to show values on terminal like top
     - slave task - samples module at given rate and outputs somewhere
@@ -9,7 +8,15 @@ In no particular order:
     - shared memory to monitor slave tasks
     - read from socket as well as a file
     - load individual modules on demand (ltdl)
-    - add support for gprof,gcov
-    - add support for valgrind
+    - add support for gcov
+    - split topiary.c into separate C source code files
+    - increase code coverage (gcov,lcov) to as close to 100% as possible
+    - read XML input such as from libvirt
+    - emit raw data to UDP socket
+    - add daemon task that reads and normalizes data read from UDP socket
+    - write data to store - such as Carpet or RRD or SQL or Riak...
+    - doxygen documentation for all code
+    - convert macros to inline functions
+    - all free type functions should have same signature and gcc attributes
 
 
