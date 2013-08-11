@@ -6,7 +6,7 @@ check-test.sh:
 	echo '$(srcdir)/test.sh $(srcdir) $(top_srcdir)' > check-test.sh
 	chmod +x check-test.sh
 
-CLEANFILES = check-test.sh testoutput *.gcda *.gcno *.gcov
+CLEANFILES = check-test.sh testoutput testoutput.diff *.gcda *.gcno *.gcov
 
 # vim: noexpandtab
 

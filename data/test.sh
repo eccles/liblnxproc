@@ -49,6 +49,7 @@ then
     then
         echo "Compare output to standard set"
         export TOPIARY_TESTROOT=${srcdir}
+#        ${BIN} test > testoutput
         ${BIN} test | grep -v '^Timestamp' | sort > testoutput
         diff testoutput ${srcdir}/testdata > testoutput.diff
     else
