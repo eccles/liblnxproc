@@ -23,6 +23,7 @@
    This class is **cached**. The file is only read **once**. Subsequent reads
    return the first value read
 
+   On later kernels (3.8?) this file does not exist
 '''
 */
 
@@ -53,6 +54,9 @@ _topiary_sys_cpufreq_new(_TOPIARY_BASE_T **base, TOPIARY_OPT_T *optional)
 
     char *filenames[] =
         { "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq", };
+/* later kernels - governor must be installed? 
+ *        { "/sys/devices/system/cpu/cpufreq/scaling_max_freq", };
+ */
     int ret = _topiary_base_new(base, "sys_cpufreq", _TOPIARY_BASE_TYPE_MEMOIZE,
                                 NULL,
                                 sys_cpufreq_normalize, NULL, 64, NULL);
