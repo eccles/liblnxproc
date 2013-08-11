@@ -1,7 +1,7 @@
 bin_PROGRAMS = topiary
 noinst_PROGRAMS = test-topiary
 
-topiary_SOURCES = topiary.c
+topiary_SOURCES = topiary.c testing.h testing.c
 topiary_CFLAGS = -I$(top_srcdir)/include
 topiary_LDADD = ../lib/libtopiary.la
 
@@ -18,7 +18,7 @@ install-exec-hook:
 	setcap cap_sys_ptrace=eip $(DESTDIR)/$(bindir)/topiary;\
 	fi; \
 	fi;
-	chmod 750 $(DESTDIR)$(bindir)/topiary
+	chmod 755 $(DESTDIR)$(bindir)/topiary
 
 # vim: noexpandtab
 

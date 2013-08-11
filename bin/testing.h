@@ -18,36 +18,15 @@
  *
  */
 
-#include <stdio.h>              // printf
-#include <string.h>             // strcmp
-#include <topiary/topiary.h>
+/* This file is a re-implementation of the 'list' type from Python
+ */
 
-#include "testing.h"
-/*----------------------------------------------------------------------------*/
-int
-main(int argc, char *argv[])
-{
+#ifndef TOPIARY_TESTING_PRIVATE_H
+#define TOPIARY_TESTING_PRIVATE_H 1
 
-    char *module = NULL;
+int testing(int mytesttype, char *module);
 
-    if (argc > 2) {
-        module = argv[2];
-    }
-
-    if (argc < 2) {
-        printf("First option is unspecified\n");
-        return 1;
-    }
-    else if (!strcmp(argv[1], "time")) {
-        testing(0,module);
-    }
-    else if (!strcmp(argv[1], "test")) {
-        testing(1,module);
-    }
-    else {
-        printf("Illegal option %s\n", argv[1]);
-        return 1;
-    }
-
-    return 0;
-}
+#endif                          // TOPIARY_TESTING_PRIVATE_H
+/*
+ * vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
+ */

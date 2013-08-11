@@ -74,7 +74,8 @@ test_topiary_DEPENDENCIES = ../lib/libtopiary.la
 test_topiary_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(test_topiary_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-am_topiary_OBJECTS = topiary-topiary.$(OBJEXT)
+am_topiary_OBJECTS = topiary-topiary.$(OBJEXT) \
+	topiary-testing.$(OBJEXT)
 topiary_OBJECTS = $(am_topiary_OBJECTS)
 topiary_DEPENDENCIES = ../lib/libtopiary.la
 topiary_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
@@ -217,7 +218,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-topiary_SOURCES = topiary.c
+topiary_SOURCES = topiary.c testing.h testing.c
 topiary_CFLAGS = -I$(top_srcdir)/include
 topiary_LDADD = ../lib/libtopiary.la
 test_topiary_SOURCES = test-topiary.c
@@ -326,6 +327,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_topiary-test-topiary.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/topiary-testing.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/topiary-topiary.Po@am__quote@
 
 .c.o:
@@ -376,6 +378,20 @@ topiary-topiary.obj: topiary.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='topiary.c' object='topiary-topiary.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(topiary_CFLAGS) $(CFLAGS) -c -o topiary-topiary.obj `if test -f 'topiary.c'; then $(CYGPATH_W) 'topiary.c'; else $(CYGPATH_W) '$(srcdir)/topiary.c'; fi`
+
+topiary-testing.o: testing.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(topiary_CFLAGS) $(CFLAGS) -MT topiary-testing.o -MD -MP -MF $(DEPDIR)/topiary-testing.Tpo -c -o topiary-testing.o `test -f 'testing.c' || echo '$(srcdir)/'`testing.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/topiary-testing.Tpo $(DEPDIR)/topiary-testing.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='testing.c' object='topiary-testing.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(topiary_CFLAGS) $(CFLAGS) -c -o topiary-testing.o `test -f 'testing.c' || echo '$(srcdir)/'`testing.c
+
+topiary-testing.obj: testing.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(topiary_CFLAGS) $(CFLAGS) -MT topiary-testing.obj -MD -MP -MF $(DEPDIR)/topiary-testing.Tpo -c -o topiary-testing.obj `if test -f 'testing.c'; then $(CYGPATH_W) 'testing.c'; else $(CYGPATH_W) '$(srcdir)/testing.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/topiary-testing.Tpo $(DEPDIR)/topiary-testing.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='testing.c' object='topiary-testing.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(topiary_CFLAGS) $(CFLAGS) -c -o topiary-testing.obj `if test -f 'testing.c'; then $(CYGPATH_W) 'testing.c'; else $(CYGPATH_W) '$(srcdir)/testing.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -601,7 +617,7 @@ install-exec-hook:
 	setcap cap_sys_ptrace=eip $(DESTDIR)/$(bindir)/topiary;\
 	fi; \
 	fi;
-	chmod 750 $(DESTDIR)$(bindir)/topiary
+	chmod 755 $(DESTDIR)$(bindir)/topiary
 
 # vim: noexpandtab
 
