@@ -20,9 +20,10 @@ doxyfile.stamp:
 CLEANFILES = doxyfile.stamp
 
 all-local: doxyfile.stamp
+
 clean-local:
-	rm -rf $(top_srcdir)/docs/html
-	rm -rf $(top_srcdir)/docs/latex
+	rm -rf html
+	rm -rf latex
 
 endif
 

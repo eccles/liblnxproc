@@ -401,9 +401,10 @@ uninstall-am:
 @HAVE_DOXYGEN_TRUE@	echo Timestamp > doxyfile.stamp
 
 @HAVE_DOXYGEN_TRUE@all-local: doxyfile.stamp
+
 @HAVE_DOXYGEN_TRUE@clean-local:
-@HAVE_DOXYGEN_TRUE@	rm -rf $(top_srcdir)/docs/html
-@HAVE_DOXYGEN_TRUE@	rm -rf $(top_srcdir)/docs/latex
+@HAVE_DOXYGEN_TRUE@	rm -rf html
+@HAVE_DOXYGEN_TRUE@	rm -rf latex
 
 # vim: noexpandtab
 
