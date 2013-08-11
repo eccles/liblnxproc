@@ -1,8 +1,8 @@
 topiary
 =======
 
-C library for accessing /proc and /sys filesystems (and other system files such as NTP drift)
-in modular fashion
+C library for accessing /proc and /sys filesystems (and other system files such
+as NTP drift) in modular fashion
 
 Installation
 ------------
@@ -25,9 +25,7 @@ Additionally VPATH builds are also available:
     ./makeall.sh debug (makes target with trace statements enabled)
     ./makeall.sh valgrind (makes target and checks for memory leaks etc. using valgrind)
     ./makeall.sh gcov (makes target and computes test coverage for all test routines)
-                    - if lcov is installed, point browser to gcov/coverage-{lib|bin}/index.html
+                if lcov is installed, point browser to gcov/coverage-{lib|bin}/index.html
 
-See files 'cflags.{build|debug|valgrind|gcov}' for the CFLAGS settings for each of these builds
-See files 'configure.{build|debug|valgrind|gcov}' for the configure options settings for each of these builds
-
+See files 'options.{build|debug|valgrind|gcov}' for the ettings for each of these builds
 
