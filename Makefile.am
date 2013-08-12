@@ -1,12 +1,15 @@
-SUBDIRS = data include lib bin man docs
+SUBDIRS = include lib bin data man docs
 ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = -Wall -Werror
 
 clean-local:
-	rm -rf $(top_srcdir)/build
-	rm -rf $(top_srcdir)/debug
-	rm -rf $(top_srcdir)/valgrind
-	rm -rf $(top_srcdir)/gcov
+	rm -rf build
+	rm -rf debug
+	rm -rf valgrind
+	rm -rf gcov
+	rm -rf lcov
+	rm -rf coverage*
+	rm -f *.info
 
 # vim: noexpandtab
 

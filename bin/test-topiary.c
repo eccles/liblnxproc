@@ -53,7 +53,7 @@ test_error(void)
     for (i = 0; i < TOPIARY_ERROR_SIZE; i++) {
         _TOPIARY_ERROR_DEBUG(i, "Test\n");
     }
-    _TOPIARY_ERROR_DEBUG(i, "Test\n");
+    //_TOPIARY_ERROR_DEBUG(i, "Test\n");
 }
 
 /*----------------------------------------------------------------------------*/

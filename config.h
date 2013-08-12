@@ -24,7 +24,7 @@
 #define HAVE_MEMORY_H 1
 
 /* Define to 1 if you have the `memset' function. */
-#define HAVE_MEMSET 1
+/* #undef HAVE_MEMSET */
 
 /* Define to 1 if the system has the type `ptrdiff_t'. */
 #define HAVE_PTRDIFF_T 1
@@ -46,10 +46,10 @@
 #define HAVE_STDLIB_H 1
 
 /* Define to 1 if you have the `strchr' function. */
-#define HAVE_STRCHR 1
+/* #undef HAVE_STRCHR */
 
 /* Define to 1 if you have the `strdup' function. */
-#define HAVE_STRDUP 1
+/* #undef HAVE_STRDUP */
 
 /* Define to 1 if you have the `strerror_r' function. */
 #define HAVE_STRERROR_R 1

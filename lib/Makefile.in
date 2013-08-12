@@ -183,12 +183,14 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GCOV = @GCOV@
 GREP = @GREP@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+LCOV = @LCOV@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
@@ -310,6 +312,15 @@ $(SYSHDRS) $(PRIVHDRS) $(PROCHDRS) $(FUNCHDRS)
 
 libtopiary_la_CFLAGS = -I$(top_srcdir)/include
 libtopiary_la_LDFLAGS = -release 0.0.1 -version-info 0:0:0
+
+#install-exec-hook:
+#	if test "$$USER" = "root"; then \
+#	groupadd -f topiary;\
+#	chgrp topiary $(DESTDIR)/$(libdir)/libtopiary;\
+#	fi;
+#	chmod 750 $(DESTDIR)$(libdir)/libtopiary
+#
+CLEANFILES = *.gcno *.gcda *.gcov libtopiary*
 all: all-am
 
 .SUFFIXES:
@@ -868,6 +879,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -964,13 +976,6 @@ uninstall-am: uninstall-libLTLIBRARIES
 	tags uninstall uninstall-am uninstall-libLTLIBRARIES
 
 
-#install-exec-hook:
-#	if test "$$USER" = "root"; then \
-#	groupadd -f topiary;\
-#	chgrp topiary $(DESTDIR)/$(libdir)/libtopiary;\
-#	fi;
-#	chmod 750 $(DESTDIR)$(libdir)/libtopiary
-#
 # vim: noexpandtab
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

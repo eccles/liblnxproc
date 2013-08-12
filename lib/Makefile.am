@@ -38,5 +38,7 @@ libtopiary_la_LDFLAGS = -release 0.0.1 -version-info 0:0:0
 #	fi;
 #	chmod 750 $(DESTDIR)$(libdir)/libtopiary
 #
+CLEANFILES = *.gcno *.gcda *.gcov libtopiary*
+
 # vim: noexpandtab
 

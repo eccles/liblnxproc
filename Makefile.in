@@ -156,12 +156,14 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GCOV = @GCOV@
 GREP = @GREP@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+LCOV = @LCOV@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
@@ -245,7 +247,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = data include lib bin man docs
+SUBDIRS = include lib bin data man docs
 ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = -Wall -Werror
 all: config.h
@@ -760,10 +762,13 @@ uninstall-am:
 
 
 clean-local:
-	rm -rf $(top_srcdir)/build
-	rm -rf $(top_srcdir)/debug
-	rm -rf $(top_srcdir)/valgrind
-	rm -rf $(top_srcdir)/gcov
+	rm -rf build
+	rm -rf debug
+	rm -rf valgrind
+	rm -rf gcov
+	rm -rf lcov
+	rm -rf coverage*
+	rm -f *.info
 
 # vim: noexpandtab
 

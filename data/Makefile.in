@@ -98,12 +98,14 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GCOV = @GCOV@
 GREP = @GREP@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+LCOV = @LCOV@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
@@ -187,10 +189,14 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+@HAVE_GCOV_FALSE@MYGCOV = 0
+@HAVE_GCOV_TRUE@MYGCOV = 1
+@HAVE_LCOV_FALSE@MYLCOV = 0
+@HAVE_LCOV_TRUE@MYLCOV = 1
 EXTRA_DIST = proc sys var testdata test.sh
 check_SCRIPTS = check-test.sh
 TESTS = check-test.sh
-CLEANFILES = check-test.sh testoutput testoutput.diff *.gcda *.gcno *.gcov
+CLEANFILES = check-test.sh testoutput testoutput.diff
 all: all-am
 
 .SUFFIXES:
@@ -479,7 +485,7 @@ uninstall-am:
 
 
 check-test.sh:
-	echo '$(srcdir)/test.sh $(srcdir) $(top_srcdir)' > check-test.sh
+	echo $(srcdir)/test.sh $(srcdir) $(top_srcdir) $(MYGCOV) $(MYLCOV) > check-test.sh
 	chmod +x check-test.sh
 
 # vim: noexpandtab
