@@ -191,20 +191,21 @@ _topiary_array_free(_TOPIARY_ARRAY_T **arrayptr)
 }
 
 #ifdef DEBUG
-#define DEBUG_IDX(iii,ddd) {\
-    char buf[32] = "";\
-    int i;\
-    int s = sizeof buf;\
-    char *c = buf;\
-    for( i=0; i < (ddd); i++ ) {\
-        int n = sizet2str((iii)[i],c, s);\
-        c += n;\
-        s -= n;\
-    }\
-    _TOPIARY_DEBUG("Idx %s Dim %zd\n", buf, (ddd));\
+static  inline void
+debug_idx(size_t idx[], size_t dim) {
+    char buf[32] = "";
+    int i;
+    int s = sizeof buf;
+    char *c = buf;
+    for( i=0; i < dim; i++ ) {
+        int n = sizet2str(idx[i],c, s);
+        c += n;
+        s -= n;
+    }
+    _TOPIARY_DEBUG("Idx %s Dim %zd\n", buf, dim);
 }
 #else
-#define DEBUG_IDX(iii,ddd)
+#define debug_idx(iii,ddd)
 #endif
 
 int
@@ -212,7 +213,7 @@ _topiary_array_set(_TOPIARY_ARRAY_T *array, size_t idx[], size_t dim, char *val)
 {
 #ifdef DEBUG
     _TOPIARY_DEBUG("Array %p\n", array);
-    DEBUG_IDX(idx, dim);
+    debug_idx(idx, dim);
     _TOPIARY_DEBUG("Val %p\n", val);
 #endif
 
@@ -284,7 +285,7 @@ _topiary_array_set_last(_TOPIARY_ARRAY_T *array, size_t idx[], size_t dim,
 {
 #ifdef DEBUG
     _TOPIARY_DEBUG("Array %p\n", array);
-    DEBUG_IDX(idx, dim);
+    debug_idx(idx, dim);
     _TOPIARY_DEBUG("Val %p\n", val);
 #endif
 
@@ -371,7 +372,7 @@ _topiary_array_get(_TOPIARY_ARRAY_T *array, size_t idx[], size_t dim,
 {
 #ifdef DEBUG
     _TOPIARY_DEBUG("Array %p\n", array);
-    DEBUG_IDX(idx, dim);
+    debug_idx(idx, dim);
 #endif
 
     if (!array) {
@@ -475,7 +476,7 @@ array_vector_iterate_func(_TOPIARY_VECTOR_T *vector, int idx, int depth,
 
 #ifdef DEBUG
     _TOPIARY_DEBUG("Adata: Data %p\n", adata->data);
-    DEBUG_IDX(aidx, adim);
+    debug_idx(aidx, adim);
 #endif
 
     int ret = TOPIARY_OK;
@@ -559,7 +560,7 @@ array_print_internal(char *val, void *data, size_t idx[], size_t dim)
 {
 #ifdef DEBUG
     _TOPIARY_DEBUG("Val %p '%s' Data %p\n", val, val, data);
-    DEBUG_IDX(idx, dim);
+    debug_idx(idx, dim);
 #endif
     int i;
 
