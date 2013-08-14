@@ -523,6 +523,25 @@ interface_func(char *mod, char *key, char *value, void *data)
 }
 
 static void
+test_performance( TOPIARY_MODULE_T *modules)
+{
+    if( modules ) {
+
+        long rawread_time;
+        long map_time;
+        long normalize_time;
+        long hash_time;
+
+        topiary_performance(modules, &rawread_time, &map_time,
+                                    &normalize_time, &hash_time);
+
+        size_t size;
+        topiary_size(modules, &size);
+
+    }
+}
+
+static void
 test_all(void)
 {
     TOPIARY_MODULE_T *modules = NULL;
@@ -545,6 +564,7 @@ test_all(void)
                       sizeof buf, &pbuf);
     printf("PROC_CGROUPS key '%s' value '%s' Error '%s'\n", "/cpuset/hierarchy",
            pbuf, topiary_strerror(ret, errbuf, sizeof errbuf));
+    test_performance(modules);
     topiary_print(modules, STDOUT_FILENO, TOPIARY_PRINT_ALL);
     topiary_print(modules, STDOUT_FILENO, TOPIARY_PRINT_JSON);
     topiary_iterate(modules, interface_func, "All");
@@ -563,6 +583,7 @@ test_faulty(void)
     topiary_read(modules);
     topiary_read(modules);
     topiary_read(modules);
+    test_performance(modules);
     topiary_print(modules, STDOUT_FILENO, TOPIARY_PRINT_ALL);
     topiary_print(modules, STDOUT_FILENO, TOPIARY_PRINT_JSON);
     topiary_free(&modules);
@@ -588,6 +609,7 @@ test_interface(void)
     topiary_read(modules);
     topiary_read(modules);
     topiary_read(modules);
+    test_performance(modules);
     topiary_print(modules, STDOUT_FILENO, TOPIARY_PRINT_ALL);
     topiary_print(modules, STDOUT_FILENO, TOPIARY_PRINT_JSON);
     topiary_iterate(modules, interface_func, "PID_STAT");
@@ -602,6 +624,7 @@ test_interface(void)
     topiary_read(modules);
     topiary_read(modules);
     topiary_read(modules);
+    test_performance(modules);
     topiary_print(modules, STDOUT_FILENO, TOPIARY_PRINT_ALL);
     topiary_print(modules, STDOUT_FILENO, TOPIARY_PRINT_JSON);
     topiary_iterate(modules, interface_func, "PID_STAT");
@@ -616,6 +639,7 @@ test_interface(void)
     topiary_read(modules);
     topiary_read(modules);
     topiary_read(modules);
+    test_performance(modules);
     topiary_print(modules, STDOUT_FILENO, TOPIARY_PRINT_ALL);
     topiary_print(modules, STDOUT_FILENO, TOPIARY_PRINT_JSON);
     topiary_iterate(modules, interface_func, "SYS_DISKSECTORS");
