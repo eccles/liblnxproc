@@ -90,6 +90,24 @@ test_standard_test() {
     fi
 }
 #----------------------------------------------------------------------------
+#test_standard_data_test() {
+#    local BIN=../bin/test-topiary
+#    if [ -s ${BIN} ]
+#    then
+#        echo "Test standard data (${BIN} srcdir=${srcdir})"
+#        TOPIARY_TESTROOT=${srcdir}
+#        export TOPIARY_TESTROOT
+#        libtool --mode=execute ${BIN} >/dev/null
+#        if [ $? -ne 0 ]
+#        then
+#            echo "${BIN} failure"
+#            exit 1
+#        fi
+#    else
+#        echo "Unable to test standard data set - ${BIN} unavailable"
+#    fi
+#}
+#----------------------------------------------------------------------------
 test_valgrind() {
     if which valgrind >/dev/null 2>&1
     then
@@ -212,6 +230,7 @@ then
     if [ ${DEBUG} -eq 0 ]
     then
         test_standard_test
+#        test_standard_data_test
     else
         test_standard_data
     fi
