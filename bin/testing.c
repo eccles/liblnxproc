@@ -257,6 +257,9 @@ testing(int mytesttype, char *module)
         test_glob_module(TOPIARY_SYS_DISKSECTORS, "sd*");
 
     }
+    else if (!strcmp(module, "all")) {
+        test_all();
+    }
     else if (!strcmp(module, "ntp_drift")) {
         test_module(TOPIARY_NTP_DRIFT);
     }
