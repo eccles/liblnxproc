@@ -8,7 +8,7 @@
 # gcov - check test coverage analysis
 #
 BASE=`pwd`
-DIRS="build debug valgrind gcov"
+DIRS="build debug valgrind gcov lcov"
 if [ $# -gt 0 ]
 then
     DIRS=$1
@@ -24,7 +24,6 @@ do
     rm -rf $d
     mkdir $d
     cd $d
-    echo $d > buildname
     if [ ! -s ../options.$d ]
     then
         log "No options file ../options.$d"
@@ -35,7 +34,7 @@ do
     ../configure CFLAGS="${MYCFLAGS}" ${MYCONFIGURE} >configure.log 2>&1
     if [ $? -ne 0 ]
     then
-        log "Configure '$d' FAILED - see ${BUILDNAME}/configure.log for details"
+        log "Configure '$d' FAILED - see ${d}/configure.log for details"
         continue
     else 
         log "Configure '$d' SUCCESS"
@@ -44,25 +43,16 @@ do
     make >make.log 2>&1
     if [ $? -ne 0 ]
     then
-        log "Make '$d' FAILED - see ${BUILDNAME}/make.log for details"
+        log "Make '$d' FAILED - see ${d}/make.log for details"
         continue
     else 
         log "Make '$d' SUCCESS"
-    fi
-    log "Make html STARTED"
-    make html >html.log 2>&1
-    if [ $? -ne 0 ]
-    then
-        log "Make html '$d' FAILED - see ${BUILDNAME}/html.log for details"
-        continue
-    else 
-        log "Make html '$d' SUCCESS"
     fi
     log "Make check STARTED"
     make check >check.log 2>&1
     if [ $? -ne 0 ]
     then
-        log "Make check '$d' FAILED - see ${BUILDNAME}/check.log for details"
+        log "Make check '$d' FAILED - see ${d}/check.log for details"
         continue
     else 
         log "Make check '$d' SUCCESS"

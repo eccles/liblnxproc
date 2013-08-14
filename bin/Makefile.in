@@ -70,14 +70,14 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 am_test_topiary_OBJECTS = test_topiary-test-topiary.$(OBJEXT)
 test_topiary_OBJECTS = $(am_test_topiary_OBJECTS)
-test_topiary_DEPENDENCIES = $(top_srcdir)/lib/libtopiary.la
+test_topiary_DEPENDENCIES = ../lib/libtopiary.la
 test_topiary_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(test_topiary_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am_topiary_OBJECTS = topiary-topiary.$(OBJEXT) \
 	topiary-testing.$(OBJEXT)
 topiary_OBJECTS = $(am_topiary_OBJECTS)
-topiary_DEPENDENCIES = $(top_srcdir)/lib/libtopiary.la
+topiary_DEPENDENCIES = ../lib/libtopiary.la
 topiary_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(topiary_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
@@ -167,6 +167,7 @@ SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+VALGRIND = @VALGRIND@
 VERSION = @VERSION@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
@@ -222,10 +223,10 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 topiary_SOURCES = topiary.c testing.h testing.c
 topiary_CFLAGS = -I$(top_srcdir)/include
-topiary_LDADD = $(top_srcdir)/lib/libtopiary.la
+topiary_LDADD = ../lib/libtopiary.la
 test_topiary_SOURCES = test-topiary.c
 test_topiary_CFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/lib
-test_topiary_LDADD = $(top_srcdir)/lib/libtopiary.la
+test_topiary_LDADD = ../lib/libtopiary.la
 CLEANFILES = test_* *.gcno *.gcda *.gcov 
 all: all-am
 

@@ -136,6 +136,7 @@ SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+VALGRIND = @VALGRIND@
 VERSION = @VERSION@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
@@ -193,10 +194,12 @@ top_srcdir = @top_srcdir@
 @HAVE_GCOV_TRUE@MYGCOV = 1
 @HAVE_LCOV_FALSE@MYLCOV = 0
 @HAVE_LCOV_TRUE@MYLCOV = 1
+@HAVE_VALGRIND_FALSE@MYVALGRIND = 0
+@HAVE_VALGRIND_TRUE@MYVALGRIND = 1
 EXTRA_DIST = proc sys var testdata test.sh
 check_SCRIPTS = check-test.sh
 TESTS = check-test.sh
-CLEANFILES = check-test.sh testoutput testoutput.diff
+CLEANFILES = check-test.sh testoutput testoutput.diff core*
 all: all-am
 
 .SUFFIXES:
@@ -485,7 +488,7 @@ uninstall-am:
 
 
 check-test.sh:
-	echo $(srcdir)/test.sh $(srcdir) $(top_srcdir) $(MYGCOV) $(MYLCOV) > check-test.sh
+	echo $(srcdir)/test.sh $(srcdir) $(top_srcdir) $(MYGCOV) $(MYLCOV) $(MYVALGRIND) "\"${CFLAGS}\"" > check-test.sh
 	chmod +x check-test.sh
 
 # vim: noexpandtab

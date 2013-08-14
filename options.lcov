@@ -1,0 +1,3 @@
+MYCFLAGS="-DDEBUG=1 -g -Wall -Werror"
+MYCONFIGURE="--enable-lcov --disable-shared"
+

@@ -97,7 +97,31 @@ if test "x${enable_gcov}" = "xyes" || test "x${enable_lcov}" = "xyes"; then
     CFLAGS="${CFLAGS} -fno-inline --coverage"
 fi
 
+# 4. valgrind support
 #
+
+AC_ARG_ENABLE([valgrind],
+    AS_HELP_STRING([--enable-valgrind],
+        [use valgrind to test the test suite (requires --disable-shared)]),
+        [enable_valgrind="yes"],
+        [enable_valgrind=no])
+
+if test "x$enable_valgrind" = "xyes"; then
+    AC_CHECK_PROGS([VALGRIND], [valgrind])
+    if test -z "$VALGRIND"; then
+        AC_MSG_WARN([Valgrind not found - continuing without Valgrind support])
+        enable_valgrind=no
+    fi
+fi
+
+if test "x$enable_valgrind" = "xyes"; then
+    if test "x$enable_shared" = "xyes"; then
+        AC_MSG_WARN([Valgrind requires disable-shared - continuing without Valgrind support])
+        enable_valgrind=no
+    fi
+fi
+AM_CONDITIONAL([HAVE_VALGRIND], test "$enable_valgrind" = "yes")
+
 # Checks for library functions.
 AC_FUNC_REALLOC
 AC_FUNC_STRERROR_R
@@ -120,6 +144,7 @@ Prefix: '${prefix}'
 Compiler: '${CC} ${CFLAGS}'
 Gcov enabled : '${enable_gcov}'
 Lcov enabled : '${enable_lcov}'
+Valgrind enabled : '${enable_valgrind}'
 Enable shared library : '${enable_shared}'
 
 Now type 'make @<:@<target>@:>@'
