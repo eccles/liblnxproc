@@ -523,11 +523,9 @@ interface_func(char *mod, char *key, char *value, void *data)
 }
 
 static void
-test_interface(void)
+test_all(void)
 {
-
     TOPIARY_MODULE_T *modules = NULL;
-    TOPIARY_OPT_T *opt = NULL;
 
     char errbuf[64];
     char buf[32];
@@ -551,6 +549,34 @@ test_interface(void)
     topiary_print(modules, STDOUT_FILENO, TOPIARY_PRINT_JSON);
     topiary_iterate(modules, interface_func, "All");
     topiary_free(&modules);
+
+}
+
+static void
+test_faulty(void)
+{
+    TOPIARY_MODULE_T *modules = NULL;
+
+    topiary_new(&modules, 2);
+    topiary_set(modules, 0, TOPIARY_SYS_CPUFREQ, NULL);
+    topiary_set(modules, 1, TOPIARY_PROC_NET_SNMP, NULL);
+    topiary_read(modules);
+    topiary_read(modules);
+    topiary_read(modules);
+    topiary_print(modules, STDOUT_FILENO, TOPIARY_PRINT_ALL);
+    topiary_print(modules, STDOUT_FILENO, TOPIARY_PRINT_JSON);
+    topiary_free(&modules);
+
+}
+
+static void
+test_interface(void)
+{
+
+    TOPIARY_MODULE_T *modules = NULL;
+    TOPIARY_OPT_T *opt = NULL;
+
+    test_all();
 
     topiary_opt_new(&opt);
     topiary_opt_set_fileglob(opt, pid);
@@ -752,6 +778,12 @@ main(int argc, char *argv[])
     }
     else if (!strcmp(argv[1], "array")) {
         test_array();
+    }
+    else if (!strcmp(argv[1], "faulty")) {
+        test_faulty();
+    }
+    else if (!strcmp(argv[1], "all")) {
+        test_all();
     }
     else if (!strcmp(argv[1], "interface")) {
         test_interface();
