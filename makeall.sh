@@ -8,7 +8,7 @@
 # gcov - check test coverage analysis
 #
 BASE=`pwd`
-DIRS="build debug valgrind gcov lcov"
+DIRS="build debug gcov lcov valgrind"
 if [ $# -gt 0 ]
 then
     DIRS=$1
