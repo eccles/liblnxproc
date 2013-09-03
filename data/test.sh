@@ -18,10 +18,10 @@ DEBUG=$?
 echo "DEBUG=${DEBUG}"
 LD_LIBRARY_PATH=../lib
 export LD_LIBRARY_PATH
-#----------------------------------------------------------------------------
-# lots of fiddling here as gcov does not seem to handle autotools library builds 
-# well. The source files are hardlinked into the build directory with the automake
-# prefix added to correspond to the gcno files.
+#-------------------------------------------------------------------------------
+# lots of fiddling here as gcov does not seem to handle autotools library builds
+# well. The source files are hardlinked into the build directory with the 
+# automake prefix added to correspond to the gcno files.
 #
 LISTFILES=
 process_source_files() {
@@ -52,7 +52,7 @@ cleanup_source_files() {
     cd -
     LISTFILES=
 }
-#----------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 test_standard_data() {
     local BIN=../bin/topiary
     if [ -s ${BIN} ]
@@ -71,7 +71,7 @@ test_standard_data() {
         echo "Unable to compare output to standard set - ${BIN} unavailable"
     fi
 }
-#----------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 test_standard_test() {
     local BIN=../bin/test-topiary
     if [ -s ${BIN} ]
@@ -89,7 +89,7 @@ test_standard_test() {
         echo "Unable to test standard set - ${BIN} unavailable"
     fi
 }
-#----------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 #test_standard_data_test() {
 #    local BIN=../bin/test-topiary
 #    if [ -s ${BIN} ]
@@ -107,7 +107,7 @@ test_standard_test() {
 #        echo "Unable to test standard data set - ${BIN} unavailable"
 #    fi
 #}
-#----------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 test_valgrind() {
     if which valgrind >/dev/null 2>&1
     then
@@ -131,7 +131,7 @@ test_valgrind() {
         echo "Unable to test memory leakage - valgrind unavailable"
     fi
 }
-#----------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 test_gcov() {
     if which gcov >/dev/null 2>&1
     then
@@ -168,7 +168,7 @@ test_gcov() {
         echo "Unable to test coverage - gcov unavailable"
     fi
 }
-#----------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 test_lcov() {
     if which lcov >/dev/null 2>&1
     then
@@ -207,7 +207,7 @@ test_lcov() {
         echo "Unable to test coverage - lcov unavailable"
     fi
 }
-#----------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 ulimit -c unlimited
 state=0
 if [ ${HAVE_LCOV} -eq 1 ]
