@@ -9,7 +9,17 @@ Installation
 
 The standard installation targets are available viz:
 
+Configuration:
+
     ./configure
+    ./configure --enable-valgrind # use valgrind to find memory leaks
+    ./configure --enable-gcov     # use gcov to compute test coverage
+    ./configure --enable-lcov     # use lcov to generate webpage showing test
+                                  # coverage
+
+    Add "-DDEBUG=1" to CFLAGS to add tracing statements (not for production...)
+    NB - see script data/test.sh for test coverage execution
+
     make
     make check
     make dist
@@ -27,14 +37,19 @@ Additionally VPATH builds are also available:
 
     ./makeall.sh debug (makes target with trace statements enabled)
 
-    ./makeall.sh valgrind (makes target and checks for memory leaks etc. using valgrind)
-                if valgrind is installed, inspect file valgrind/check.log
+    ./makeall.sh valgrind (makes target and checks for memory leaks etc. using
+                 valgrind)
+                 if valgrind is installed, inspect file valgrind/check.log
 
-    ./makeall.sh gcov (makes target and computes test coverage for all test routines)
-                if gcov is installed, inspect file gcov/check.log
+    ./makeall.sh gcov (makes target and computes test coverage for all test
+                 routines)
+                 if gcov is installed, inspect file gcov/check.log
 
-    ./makeall.sh lcov (makes target and computes test coverage for all test routines)
-                if lcov is installed, point browser to lcov/coverage-{lib|bin}/index.html
+    ./makeall.sh lcov (makes target and computes test coverage for all test 
+                 routines)
+                 if lcov is installed, point browser to 
+                 lcov/coverage-{lib|bin}/index.html
 
-See files 'options.{build|debug|valgrind|gcov|lcov}' for the settings for each of these builds
+See files 'options.{build|debug|valgrind|gcov|lcov}' for the settings for each
+of these builds
 
